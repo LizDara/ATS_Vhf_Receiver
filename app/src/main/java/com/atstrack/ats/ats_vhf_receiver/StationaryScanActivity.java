@@ -3,7 +3,6 @@ package com.atstrack.ats.ats_vhf_receiver;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,11 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +29,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -46,11 +48,11 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.ready_stationary_scan_LinearLayout)
     LinearLayout ready_stationary_scan_LinearLayout;
@@ -60,24 +62,32 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView scan_rate_stationary_textView;
     @BindView(R.id.selected_frequency_stationary_textView)
     TextView selected_frequency_stationary_textView;
+    @BindView(R.id.store_rateC_stationary_textView)
+    TextView store_rateC_stationary_textView;
+    @BindView(R.id.external_data_transfer_stationary_textView)
+    TextView external_data_transfer_stationary_textView;
     @BindView(R.id.number_antennas_stationary_textView)
     TextView number_antennas_stationary_textView;
     @BindView(R.id.timeout_stationary_textView)
     TextView timeout_stationary_textView;
-    @BindView(R.id.gps_stationary_textView)
-    TextView gps_stationary_textView;
-    @BindView(R.id.auto_record_stationary_textView)
-    TextView auto_record_stationary_textView;
-    @BindView(R.id.edit_stationary_defaults_textView)
+    @BindView(R.id.edit_stationary_settings_button)
     TextView edit_stationary_defaults_textView;
     @BindView(R.id.frequency_empty_textView)
     TextView frequency_empty_textView;
     @BindView(R.id.start_stationary_button)
     Button start_stationary_button;
-    @BindView(R.id.stationary_result_constraintLayout)
-    ConstraintLayout stationary_result_constraintLayout;
-    @BindView(R.id.table_freq_stationary)
-    TextView table_freq;
+    @BindView(R.id.stationary_result_linearLayout)
+    LinearLayout stationary_result_linearLayout;
+    @BindView(R.id.table_stationary_textView)
+    TextView table_stationary_textView;
+    @BindView(R.id.frequency_stationary_textView)
+    TextView frequency_stationary_textView;
+    @BindView(R.id.scan_rateD_stationary_textView)
+    TextView scan_rateD_stationary_textView;
+    @BindView(R.id.timeoutD_stationary_textView)
+    TextView timeoutD_stationary_textView;
+    @BindView(R.id.current_antenna_stationary_textView)
+    TextView current_antenna_stationary_textView;
     @BindView(R.id.first_result_stationary_textView)
     TextView firstResultTextView;
     @BindView(R.id.second_result_stationary_textView)
@@ -86,43 +96,43 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView thirdResultTextView;
     @BindView(R.id.forth_result_stationary_textView)
     TextView forthResultTextView;
-    @BindView(R.id.fifth_result_stationary_textView)
-    TextView fifthResultTextView;
-    @BindView(R.id.sixth_result_stationary_textView)
-    TextView sixthResultTextView;
-    @BindView(R.id.seventh_result_stationary_textView)
-    TextView seventhResultTextView;
-    @BindView(R.id.eighth_result_stationary_textView)
-    TextView eighthResultTextView;
-    @BindView(R.id.ninth_result_stationary_textView)
-    TextView ninthResultTextView;
-    @BindView(R.id.tenth_result_stationary_textView)
-    TextView tenthResultTextView;
 
     private final static String TAG = StationaryScanActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private final int MESSAGE_PERIOD = 3000;
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
     private boolean response = true;
 
     private boolean scanning;
     private String currentData;
-    private int selectedFrequency;
+
+    private AnimationDrawable animationDrawable;
+
+    private int selectedTable;
     private int numberAntennas;
-    private int scanRate;
+    private int matches;
+    private int txType;
+    private int scanTime;
     private int timeout;
-    private int gps;
-    private int autoRecord;
-    private String year;
-    private String month;
+    private int storeTime;
+    private int year;
+    private int month;
+    private int day;
+    private int hour;
+    private int minute;
+    private int seconds;
+    private int referenceFrequency;
+    private int referenceFrequencyStoreRate;
+    private int externalDataPush;
+    private int pr1;
+    private int pr1_tolerance;
+    private int pr2;
+    private int pr2_tolerance;
+    private int pr3;
+    private int pr3_tolerance;
+    private int pr4;
+    private int pr4_tolerance;
     private boolean mortality;
 
     // Code to manage Service lifecycle.
@@ -136,7 +146,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -163,7 +173,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-//                    state = false;
+                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     switch (parameter) {
@@ -216,9 +226,9 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Characteristic name: Stationary.
      */
     private void onClickStationary() {
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("6dd91f4d-b30b-46c4-b111-dd49cd1f952e");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice, uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     /**
@@ -236,15 +246,14 @@ public class StationaryScanActivity extends AppCompatActivity {
         int hh = currentDate.get(Calendar.HOUR_OF_DAY);
         int mm =  currentDate.get(Calendar.MINUTE);
         int ss = currentDate.get(Calendar.SECOND);
-        int ms = currentDate.get(Calendar.MILLISECOND);
+        year = YY % 100;
 
         byte[] b = new byte[]{
-                (byte) 0x83, (byte) selectedFrequency, (byte) numberAntennas, (byte) scanRate, (byte) timeout, (byte) gps, (byte) autoRecord,
-                (byte) 0xff, (byte) 0x7f, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) (ms / 100), (byte) (ms % 100)};
+                (byte) 0x83, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable};
 
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("6dd91f4d-b30b-46c4-b111-dd49cd1f952e");
-        mBluetoothLeService.writeCharacteristic( uservice,uservicechar,b, true);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
 
         scanning = true;
     }
@@ -255,9 +264,9 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Characteristic name: SendLog.
      */
     private void onClickLog() {
-        UUID uservice=UUID.fromString("26da3d0d-9119-48bb-af48-b0b96c665a66");
-        UUID uservicechar=UUID.fromString("7052b8df-95f9-4ba3-8324-0d8ff9232435");
-        mBluetoothLeService.setCharacteristicNotificationRead(uservice, uservicechar, true);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
+        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
     /**
@@ -267,48 +276,47 @@ public class StationaryScanActivity extends AppCompatActivity {
      */
     private void onClickStop() {
         parameter = "stationary";
-        byte[] b = new byte[]{(byte)0x87};
+        byte[] b = new byte[]{(byte) 0x87};
 
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("6dd91f4d-b30b-46c4-b111-dd49cd1f952e");
-        mBluetoothLeService.writeCharacteristic(uservice, uservicechar, b, false);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
 
-        scanning =false;
-        getSupportActionBar().show();
-        state_view.setVisibility(View.VISIBLE);
+        scanning = false;
+        animationDrawable.stop();
+        state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
         clear();
-        stationary_result_constraintLayout.setVisibility(View.GONE);
+        stationary_result_linearLayout.setVisibility(View.GONE);
         ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
+        title_toolbar.setText(R.string.stationary_scanning);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
-        new Handler().postDelayed(() -> {
-            onRestartConnection();
-        }, 500);
+        mBluetoothLeService.discovering();
     }
 
-    @OnClick(R.id.edit_stationary_defaults_textView)
-    public void onClickEditDefaults(View v) {
+    @OnClick(R.id.edit_stationary_settings_button)
+    public void onClickEditStationarySettings(View v) {
         Intent intent = new Intent(this, StationaryDefaultsActivity.class);
-        intent.putExtra(StationaryDefaultsActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(StationaryDefaultsActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(StationaryDefaultsActivity.EXTRAS_BATTERY, mPercentBattery);
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @OnClick(R.id.start_stationary_button)
     public void onClickStartStationary(View v) {
         parameter = "startStationary";
-        mBluetoothLeService.connect(mDeviceAddress);
-        getSupportActionBar().hide();
-        state_view.setVisibility(View.GONE);
+        mBluetoothLeService.discovering();
+        title_toolbar.setText(R.string.lb_stationary_scanning);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
-        stationary_result_constraintLayout.setVisibility(View.VISIBLE);
+        stationary_result_linearLayout.setVisibility(View.VISIBLE);
+        state_view.setBackgroundResource(R.drawable.scanning_animation);
+        animationDrawable = (AnimationDrawable) state_view.getBackground();
+        animationDrawable.start();
     }
 
-    @OnClick(R.id.stationary_exit_image)
-    public void onClickExit(View  v) {
+    @OnClick(R.id.stop_scanning_stationary_button)
+    public void onClickStopScanning(View v) {
         parameter = "stopStationary";
-        onRestartConnection();
+        mBluetoothLeService.discovering();
     }
 
     @Override
@@ -319,7 +327,7 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Stationary Scanning");
+        title_toolbar.setText(R.string.stationary_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -328,27 +336,35 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         // Get device data from previous activity
         final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
         scanning = intent.getExtras().getBoolean("scanning");
+        receiverInformation = ReceiverInformation.getReceiverInformation();
+
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         mortality = false;
 
         if (scanning) { // The device is already scanning
             parameter = "sendLog";
-            year = intent.getExtras().getString("year");
-            month = intent.getExtras().getString("month");
-            getSupportActionBar().hide();
+            year = intent.getExtras().getInt("year");
+            month = intent.getExtras().getInt("month");
+            day = intent.getExtras().getInt("day");
+            hour = intent.getExtras().getInt("hour");
+            minute = intent.getExtras().getInt("minute");
+            seconds = intent.getExtras().getInt("seconds");
+
             ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
-            stationary_result_constraintLayout.setVisibility(View.VISIBLE);
+            stationary_result_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.lb_stationary_scanning);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+
+            state_view.setBackgroundResource(R.drawable.scanning_animation);
+            animationDrawable = (AnimationDrawable) state_view.getBackground();
+            animationDrawable.start();
         } else { // Gets aerial defaults data
             parameter = "stationary";
         }
-
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -356,20 +372,19 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                Intent intent = new Intent(this, StartScanningActivity.class);
-                intent.putExtra(AerialScanActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-                intent.putExtra(AerialScanActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-                intent.putExtra(AerialScanActivity.EXTRAS_BATTERY, mPercentBattery);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            if (!scanning) {
+                Intent intent = new Intent(this, StationaryScanningActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                mBluetoothLeService.disconnect();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            } else {
+                parameter = "stopStationary";
+                mBluetoothLeService.discovering();
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -381,7 +396,7 @@ public class StationaryScanActivity extends AppCompatActivity {
             builder.setMessage("Are you sure you want to stop scanning?");
             builder.setPositiveButton("OK", (dialog, which) -> {
                 parameter = "stopStationary";
-                onRestartConnection();
+                mBluetoothLeService.discovering();
             });
             builder.setNegativeButton("Cancel", null);
             AlertDialog dialog = builder.create();
@@ -395,7 +410,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -427,13 +442,15 @@ public class StationaryScanActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
 
         View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -447,40 +464,37 @@ public class StationaryScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        mBluetoothLeService.disconnect();
         if (!response) {
             showMessage(new byte[]{0});
             response = true;
         }
-        parameter = "stationary";
-        if (Converters.getHexValue(data[0]).equals("7C")) {
-            if (Integer.parseInt(Converters.getDecimalValue(data[1])) == 0) { // There are no tables with frequencies to scan
-                selected_frequency_stationary_textView.setText("None");
-                ready_stationary_textView.setText("Not Ready to Scan");
+        if (data.length == 1) {
+            parameter = "stationary";
+            mBluetoothLeService.discovering();
+        }
+        if (Converters.getHexValue(data[0]).equals("6C")) {
+            int frequencyTable = Integer.parseInt(Converters.getDecimalValue(data[1])) / 16;
+            selectedTable = frequencyTable;
+            if (frequencyTable == 0) { // There are no tables with frequencies to scan
+                selected_frequency_stationary_textView.setText(R.string.lb_none);
                 frequency_empty_textView.setVisibility(View.VISIBLE);
                 start_stationary_button.setEnabled(false);
-                start_stationary_button.setBackgroundResource(R.color.slate_gray);
-                start_stationary_button.setTextColor(ContextCompat.getColor(this, R.color.ghost));
+                start_stationary_button.setAlpha((float) 0.6);
             } else { // Shows the table to be scanned
-                selected_frequency_stationary_textView.setText(Converters.getDecimalValue(data[1]));
-                ready_stationary_textView.setText("Ready to Scan");
+                selected_frequency_stationary_textView.setText(String.valueOf(frequencyTable));
                 frequency_empty_textView.setVisibility(View.GONE);
                 start_stationary_button.setEnabled(true);
-                start_stationary_button.setBackgroundResource(R.color.mountain_meadow);
-                start_stationary_button.setTextColor(ContextCompat.getColor(this, R.color.white));
+                start_stationary_button.setAlpha((float) 1);
             }
-            selected_frequency_stationary_textView.setText(Converters.getDecimalValue(data[1]));
-            selectedFrequency = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[2])) & 15;
-            number_antennas_stationary_textView.setText("" + numberAntennas);
+            number_antennas_stationary_textView.setText((numberAntennas == 0) ? "None" : String.valueOf(numberAntennas));
             scan_rate_stationary_textView.setText(Converters.getDecimalValue(data[3]));
-            scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
             timeout_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
-            gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-            gps_stationary_textView.setText((gps == 1) ? "ON" : "OFF");
-            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-            auto_record_stationary_textView.setText((autoRecord == 1) ? "ON" : "OFF");
+            if (Converters.getHexValue(data[5]).equals("FF")) {
+                store_rateC_stationary_textView.setText("Continuous Store");
+            } else {
+                store_rateC_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No store rate" :
+                        Converters.getDecimalValue(data[5]));
+            }
         }
     }
 
@@ -494,53 +508,64 @@ public class StationaryScanActivity extends AppCompatActivity {
         String format = Converters.getHexValue(data[0]);
         switch (format) {
             case "83":
-                year = Converters.getDecimalValue(data[6]);
-                month = Converters.getDecimalValue(data[7]);
-                logFreq(new byte[]{data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]});//byte 0 = F0
+                Log.i(TAG, "83: " + Converters.getHexValue(data));
+                startScanStationaryFirstPart(data);
+                //logFreq(new byte[]{data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]});//byte 0 = F0
+                break;
+            case "84":
+                Log.i(TAG, "84: " + Converters.getHexValue(data));
+                startScanStationarySecondPart(data);
+                break;
+            case "85":
+                Log.i(TAG, "85: " + Converters.getHexValue(data));
+                startScanStationaryThirdPart(data);
                 break;
             case "F0":
-                logFreq(data);
+                logScanHeader(data);
                 break;
             case "F1":
-                logCode(data);
+                logScanFix(data);
+                break;
+            case "F2":
+                logCoded(data);
+                break;
+            case "E3":
+                logFixedPulseRate(data);
+                break;
+            default: //E1 and E2
+                logScanData(data);
                 break;
         }
         refresh();
     }
 
-    /**
-     * With the received packet, processes the data to display.
-     *
-     * @param data The received packet.
-     */
-    public void logFreq(byte[] data){
-        mortality = false;
-        int freqOffset = 0;
-        for (int i = 1;i < data.length; i++) {
-            byte b = data[i];
-            switch (i) {
-                case 1:
-                    freqOffset = Integer.parseInt(Converters.getDecimalValue(b)) * 256;
-                    break;
-                case 2:
-                    freqOffset = (150 * 1000) + (Integer.parseInt(Converters.getDecimalValue(b)) + freqOffset);
-                    break;
-                case 4:
-                    currentData += month + "/" + Converters.getDecimalValue(b) + "/" + year + "     ";
-                    break;
-                case 5:
-                    currentData += Converters.getDecimalValue(b) + ":";
-                    break;
-                case 6:
-                    currentData += Converters.getDecimalValue(b) + ":";
-                    break;
-                case 7:
-                    currentData += Converters.getDecimalValue(b);
-                    break;
-            }
-        }
-        table_freq.setText("Table: " + selectedFrequency + " [" + Converters.getDecimalValue(data[3]) + "] Freq: " +
-                String.valueOf(freqOffset).substring(0, 3) + "." + String.valueOf(freqOffset).substring(3));
+    public void startScanStationaryFirstPart(byte[] data) {
+        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1])) / 16;
+        numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1])) % 16;
+        matches = Integer.parseInt(Converters.getDecimalValue(data[2])) / 16;
+        txType = Integer.parseInt(Converters.getDecimalValue(data[2])) % 16; // 1 = fixed pulse, 2 = variable pulse, 0 = eiler
+        scanTime = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        storeTime = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        year = Integer.parseInt(Converters.getDecimalValue(data[6]));
+        pr1 = Integer.parseInt(Converters.getDecimalValue(data[7]));
+    }
+
+    public void startScanStationarySecondPart(byte[] data) {
+        referenceFrequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+                Integer.parseInt(Converters.getDecimalValue(data[2])) + 150000;
+        referenceFrequencyStoreRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        externalDataPush = Integer.parseInt(Converters.getDecimalValue(data[4]));
+    }
+
+    public void startScanStationaryThirdPart(byte[] data) {
+        pr1_tolerance = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        pr2 = Integer.parseInt(Converters.getDecimalValue(data[2]));
+        pr2_tolerance = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        pr3 = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        pr3_tolerance = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        pr4 = Integer.parseInt(Converters.getDecimalValue(data[6]));
+        pr4_tolerance = Integer.parseInt(Converters.getDecimalValue(data[7]));
     }
 
     /**
@@ -548,9 +573,35 @@ public class StationaryScanActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void logCode(byte[] data){
-        mortality = (Integer.parseInt(Converters.getDecimalValue(data[5])) >= 100);
-        for (int i = 1;i < data.length; i++) {
+    public void logScanHeader(byte[] data) {
+        mortality = false;
+        int freqOffset = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+                Integer.parseInt(Converters.getDecimalValue(data[2])) + 150000;
+        int date = Converters.strToDecimal(Converters.getHexValue(data[4]) + Converters.getHexValue(data[5]) + Converters.getHexValue(data[6]));
+        month = date / 1000000;
+        date = date % 1000000;
+        day = date / 10000;
+        date = date % 10000;
+        hour = date / 100;
+        minute = date % 100;
+        seconds = Integer.parseInt(Converters.getDecimalValue(data[7]));
+        currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;
+
+        table_stationary_textView.setText(selectedTable + " (" + Converters.getDecimalValue(data[3]) + ")");
+        frequency_stationary_textView.setText(String.valueOf(freqOffset).substring(0, 3) + "." + String.valueOf(freqOffset).substring(3));
+        scan_rateD_stationary_textView.setText(String.valueOf(scanTime));
+        timeoutD_stationary_textView.setText(String.valueOf(timeout));
+        current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
+    }
+
+    /**
+     * With the received packet, processes the data to display.
+     *
+     * @param data The received packet.
+     */
+    public void logScanFix(byte[] data) {
+        mortality = (Integer.parseInt(Converters.getDecimalValue(data[5])) > 0);
+        for (int i = 1; i < data.length; i++) {
             byte b = data[i];
             switch (i) {
                 case 1:
@@ -562,14 +613,89 @@ public class StationaryScanActivity extends AppCompatActivity {
                     break;
                 case 3:
                     currentData += "C:" +
-                            ((Integer.valueOf(Converters.getDecimalValue(b)) < 10)? "0" + Converters.getDecimalValue(b): Converters.getDecimalValue(b))
+                            ((Integer.parseInt(Converters.getDecimalValue(b)) < 10) ? "0" + Converters.getDecimalValue(b): Converters.getDecimalValue(b))
                             + (mortality ? "M " : " ");
                     break;
                 case 4:
-                    currentData += "SS:" + (Integer.valueOf(Converters.getDecimalValue(b)) + 200) + " ";
+                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
                     break;
-                case 5:
+                /*case 5:
                     currentData += "#:" + (mortality ? Integer.parseInt(Converters.getDecimalValue(b)) - 100 : Converters.getDecimalValue(b));
+                    break;*/
+            }
+        }
+    }
+
+    public void logScanData(byte[] data) {
+        int number = Integer.parseInt(Converters.getDecimalValue(data[5])) * 256;
+        int match = 0;
+        for (int i = 1; i < data.length; i++) {
+            byte b = data[i];
+            switch (i) {
+                case 1:
+                    currentData += "Sec:" + Converters.getDecimalValue(b) + " ";
+                    break;
+                case 2:
+                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) % 10) + " ";
+                    match = Integer.parseInt(Converters.getDecimalValue(b)) / 10;
+                    break;
+                case 4:
+                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
+                    break;
+                case 6:
+                    currentData += "Per:" + (number + Integer.parseInt(Converters.getDecimalValue(b))) + " ";
+                    currentData += "Match:" + match + " ";
+                    break;
+                case 7:
+                    currentData += "#:" + Converters.getDecimalValue(b);
+                    break;
+            }
+        }
+    }
+
+    public void logCoded(byte[] data) {
+        mortality = (Integer.parseInt(Converters.getDecimalValue(data[5])) > 0);
+        for (int i = 1; i < data.length; i++) {
+            byte b = data[i];
+            switch (i) {
+                case 2:
+                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) > 128 ?
+                            Integer.parseInt(Converters.getDecimalValue(b)) - 128 : Converters.getDecimalValue(b)) + " ";
+                    break;
+                case 3:
+                    currentData += "C:" +
+                            ((Integer.parseInt(Converters.getDecimalValue(b)) < 10) ? "0" + Converters.getDecimalValue(b): Converters.getDecimalValue(b))
+                            + (mortality ? "M " : " ");
+                    break;
+                case 4:
+                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
+                    break;
+                /*case 5:
+                    currentData += "#:" + (mortality ? Integer.parseInt(Converters.getDecimalValue(b)) - 100 : Converters.getDecimalValue(b));
+                    break;*/
+            }
+        }
+    }
+
+    public void logFixedPulseRate(byte[] data) {
+        int number = Integer.parseInt(Converters.getDecimalValue(data[5])) * 256;
+        int match = 0;
+        for (int i = 1; i < data.length; i++) {
+            byte b = data[i];
+            switch (i) {
+                case 2:
+                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) % 10) + " ";
+                    match = Integer.parseInt(Converters.getDecimalValue(b)) / 10;
+                    break;
+                case 4:
+                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
+                    break;
+                case 6:
+                    currentData += "Per:" + (number + Integer.parseInt(Converters.getDecimalValue(b))) + " ";
+                    currentData += "Match:" + match + " ";
+                    break;
+                case 7:
+                    currentData += "#:" + Converters.getDecimalValue(b);
                     break;
             }
         }
@@ -579,30 +705,6 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Updates the data displayed on the screen.
      */
     public void refresh() {
-        tenthResultTextView.setText(ninthResultTextView.getText());
-        tenthResultTextView.setTextColor(ninthResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
-        ninthResultTextView.setText(eighthResultTextView.getText());
-        ninthResultTextView.setTextColor(eighthResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
-        eighthResultTextView.setText(seventhResultTextView.getText());
-        eighthResultTextView.setTextColor(seventhResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
-        seventhResultTextView.setText(sixthResultTextView.getText());
-        seventhResultTextView.setTextColor(sixthResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
-        sixthResultTextView.setText(fifthResultTextView.getText());
-        sixthResultTextView.setTextColor(fifthResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
-        fifthResultTextView.setText(forthResultTextView.getText());
-        fifthResultTextView.setTextColor(forthResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
-
         forthResultTextView.setText(thirdResultTextView.getText());
         forthResultTextView.setTextColor(thirdResultTextView.getText().toString().contains("M") ?
                 ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
@@ -624,17 +726,10 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Clears the screen to start displaying the data.
      */
     public void clear() {
-        table_freq.setText("");
         firstResultTextView.setText("");
         secondResultTextView.setText("");
         thirdResultTextView.setText("");
         forthResultTextView.setText("");
-        fifthResultTextView.setText("");
-        sixthResultTextView.setText("");
-        seventhResultTextView.setText("");
-        eighthResultTextView.setText("");
-        ninthResultTextView.setText("");
-        tenthResultTextView.setText("");
     }
 
     /**
@@ -651,11 +746,5 @@ public class StationaryScanActivity extends AppCompatActivity {
             builder.setMessage("Completed.");
         builder.setPositiveButton("OK", null);
         builder.show();
-    }
-
-    public void onRestartConnection() {
-        mBluetoothLeService.disconnect();
-        SystemClock.sleep(1000);
-        mBluetoothLeService.connect(mDeviceAddress);
     }
 }

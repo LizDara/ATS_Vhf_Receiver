@@ -24,13 +24,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,42 +46,51 @@ public class InputValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.input_value_linearLayout)
-    LinearLayout input_value_linearLayout;
     @BindView(R.id.spinner_value_linearLayout)
     LinearLayout spinner_value_linearLayout;
-    @BindView(R.id.value_editText)
-    EditText value_editText;
     @BindView(R.id.value_spinner)
     Spinner value_spinner;
     @BindView(R.id.message_error_textView)
     TextView message_error_textView;
+    @BindView(R.id.set_value_linearLayout)
+    LinearLayout set_value_linearLayout;
+    @BindView(R.id.store_rate_linearLayout)
+    LinearLayout store_rate_linearLayout;
+    @BindView(R.id.no_store_rate_imageView)
+    ImageView no_store_rate_imageView;
+    @BindView(R.id.five_minutes_imageView)
+    ImageView five_minutes_imageView;
+    @BindView(R.id.ten_minutes_imageView)
+    ImageView ten_minutes_imageView;
+    @BindView(R.id.twenty_minutes_imageView)
+    ImageView twenty_minutes_imageView;
+    @BindView(R.id.thirty_minutes_imageView)
+    ImageView thirty_minutes_imageView;
+    @BindView(R.id.sixty_minutes_imageView)
+    ImageView sixty_minutes_imageView;
 
     private final static String TAG = InputValueActivity.class.getSimpleName();
-
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private static final long MESSAGE_PERIOD = 3000;
 
     public static final int FREQUENCY_TABLE_NUMBER = 1001;
     public static final int SCAN_RATE_SECONDS = 1002;
     public static final int NUMBER_OF_ANTENNAS = 1003;
     public static final int SCAN_TIMEOUT_SECONDS = 1004;
+    public static final int STORE_RATE = 1005;
+    public static final int REFERENCE_FREQUENCY = 1006;
+    public static final int REFERENCE_FREQUENCY_STORE_RATE = 1007;
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
 
     private int value;
+    private int storeRate = 0;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -92,7 +103,7 @@ public class InputValueActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -119,7 +130,7 @@ public class InputValueActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-//                    state = false;
+                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals("aerial")) { // Gets aerial defaults data
@@ -131,12 +142,16 @@ public class InputValueActivity extends AppCompatActivity {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (value == FREQUENCY_TABLE_NUMBER)
                         downloadTable(packet);
-                    if (value == SCAN_RATE_SECONDS)
+                    else if (value == SCAN_RATE_SECONDS)
                         downloadScanRate(packet);
-                    if (value == NUMBER_OF_ANTENNAS)
+                    else if (value == NUMBER_OF_ANTENNAS)
                         downloadAntennas(packet);
-                    if (value == SCAN_TIMEOUT_SECONDS)
+                    else if (value == SCAN_TIMEOUT_SECONDS)
                         downloadTimeout(packet);
+                    else if (value == STORE_RATE)
+                        downloadStoreRate(packet);
+                    else if (value == REFERENCE_FREQUENCY_STORE_RATE)
+                        downloadReferenceFrequencyStoreRate(packet);
                 }
             }
             catch (Exception e) {
@@ -160,9 +175,9 @@ public class InputValueActivity extends AppCompatActivity {
      * Characteristic name: Aerial.
      */
     private void onClickAerialDefaults() {
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("111584dd-b374-417c-a51d-9314eba66d6c");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice, uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     /**
@@ -171,9 +186,75 @@ public class InputValueActivity extends AppCompatActivity {
      * Characteristic name: Stationary.
      */
     private void onClickStationaryDefaults() {
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("6dd91f4d-b30b-46c4-b111-dd49cd1f952e");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice, uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+    }
+
+    @OnClick(R.id.no_store_rate_linearLayout)
+    public void onClickNoStoreRate(View v) {
+        no_store_rate_imageView.setVisibility(View.VISIBLE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        twenty_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 100;
+    }
+
+    @OnClick(R.id.five_minutes_linearLayout)
+    public void onClickFiveMinutes(View v) {
+        no_store_rate_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.VISIBLE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        twenty_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 5;
+    }
+
+    @OnClick(R.id.ten_minutes_linearLayout)
+    public void onClickTenMinutes(View v) {
+        no_store_rate_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.VISIBLE);
+        twenty_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 10;
+    }
+
+    @OnClick(R.id.twenty_minutes_linearLayout)
+    public void onClickTwentyMinutes(View v) {
+        no_store_rate_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        twenty_minutes_imageView.setVisibility(View.VISIBLE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 20;
+    }
+
+    @OnClick(R.id.thirty_minutes_linearLayout)
+    public void onClickThirtyMinutes(View v) {
+        no_store_rate_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        twenty_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.VISIBLE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 30;
+    }
+
+    @OnClick(R.id.sixty_minutes_linearLayout)
+    public void onClickSixtyMinutes(View v) {
+        no_store_rate_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        twenty_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.VISIBLE);
+        storeRate = 60;
     }
 
     @OnClick(R.id.save_changes_input_value_button)
@@ -183,20 +264,25 @@ public class InputValueActivity extends AppCompatActivity {
             setResult((int) (scanRate * 10));
         }
         if (parameter.equals("stationary") && value == SCAN_RATE_SECONDS) { // Sends the scan rate value for stationary
-            int scanRate = Integer.parseInt(value_editText.getText().toString());
+            int scanRate = Integer.parseInt(value_spinner.getSelectedItem().toString());
             setResult(scanRate);
         }
         if (value == FREQUENCY_TABLE_NUMBER) { // Sends the frequency table number
-            int frequencyTableNumber = Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
+            int frequencyTableNumber = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
+                    Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
             setResult(frequencyTableNumber);
         }
         if (value == NUMBER_OF_ANTENNAS) { // Sends the number of antennas
-            int numberAntennas = Integer.parseInt(value_spinner.getSelectedItem().toString());
+            int numberAntennas = value_spinner.getSelectedItemPosition();
             setResult(numberAntennas);
         }
         if (value == SCAN_TIMEOUT_SECONDS) { // Sends scan timeout value
-            int timeout = Integer.parseInt(value_editText.getText().toString());
+            int timeout = Integer.parseInt(value_spinner.getSelectedItem().toString());
             setResult(timeout);
+        }
+        if (value == REFERENCE_FREQUENCY_STORE_RATE) {
+            int storeRate = value_spinner.getSelectedItemPosition();
+            setResult(storeRate);
         }
         finish();
     }
@@ -209,7 +295,7 @@ public class InputValueActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Edit Receiver Defaults");
+        title_toolbar.setText(R.string.edit_receiver_defaults);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -217,30 +303,20 @@ public class InputValueActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
+
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         parameter = getIntent().getStringExtra("type");
         value = getIntent().getIntExtra("value", 0);
 
-        if (parameter.equals("aerial") && value == SCAN_RATE_SECONDS) {
-            spinner_value_linearLayout.setVisibility(View.VISIBLE);
+        if (value == STORE_RATE) {
+            store_rate_linearLayout.setVisibility(View.VISIBLE);
+        } else {
+            set_value_linearLayout.setVisibility(View.VISIBLE);
         }
-        if (parameter.equals("stationary") && value == SCAN_RATE_SECONDS) {
-            input_value_linearLayout.setVisibility(View.VISIBLE);
-        }
-        if (value == FREQUENCY_TABLE_NUMBER || value == NUMBER_OF_ANTENNAS) {
-            spinner_value_linearLayout.setVisibility(View.VISIBLE);
-        }
-        if (value == SCAN_TIMEOUT_SECONDS) {
-            input_value_linearLayout.setVisibility(View.VISIBLE);
-        }
-
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -248,13 +324,13 @@ public class InputValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            if (value == STORE_RATE)
+                setResult(storeRate);
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -262,7 +338,7 @@ public class InputValueActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -301,7 +377,9 @@ public class InputValueActivity extends AppCompatActivity {
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -317,7 +395,7 @@ public class InputValueActivity extends AppCompatActivity {
     public void downloadTable(byte[] data) {
         List<String> tables = new ArrayList<>();
         int positionFrequencyTableNumber = 0;
-        byte b = data[6];
+        byte b = (parameter.equals("aerial")) ? data[6] : data[9];
         for (int i = 1; i <= 8; i++) {
             if ((b & 1) == 1) {
                 tables.add("Table " + i);
@@ -325,11 +403,12 @@ public class InputValueActivity extends AppCompatActivity {
             }
             b = (byte) (b >> 1);
         }
-        b = data[7];
+        b = (parameter.equals("aerial")) ? data[7] : data[10];
         for (int i = 9; i <= 12; i++) {
             if ((b & 1) == 1) {
                 tables.add("Table " + i);
-                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ? tables.size() - 1 : 0;
+                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ?
+                        tables.size() - 1 : 0;
             }
             b = (byte) (b >> 1);
         }
@@ -349,7 +428,7 @@ public class InputValueActivity extends AppCompatActivity {
      */
     public void downloadScanRate(byte[] data) {
         if (parameter.equals("aerial")) {
-            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRate, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             value_spinner.setAdapter(scanRateAdapter);
 
@@ -363,8 +442,16 @@ public class InputValueActivity extends AppCompatActivity {
             }
             value_spinner.setSelection(index);
         } else {
-            float scanRate = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
-            value_editText.setText(String.valueOf(scanRate));
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateStationary, android.R.layout.simple_spinner_item);
+            scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            value_spinner.setAdapter(scanRateAdapter);
+
+            int scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
+            if (scanRate <= 255) {
+                value_spinner.setSelection(scanRate - 3);
+            } else {
+                value_spinner.setSelection(0);
+            }
         }
     }
 
@@ -379,7 +466,11 @@ public class InputValueActivity extends AppCompatActivity {
         value_spinner.setAdapter(antennasAdapter);
 
         int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[2])) & 15;
-        value_spinner.setSelection(antennaNumber - 1);
+        if (antennaNumber <= 4 && antennaNumber > 0) {
+            value_spinner.setSelection(antennaNumber - 1);
+        } else {
+            value_spinner.setSelection(0);
+        }
     }
 
     /**
@@ -388,6 +479,51 @@ public class InputValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     public void downloadTimeout(byte[] data) {
-        value_editText.setText(Converters.getDecimalValue(data[4]));
+        ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
+        timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        value_spinner.setAdapter(timeoutAdapter);
+
+        int timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        if (timeout <= 200) {
+            value_spinner.setSelection(timeout - 2);
+        } else {
+            value_spinner.setSelection(0);
+        }
+    }
+
+    public void downloadStoreRate(byte[] data) {
+        switch (Converters.getDecimalValue(data[5])) {
+            case "0":
+                no_store_rate_imageView.setVisibility(View.VISIBLE);
+                break;
+            case "5":
+                five_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case "10":
+                ten_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case "20":
+                twenty_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case "30":
+                thirty_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case "60":
+                sixty_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    public void downloadReferenceFrequencyStoreRate(byte[] data) {
+        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(this, R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
+        storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        value_spinner.setAdapter(storeRateAdapter);
+
+        int referenceFrequencyStoreRate = Integer.parseInt(Converters.getDecimalValue(data[8]));
+        if (referenceFrequencyStoreRate <= 24) {
+            value_spinner.setSelection(referenceFrequencyStoreRate);
+        } else {
+            value_spinner.setSelection(0);
+        }
     }
 }

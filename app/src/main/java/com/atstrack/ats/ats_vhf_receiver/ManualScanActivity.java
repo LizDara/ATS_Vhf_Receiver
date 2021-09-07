@@ -3,6 +3,7 @@ package com.atstrack.ats.ats_vhf_receiver;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -27,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 public class ManualScanActivity extends AppCompatActivity {
 
@@ -36,29 +39,28 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.ready_manual_scan_LinearLayout)
+    @BindView(R.id.ready_manual_scan_linearLayout)
     LinearLayout ready_manual_scan_LinearLayout;
-    @BindView(R.id.manual_result_linearLayout)
-    LinearLayout manual_result_linearLayout;
+    @BindView(R.id.change_frequency_linearLayout)
+    LinearLayout change_frequency_linearLayout;
+    @BindView(R.id.manual_scan_linearLayout)
+    LinearLayout manual_scan_linearLayout;
 
     private final static String TAG = ManualScanActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private final int MESSAGE_PERIOD = 3000;
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
+
+    private boolean isScanning;
+
+    private AnimationDrawable animationDrawable;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -71,7 +73,7 @@ public class ManualScanActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -121,20 +123,43 @@ public class ManualScanActivity extends AppCompatActivity {
         return intentFilter;
     }
 
-    @OnClick(R.id.start_manual_button)
-    public void onClickStartManual(View v){
-        getSupportActionBar().hide();
-        state_view.setVisibility(View.GONE);
+    @OnClick(R.id.enter_new_frequency_button)
+    public void onClickEnterNewFrequency(View v) {
+        title_toolbar.setText(R.string.lb_change_frequency);
+        change_frequency_linearLayout.setVisibility(View.VISIBLE);
         ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-        manual_result_linearLayout.setVisibility(View.VISIBLE);
     }
 
-    @OnClick(R.id.manual_exit_image)
-    public void onClickExit(View v){
-        getSupportActionBar().show();
-        state_view.setVisibility(View.VISIBLE);
-        manual_result_linearLayout.setVisibility(View.GONE);
+    @OnClick(R.id.ready_to_scan_manual_button)
+    public void onClickReadyToScan(View v) {
+        title_toolbar.setText(R.string.manual_scanning);
+        change_frequency_linearLayout.setVisibility(View.GONE);
         ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.start_manual_button)
+    public void onClickStartManual(View v) {
+        title_toolbar.setText(R.string.lb_manual_scanning);
+        ready_manual_scan_LinearLayout.setVisibility(View.GONE);
+        manual_scan_linearLayout.setVisibility(View.VISIBLE);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+
+        state_view.setBackgroundResource(R.drawable.scanning_animation);
+        animationDrawable = (AnimationDrawable) state_view.getBackground();
+        animationDrawable.start();
+
+        isScanning = true;
+    }
+
+    @OnClick(R.id.stop_scanning_manual_button)
+    public void onClickStopScanning(View v) {
+        title_toolbar.setText(R.string.manual_scanning);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+        ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+        manual_scan_linearLayout.setVisibility(View.GONE);
+        animationDrawable.stop();
+        state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+        isScanning = false;
     }
 
     @Override
@@ -145,22 +170,20 @@ public class ManualScanActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Manual Scanning");
+        title_toolbar.setText(R.string.manual_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+        isScanning = false;
 
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -171,7 +194,7 @@ public class ManualScanActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -191,13 +214,22 @@ public class ManualScanActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) { //Go back to the previous activity
-            case android.R.id.home:
+        //Go back to the previous activity
+        if (item.getItemId() == android.R.id.home) {
+            if (!isScanning) {
                 finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            } else {
+                title_toolbar.setText(R.string.manual_scanning);
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+                manual_scan_linearLayout.setVisibility(View.GONE);
+                animationDrawable.stop();
+                state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+                isScanning = false;
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -220,7 +252,9 @@ public class ManualScanActivity extends AppCompatActivity {
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

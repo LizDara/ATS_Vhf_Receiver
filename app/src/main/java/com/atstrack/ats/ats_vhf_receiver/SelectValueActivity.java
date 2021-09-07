@@ -23,13 +23,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
-import java.security.PublicKey;
+import java.util.UUID;
 
 public class SelectValueActivity extends AppCompatActivity {
 
@@ -39,18 +45,22 @@ public class SelectValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
+    @BindView(R.id.non_coded_linearLayout)
+    LinearLayout non_coded_linearLayout;
     @BindView(R.id.select_pulse_rate_linearLayout)
     LinearLayout select_pulse_rate_linearLayout;
     @BindView(R.id.fixed_filter_type_linearLayout)
     LinearLayout fixed_filter_type_linearLayout;
     @BindView(R.id.variable_filter_type_linearLayout)
     LinearLayout variable_filter_type_linearLayout;
+    @BindView(R.id.number_of_matches_scrollView)
+    ScrollView number_of_matches_scrollView;
     @BindView(R.id.fixed_pulse_rate_imageView)
     ImageView fixed_pulse_rate_imageView;
     @BindView(R.id.variable_pulse_rate_imageView)
@@ -67,28 +77,52 @@ public class SelectValueActivity extends AppCompatActivity {
     ImageView altitude_imageView;
     @BindView(R.id.depth_imageView)
     ImageView depth_imageView;
+    @BindView(R.id.two_imageView)
+    ImageView two_imageView;
+    @BindView(R.id.three_imageView)
+    ImageView three_imageView;
+    @BindView(R.id.four_imageView)
+    ImageView four_imageView;
+    @BindView(R.id.five_imageView)
+    ImageView five_imageView;
+    @BindView(R.id.six_imageView)
+    ImageView six_imageView;
+    @BindView(R.id.seven_imageView)
+    ImageView seven_imageView;
+    @BindView(R.id.eight_imageView)
+    ImageView eight_imageView;
+    @BindView(R.id.pulse_rate_linearLayout)
+    LinearLayout pulse_rate_linearLayout;
+    @BindView(R.id.pulse_rate_textView)
+    TextView pulse_rate_textView;
+    @BindView(R.id.pulse_rate_editText)
+    EditText pulse_rate_editText;
+    @BindView(R.id.pulse_rate_tolerance_textView)
+    TextView pulse_rate_tolerance_textView;
+    @BindView(R.id.pulse_rate_tolerance_editText)
+    EditText pulse_rate_tolerance_editText;
+    @BindView(R.id.save_changes_select_value_button)
+    Button save_changes_select_value_button;
 
     private final static String TAG = SelectValueActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private static final long MESSAGE_PERIOD = 3000;
+    public static final int PULSE_RATE_TYPE = 1001;
+    public static final int FILTER_TYPE = 1002;
+    public static final int MATCHES_FOR_VALID_PATTERN = 1003;
+    public static final int FIXED_PULSE_RATE = 1004;
+    public static final int VARIABLE_PULSE_RATE = 1005;
+    public static final int PATTERN_MATCHING = 1006;
+    public static final int PULSES_PER_SCAN_TIME = 1007;
+    public static final int TEMPERATURE = 1008;
+    public static final int PERIOD = 1009;
+    public static final int ALTITUDE = 1010;
+    public static final int DEPTH = 1011;
+    public static final int PULSE_RATE_1 = 1012;
+    public static final int PULSE_RATE_2 = 1013;
+    public static final int PULSE_RATE_3 = 1014;
+    public static final int PULSE_RATE_4 = 1015;
 
-    public static final int PULSE_RATE = 1001;
-    public static final int FILTER = 1002;
-    public static final int FIXED_PULSE_RATE = 1003;
-    public static final int VARIABLE_PULSE_RATE = 1004;
-    public static final int PATTERN_MATCHING = 1005;
-    public static final int PULSES_PER_SCAN_TIME = 1006;
-    public static final int TEMPERATURE = 1007;
-    public static final int PERIOD = 1008;
-    public static final int ALTITUDE = 1009;
-    public static final int DEPTH = 1010;
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
 
@@ -105,7 +139,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -127,13 +161,26 @@ public class SelectValueActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-//                    state = false;
+                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-
+                    if (parameter.equals("txType")) {
+                        onClickTxType();
+                    }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-
+                    if (type == PULSE_RATE_TYPE)
+                        downloadPulseRateType(packet);
+                    else if (type == MATCHES_FOR_VALID_PATTERN)
+                        downloadMatchesForValidPattern(packet);
+                    else if (type == PULSE_RATE_1)
+                        downloadPulseRate1(packet);
+                    else if (type == PULSE_RATE_2)
+                        downloadPulseRate2(packet);
+                    else if (type == PULSE_RATE_3)
+                        downloadPulseRate3(packet);
+                    else if (type == PULSE_RATE_4)
+                        downloadPulseRate4(packet);
                 }
             }
             catch (Exception e) {
@@ -149,6 +196,19 @@ public class SelectValueActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         return intentFilter;
+    }
+
+    public void onClickTxType() {
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+    }
+
+    @OnClick(R.id.select_pulse_rate_button)
+    public void onClickSelectPulseRate(View v) {
+        non_coded_linearLayout.setVisibility(View.GONE);
+        select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+        save_changes_select_value_button.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.fixed_pulse_rate_linearLayout)
@@ -215,8 +275,96 @@ public class SelectValueActivity extends AppCompatActivity {
         value = DEPTH;
     }
 
+    @OnClick(R.id.two_linearLayout)
+    public void onClickTwo(View v) {
+        two_imageView.setVisibility(View.VISIBLE);
+        three_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 2;
+    }
+
+    @OnClick(R.id.three_linearLayout)
+    public void onClickThree(View v) {
+        three_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 3;
+    }
+
+    @OnClick(R.id.four_linearLayout)
+    public void onClickFour(View v) {
+        four_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        three_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 4;
+    }
+
+    @OnClick(R.id.five_linearLayout)
+    public void onClickFive(View v) {
+        five_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        three_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 5;
+    }
+
+    @OnClick(R.id.six_linearLayout)
+    public void onClickSix(View v) {
+        six_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        three_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 6;
+    }
+
+    @OnClick(R.id.seven_linearLayout)
+    public void onClickSeven(View v) {
+        seven_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        three_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        eight_imageView.setVisibility(View.GONE);
+        value = 7;
+    }
+
+    @OnClick(R.id.eight_linearLayout)
+    public void onClickEight(View v) {
+        eight_imageView.setVisibility(View.VISIBLE);
+        two_imageView.setVisibility(View.GONE);
+        three_imageView.setVisibility(View.GONE);
+        four_imageView.setVisibility(View.GONE);
+        five_imageView.setVisibility(View.GONE);
+        six_imageView.setVisibility(View.GONE);
+        seven_imageView.setVisibility(View.GONE);
+        value = 8;
+    }
+
     @OnClick(R.id.save_changes_select_value_button)
     public void onClickSaveChanges(View v) {
+        if (type == PULSE_RATE_1 || type == PULSE_RATE_2 || type == PULSE_RATE_3 || type == PULSE_RATE_4) {
+            value = Integer.parseInt(pulse_rate_editText.getText().toString());
+            value = (value * 100) + Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
+        }
         setResult(value);
         finish();
     }
@@ -227,35 +375,66 @@ public class SelectValueActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_value);
         ButterKnife.bind(this);
 
+        // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Edit Receiver Defaults");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
+        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        // Get device data from previous activity
         final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
+        parameter = "txType";
+
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         type = intent.getIntExtra("type", 0);
-        if (type == PULSE_RATE) {
-            select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-            value = FIXED_PULSE_RATE;
+        if (type == PULSE_RATE_TYPE) {
+            title_toolbar.setText(R.string.pulse_rate_type_options);
+            save_changes_select_value_button.setVisibility(View.GONE);
         }
-        if (type == FIXED_PULSE_RATE) {
+        /*if (type == FIXED_PULSE_RATE) {
             fixed_filter_type_linearLayout.setVisibility(View.VISIBLE);
             value = PATTERN_MATCHING;
+            title_toolbar.setText("Filter Type Options");
         }
         if (type == VARIABLE_PULSE_RATE) {
             variable_filter_type_linearLayout.setVisibility(View.VISIBLE);
             value = TEMPERATURE;
+            title_toolbar.setText("Filter Type Options");
+        }*/
+        if (type == MATCHES_FOR_VALID_PATTERN) {
+            number_of_matches_scrollView.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.matches_for_valid_pattern);
         }
-
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        if (type == PULSE_RATE_1) {
+            pulse_rate_textView.setText(R.string.lb_pr1);
+            pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
+            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.target_pulse_rate_1);
+        }
+        if (type == PULSE_RATE_2) {
+            pulse_rate_textView.setText(R.string.lb_pr2);
+            pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
+            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.target_pulse_rate_2);
+        }
+        if (type == PULSE_RATE_3) {
+            pulse_rate_textView.setText(R.string.lb_pr3);
+            pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
+            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.target_pulse_rate_3);
+        }
+        if (type == PULSE_RATE_4) {
+            pulse_rate_textView.setText(R.string.lb_pr4);
+            pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
+            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.target_pulse_rate_4);
+        }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -263,13 +442,11 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //hago un case por si en un futuro agrego mas opciones
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //hago un case por si en un futuro agrego mas opciones
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -277,7 +454,7 @@ public class SelectValueActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -312,11 +489,75 @@ public class SelectValueActivity extends AppCompatActivity {
         dialog.setView(view);
         dialog.show();
 
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }, MESSAGE_PERIOD);
+    }
+
+    public void downloadPulseRateType(byte[] data) {
+        if (Converters.getHexValue(data[1]).equals("20") || Converters.getHexValue(data[1]).equals("04")) {
+            non_coded_linearLayout.setVisibility(View.VISIBLE);
+            value = 0;
+        } else if (Converters.getHexValue(data[1]).equals("21")) {
+            select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
+            save_changes_select_value_button.setVisibility(View.VISIBLE);
+            value = FIXED_PULSE_RATE;
+        } else if (Converters.getHexValue(data[1]).equals("22")) {
+            select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
+            save_changes_select_value_button.setVisibility(View.VISIBLE);
+            value = FIXED_PULSE_RATE;
+        }
+    }
+
+    public void downloadMatchesForValidPattern(byte[] data) {
+        if (Converters.getDecimalValue(data[2]).equals("2")) {
+            two_imageView.setVisibility(View.VISIBLE);
+            value = 2;
+        } else if (Converters.getDecimalValue(data[2]).equals("3")) {
+            three_imageView.setVisibility(View.VISIBLE);
+            value = 3;
+        } else if (Converters.getDecimalValue(data[2]).equals("4")) {
+            four_imageView.setVisibility(View.VISIBLE);
+            value = 4;
+        } else if (Converters.getDecimalValue(data[2]).equals("5")) {
+            five_imageView.setVisibility(View.VISIBLE);
+            value = 5;
+        } else if (Converters.getDecimalValue(data[2]).equals("6")) {
+            six_imageView.setVisibility(View.VISIBLE);
+            value = 6;
+        } else if (Converters.getDecimalValue(data[2]).equals("7")) {
+            seven_imageView.setVisibility(View.VISIBLE);
+            value = 7;
+        } else if (Converters.getDecimalValue(data[2]).equals("8")) {
+            eight_imageView.setVisibility(View.VISIBLE);
+            value = 8;
+        }
+    }
+
+    public void downloadPulseRate1(byte[] data) {
+        pulse_rate_editText.setText(Converters.getDecimalValue(data[3]));
+        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[4]));
+    }
+
+    public void downloadPulseRate2(byte[] data) {
+        pulse_rate_editText.setText(Converters.getDecimalValue(data[5]));
+        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[6]));
+    }
+
+    public void downloadPulseRate3(byte[] data) {
+        pulse_rate_editText.setText(Converters.getDecimalValue(data[7]));
+        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[8]));
+    }
+
+    public void downloadPulseRate4(byte[] data) {
+        pulse_rate_editText.setText(Converters.getDecimalValue(data[9]));
+        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[10]));
     }
 }

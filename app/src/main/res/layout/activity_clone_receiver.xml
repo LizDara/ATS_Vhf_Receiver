@@ -33,18 +33,29 @@
                 android:padding="16sp"
                 android:orientation="vertical"
                 android:gravity="center"
+                android:elevation="4sp"
                 android:background="@color/catskill_white">
 
-                <ImageView
+                <LinearLayout
                     android:layout_width="@dimen/connect_image"
                     android:layout_height="@dimen/connect_image"
-                    android:background="@drawable/ic_receiver_disconnected_dark"/>
+                    android:layout_marginBottom="32sp"
+                    android:elevation="4sp"
+                    android:background="@drawable/disconnected"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/receiver_connect"
+                        android:layout_height="@dimen/receiver_connect"
+                        android:src="@drawable/receiver"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lb_no_receiver_detected"
-                    android:textColor="@color/tall_poppy"
+                    android:textColor="@color/ebony_clay"
                     style="@style/h2"/>
 
                 <TextView
@@ -94,10 +105,20 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <ImageView
+                <LinearLayout
                     android:layout_width="@dimen/connect_image"
                     android:layout_height="@dimen/connect_image"
-                    android:background="@drawable/ic_receiver_connected_dark"/>
+                    android:layout_marginBottom="46sp"
+                    android:elevation="4sp"
+                    android:background="@drawable/connected"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/receiver_connect"
+                        android:layout_height="@dimen/receiver_connect"
+                        android:src="@drawable/receiver"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -110,7 +131,7 @@
 
             <Space
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"/>
 
             <Button

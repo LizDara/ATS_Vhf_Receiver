@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".StationaryScanningActivity" />
+        <activity android:name=".AerialScanningActivity" />
+        <activity android:name=".TemporaryStationaryActivity" />
+        <activity android:name=".TemporaryAerialActivity" />
+        <activity android:name=".ReceiverOptionsActivity" />
         <activity
             android:name=".SelectValueActivity"
             android:screenOrientation="portrait" />
@@ -83,6 +88,7 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
+
     <uses-feature
         android:name="android.hardware.location.gps"
         android:required="true" />

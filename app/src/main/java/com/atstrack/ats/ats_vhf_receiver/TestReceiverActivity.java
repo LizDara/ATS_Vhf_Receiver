@@ -3,6 +3,9 @@ package com.atstrack.ats.ats_vhf_receiver;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -13,6 +16,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,11 +28,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.UUID;
 
@@ -38,22 +48,22 @@ public class TestReceiverActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.running_test_linearLayout)
-    LinearLayout running_test_linearLayout;
-    @BindView(R.id.test_complete_linearLayout)
-    LinearLayout test_complete_linearLayout;
+    @BindView(R.id.loading_linearLayout)
+    LinearLayout loading_linearLayout;
+    @BindView(R.id.test_complete_scrollView)
+    ScrollView test_complete_scrollView;
     @BindView(R.id.range_textView)
     TextView range_textView;
     @BindView(R.id.battery_textView)
     TextView battery_textView;
-    @BindView(R.id.bytes_stored_textView)
-    TextView bytes_stored_textView;
+    @BindView(R.id.bytes_stored_test_textView)
+    TextView bytes_stored_test_textView;
     @BindView(R.id.memory_used_textView)
     TextView memory_used_textView;
     @BindView(R.id.frequency_tables_textView)
@@ -82,17 +92,17 @@ public class TestReceiverActivity extends AppCompatActivity {
     TextView eleventh_table_textView;
     @BindView(R.id.twelfth_table_textView)
     TextView twelfth_table_textView;
-    @BindView(R.id.table1_linearLayout)
+    @BindView(R.id.table_1_linearLayout)
     LinearLayout table1_linearLayout;
-    @BindView(R.id.table2_linearLayout)
+    @BindView(R.id.table_2_linearLayout)
     LinearLayout table2_linearLayout;
     @BindView(R.id.table3_linearLayout)
     LinearLayout table3_linearLayout;
-    @BindView(R.id.table4_linearLayout)
+    @BindView(R.id.table_4_linearLayout)
     LinearLayout table4_linearLayout;
-    @BindView(R.id.table5_linearLayout)
+    @BindView(R.id.table_5_linearLayout)
     LinearLayout table5_linearLayout;
-    @BindView(R.id.table6_linearLayout)
+    @BindView(R.id.table_6_linearLayout)
     LinearLayout table6_linearLayout;
     @BindView(R.id.table7_linearLayout)
     LinearLayout table7_linearLayout;
@@ -109,15 +119,10 @@ public class TestReceiverActivity extends AppCompatActivity {
 
     private final static String TAG = TestReceiverActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
     private final int MESSAGE_PERIOD = 3000;
-    private final int TEST_PERIOD = 5000;
+    private final int TEST_PERIOD = 1000;
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
 
@@ -134,7 +139,7 @@ public class TestReceiverActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -193,9 +198,9 @@ public class TestReceiverActivity extends AppCompatActivity {
      * Characteristic name: DiagInfo.
      */
     private void onClickTest() {
-        UUID uservice=UUID.fromString("fab2d796-3364-4b54-b9a1-7735545814ad");
-        UUID uservicechar=UUID.fromString("42d03a17-ebe1-4072-97a5-393f4a0515d7");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice,uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_DIAG_INFO;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     @Override
@@ -206,7 +211,7 @@ public class TestReceiverActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Test Receiver");
+        title_toolbar.setText(R.string.test_receiver);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -214,14 +219,11 @@ public class TestReceiverActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         mHandlerTest = new Handler();
         parameter = "test";
@@ -235,13 +237,11 @@ public class TestReceiverActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -249,7 +249,7 @@ public class TestReceiverActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -281,13 +281,14 @@ public class TestReceiverActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
 
         View view = inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -327,7 +328,7 @@ public class TestReceiverActivity extends AppCompatActivity {
         battery_textView.setText(Converters.getDecimalValue(data[1]));
         int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
         int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
-        bytes_stored_textView.setText(String.valueOf(numberPage * 2048));
+        bytes_stored_test_textView.setText(String.valueOf(numberPage * 2048));
         memory_used_textView.setText(String.valueOf(numberPage * 100 / lastPage));
         frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
 
@@ -397,10 +398,46 @@ public class TestReceiverActivity extends AppCompatActivity {
     /**
      * Defines the period it will take to do the test.
      */
-    private void runningTest(){
+    private void runningTest() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        View view = inflater.inflate(R.layout.connecting_test, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        ImageView spinner_testing = view.findViewById(R.id.spinner_testing);
+        TextView state_test_textView = view.findViewById(R.id.state_test_textView);
+
+        spinner_testing.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
+        Drawable drawable1 = spinner_testing.getDrawable();
+        Animatable animatable1 = (Animatable) drawable1;
+        AnimatedVectorDrawableCompat.registerAnimationCallback(drawable1, new Animatable2Compat.AnimationCallback() {
+            @Override
+            public void onAnimationEnd(Drawable drawable) {
+                new Handler().postDelayed(animatable1::start, MESSAGE_PERIOD);
+            }
+        });
+        animatable1.start();
+
+        dialog.setView(view);
+        dialog.show();
+
         mHandlerTest.postDelayed(() -> {
-            running_test_linearLayout.setVisibility(View.GONE);
-            test_complete_linearLayout.setVisibility(View.VISIBLE);
-        }, TEST_PERIOD);
+            state_test_textView.setText(R.string.lb_test_complete);
+            spinner_testing.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.check_avd_anim));
+            Drawable drawable2 = spinner_testing.getDrawable();
+            Animatable animatable2 = (Animatable) drawable2;
+            AnimatedVectorDrawableCompat.registerAnimationCallback(drawable2, new Animatable2Compat.AnimationCallback() {
+                @Override
+                public void onAnimationEnd(Drawable drawable) {
+                    new Handler().postDelayed(animatable2::start, TEST_PERIOD);
+                }
+            });
+            animatable2.start();
+
+            new Handler().postDelayed(() -> {
+                dialog.dismiss();
+                loading_linearLayout.setVisibility(View.GONE);
+                test_complete_scrollView.setVisibility(View.VISIBLE);
+            }, TEST_PERIOD);
+        }, MESSAGE_PERIOD);
     }
 }

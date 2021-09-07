@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="elevation_button">4sp</dimen>
     <dimen name="h1">30sp</dimen>
     <dimen name="h2">24sp</dimen>
     <dimen name="subtitle">20sp</dimen>
@@ -9,12 +10,16 @@
     <dimen name="button">16sp</dimen>
     <dimen name="text_button">16sp</dimen>
     <dimen name="paragraph">16sp</dimen>
-    <dimen name="line_height">1.5sp</dimen>
+    <dimen name="paragraph_small">12sp</dimen>
+    <dimen name="line_height">24sp</dimen>
     <dimen name="button_height">48sp</dimen>
-    <dimen name="button_small_height">34sp</dimen>
+    <dimen name="button_rectangle_height">52sp</dimen>
+    <dimen name="button_small_height">32sp</dimen>
     <dimen name="input_height">32sp</dimen>
     <dimen name="toolbar_height">56sp</dimen>
-    <dimen name="connect_image">134sp</dimen>
+    <dimen name="connect_image">128sp</dimen>
+    <dimen name="receiver_connect">96sp</dimen>
     <dimen name="receiver_image">200sp</dimen>
+    <dimen name="receiver_logo">256sp</dimen>
     <dimen name="disconnect_message">312sp</dimen>
 </resources>

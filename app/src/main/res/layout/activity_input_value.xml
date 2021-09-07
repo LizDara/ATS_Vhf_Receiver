@@ -23,42 +23,13 @@
             android:padding="16sp"
             android:orientation="vertical"
             android:background="@color/catskill_white"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:id="@+id/input_value_linearLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lb_set_value"
-                    android:textColor="@color/limed_spruce"
-                    style="@style/body_small"/>
-
-                <EditText
-                    android:id="@+id/value_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/input_height"
-                    android:paddingStart="8sp"
-                    android:paddingEnd="8sp"
-                    android:layout_marginTop="8sp"
-                    android:layout_marginBottom="8sp"
-                    android:hint="@string/lb_input_value"
-                    android:textColorHint="@color/limed_spruce"
-                    android:background="@color/athens_gray"
-                    style="@style/body_regular"/>
-
-            </LinearLayout>
+            android:layout_weight="1"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/spinner_value_linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:orientation="vertical">
 
                 <TextView
@@ -96,6 +67,235 @@
                 android:layout_height="wrap_content"
                 android:text="@string/lb_save_changes"
                 style="@style/button_primary"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/store_rate_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16sp"
+            android:orientation="vertical"
+            android:elevation="4sp"
+            android:visibility="gone"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_select_store_rate"
+                android:textColor="@color/limed_spruce"
+                style="@style/subtitle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/catskill_white"
+                android:orientation="vertical"
+                android:elevation="4sp">
+
+                <LinearLayout
+                    android:id="@+id/no_store_rate_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_no_store_rate"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/no_store_rate_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1sp"
+                    android:background="@color/light_gray"/>
+
+                <LinearLayout
+                    android:id="@+id/five_minutes_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_5_minutes"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/five_minutes_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1sp"
+                    android:background="@color/light_gray"/>
+
+                <LinearLayout
+                    android:id="@+id/ten_minutes_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_10_minutes"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/ten_minutes_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1sp"
+                    android:background="@color/light_gray"/>
+
+                <LinearLayout
+                    android:id="@+id/twenty_minutes_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_20_minutes"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/twenty_minutes_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1sp"
+                    android:background="@color/light_gray"/>
+
+                <LinearLayout
+                    android:id="@+id/thirty_minutes_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_30_minutes"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/thirty_minutes_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1sp"
+                    android:background="@color/light_gray"/>
+
+                <LinearLayout
+                    android:id="@+id/sixty_minutes_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16sp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lb_60_minutes"
+                        android:textColor="@color/ebony_clay"
+                        style="@style/body_regular"/>
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/sixty_minutes_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_check"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 

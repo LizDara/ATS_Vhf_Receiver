@@ -1,34 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/athens_gray"
     tools:context=".GetDataActivity">
-
-    <TextView
-        android:id="@+id/percentage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16sp"
-        android:textSize="16sp"
-        android:textColor="@color/light_blue"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/iv_ProgressGIF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <ImageView
-        android:id="@+id/iv_ProgressGIF"
-        android:layout_width="170.67dp"
-        android:layout_height="21.33dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,6 +14,30 @@
 
         <include
             layout="@layout/toolbar"/>
+
+        <LinearLayout
+            android:id="@+id/download_data_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/percentage_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textSize="16sp"
+                android:textColor="@color/light_blue"/>
+
+            <ImageView
+                android:id="@+id/iv_ProgressGIF"
+                android:layout_width="170.67dp"
+                android:layout_height="21.33dp"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/menu_manage_receiver_linearLayout"
@@ -49,10 +50,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
+                android:layout_marginHorizontal="16sp"
                 android:layout_marginTop="24sp"
                 android:padding="16sp"
+                android:elevation="4sp"
                 android:background="@color/catskill_white"
                 android:orientation="vertical">
 
@@ -72,7 +73,7 @@
                     android:progressDrawable="@drawable/progress_bar"/>
 
                 <TextView
-                    android:id="@+id/bytes_stored"
+                    android:id="@+id/bytes_stored_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8sp"
@@ -81,31 +82,36 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/memory_button"
-                android:layout_width="match_parent"
+            <Space
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24sp"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:text="@string/lb_view_data"
-                style="@style/button_primary"/>
-
-            <Button
-                android:id="@+id/download_data_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_download_data"
-                style="@style/button_primary"/>
+                android:layout_weight="1"/>
 
             <Button
                 android:id="@+id/erase_data_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginBottom="16sp"
                 android:text="@string/lb_erase_data"
+                style="@style/button_tertiary"/>
+
+            <Button
+                android:id="@+id/memory_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginBottom="16sp"
+                android:text="@string/lb_view_data"
+                style="@style/button_secondary"/>
+
+            <Button
+                android:id="@+id/download_data_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginBottom="24sp"
+                android:text="@string/lb_download_data"
                 style="@style/button_primary"/>
 
         </LinearLayout>

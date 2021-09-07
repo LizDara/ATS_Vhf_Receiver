@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 public class StartScanningActivity extends AppCompatActivity {
 
@@ -35,23 +36,16 @@ public class StartScanningActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
 
     private final static String TAG = StartScanningActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private final int MESSAGE_PERIOD = 3000;
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
 
@@ -66,7 +60,7 @@ public class StartScanningActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -94,10 +88,6 @@ public class StartScanningActivity extends AppCompatActivity {
                     mConnected = false;
                     state = false;
                     invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-
-                } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                    byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 }
             }
             catch (Exception e) {
@@ -118,33 +108,19 @@ public class StartScanningActivity extends AppCompatActivity {
     @OnClick(R.id.start_manual_scan_button)
     public void onClickStartManualScan(View v){
         Intent intent = new Intent(this, ManualScanActivity.class);
-        intent.putExtra(ManualScanActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(ManualScanActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(ManualScanActivity.EXTRAS_BATTERY, mPercentBattery);
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @OnClick(R.id.start_aerial_scan_button)
     public void onClickStartAerialScan(View v){
-        Intent intent = new Intent(this, AerialScanActivity.class);
-        intent.putExtra(AerialScanActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(AerialScanActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(AerialScanActivity.EXTRAS_BATTERY, mPercentBattery);
-        intent.putExtra("scanning", false);
+        Intent intent = new Intent(this, AerialScanningActivity.class);
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @OnClick(R.id.start_stationary_scan_button)
     public void onClickStartStationaryScan(View v){
-        Intent intent = new Intent(this, StationaryScanActivity.class);
-        intent.putExtra(StationaryScanActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(StationaryScanActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(StationaryScanActivity.EXTRAS_BATTERY, mPercentBattery);
-        intent.putExtra("scanning", false);
+        Intent intent = new Intent(this, StationaryScanningActivity.class);
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @Override
@@ -155,7 +131,7 @@ public class StartScanningActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Start Scanning");
+        title_toolbar.setText(R.string.lb_start_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -163,14 +139,11 @@ public class StartScanningActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -181,7 +154,7 @@ public class StartScanningActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -201,22 +174,16 @@ public class StartScanningActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                Intent intent = new Intent(this, MainMenuActivity.class);
-                intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-                intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-                intent.putExtra(MainMenuActivity.EXTRAS_BATTERY, mPercentBattery);
-                // In the MainMenuActivity, only displays the main menu
-                intent.putExtra("menu", true);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                mBluetoothLeService.disconnect();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            Intent intent = new Intent(this, MainMenuActivity.class);
+            // In the MainMenuActivity, only displays the main menu
+            intent.putExtra("menu", true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -239,7 +206,9 @@ public class StartScanningActivity extends AppCompatActivity {
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

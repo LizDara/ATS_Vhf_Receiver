@@ -19,7 +19,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +28,9 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.UUID;
 
@@ -41,18 +42,16 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_aerial_textView)
     TextView frequency_table_number_aerial_textView;
     @BindView(R.id.scan_rate_seconds_aerial_textView)
     TextView scan_rate_seconds_aerial_textView;
-    @BindView(R.id.number_of_antennas_aerial_textView)
-    TextView number_of_antennas_aerial_textView;
     @BindView(R.id.aerial_gps_switch)
     SwitchCompat aerial_gps_switch;
     @BindView(R.id.aerial_auto_record_switch)
@@ -60,16 +59,11 @@ public class AerialDefaultsActivity extends AppCompatActivity {
 
     private final static String TAG = AerialDefaultsActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private static final long MESSAGE_PERIOD = 3000;
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
+
+    private int[] data;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -82,7 +76,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -109,7 +103,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-//                    state = false;
+                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals("save")) { // Save aerial defaults data
@@ -146,9 +140,9 @@ public class AerialDefaultsActivity extends AppCompatActivity {
      * Characteristic name: Aerial.
      */
     private void onClickAerialDefaults() {
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("111584dd-b374-417c-a51d-9314eba66d6c");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice, uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     /**
@@ -159,58 +153,31 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     private void onClickSave() {
         int info = (aerial_gps_switch.isChecked() ? 1 : 0) << 7;
         info = info | ((aerial_auto_record_switch.isChecked() ? 1 : 0) << 6);
-        info = info | Integer.parseInt(number_of_antennas_aerial_textView.getText().toString());
         float scanRate = Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString());
-        int frequencyTableNumber = Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
-        byte[] b = new byte[]{(byte) 0x7D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
+        int frequencyTableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
+                Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
+        byte[] b = new byte[]{(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
 
-        UUID uservice = UUID.fromString("8d60a8bb-1f60-4703-92ff-411103c493e6");
-        UUID uservicechar = UUID.fromString("111584dd-b374-417c-a51d-9314eba66d6c");
-        mBluetoothLeService.writeCharacteristic(uservice, uservicechar, b, false);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
         finish();
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.frequency_table_number_aerial_imageView)
+    @OnClick(R.id.frequency_table_number_aerial_linearLayout)
     public void onClickFrequencyTableNumber(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("type", "aerial");
         intent.putExtra("value", InputValueActivity.FREQUENCY_TABLE_NUMBER);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivityForResult(intent, InputValueActivity.FREQUENCY_TABLE_NUMBER);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.scan_rate_seconds_aerial_imageView)
+    @OnClick(R.id.scan_rate_seconds_aerial_linearLayout)
     public void onClickScanRateSeconds(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("type", "aerial");
         intent.putExtra("value", InputValueActivity.SCAN_RATE_SECONDS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivityForResult(intent, InputValueActivity.SCAN_RATE_SECONDS);
-        mBluetoothLeService.disconnect();
-    }
-
-    @OnClick(R.id.number_of_antennas_aerial_imageView)
-    public void onClickNumberOfAntennas(View v) {
-        Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(AerialDefaultsActivity.EXTRAS_BATTERY, mPercentBattery);
-        intent.putExtra("type", "aerial");
-        intent.putExtra("value", InputValueActivity.NUMBER_OF_ANTENNAS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivityForResult(intent, InputValueActivity.NUMBER_OF_ANTENNAS);
-        mBluetoothLeService.disconnect();
     }
 
     @Override
@@ -221,7 +188,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Mobile Defaults");
+        title_toolbar.setText(R.string.aerial_defaults);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -229,15 +196,12 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "aerial";
 
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -246,27 +210,32 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == 0)
+            return;
         if (requestCode == InputValueActivity.FREQUENCY_TABLE_NUMBER) { // Gets the modified frequency table number
             frequency_table_number_aerial_textView.setText(String.valueOf(resultCode));
         }
         if (requestCode == InputValueActivity.SCAN_RATE_SECONDS) { // Gets the modified scan rate
             scan_rate_seconds_aerial_textView.setText(String.valueOf(resultCode * 0.1));
         }
-        if (requestCode == InputValueActivity.NUMBER_OF_ANTENNAS) { // Gets the modified number of antennas
-            number_of_antennas_aerial_textView.setText(String.valueOf(resultCode));
-        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                parameter = "save";
-                onRestartConnection();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            if (checkChanges()) {
+                if (isDataCorrect()) {
+                    parameter = "save";
+                    mBluetoothLeService.discovering();
+                } else {
+                    showMessage(new byte[]{(byte) 1});
+                }
+            } else {
+                finish();
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -274,7 +243,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG,"Connect request result= " + result);
         }
     }
@@ -313,7 +282,9 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -327,16 +298,19 @@ public class AerialDefaultsActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        mBluetoothLeService.disconnect();
-        frequency_table_number_aerial_textView.setText(Converters.getDecimalValue(data[1]));
-        int gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-        aerial_gps_switch.setChecked(gps == 1);
-        int autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-        aerial_auto_record_switch.setChecked(autoRecord == 1);
-        int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[2])) & 15;
-        number_of_antennas_aerial_textView.setText(String.valueOf(antennaNumber));
-        float scanRate = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
-        scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
+        if (Converters.getHexValue(data[0]).equals("6D")) {
+            parameter = "";
+            frequency_table_number_aerial_textView.setText(
+                    (Converters.getDecimalValue(data[1]).equals("0")) ? "None" : Converters.getDecimalValue(data[1]));
+            int gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
+            aerial_gps_switch.setChecked(gps == 1);
+            int autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+            aerial_auto_record_switch.setChecked(autoRecord == 1);
+            float scanRate = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
+            scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
+            this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])),
+                    (gps == 1) ? 1 : 0, (autoRecord == 1) ? 1 : 0, (int) (scanRate * 10)};
+        }
     }
 
     /**
@@ -348,19 +322,30 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Success!");
-        if (status == 0)
+        builder.setTitle("Message!");
+        if (status == 0) {
             builder.setMessage("Completed.");
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            finish();
-            mBluetoothLeService.disconnect();
-        });
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                finish();
+            });
+        }
+        if (status == 1) {
+            builder.setMessage("Data incorrect.");
+            builder.setPositiveButton("OK", null);
+        }
         builder.show();
     }
 
-    public void onRestartConnection() {
-        mBluetoothLeService.disconnect();
-        SystemClock.sleep(1000);
-        mBluetoothLeService.connect(mDeviceAddress);
+    public boolean checkChanges() {
+        int gps = (aerial_gps_switch.isChecked() ? 1 : 0);
+        int autoRecord = (aerial_auto_record_switch.isChecked() ? 1 : 0);
+        int tableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
+                Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
+        return (data[0] != tableNumber || data[1] != gps || data[2] != autoRecord
+                || data[3] != (int) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10));
+    }
+
+    public boolean isDataCorrect() {
+        return true;
     }
 }

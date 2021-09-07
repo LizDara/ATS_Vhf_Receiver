@@ -4,6 +4,9 @@
     <!--DISCONNECT RECEIVER-->
     <string name="disconnect_receiver">Receiver Disconnected</string>
 
+    <!--LOW POWER MODE-->
+    <string name="low_power_mode">Receiver is in Low Power mode</string>
+
     <!--CONNECT TO RECEIVER-->
     <string name="enable">ENABLE</string>
     <string name="bluetooth_adapter_is_disabled">Bluetooth adapter is disabled.</string>
@@ -11,22 +14,29 @@
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
     <string name="unknown_device">Unknown device</string>
-    <string name="lb_vhf_receiver">VHF RECEIVER</string>
+    <string name="lb_vhf_receiver">VHF Receiver</string>
+    <string name="lb_update_required">Update Required</string>
     <string name="lb_update">We have made an important update to the app and we need you to install the latest version. Please head to the App Store and upgrade to the latest version to continue using the app. Thank you.</string>
     <string name="lb_searching_receivers">Searching for Receivers</string>
-    <string name="lb_unable_find">Unable to find any devices within range</string>
+    <string name="lb_no_receivers_found">No Receivers Found</string>
+    <string name="lb_unable_find">Please make sure your receivers are within bluetooth range and tap the retry button.</string>
     <string name="lb_retry">Retry</string>
-    <string name="lb_connected">Connected</string>
+    <string name="lb_select_receiver">Select ATS Receiver</string>
     <string name="lb_DarkMode">Dark Mode</string>
 
     <!--HOME-->
+    <string name="lb_view_receiver_options">View Receiver Options</string>
     <string name="lb_start_scanning">Start Scanning</string>
+    <string name="lb_connecting_device">Connecting ...</string>
+    <string name="lb_connected">Connected</string>
+    <string name="lb_receiver_connected">ATS Receiver connected</string>
+    <string name="lb_disconnect">Disconnect</string>
+
+    <!--RECEIVER OPTIONS-->
+    <string name="receiver_options">Receiver Options</string>
     <string name="lb_receiver_configuration">Receiver Configuration</string>
     <string name="lb_manage_receiver">Manage Receiver Data</string>
     <string name="lb_test_receiver">Test Receiver</string>
-    <string name="lb_connecting_device">Connecting ...</string>
-    <string name="lb_connected_no_scanning">Connected, Not Scanning</string>
-    <string name="lb_disconnect">Disconnect Receiver</string>
 
     <!--START SCANNING-->
     <string name="lb_manual_scan">Manual Scan</string>
@@ -34,46 +44,72 @@
     <string name="lb_stationary_scan">Stationary Scan</string>
 
     <!--MANUAL SCAN-->
-    <string name="lb_ready_scan">Ready to Scan</string>
+    <string name="manual_scanning">Manual Scanning</string>
+    <string name="lb_current_frequency">Current Frequency</string>
     <string name="lb_frequency">Frequency</string>
-    <string name="lb_set_frequency">Set Frequency</string>
+    <string name="lb_set_frequency">Enter New Frequency</string>
     <string name="lb_start_manual_scan">Start Manual Scan</string>
+    <string name="lb_change_frequency">Change Frequency</string>
+    <string name="lb_enter_frequency">Enter Frequency</string>
+    <string name="lb_ready_to_scan">Ready to Scan</string>
     <string name="lb_manual_scanning">Manual Scanning ...</string>
-    <string name="lb_details">Details</string>
-    <string name="lb_period">Period</string>
-    <string name="lb_signal_strength">Signal Strength</string>
-    <string name="lb_record">Start Recording</string>
+    <string name="lb_scan_details">Scan Details</string>
+    <string name="lb_period">Period (ms)</string>
+    <string name="lb_pulse_rate">Pulse Rate (secs)</string>
+    <string name="lb_signal_strength">Signal Strength (ppm)</string>
+    <string name="lb_record">Recording</string>
+    <string name="lb_stop_scanning">Stop Scanning</string>
 
     <!--AERIAL SCAN-->
-    <string name="lb_scan_rate_seconds">Scan Rate (seconds)</string>
+    <string name="aerial_scanning">Mobile Scanning</string>
+    <string name="lb_scan_defaults">Scan With Default Settings</string>
+    <string name="lb_scan_temporary">Scan With Temporary Settings</string>
+    <string name="lb_current_settings">Current Settings</string>
+    <string name="lb_scan_rate_seconds">Scan Time (seconds)</string>
     <string name="lb_selected_frequency">Selected Frequency Table</string>
     <string name="lb_number_antennas">Number of Antennas</string>
     <string name="lb_gps">GPS</string>
     <string name="lb_auto_record">Auto Record</string>
-    <string name="lb_edit_defaults">Edit Defaults</string>
+    <string name="lb_edit_settings">Edit Settings</string>
     <string name="lb_frequency_empty">All Frequency Tables are Empty</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
-    <string name="lb_table">Table</string>
+    <string name="lb_table">Table (Index)</string>
     <string name="lb_table_index">Table Index</string>
-    <string name="lb_scan_rate">Scan Rate</string>
+    <string name="lb_scan_rate">Scan Time</string>
     <string name="lb_scan_feed">Scan Feed</string>
-    <string name="lb_hold">Hold</string>
+    <string name="lb_hold">Hold Frequency</string>
+    <string name="lb_none">None</string>
+    <string name="lb_on">ON</string>
+    <string name="lb_off">OFF</string>
+
+    <!--TEMPORARY AERIAL-->
+    <string name="temporary_aerial">Temporary Mobile Settings</string>
 
     <!--STATIONARY SCAN-->
+    <string name="stationary_scanning">Stationary Scanning</string>
+    <string name="lb_store_rate">Store Rate</string>
+    <string name="lb_external_data_transfer">External Data Transfer</string>
+    <string name="lb_reference_frequency">Reference Frequency</string>
     <string name="lb_timeout">Timeout (seconds)</string>
     <string name="lb_start_stationary_scan">Start Stationary Scan</string>
     <string name="lb_stationary_scanning">Stationary Scanning ...</string>
+    <string name="lb_current_antenna">Current Antenna</string>
+
+    <!--TEMPORARY STATIONARY-->
+    <string name="temporary_stationary">Temporary Stationary Settings</string>
 
     <!--RECEIVER CONFIGURATION-->
+    <string name="receiver_configuration">Receiver Configuration</string>
     <string name="lb_edit_frequency_tables">Edit Frequency Tables</string>
     <string name="lb_edit_receiver_defaults">Edit Receiver Defaults</string>
-    <string name="lb_set_transmitter_type">Set Transmitter Type</string>
+    <string name="lb_set_transmitter_type">Set Detection Filter</string>
     <string name="lb_clone_from_other_receiver">Clone From Other Receiver</string>
 
     <!--EDIT FREQUENCY TABLES-->
+    <string name="edit_frequency_tables">Edit Frequency Tables</string>
     <string name="lb_select_table">Select a Table</string>
-    <string name="lb_load_table_from_file"><u>Load From File</u></string>
+    <string name="lb_load_table_from_file">Load From File</string>
     <string name="lb_table1">Table 1</string>
     <string name="lb_table2">Table 2</string>
     <string name="lb_table3">Table 3</string>
@@ -87,7 +123,7 @@
     <string name="lb_table11">Table 11</string>
     <string name="lb_table12">Table 12</string>
     <string name="lb_empty_table">0 frequencies</string>
-    <string name="lb_discard_changes"><u>Discard Changes</u></string>
+    <string name="lb_discard_changes">Undo Changes</string>
     <string name="lb_edit_table">Edit Table</string>
     <string name="lb_edit_table_in_order">Edit table in order to save changes</string>
     <string name="lb_save_changes">Save Changes</string>
@@ -96,22 +132,45 @@
     <string name="lb_done">Done</string>
 
     <!--EDIT RECEIVER DEFAULTS-->
-    <string name="lb_aerial_defaults">Mobile Defaults</string>
-    <string name="lb_stationary_defaults">Stationary Defaults</string>
+    <string name="edit_receiver_defaults">Edit Receiver Defaults</string>
+    <string name="lb_aerial_defaults">Edit Mobile Defaults</string>
+    <string name="lb_stationary_defaults">Edit Stationary Defaults</string>
 
     <!--AERIAL DEFAULTS-->
-    <string name="lb_base_defaults">Base Defaults</string>
+    <string name="aerial_defaults">Mobile Default Settings</string>
+    <string name="lb_aerial_settings">Mobile Settings</string>
     <string name="lb_frequency_table_number">Frequency Table Number</string>
     <string name="lb_set_value">Set value</string>
-    <string name="lb_input_value">Input value</string>
 
     <!--STATIONARY DEFAULTS-->
+    <string name="stationary_defaults">Stationary Default Settings</string>
+    <string name="lb_stationary_settings">Stationary Settings</string>
     <string name="lb_scan_timeout">Scan Timeout (seconds)</string>
+    <string name="lb_select_store_rate">Select Store Rate</string>
+    <string name="lb_no_store_rate">No Store Rate</string>
+    <string name="lb_5_minutes">5 minutes</string>
+    <string name="lb_10_minutes">10 minutes</string>
+    <string name="lb_20_minutes">20 minutes</string>
+    <string name="lb_30_minutes">30 minutes</string>
+    <string name="lb_60_minutes">60 minutes</string>
+    <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate</string>
 
     <!--SET TRANSMITTER TYPE-->
+    <string name="set_transmitter_type">Select Detection Filter</string>
     <string name="lb_transmitter_detection">Transmitter Detection Filter Options</string>
     <string name="lb_pulse_rate_type">Pulse Rate Type</string>
+    <string name="lb_choose_one">Choose one now to setup the detection filters.</string>
     <string name="lb_filter_type">Filter Type</string>
+    <string name="lb_matches_for_valid_pattern">Matches for Valid Pattern</string>
+    <string name="lb_target_pulse_rates">Target Pulse Rates</string>
+    <string name="lb_pr1">PR1 (ppm)</string>
+    <string name="lb_pr1_tolerance">PR1 Tolerance (ppm)</string>
+    <string name="lb_pr2">PR2 (ppm)</string>
+    <string name="lb_pr2_tolerance">PR2 Tolerance (ppm)</string>
+    <string name="lb_pr3">PR3 (ppm)</string>
+    <string name="lb_pr3_tolerance">PR3 Tolerance (ppm)</string>
+    <string name="lb_pr4">PR4 (ppm)</string>
+    <string name="lb_pr4_tolerance">PR4 Tolerance (ppm)</string>
     <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
     <string name="lb_fixed_pulse_rate">Fixed Pulse Rate</string>
     <string name="lb_variable_pulse_rate">Variable Pulse Rate</string>
@@ -121,8 +180,19 @@
     <string name="lb_altitude">Altitude</string>
     <string name="lb_depth">Depth</string>
     <string name="lb_select_type">Select Type:</string>
+    <string name="lb_number_matches">Number of Matches</string>
+    <string name="pulse_rate_type_options">Pulse Rate Type Options</string>
+    <string name="matches_for_valid_pattern">Matches for Valid Pattern</string>
+    <string name="lb_eiler_coded">Eiler Coded</string>
+    <string name="lb_eiler_special_coded">Eiler Special Coded</string>
+    <string name="lb_non_coded">Non Coded</string>
+    <string name="target_pulse_rate_1">Target Pulse Rate 1</string>
+    <string name="target_pulse_rate_2">Target Pulse Rate 2</string>
+    <string name="target_pulse_rate_3">Target Pulse Rate 3</string>
+    <string name="target_pulse_rate_4">Target Pulse Rate 4</string>
 
     <!--CLONE RECEIVER-->
+    <string name="clone_receiver">Clone Receiver</string>
     <string name="lb_no_receiver_detected">No Receivers Detected</string>
     <string name="lb_make_sure_receivers">Make sure receivers are on and connected via the clone cable.</string>
     <string name="lb_retry_receiver_search">Retry Receiver Search</string>
@@ -131,11 +201,13 @@
     <string name="lb_clonning">Clonning ...</string>
 
     <!--MANAGE RECEIVER DATA-->
+    <string name="manage_receiver_data">Manage Receiver Data</string>
     <string name="lb_view_data">View Data</string>
     <string name="lb_download_data">Download Data</string>
     <string name="lb_erase_data">Delete Data</string>
 
     <!--TEST RECEIVER-->
+    <string name="test_receiver">Test Receiver</string>
     <string name="lb_running_test">Running Test...</string>
     <string name="lb_test_complete">Test Complete</string>
     <string name="lb_frequency_range">Frequency Range:</string>
@@ -161,12 +233,9 @@
         <item>2</item>
         <item>3</item>
         <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
     </string-array>
-    <string-array name="scanRate">
+
+    <string-array name="scanRateAerial">
         <item>1.5</item>
         <item>2.0</item>
         <item>2.5</item>
@@ -216,5 +285,491 @@
         <item>24.5</item>
         <item>25.0</item>
         <item>25.5</item>
+    </string-array>
+
+    <string-array name="scanRateStationary">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>43</item>
+        <item>44</item>
+        <item>45</item>
+        <item>46</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+        <item>50</item>
+        <item>51</item>
+        <item>52</item>
+        <item>53</item>
+        <item>54</item>
+        <item>55</item>
+        <item>56</item>
+        <item>57</item>
+        <item>58</item>
+        <item>59</item>
+        <item>60</item>
+        <item>61</item>
+        <item>62</item>
+        <item>63</item>
+        <item>64</item>
+        <item>65</item>
+        <item>66</item>
+        <item>67</item>
+        <item>68</item>
+        <item>69</item>
+        <item>70</item>
+        <item>71</item>
+        <item>72</item>
+        <item>73</item>
+        <item>74</item>
+        <item>75</item>
+        <item>76</item>
+        <item>77</item>
+        <item>78</item>
+        <item>79</item>
+        <item>80</item>
+        <item>81</item>
+        <item>82</item>
+        <item>83</item>
+        <item>84</item>
+        <item>85</item>
+        <item>86</item>
+        <item>87</item>
+        <item>88</item>
+        <item>89</item>
+        <item>90</item>
+        <item>91</item>
+        <item>92</item>
+        <item>93</item>
+        <item>94</item>
+        <item>95</item>
+        <item>96</item>
+        <item>97</item>
+        <item>98</item>
+        <item>99</item>
+        <item>100</item>
+        <item>101</item>
+        <item>102</item>
+        <item>103</item>
+        <item>104</item>
+        <item>105</item>
+        <item>106</item>
+        <item>107</item>
+        <item>108</item>
+        <item>109</item>
+        <item>110</item>
+        <item>111</item>
+        <item>112</item>
+        <item>113</item>
+        <item>114</item>
+        <item>115</item>
+        <item>116</item>
+        <item>117</item>
+        <item>118</item>
+        <item>119</item>
+        <item>120</item>
+        <item>121</item>
+        <item>122</item>
+        <item>123</item>
+        <item>124</item>
+        <item>125</item>
+        <item>126</item>
+        <item>127</item>
+        <item>128</item>
+        <item>129</item>
+        <item>130</item>
+        <item>131</item>
+        <item>132</item>
+        <item>133</item>
+        <item>134</item>
+        <item>135</item>
+        <item>136</item>
+        <item>137</item>
+        <item>138</item>
+        <item>139</item>
+        <item>140</item>
+        <item>141</item>
+        <item>142</item>
+        <item>143</item>
+        <item>144</item>
+        <item>145</item>
+        <item>146</item>
+        <item>147</item>
+        <item>148</item>
+        <item>149</item>
+        <item>150</item>
+        <item>151</item>
+        <item>152</item>
+        <item>153</item>
+        <item>154</item>
+        <item>155</item>
+        <item>156</item>
+        <item>157</item>
+        <item>158</item>
+        <item>159</item>
+        <item>160</item>
+        <item>161</item>
+        <item>162</item>
+        <item>163</item>
+        <item>164</item>
+        <item>165</item>
+        <item>166</item>
+        <item>167</item>
+        <item>168</item>
+        <item>169</item>
+        <item>170</item>
+        <item>171</item>
+        <item>172</item>
+        <item>173</item>
+        <item>174</item>
+        <item>175</item>
+        <item>176</item>
+        <item>177</item>
+        <item>178</item>
+        <item>179</item>
+        <item>180</item>
+        <item>181</item>
+        <item>182</item>
+        <item>183</item>
+        <item>184</item>
+        <item>185</item>
+        <item>186</item>
+        <item>187</item>
+        <item>188</item>
+        <item>189</item>
+        <item>190</item>
+        <item>191</item>
+        <item>192</item>
+        <item>193</item>
+        <item>194</item>
+        <item>195</item>
+        <item>196</item>
+        <item>197</item>
+        <item>198</item>
+        <item>199</item>
+        <item>200</item>
+        <item>201</item>
+        <item>202</item>
+        <item>203</item>
+        <item>204</item>
+        <item>205</item>
+        <item>206</item>
+        <item>207</item>
+        <item>208</item>
+        <item>209</item>
+        <item>210</item>
+        <item>211</item>
+        <item>212</item>
+        <item>213</item>
+        <item>214</item>
+        <item>215</item>
+        <item>216</item>
+        <item>217</item>
+        <item>218</item>
+        <item>219</item>
+        <item>220</item>
+        <item>221</item>
+        <item>222</item>
+        <item>223</item>
+        <item>224</item>
+        <item>225</item>
+        <item>226</item>
+        <item>227</item>
+        <item>228</item>
+        <item>229</item>
+        <item>230</item>
+        <item>231</item>
+        <item>232</item>
+        <item>233</item>
+        <item>234</item>
+        <item>235</item>
+        <item>236</item>
+        <item>237</item>
+        <item>238</item>
+        <item>239</item>
+        <item>240</item>
+        <item>241</item>
+        <item>242</item>
+        <item>243</item>
+        <item>244</item>
+        <item>245</item>
+        <item>246</item>
+        <item>247</item>
+        <item>248</item>
+        <item>249</item>
+        <item>250</item>
+        <item>251</item>
+        <item>252</item>
+        <item>253</item>
+        <item>254</item>
+        <item>255</item>
+    </string-array>
+
+    <string-array name="timeout">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>43</item>
+        <item>44</item>
+        <item>45</item>
+        <item>46</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+        <item>50</item>
+        <item>51</item>
+        <item>52</item>
+        <item>53</item>
+        <item>54</item>
+        <item>55</item>
+        <item>56</item>
+        <item>57</item>
+        <item>58</item>
+        <item>59</item>
+        <item>60</item>
+        <item>61</item>
+        <item>62</item>
+        <item>63</item>
+        <item>64</item>
+        <item>65</item>
+        <item>66</item>
+        <item>67</item>
+        <item>68</item>
+        <item>69</item>
+        <item>70</item>
+        <item>71</item>
+        <item>72</item>
+        <item>73</item>
+        <item>74</item>
+        <item>75</item>
+        <item>76</item>
+        <item>77</item>
+        <item>78</item>
+        <item>79</item>
+        <item>80</item>
+        <item>81</item>
+        <item>82</item>
+        <item>83</item>
+        <item>84</item>
+        <item>85</item>
+        <item>86</item>
+        <item>87</item>
+        <item>88</item>
+        <item>89</item>
+        <item>90</item>
+        <item>91</item>
+        <item>92</item>
+        <item>93</item>
+        <item>94</item>
+        <item>95</item>
+        <item>96</item>
+        <item>97</item>
+        <item>98</item>
+        <item>99</item>
+        <item>100</item>
+        <item>101</item>
+        <item>102</item>
+        <item>103</item>
+        <item>104</item>
+        <item>105</item>
+        <item>106</item>
+        <item>107</item>
+        <item>108</item>
+        <item>109</item>
+        <item>110</item>
+        <item>111</item>
+        <item>112</item>
+        <item>113</item>
+        <item>114</item>
+        <item>115</item>
+        <item>116</item>
+        <item>117</item>
+        <item>118</item>
+        <item>119</item>
+        <item>120</item>
+        <item>121</item>
+        <item>122</item>
+        <item>123</item>
+        <item>124</item>
+        <item>125</item>
+        <item>126</item>
+        <item>127</item>
+        <item>128</item>
+        <item>129</item>
+        <item>130</item>
+        <item>131</item>
+        <item>132</item>
+        <item>133</item>
+        <item>134</item>
+        <item>135</item>
+        <item>136</item>
+        <item>137</item>
+        <item>138</item>
+        <item>139</item>
+        <item>140</item>
+        <item>141</item>
+        <item>142</item>
+        <item>143</item>
+        <item>144</item>
+        <item>145</item>
+        <item>146</item>
+        <item>147</item>
+        <item>148</item>
+        <item>149</item>
+        <item>150</item>
+        <item>151</item>
+        <item>152</item>
+        <item>153</item>
+        <item>154</item>
+        <item>155</item>
+        <item>156</item>
+        <item>157</item>
+        <item>158</item>
+        <item>159</item>
+        <item>160</item>
+        <item>161</item>
+        <item>162</item>
+        <item>163</item>
+        <item>164</item>
+        <item>165</item>
+        <item>166</item>
+        <item>167</item>
+        <item>168</item>
+        <item>169</item>
+        <item>170</item>
+        <item>171</item>
+        <item>172</item>
+        <item>173</item>
+        <item>174</item>
+        <item>175</item>
+        <item>176</item>
+        <item>177</item>
+        <item>178</item>
+        <item>179</item>
+        <item>180</item>
+        <item>181</item>
+        <item>182</item>
+        <item>183</item>
+        <item>184</item>
+        <item>185</item>
+        <item>186</item>
+        <item>187</item>
+        <item>188</item>
+        <item>189</item>
+        <item>190</item>
+        <item>191</item>
+        <item>192</item>
+        <item>193</item>
+        <item>194</item>
+        <item>195</item>
+        <item>196</item>
+        <item>197</item>
+        <item>198</item>
+        <item>199</item>
+        <item>200</item>
+    </string-array>
+
+    <string-array name="referenceFrequencyStoreRate">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
     </string-array>
 </resources>

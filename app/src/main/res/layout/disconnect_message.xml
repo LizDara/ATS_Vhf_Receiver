@@ -3,14 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/disconnect_message"
     android:layout_height="wrap_content"
-    android:padding="16sp"
+    android:padding="32sp"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
     android:orientation="vertical"
     android:gravity="center">
 
-    <ImageView
+    <LinearLayout
         android:layout_width="@dimen/connect_image"
         android:layout_height="@dimen/connect_image"
-        android:background="@drawable/ic_receiver_disconnected_dark"/>
+        android:layout_marginBottom="32sp"
+        android:elevation="4sp"
+        android:background="@drawable/disconnected"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="@dimen/receiver_connect"
+            android:layout_height="@dimen/receiver_connect"
+            android:src="@drawable/receiver"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/disconnect_message"
@@ -18,7 +30,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/disconnect_receiver"
-        android:textColor="@color/tall_poppy"
-        style="@style/subtitle"/>
+        android:textColor="@color/ebony_clay"
+        style="@style/h1"/>
 
 </LinearLayout>

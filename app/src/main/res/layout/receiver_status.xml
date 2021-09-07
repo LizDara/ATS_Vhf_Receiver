@@ -16,7 +16,7 @@
         android:layout_weight="6">
 
         <TextView
-            android:id="@+id/device_name"
+            android:id="@+id/device_name_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8sp"
@@ -24,7 +24,7 @@
             style="@style/body_large"/>
 
         <TextView
-            android:id="@+id/device_address"
+            android:id="@+id/device_status_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/ebony_clay"
@@ -45,7 +45,7 @@
             android:src="@drawable/ic_battery_full"/>
 
         <TextView
-            android:id="@+id/percent_battery"
+            android:id="@+id/percent_battery_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

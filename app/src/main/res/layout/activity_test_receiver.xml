@@ -13,57 +13,27 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <include
+            layout="@layout/toolbar"/>
+
         <LinearLayout
+            android:id="@+id/loading_linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"/>
+
+        <ScrollView
+            android:id="@+id/test_complete_scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="6">
-
-            <include
-                layout="@layout/toolbar"/>
+            android:visibility="gone"
+            android:layout_weight="1">
 
             <LinearLayout
-                android:id="@+id/running_test_linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="186sp"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:layout_marginTop="24sp"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:visibility="visible"
-                android:background="@color/catskill_white">
-
-                <ImageView
-                    android:id="@+id/spinner_testing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="59sp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/avd_anim_spinner_48"/>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16sp"
-                    android:gravity="center"
-                    android:text="@string/lb_running_test"
-                    android:textColor="@color/mountain_meadow"
-                    style="@style/subtitle"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/test_complete_linearLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -75,44 +45,160 @@
                     android:textColor="@color/limed_spruce"
                     style="@style/subtitle"/>
 
-                <ScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16sp"
-                    android:layout_marginEnd="16sp"
-                    android:layout_marginTop="12sp"
-                    android:layout_marginBottom="12sp"
-                    android:layout_weight="1">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="16sp"
+                    android:elevation="4sp"
+                    android:background="@color/catskill_white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="16sp"
                         android:orientation="vertical"
-                        android:background="@color/catskill_white">
+                        android:gravity="center_vertical">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="16sp"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
+                            android:layout_marginBottom="8sp"
+                            android:text="@string/lb_frequency_range"
+                            android:textColor="@color/limed_spruce"
+                            style="@style/body_small"/>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8sp"
-                                android:text="@string/lb_frequency_range"
-                                android:textColor="@color/limed_spruce"
-                                style="@style/body_small"/>
+                        <TextView
+                            android:id="@+id/range_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/ebony_clay"
+                            style="@style/body_regular"/>
 
-                            <TextView
-                                android:id="@+id/range_textView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/ebony_clay"
-                                style="@style/body_regular"/>
+                    </LinearLayout>
 
-                        </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1sp"
+                        android:background="@color/light_gray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16sp"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8sp"
+                            android:text="@string/lb_battery"
+                            android:textColor="@color/limed_spruce"
+                            style="@style/body_small"/>
+
+                        <TextView
+                            android:id="@+id/battery_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/ebony_clay"
+                            style="@style/body_regular"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1sp"
+                        android:background="@color/light_gray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16sp"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8sp"
+                            android:text="@string/lb_bytes_stored"
+                            android:textColor="@color/limed_spruce"
+                            style="@style/body_small"/>
+
+                        <TextView
+                            android:id="@+id/bytes_stored_test_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/ebony_clay"
+                            style="@style/body_regular"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1sp"
+                        android:background="@color/light_gray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16sp"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8sp"
+                            android:text="@string/lb_memory_used_percent"
+                            android:textColor="@color/limed_spruce"
+                            style="@style/body_small"/>
+
+                        <TextView
+                            android:id="@+id/memory_used_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/ebony_clay"
+                            style="@style/body_regular"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1sp"
+                        android:background="@color/light_gray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16sp"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8sp"
+                            android:text="@string/lb_frequency_tables"
+                            android:textColor="@color/limed_spruce"
+                            style="@style/body_small"/>
+
+                        <TextView
+                            android:id="@+id/frequency_tables_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/ebony_clay"
+                            style="@style/body_regular"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table_1_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
 
                         <View
                             android:layout_width="match_parent"
@@ -130,569 +216,444 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
-                                android:text="@string/lb_battery"
+                                android:text="@string/lb_first_table"
                                 android:textColor="@color/limed_spruce"
                                 style="@style/body_small"/>
 
                             <TextView
-                                android:id="@+id/battery_textView"
+                                android:id="@+id/first_table_textView"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/ebony_clay"
                                 style="@style/body_regular"/>
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1sp"
-                            android:background="@color/light_gray"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16sp"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8sp"
-                                android:text="@string/lb_bytes_stored"
-                                android:textColor="@color/limed_spruce"
-                                style="@style/body_small"/>
-
-                            <TextView
-                                android:id="@+id/bytes_stored_textView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/ebony_clay"
-                                style="@style/body_regular"/>
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1sp"
-                            android:background="@color/light_gray"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16sp"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8sp"
-                                android:text="@string/lb_memory_used_percent"
-                                android:textColor="@color/limed_spruce"
-                                style="@style/body_small"/>
-
-                            <TextView
-                                android:id="@+id/memory_used_textView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/ebony_clay"
-                                style="@style/body_regular"/>
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1sp"
-                            android:background="@color/light_gray"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16sp"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8sp"
-                                android:text="@string/lb_frequency_tables"
-                                android:textColor="@color/limed_spruce"
-                                style="@style/body_small"/>
-
-                            <TextView
-                                android:id="@+id/frequency_tables_textView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/ebony_clay"
-                                style="@style/body_regular"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table1_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_first_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/first_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table2_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_second_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/second_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table3_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_third_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/third_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table4_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_fourth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/fourth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table5_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_fifth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/fifth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table6_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_sixth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/sixth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table7_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_seventh_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/seventh_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table8_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_eighth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/eighth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table9_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_ninth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/ninth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table10_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_tenth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/tenth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table11_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_eleventh_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/eleventh_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/table12_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:orientation="vertical">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1sp"
-                                android:background="@color/light_gray"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_twelfth_table"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/twelfth_table_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                </ScrollView>
+                    <LinearLayout
+                        android:id="@+id/table_2_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_second_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/second_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table3_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_third_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/third_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table_4_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_fourth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/fourth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table_5_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_fifth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/fifth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table_6_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_sixth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/sixth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table7_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_seventh_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/seventh_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table8_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_eighth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/eighth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table9_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_ninth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/ninth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table10_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_tenth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/tenth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table11_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_eleventh_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/eleventh_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/table12_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1sp"
+                            android:background="@color/light_gray"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16sp"
+                            android:orientation="vertical"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8sp"
+                                android:text="@string/lb_twelfth_table"
+                                android:textColor="@color/limed_spruce"
+                                style="@style/body_small"/>
+
+                            <TextView
+                                android:id="@+id/twelfth_table_textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ebony_clay"
+                                style="@style/body_regular"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
 
         <include
             layout="@layout/receiver_status"/>

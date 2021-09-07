@@ -465,4 +465,76 @@ public class Converters {
         }
         return returnVal;
     }
+
+    public static int strToDecimal(String input) {
+        int total = 0;
+        int pot = 0;
+        int multiple = 0;
+        int z;
+
+        String[] hexadecimal = input.split("");
+
+        for (int x = hexadecimal.length - 1; x >= 0; x--) {
+
+            z = (hexadecimal.length - x - 1);
+            pot = 1;
+            for (int y = 0; y < z; y++){
+                pot *= 16;
+            }
+
+            String letter = hexadecimal[x];
+            switch (letter) {
+                case "0":
+                    multiple = 0;
+                    break;
+                case "1":
+                    multiple = 1;
+                    break;
+                case "2":
+                    multiple = 2;
+                    break;
+                case "3":
+                    multiple = 3;
+                    break;
+                case "4":
+                    multiple = 4;
+                    break;
+                case "5":
+                    multiple = 5;
+                    break;
+                case "6":
+                    multiple = 6;
+                    break;
+                case "7":
+                    multiple = 7;
+                    break;
+                case "8":
+                    multiple = 8;
+                    break;
+                case "9":
+                    multiple = 9;
+                    break;
+                case "A":
+                    multiple = 10;
+                    break;
+                case "B":
+                    multiple = 11;
+                    break;
+                case "C":
+                    multiple = 12;
+                    break;
+                case "D":
+                    multiple = 13;
+                    break;
+                case "E":
+                    multiple = 14;
+                    break;
+                case "F":
+                    multiple = 15;
+                    break;
+            }
+            total += (pot * multiple);
+        }
+        return total;
+    }
 }

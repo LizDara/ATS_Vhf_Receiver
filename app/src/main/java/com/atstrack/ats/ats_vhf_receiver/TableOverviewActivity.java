@@ -32,7 +32,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,11 +52,11 @@ public class TableOverviewActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name)
+    @BindView(R.id.device_name_textView)
     TextView device_name_textView;
-    @BindView(R.id.device_address)
-    TextView device_address_textView;
-    @BindView(R.id.percent_battery)
+    @BindView(R.id.device_status_textView)
+    TextView device_status_textView;
+    @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.table1_frequency)
     TextView table1_frequency;
@@ -89,10 +91,6 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     final private String TAG = TableOverviewActivity.class.getSimpleName();
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private final int MESSAGE_PERIOD = 3000;
     //private static final int REQUEST_CODE_SIGN_IN = 1;
     private static final int REQUEST_CODE_OPEN_STORAGE = 3;
 
@@ -106,9 +104,7 @@ public class TableOverviewActivity extends AppCompatActivity {
     private String fileUrl;
     private String fileId;*/
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private String mPercentBattery;
+    private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private boolean state = true;
 
@@ -123,7 +119,7 @@ public class TableOverviewActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
         @Override
@@ -181,9 +177,9 @@ public class TableOverviewActivity extends AppCompatActivity {
      * Characteristic name: FreqTable.
      */
     public void onClickFrequencies() {
-        UUID uservice = UUID.fromString("609d10ad-d22d-48f3-9e6e-d035398c3606");
-        UUID uservicechar = UUID.fromString("ad0ea6e5-d93a-47a5-a6fc-a930552520dd");
-        mBluetoothLeService.readCharacteristicDiagnostic(uservice, uservicechar);
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     /*@OnClick(R.id.ok_drive_button)
@@ -197,7 +193,7 @@ public class TableOverviewActivity extends AppCompatActivity {
         return word[5];
     }*/
 
-    @OnClick(R.id.load_from_file_overview)
+    @OnClick(R.id.load_from_file_button)
     public void onClickLoadTablesFromFile(View v) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 
@@ -233,35 +229,33 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_OPEN_STORAGE:
-                if (resultCode == RESULT_OK) { // Gets the Uri of the selected file
-                    Uri uri = data.getData();
-                    String uriString = uri.toString();
-                    File myFile = new File(uriString);
-                    String path = myFile.getAbsolutePath();
-                    if (uriString.startsWith("content://")) {
-                        Cursor cursor = null;
-                        try {
-                            cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null);
-                            if (cursor != null && cursor.moveToFirst()) {
-                                String fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                                Log.i(TAG, "NAME FILE: " + fileName);
-                                Log.i(TAG, "PATH FILE: " + myFile.getAbsolutePath());
-                                mBluetoothLeService.disconnect();
-                                readFile(path);
-                            }
-                        } finally {
-                            cursor.close();
+        if (requestCode == REQUEST_CODE_OPEN_STORAGE) {
+            if (resultCode == RESULT_OK) { // Gets the Uri of the selected file
+                Uri uri = data.getData();
+                String uriString = uri.toString();
+                File myFile = new File(uriString);
+                String path = myFile.getAbsolutePath();
+                if (uriString.startsWith("content://")) {
+                    Cursor cursor = null;
+                    try {
+                        cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null);
+                        if (cursor != null && cursor.moveToFirst()) {
+                            String fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                            Log.i(TAG, "NAME FILE: " + fileName);
+                            Log.i(TAG, "PATH FILE: " + myFile.getAbsolutePath());
+                            mBluetoothLeService.disconnect();
+                            readFile(path);
                         }
-                    } else if (uriString.startsWith("file://")) {
-                        String fileName = myFile.getName();
-                        mBluetoothLeService.disconnect();
-                        readFile(path);
+                    } finally {
+                        cursor.close();
                     }
+                } else if (uriString.startsWith("file://")) {
+                    String fileName = myFile.getName();
+                    mBluetoothLeService.disconnect();
+                    readFile(path);
                 }
-                break;
-            /*case REQUEST_CODE_SIGN_IN:
+            }
+                /*case REQUEST_CODE_SIGN_IN:
                 if (resultCode == RESULT_OK)
                     handleSignInIntent(data);
                 break;*/
@@ -557,12 +551,9 @@ public class TableOverviewActivity extends AppCompatActivity {
         table12_frequency.setText(data[12] + " frequencies");
     }
 
-    @OnClick(R.id.table1)
+    @OnClick(R.id.table_1_linearLayout)
     public void onClickTable1(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 1);
         intent.putExtra("total", (int)data[1]);
         intent.putExtra("isFile", isFile);
@@ -573,15 +564,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table2)
+    @OnClick(R.id.table_2_linearLayout)
     public void onClickTable2(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 2);
         intent.putExtra("total", (int)data[2]);
         intent.putExtra("isFile", isFile);
@@ -592,15 +579,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @OnClick(R.id.table3)
     public void onClickTable3(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 3);
         intent.putExtra("total", (int)data[3]);
         if (isFile) {
@@ -610,15 +593,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table4)
+    @OnClick(R.id.table_4_linearLayout)
     public void onClickTable4(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 4);
         intent.putExtra("total", (int)data[4]);
         if (isFile) {
@@ -628,15 +607,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table5)
+    @OnClick(R.id.table_5_linearLayout)
     public void onClickTable5(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 5);
         intent.putExtra("total", (int)data[5]);
         if (isFile) {
@@ -646,15 +621,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table6)
+    @OnClick(R.id.table_6_linearLayout)
     public void onClickTable6(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 6);
         intent.putExtra("total", (int)data[6]);
         if (isFile) {
@@ -664,15 +635,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table7)
+    @OnClick(R.id.table_7_linearLayout)
     public void onClickTable7(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 7);
         intent.putExtra("total", (int)data[7]);
         if (isFile) {
@@ -682,15 +649,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table8)
+    @OnClick(R.id.table_8_linearLayout)
     public void onClickTable8(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 8);
         intent.putExtra("total", (int)data[8]);
         if (isFile) {
@@ -700,15 +663,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table9)
+    @OnClick(R.id.table_9_linearLayout)
     public void onClickTable9(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 9);
         intent.putExtra("total", (int)data[9]);
         if (isFile) {
@@ -718,15 +677,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table10)
+    @OnClick(R.id.table_10_linearLayout)
     public void onClickTable10(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 10);
         intent.putExtra("total", (int)data[10]);
         if (isFile) {
@@ -736,15 +691,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table11)
+    @OnClick(R.id.table_11_linearLayout)
     public void onClickTable11(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 11);
         intent.putExtra("total", (int)data[11]);
         if (isFile) {
@@ -754,15 +705,11 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.table12)
+    @OnClick(R.id.table_12_linearLayout)
     public void onClickTable12(View v) {
         Intent intent = new Intent(this, EditTablesActivity.class);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_NAME, mDeviceName);
-        intent.putExtra(EditTablesActivity.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-        intent.putExtra(EditTablesActivity.EXTRAS_BATTERY, mPercentBattery);
         intent.putExtra("number", 12);
         intent.putExtra("total", (int)data[12]);
         if (isFile) {
@@ -772,7 +719,6 @@ public class TableOverviewActivity extends AppCompatActivity {
             intent.putExtra("range", range);
         }
         startActivity(intent);
-        mBluetoothLeService.disconnect();
     }
 
     @Override
@@ -783,7 +729,7 @@ public class TableOverviewActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText("Edit Frequency Tables");
+        title_toolbar.setText(R.string.edit_frequency_tables);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -791,14 +737,11 @@ public class TableOverviewActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        mPercentBattery = intent.getStringExtra(EXTRAS_BATTERY);
+        receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(mDeviceName);
-        device_address_textView.setText(mDeviceAddress);
-        percent_battery_textView.setText(mPercentBattery);
+        device_name_textView.setText(receiverInformation.getDeviceName());
+        device_status_textView.setText(receiverInformation.getDeviceStatus());
+        percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         // Gets the number of frequencies from each table
         parameter = "frequencies";
@@ -812,13 +755,11 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: //Go back to the previous activity
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -826,7 +767,7 @@ public class TableOverviewActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG, "Connect request result= " + result);
         }
     }
@@ -864,7 +805,9 @@ public class TableOverviewActivity extends AppCompatActivity {
         dialog.show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
+        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
+            dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -878,25 +821,29 @@ public class TableOverviewActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        table1_frequency.setText(Converters.getDecimalValue(data[1]) + " frequencies");
-        table2_frequency.setText(Converters.getDecimalValue(data[2]) + " frequencies");
-        table3_frequency.setText(Converters.getDecimalValue(data[3]) + " frequencies");
-        table4_frequency.setText(Converters.getDecimalValue(data[4]) + " frequencies");
-        table5_frequency.setText(Converters.getDecimalValue(data[5]) + " frequencies");
-        table6_frequency.setText(Converters.getDecimalValue(data[6]) + " frequencies");
-        table7_frequency.setText(Converters.getDecimalValue(data[7]) + " frequencies");
-        table8_frequency.setText(Converters.getDecimalValue(data[8]) + " frequencies");
-        table9_frequency.setText(Converters.getDecimalValue(data[9]) + " frequencies");
-        table10_frequency.setText(Converters.getDecimalValue(data[10]) + " frequencies");
-        table11_frequency.setText(Converters.getDecimalValue(data[11]) + " frequencies");
-        table12_frequency.setText(Converters.getDecimalValue(data[12]) + " frequencies");
+        if (data.length == 1) {
+            mBluetoothLeService.discovering();
+        } else {
+            table1_frequency.setText(Converters.getDecimalValue(data[1]) + " frequencies");
+            table2_frequency.setText(Converters.getDecimalValue(data[2]) + " frequencies");
+            table3_frequency.setText(Converters.getDecimalValue(data[3]) + " frequencies");
+            table4_frequency.setText(Converters.getDecimalValue(data[4]) + " frequencies");
+            table5_frequency.setText(Converters.getDecimalValue(data[5]) + " frequencies");
+            table6_frequency.setText(Converters.getDecimalValue(data[6]) + " frequencies");
+            table7_frequency.setText(Converters.getDecimalValue(data[7]) + " frequencies");
+            table8_frequency.setText(Converters.getDecimalValue(data[8]) + " frequencies");
+            table9_frequency.setText(Converters.getDecimalValue(data[9]) + " frequencies");
+            table10_frequency.setText(Converters.getDecimalValue(data[10]) + " frequencies");
+            table11_frequency.setText(Converters.getDecimalValue(data[11]) + " frequencies");
+            table12_frequency.setText(Converters.getDecimalValue(data[12]) + " frequencies");
 
-        baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[13]));
-        range = Integer.parseInt(Converters.getDecimalValue(data[14]));
+            baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[13]));
+            range = Integer.parseInt(Converters.getDecimalValue(data[14]));
 
-        this.data = new int[data.length];
-        for (int i = 0; i < data.length; i++) {
-            this.data[i] = data[i];
+            this.data = new int[data.length];
+            for (int i = 0; i < data.length; i++) {
+                this.data[i] = data[i];
+            }
         }
     }
 }

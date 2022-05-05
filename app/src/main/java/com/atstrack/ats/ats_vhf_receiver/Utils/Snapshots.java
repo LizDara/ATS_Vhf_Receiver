@@ -7,8 +7,6 @@ import java.util.Calendar;
 
 public class Snapshots implements Parcelable {
 
-    private final static String TAG = Snapshots.class.getSimpleName();
-
     public static final Creator<Snapshots> CREATOR = new Creator<Snapshots>() {
         @Override
         public Snapshots createFromParcel(Parcel in) {
@@ -29,9 +27,20 @@ public class Snapshots implements Parcelable {
     public int byteIndex;
     private int size;
 
+    public Snapshots() {
+        //attributable variables
+        snapshot = new byte[244];
+        fileName = "";
+        //internal use variables
+        byteIndex = 0;
+        filled = false;
+        error = false;
+        this.size = snapshot.length;
+    }
+
     public Snapshots(int size) {
         //attributable variables
-        snapshot = new byte[size]; //16402
+        snapshot = new byte[size];
         fileName = "";
         //internal use variables
         byteIndex = 0;
@@ -64,10 +73,6 @@ public class Snapshots implements Parcelable {
         return filled;
     }
 
-    public boolean isError() {
-        return error;
-    }
-
     /**
      * Generates current date and time, setting variable fileName with the results.
      * Uses global variables to fill fileName.
@@ -75,12 +80,12 @@ public class Snapshots implements Parcelable {
      */
     private void setFileName(boolean isRaw) {
         Calendar time = Calendar.getInstance();
-        fileName = "D_" + (((time.get(Calendar.MONTH) + 1)<10)? "0" + (time.get(Calendar.MONTH) + 1): time.get(Calendar.MONTH) + 1)
-                + "_" + ((time.get(Calendar.DAY_OF_MONTH)<10)? "0" + time.get(Calendar.DAY_OF_MONTH): time.get(Calendar.DAY_OF_MONTH))
+        fileName = "D_" + (((time.get(Calendar.MONTH) + 1) < 10) ? "0" + (time.get(Calendar.MONTH) + 1) : time.get(Calendar.MONTH) + 1)
+                + "_" + ((time.get(Calendar.DAY_OF_MONTH) < 10) ? "0" + time.get(Calendar.DAY_OF_MONTH) : time.get(Calendar.DAY_OF_MONTH))
                 + "_" + time.get(Calendar.YEAR)
-                + "_" + ((time.get(Calendar.HOUR_OF_DAY)<10)? "0" + time.get(Calendar.HOUR_OF_DAY): time.get(Calendar.HOUR_OF_DAY))
-                + "_" + ((time.get(Calendar.MINUTE)<10)? "0" + time.get(Calendar.MINUTE): time.get(Calendar.MINUTE))
-                + "_" + ((time.get(Calendar.SECOND)<10)? "0" + time.get(Calendar.SECOND): time.get(Calendar.SECOND)) + (isRaw ? "Raw" : "") + ".txt";
+                + "_" + ((time.get(Calendar.HOUR_OF_DAY) < 10) ? "0" + time.get(Calendar.HOUR_OF_DAY) : time.get(Calendar.HOUR_OF_DAY))
+                + "_" + ((time.get(Calendar.MINUTE) < 10) ? "0" + time.get(Calendar.MINUTE) : time.get(Calendar.MINUTE))
+                + "_" + ((time.get(Calendar.SECOND) < 10) ? "0" + time.get(Calendar.SECOND) : time.get(Calendar.SECOND)) + (isRaw ? "Raw" : "") + ".txt";
     }
 
     /**
@@ -93,7 +98,7 @@ public class Snapshots implements Parcelable {
                 setFileName(true);
             System.arraycopy(packRead, 0, snapshot, byteIndex, packRead.length);
             byteIndex += packRead.length;
-            if ((byteIndex == size)) filled = true;
+            if (byteIndex == size) filled = true;
         }
         catch (Exception e) {
             setFileName(getFileName() + " || error: " + e.getMessage());
@@ -112,6 +117,23 @@ public class Snapshots implements Parcelable {
                     setFileName(false);
                 System.arraycopy(packRead, 0, snapshot, byteIndex, packRead.length);
                 byteIndex += packRead.length;
+            }
+        } catch (Exception e) {
+            setFileName(getFileName() + " || error: " + e.getMessage());
+            error = true;
+        }
+    }
+
+    /**
+     * GET PACKAGES WRITTEN IN THE TXT FORMAT
+     * @param packRead Conceived to receive 244 bytes.
+     */
+    public void processSnapshotManual(byte[] packRead) {
+        try {
+            if (packRead.length > 0) {
+                System.arraycopy(packRead, 0, snapshot, byteIndex, packRead.length);
+                byteIndex += packRead.length;
+                if (byteIndex == size) filled = true;
             }
         } catch (Exception e) {
             setFileName(getFileName() + " || error: " + e.getMessage());

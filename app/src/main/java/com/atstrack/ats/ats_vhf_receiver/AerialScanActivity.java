@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -37,8 +38,8 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static com.atstrack.ats.ats_vhf_receiver.R.color.light_blue;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
 
 public class AerialScanActivity extends AppCompatActivity {
 
@@ -76,52 +77,39 @@ public class AerialScanActivity extends AppCompatActivity {
     LinearLayout aerial_result_linearLayout;
     @BindView(R.id.table_aerial_textView)
     TextView table_aerial_textView;
-    @BindView(R.id.scan_rateD_aerial_textView)
-    TextView scan_rateD_aerial_textView;
     @BindView(R.id.frequency_aerial_textView)
     TextView frequency_aerial_textView;
-    @BindView(R.id.first_result_aerial_textView)
-    TextView firstResultTextView;
-    @BindView(R.id.second_result_aerial_textView)
-    TextView secondResultTextView;
-    @BindView(R.id.third_result_aerial_textView)
-    TextView thirdResultTextView;
-    @BindView(R.id.forth_result_aerial_textView)
-    TextView forthResultTextView;
+    @BindView(R.id.scan_details_linearLayout)
+    LinearLayout scan_details_linearLayout;
+    @BindView(R.id.code_textView)
+    TextView code_textView;
+    @BindView(R.id.period_textView)
+    TextView period_textView;
+    @BindView(R.id.pulse_rate_textView)
+    TextView pulse_rate_textView;
+    @BindView(R.id.line_view)
+    View line_view;
+    @BindView(R.id.hold_aerial_button)
+    Button hold_aerial_button;
 
     private final static String TAG = AerialScanActivity.class.getSimpleName();
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean state = true;
     private boolean response = true;
 
-    private boolean scanning;
-    private String currentData;
+    private boolean isScanning;
 
     private AnimationDrawable animationDrawable;
 
     private int selectedTable;
-    private int gps;
     private int autoRecord;
-    private float scanTime;
-    private int matches;
-    private int txType;
     private int year;
     private int month;
     private int day;
     private int hour;
     private int minute;
     private int seconds;
-    private int pr1;
-    private int pr1_tolerance;
-    private int pr2;
-    private int pr2_tolerance;
-    private int pr3;
-    private int pr3_tolerance;
-    private int pr4;
-    private int pr4_tolerance;
-    private boolean mortality;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -130,7 +118,6 @@ public class AerialScanActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -143,8 +130,8 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = false;
-    private String parameter = "";
+    private boolean mConnected = true;
+        private String parameter = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -161,7 +148,6 @@ public class AerialScanActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     switch (parameter) {
@@ -236,14 +222,24 @@ public class AerialScanActivity extends AppCompatActivity {
         int ss = currentDate.get(Calendar.SECOND);
         year = YY % 100;
 
-        byte[] b = new byte[]{
+        byte[] b = new byte[] {
                 (byte) 0x82, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
         mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
 
-        scanning = true;
+        isScanning = true;
+        title_toolbar.setText(R.string.lb_aerial_scanning);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
+        aerial_result_linearLayout.setVisibility(View.VISIBLE);
+        hold_aerial_button.setVisibility(View.VISIBLE);
+
+        state_view.setBackgroundResource(R.drawable.scanning_animation);
+        animationDrawable = (AnimationDrawable) state_view.getBackground();
+        animationDrawable.start();
+        frequency_aerial_textView.setText("0");
     }
 
     /**
@@ -264,17 +260,18 @@ public class AerialScanActivity extends AppCompatActivity {
      */
     private void onClickStop() {
         parameter = "aerial";
-        byte[] b = new byte[]{(byte) 0x87};
+        byte[] b = new byte[] {(byte) 0x87};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
         mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
 
-        scanning = false;
+        clear();
+        isScanning = false;
         animationDrawable.stop();
         state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-        clear();
         aerial_result_linearLayout.setVisibility(View.GONE);
+        hold_aerial_button.setVisibility(View.GONE);
         ready_aerial_scan_LinearLayout.setVisibility(View.VISIBLE);
         title_toolbar.setText(R.string.aerial_scanning);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
@@ -291,21 +288,6 @@ public class AerialScanActivity extends AppCompatActivity {
     @OnClick(R.id.start_aerial_button)
     public void onClickStartAerial(View v) {
         parameter = "startAerial";
-        mBluetoothLeService.discovering();
-
-        title_toolbar.setText(R.string.lb_aerial_scanning);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
-        aerial_result_linearLayout.setVisibility(View.VISIBLE);
-
-        state_view.setBackgroundResource(R.drawable.scanning_animation);
-        animationDrawable = (AnimationDrawable) state_view.getBackground();
-        animationDrawable.start();
-    }
-
-    @OnClick(R.id.stop_scanning_aerial_button)
-    public void onClickStopScanning(View v) {
-        parameter = "stopAerial";
         mBluetoothLeService.discovering();
     }
 
@@ -325,27 +307,25 @@ public class AerialScanActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
-        scanning = intent.getExtras().getBoolean("scanning");
+        isScanning = getIntent().getExtras().getBoolean("scanning");
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
         device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        mortality = false;
-
-        if (scanning) { // The device is already scanning
+        if (isScanning) { // The device is already scanning
             parameter = "sendLog";
-            year = intent.getExtras().getInt("year");
-            month = intent.getExtras().getInt("month");
-            day = intent.getExtras().getInt("day");
-            hour = intent.getExtras().getInt("hour");
-            minute = intent.getExtras().getInt("minute");
-            seconds = intent.getExtras().getInt("seconds");
+            year = getIntent().getExtras().getInt("year");
+            month = getIntent().getExtras().getInt("month");
+            day = getIntent().getExtras().getInt("day");
+            hour = getIntent().getExtras().getInt("hour");
+            minute = getIntent().getExtras().getInt("minute");
+            seconds = getIntent().getExtras().getInt("seconds");
 
             ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
             aerial_result_linearLayout.setVisibility(View.VISIBLE);
+            hold_aerial_button.setVisibility(View.VISIBLE);
             title_toolbar.setText(R.string.lb_aerial_scanning);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
@@ -363,7 +343,7 @@ public class AerialScanActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (!scanning) {
+            if (!isScanning) {
                 Intent intent = new Intent(this, AerialScanningActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -380,7 +360,7 @@ public class AerialScanActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (scanning) { // Asks if you want to stop the scan
+        if (isScanning) { // Asks if you want to stop the scan
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Stop Aerial");
             builder.setMessage("Are you sure you want to stop scanning?");
@@ -401,7 +381,6 @@ public class AerialScanActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -420,7 +399,7 @@ public class AerialScanActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected && !state)
+        if (!mConnected)
             showDisconnectionMessage();
         return true;
     }
@@ -431,8 +410,8 @@ public class AerialScanActivity extends AppCompatActivity {
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.disconnect_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
@@ -475,9 +454,9 @@ public class AerialScanActivity extends AppCompatActivity {
                 start_aerial_button.setAlpha((float) 1);
             }
             selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            scanTime = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
+            float scanTime = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
             scan_rate_aerial_textView.setText(String.valueOf(scanTime));
-            gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
+            int gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
             gps_aerial_textView.setText((gps == 1) ? R.string.lb_on : R.string.lb_off);
             autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
             auto_record_aerial_textView.setText((autoRecord == 1) ? R.string.lb_on : R.string.lb_off);
@@ -489,17 +468,12 @@ public class AerialScanActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void setCurrentLog(byte[] data) {
-        currentData = "";
-        String format = Converters.getHexValue(data[0]);
-        switch (format) {
+    private void setCurrentLog(byte[] data) {
+        switch (Converters.getHexValue(data[0])) {
             case "82":
-                Log.i(TAG, Converters.getDecimalValue(data));
                 startScanAerialFirstPart(data);
-                //logFreq(new byte[]{data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]});//byte 0 = F0
                 break;
             case "85":
-                Log.i(TAG, Converters.getDecimalValue(data));
                 startScanAerialSecondPart(data);
                 break;
             case "F0":
@@ -509,46 +483,43 @@ public class AerialScanActivity extends AppCompatActivity {
                 logScanFix(data);
                 break;
             case "F2":
-                logCoded(data);
+                logScanFixConsolidated(data);
                 break;
             default: //E1 and E2
                 logScanData(data);
                 break;
         }
-        refresh();
-    }
-
-    public void startScanAerialFirstPart(byte[] data) {
-        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-        autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-        scanTime = (float) (Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1);
-        matches = Integer.parseInt(Converters.getDecimalValue(data[4])) / 16;
-        txType = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
-        year = Integer.parseInt(Converters.getDecimalValue(data[6]));
-        pr1 = Integer.parseInt(Converters.getDecimalValue(data[7]));
-    }
-
-    public void startScanAerialSecondPart(byte[] data) {
-        pr1_tolerance = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        pr2 = Integer.parseInt(Converters.getDecimalValue(data[2]));
-        pr2_tolerance = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        pr3 = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        pr3_tolerance = Integer.parseInt(Converters.getDecimalValue(data[5]));
-        pr4 = Integer.parseInt(Converters.getDecimalValue(data[6]));
-        pr4_tolerance = Integer.parseInt(Converters.getDecimalValue(data[7]));
     }
 
     /**
-     * With the received packet, processes the data to display.
+     * Process the aerial data, first part of packet.
+     *
+     * @param data The aerial data packet.
+     */
+    private void startScanAerialFirstPart(byte[] data) {
+        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+        //txType = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
+        year = Integer.parseInt(Converters.getDecimalValue(data[6]));
+    }
+
+    /**
+     * Process the aerial data, second part of packet.
+     *
+     * @param data The aerial data packet.
+     */
+    private void startScanAerialSecondPart(byte[] data) {
+    }
+
+    /**
+     * With the received packet, processes the data of scan header to display.
      *
      * @param data The received packet.
      */
-    public void logScanHeader(byte[] data) {
-        mortality = false;
-        int freqOffset = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+    private void logScanHeader(byte[] data) {
+        int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + 150000;
-        int date = Converters.strToDecimal(
+        /*int date = Converters.hexToDecimal(
                 Converters.getHexValue(data[4]) + Converters.getHexValue(data[5]) + Converters.getHexValue(data[6]));
         month = date / 1000000;
         date = date % 1000000;
@@ -557,127 +528,317 @@ public class AerialScanActivity extends AppCompatActivity {
         hour = date / 100;
         minute = date % 100;
         seconds = Integer.parseInt(Converters.getDecimalValue(data[7]));
-        currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;
+        currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;*/
+
+        if (Integer.parseInt(frequency_aerial_textView.getText().toString().replace(".", "")) != frequency) {
+            clear();
+        }
 
         table_aerial_textView.setText(selectedTable + " (" + Converters.getDecimalValue(data[3]) + ")");
-        frequency_aerial_textView.setText(String.valueOf(freqOffset).substring(0, 3) + "." + String.valueOf(freqOffset).substring(3));
-        scan_rateD_aerial_textView.setText(String.valueOf(scanTime));
+        frequency_aerial_textView.setText(String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3));
     }
 
     /**
-     * With the received packet, processes the data to display.
+     * With the received packet, processes the data to display. The pulse rate type is code.
      *
      * @param data The received packet.
      */
-    public void logScanFix(byte[] data) {
-        mortality = (Integer.parseInt(Converters.getDecimalValue(data[5])) > 0);
-        for (int i = 1; i < data.length; i++) {
-            byte b = data[i];
-            switch (i) {
-                case 1:
-                    currentData += "Sec:" + Converters.getDecimalValue(b) + " ";
-                    break;
-                case 2:
-                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) > 128 ?
-                            Integer.parseInt(Converters.getDecimalValue(b)) - 128 : Converters.getDecimalValue(b)) + " ";//Si es mayor que x80 se resta x80
-                    break;
-                case 3:
-                    currentData += "C:" +
-                            ((Integer.parseInt(Converters.getDecimalValue(b)) < 10)? "0" + Converters.getDecimalValue(b): Converters.getDecimalValue(b))
-                            + (mortality ? "M " : " ");
-                    break;
-                case 4:
-                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
-                    break;
-                /*case 5:
-                    currentData += "#:" + (mortality ? Integer.parseInt(Converters.getDecimalValue(b)) - 100 : Converters.getDecimalValue(b));
-                    break;*/
-            }
-        }
-    }
+    private void logScanFix(byte[] data) {
+        int position;
+        int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
+        int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-    public void logScanData(byte[] data) {
-        int number = Integer.parseInt(Converters.getDecimalValue(data[5])) * 256;
-        int match = 0;
-        for (int i = 1; i < data.length; i++) {
-            byte b = data[i];
-            switch (i) {
-                case 1:
-                    currentData += "Sec:" + Converters.getDecimalValue(b) + " ";
-                    break;
-                case 2:
-                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) % 10) + " ";
-                    match = Integer.parseInt(Converters.getDecimalValue(b)) / 10;
-                    break;
-                case 4:
-                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
-                    break;
-                case 6:
-                    currentData += "Per:" + (number + Integer.parseInt(Converters.getDecimalValue(b))) + " ";
-                    currentData += "Match:" + match + " ";
-                    break;
-                case 7:
-                    currentData += "#:" + Converters.getDecimalValue(b);
-            }
-        }
-    }
-
-    public void logCoded(byte[] data) {
-        mortality = (Integer.parseInt(Converters.getDecimalValue(data[5])) > 0);
-        for (int i = 1; i < data.length; i++) {
-            byte b = data[i];
-            switch (i) {
-                case 2:
-                    currentData += "A:" + (Integer.parseInt(Converters.getDecimalValue(b)) > 128 ?
-                            Integer.parseInt(Converters.getDecimalValue(b)) - 128 : Converters.getDecimalValue(b)) + " ";
-                    break;
-                case 3:
-                    currentData += "C:" +
-                            ((Integer.parseInt(Converters.getDecimalValue(b)) < 10) ? "0" + Converters.getDecimalValue(b): Converters.getDecimalValue(b))
-                            + (mortality ? "M " : " ");
-                    break;
-                case 4:
-                    currentData += "SS:" + (Integer.parseInt(Converters.getDecimalValue(b)) + 200) + " ";
-                    break;
-                /*case 5:
-                    currentData += "#:" + (mortality ? Integer.parseInt(Converters.getDecimalValue(b)) - 100 : Converters.getDecimalValue(b));
-                    break;*/
-            }
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+            refreshFirstCode(signalStrength);
+        } else if ((position = positionCode(code)) != 0) {
+            refreshPosition(position, signalStrength);
+        } else {
+            createCodeDetail(code, signalStrength, detections, mort > 0);
         }
     }
 
     /**
-     * Updates the data displayed on the screen.
+     * With the received packet, processes the data to display. The pulse rate type is code.
+     *
+     * @param data The received packet.
      */
-    public void refresh() {
-        forthResultTextView.setText(thirdResultTextView.getText());
-        forthResultTextView.setTextColor(thirdResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
+    private void logScanFixConsolidated(byte[] data) {
+        int position;
+        int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
+        int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-        thirdResultTextView.setText(secondResultTextView.getText());
-        thirdResultTextView.setTextColor(secondResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+            refreshFirstCode(signalStrength);
+        } else if ((position = positionCode(code)) != 0) {
+            refreshPosition(position, signalStrength);
+        } else {
+            createCodeDetail(code, signalStrength, detections, mort > 0);
+        }
+    }
 
-        secondResultTextView.setText(firstResultTextView.getText());
-        secondResultTextView.setTextColor(firstResultTextView.getText().toString().contains("M") ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
+    /**
+     * With the received packet, processes the data to display. The pulse rate type is non code.
+     *
+     * @param data The received packet.
+     */
+    private void logScanData(byte[] data) {
+        int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        float pulseRate = (float) (60000 / period);
+        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        int detections = Integer.parseInt(Converters.getDecimalValue(data[2])) / 10;
 
-        firstResultTextView.setText(currentData);
-        firstResultTextView.setTextColor(mortality ?
-                ContextCompat.getColor(this, tall_poppy) : ContextCompat.getColor(this, light_blue));
+        refreshNonCoded(period, pulseRate, signalStrength, detections);
+    }
+
+    /**
+     * Creates a row of code data and display it.
+     *
+     * @param code Number of code.
+     * @param signalStrength Number of signal strength.
+     * @param detections Number of detections.
+     * @param isMort True, if the code is mort.
+     */
+    private void createCodeDetail(int code, int signalStrength, int detections, boolean isMort) {
+        LinearLayout newCode = new LinearLayout(this);
+        newCode.setOrientation(LinearLayout.HORIZONTAL);
+        newCode.setPadding(0, 8, 0, 8);
+
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.weight = 1;
+
+        TextView codeTextView = new TextView(this);
+        codeTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        codeTextView.setTextAppearance(this, R.style.body_regular);
+        codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        codeTextView.setLayoutParams(params);
+
+        TextView signalStrengthTextView = new TextView(this);
+        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        signalStrengthTextView.setLayoutParams(params);
+
+        TextView detectionsTextView = new TextView(this);
+        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        detectionsTextView.setTextAppearance(this, R.style.body_regular);
+        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        detectionsTextView.setLayoutParams(params);
+
+        newCode.addView(codeTextView);
+        newCode.addView(signalStrengthTextView);
+        newCode.addView(detectionsTextView);
+
+        LinearLayout line = new LinearLayout(this);
+        line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
+        line.setLayoutParams(line_view.getLayoutParams());
+
+        scan_details_linearLayout.addView(newCode);
+        scan_details_linearLayout.addView(line);
+
+        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort);
+    }
+
+    /**
+     * Checks that the first code in the table is equal to code received.
+     *
+     * @param code Number of code received.
+     *
+     * @return Returns true, if the first code is equal to code received.
+     */
+    private boolean isEqualFirstCode(int code) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+        TextView codeTextView = (TextView) linearLayout.getChildAt(0);
+
+        return Integer.parseInt(codeTextView.getText().toString().replace(" M", "")) == code;
+    }
+
+    /**
+     * Updates data in the first row in the table.
+     *
+     * @param signalStrength Number of signal strength to update.
+     */
+    private void refreshFirstCode(int signalStrength) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(1);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
+        signalStrengthTextView.setText(String.valueOf(signalStrength));
+        detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
+    }
+
+    /**
+     * Looks for the position in the table of code received.
+     *
+     * @param code Number of code to look.
+     *
+     * @return Returns the position of code in the table.
+     */
+    private int positionCode(int code) {
+        int position = 0;
+        for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
+            LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
+            TextView textView = (TextView) linearLayout.getChildAt(0);
+
+            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) {
+                position = i;
+            }
+        }
+
+        return position;
+    }
+
+    /**
+     * Updates data at a specific position in the table.
+     *
+     * @param position Number of position in the table to update.
+     * @param signalStrength Number of signal strength.
+     */
+    private void refreshPosition(int position, int signalStrength) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
+        TextView codeTextView = (TextView) linearLayout.getChildAt(0);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
+        int code = Integer.parseInt(codeTextView.getText().toString());
+        int detections = Integer.parseInt(detectionsTextView.getText().toString());
+
+        refreshCode(position, code, signalStrength, detections + 1, codeTextView.getText().toString().contains(" M"));
+    }
+
+    /**
+     * Updates data from a specific position to the first position in the table.
+     *
+     * @param finalPosition Number of rows to update in the table.
+     * @param code Number of code received.
+     * @param signalStrength Number of signal strength received.
+     * @param detections Number of signal strength calculated.
+     * @param isMort True, if the code is mort.
+     */
+    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort) {
+        for (int i = finalPosition; i > 3 ; i -= 2) {
+            LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
+            LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
+
+            TextView lastCodeTextView = (TextView) lastLinearLayout.getChildAt(0);
+            TextView penultimateCodeTextView = (TextView) penultimateLinearLayout.getChildAt(0);
+            lastCodeTextView.setText(penultimateCodeTextView.getText());
+
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
+
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+        }
+
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+        TextView newCodeTextView = (TextView) linearLayout.getChildAt(0);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(2);
+        Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + "Size: " + scan_details_linearLayout.getChildCount());
+
+        newCodeTextView.setText(code + (isMort ? " M" : ""));
+        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
+        newDetectionsTextView.setText(String.valueOf(detections));
+    }
+
+    /**
+     * Creates a row of non code data and display it.
+     *
+     * @param period Number of period received.
+     * @param pulseRate Number of pulse rate received.
+     * @param signalStrength Number of signal strength received.
+     * @param detections Number of detections received.
+     */
+    private void refreshNonCoded(int period, float pulseRate, int signalStrength, int detections) {
+        LinearLayout newNonCoded = new LinearLayout(this);
+        newNonCoded.setOrientation(LinearLayout.HORIZONTAL);
+        newNonCoded.setPadding(0, 8, 0, 8);
+
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.weight = 1;
+
+        TextView periodTextView = new TextView(this);
+        periodTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        periodTextView.setTextAppearance(this, R.style.body_regular);
+        periodTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        periodTextView.setLayoutParams(params);
+
+        TextView pulseRateTextView = new TextView(this);
+        pulseRateTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        pulseRateTextView.setTextAppearance(this, R.style.body_regular);
+        pulseRateTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        pulseRateTextView.setLayoutParams(params);
+
+        TextView signalStrengthTextView = new TextView(this);
+        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        signalStrengthTextView.setLayoutParams(params);
+
+        TextView detectionsTextView = new TextView(this);
+        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        detectionsTextView.setTextAppearance(this, R.style.body_regular);
+        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        detectionsTextView.setLayoutParams(params);
+
+        newNonCoded.addView(periodTextView);
+        newNonCoded.addView(pulseRateTextView);
+        newNonCoded.addView(signalStrengthTextView);
+        newNonCoded.addView(detectionsTextView);
+
+        LinearLayout line = new LinearLayout(this);
+        line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
+        line.setLayoutParams(line_view.getLayoutParams());
+
+        scan_details_linearLayout.addView(newNonCoded);
+        scan_details_linearLayout.addView(line);
+
+        for (int i = scan_details_linearLayout.getChildCount() - 2; i > 3 ; i -= 2) {
+            LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
+            LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
+
+            TextView lastPeriodTextView = (TextView) lastLinearLayout.getChildAt(0);
+            TextView penultimatePeriodTextView = (TextView) penultimateLinearLayout.getChildAt(0);
+            lastPeriodTextView.setText(penultimatePeriodTextView.getText());
+
+            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            lastPulseRateTextView.setText(penultimatePulseRateTextView.getText());
+
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
+
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+        }
+
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+        TextView newPeriodTextView = (TextView) linearLayout.getChildAt(0);
+        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(3);
+
+        newPeriodTextView.setText(String.valueOf(period));
+        newPulseRateTextView.setText(String.valueOf(pulseRate));
+        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
+        newDetectionsTextView.setText(String.valueOf(detections));
     }
 
     /**
      * Clears the screen to start displaying the data.
      */
-    public void clear() {
-        table_aerial_textView.setText("");
-        scan_rateD_aerial_textView.setText("");
-        frequency_aerial_textView.setText("");
-        firstResultTextView.setText("");
-        secondResultTextView.setText("");
-        thirdResultTextView.setText("");
-        forthResultTextView.setText("");
+    private void clear() {
+        int count = scan_details_linearLayout.getChildCount();
+
+        while (count > 2) {
+            scan_details_linearLayout.removeViewAt(2);
+            count--;
+        }
     }
 
     /**
@@ -688,7 +849,7 @@ public class AerialScanActivity extends AppCompatActivity {
     private void showMessage(byte[] data) {
         int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Success!");
         if (status == 0)
             builder.setMessage("Completed.");

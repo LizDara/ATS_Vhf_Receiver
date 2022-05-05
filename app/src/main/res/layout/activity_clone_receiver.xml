@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,8 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <include
             layout="@layout/toolbar"/>
@@ -20,68 +19,69 @@
             android:id="@+id/no_receiver_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:visibility="visible"
-            android:layout_weight="1">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
                 android:layout_marginTop="24sp"
-                android:padding="16sp"
-                android:orientation="vertical"
-                android:gravity="center"
+                android:layout_marginEnd="16sp"
+                android:background="@color/catskill_white"
                 android:elevation="4sp"
-                android:background="@color/catskill_white">
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16sp">
 
                 <LinearLayout
                     android:layout_width="@dimen/connect_image"
                     android:layout_height="@dimen/connect_image"
                     android:layout_marginBottom="32sp"
-                    android:elevation="4sp"
                     android:background="@drawable/disconnected"
+                    android:elevation="4sp"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="@dimen/receiver_connect"
                         android:layout_height="@dimen/receiver_connect"
-                        android:src="@drawable/receiver"/>
+                        android:src="@drawable/receiver" />
 
                 </LinearLayout>
 
                 <TextView
+                    style="@style/h2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lb_no_receiver_detected"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/h2"/>
+                    android:textColor="@color/ebony_clay" />
 
                 <TextView
+                    style="@style/body_regular"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16sp"
                     android:gravity="center"
                     android:text="@string/lb_make_sure_receivers"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/body_regular"/>
+                    android:textColor="@color/ebony_clay" />
 
             </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:ignore="NestedWeights" />
 
             <Button
+                style="@style/button_primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
                 android:layout_marginEnd="16sp"
                 android:layout_marginBottom="24sp"
-                android:text="@string/lb_retry_receiver_search"
-                style="@style/button_primary"/>
+                android:text="@string/lb_retry_receiver_search" />
 
         </LinearLayout>
 
@@ -89,94 +89,95 @@
             android:id="@+id/ready_clone_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center"
-            android:visibility="gone"
-            android:layout_weight="1">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
                 android:layout_marginTop="24sp"
-                android:padding="16sp"
+                android:layout_marginEnd="16sp"
                 android:background="@color/catskill_white"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:padding="16sp">
 
                 <LinearLayout
                     android:layout_width="@dimen/connect_image"
                     android:layout_height="@dimen/connect_image"
                     android:layout_marginBottom="46sp"
-                    android:elevation="4sp"
                     android:background="@drawable/connected"
+                    android:elevation="4sp"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="@dimen/receiver_connect"
                         android:layout_height="@dimen/receiver_connect"
-                        android:src="@drawable/receiver"/>
+                        android:src="@drawable/receiver" />
 
                 </LinearLayout>
 
                 <TextView
+                    style="@style/h1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lb_ready_clone"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/h1"/>
+                    android:textColor="@color/ebony_clay" />
 
             </LinearLayout>
 
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                tools:ignore="NestedWeights" />
 
             <Button
+                style="@style/button_primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
                 android:layout_marginEnd="16sp"
                 android:layout_marginBottom="24sp"
-                android:text="@string/lb_start_cloning"
-                style="@style/button_primary"/>
+                android:text="@string/lb_start_cloning" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/clonning_linearLayout"
+            android:id="@+id/cloning_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_weight="1">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
                 android:layout_marginTop="24sp"
-                android:padding="24sp"
+                android:layout_marginEnd="16sp"
                 android:background="@color/catskill_white"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:padding="24sp">
 
                 <ImageView
-                    android:id="@+id/clonning_imageView"
+                    android:id="@+id/cloning_imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40sp"/>
+                    android:layout_marginTop="40sp" />
 
                 <TextView
+                    style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24sp"
-                    android:text="@string/lb_clonning"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/subtitle"/>
+                    android:text="@string/lb_cloning"
+                    android:textColor="@color/ebony_clay" />
 
             </LinearLayout>
 

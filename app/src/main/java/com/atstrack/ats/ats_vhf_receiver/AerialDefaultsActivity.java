@@ -72,7 +72,6 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -156,7 +155,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         float scanRate = Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString());
         int frequencyTableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
                 Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
-        byte[] b = new byte[]{(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
+        byte[] b = new byte[] {(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
@@ -214,8 +213,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
             return;
         if (requestCode == InputValueActivity.FREQUENCY_TABLE_NUMBER) { // Gets the modified frequency table number
             frequency_table_number_aerial_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.SCAN_RATE_SECONDS) { // Gets the modified scan rate
+        } else if (requestCode == InputValueActivity.SCAN_RATE_SECONDS) { // Gets the modified scan rate
             scan_rate_seconds_aerial_textView.setText(String.valueOf(resultCode * 0.1));
         }
     }
@@ -275,8 +273,8 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.disconnect_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
@@ -321,7 +319,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     private void showMessage(byte[] data) {
         int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Message!");
         if (status == 0) {
             builder.setMessage("Completed.");
@@ -336,16 +334,27 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public boolean checkChanges() {
+    /**
+     * Checks for changes to the default data.
+     *
+     * @return Returns true, if there are changes.
+     */
+    private boolean checkChanges() {
         int gps = (aerial_gps_switch.isChecked() ? 1 : 0);
         int autoRecord = (aerial_auto_record_switch.isChecked() ? 1 : 0);
         int tableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
                 Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
+        int scanRate = (int) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10);
         return (data[0] != tableNumber || data[1] != gps || data[2] != autoRecord
-                || data[3] != (int) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10));
+                || data[3] != scanRate);
     }
 
-    public boolean isDataCorrect() {
+    /**
+     * Checks that the data is a valid and correct format.
+     *
+     * @return Returns true, if the data is correct.
+     */
+    private boolean isDataCorrect() {
         return true;
     }
 }

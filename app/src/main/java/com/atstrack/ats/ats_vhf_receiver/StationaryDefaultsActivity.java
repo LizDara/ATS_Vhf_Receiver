@@ -72,7 +72,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean state = true;
 
     private int[] data;
 
@@ -83,7 +82,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -96,7 +94,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = false;
+    private boolean mConnected = true;
     private String parameter = "";
 
     // Handles various events fired by the Service.
@@ -114,7 +112,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals("save")) { // Save stationary defaults data
@@ -284,23 +281,25 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 0)
             return;
-        if (requestCode == InputValueActivity.FREQUENCY_TABLE_NUMBER) { // Gets the modified frequency table number
-            frequency_table_number_stationary_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.SCAN_RATE_SECONDS) { // Gets the modified scan rate
-            scan_rate_seconds_stationary_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.SCAN_TIMEOUT_SECONDS) { // Gets the modified scan timeout
-            scan_timeout_seconds_stationary_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.NUMBER_OF_ANTENNAS) { // Gets the modified number of antennas
-            number_of_antennas_stationary_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.STORE_RATE) {
-            store_rate_stationary_textView.setText((resultCode == 100) ? "No Store Rate" : String.valueOf(resultCode));
-        }
-        if (requestCode == InputValueActivity.REFERENCE_FREQUENCY_STORE_RATE) {
-            reference_frequency_store_rate_stationary_textView.setText(String.valueOf(resultCode));
+        switch (requestCode) {
+            case InputValueActivity.FREQUENCY_TABLE_NUMBER:  // Gets the modified frequency table number
+                frequency_table_number_stationary_textView.setText(String.valueOf(resultCode));
+                break;
+            case InputValueActivity.SCAN_RATE_SECONDS:  // Gets the modified scan rate
+                scan_rate_seconds_stationary_textView.setText(String.valueOf(resultCode));
+                break;
+            case InputValueActivity.SCAN_TIMEOUT_SECONDS:  // Gets the modified scan timeout
+                scan_timeout_seconds_stationary_textView.setText(String.valueOf(resultCode));
+                break;
+            case InputValueActivity.NUMBER_OF_ANTENNAS:  // Gets the modified number of antennas
+                number_of_antennas_stationary_textView.setText(String.valueOf(resultCode));
+                break;
+            case InputValueActivity.STORE_RATE:
+                store_rate_stationary_textView.setText((resultCode == 100) ? "No Store Rate" : String.valueOf(resultCode));
+                break;
+            case InputValueActivity.REFERENCE_FREQUENCY_STORE_RATE:
+                reference_frequency_store_rate_stationary_textView.setText(String.valueOf(resultCode));
+                break;
         }
     }
 
@@ -328,7 +327,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -347,7 +345,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected && !state)
+        if (!mConnected)
             showDisconnectionMessage();
         return true;
     }
@@ -358,8 +356,8 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.disconnect_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
@@ -423,7 +421,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     private void showMessage(byte[] data) {
         int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Message!");
         if (status == 0) {
             builder.setMessage("Completed.");
@@ -438,7 +436,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public boolean checkChanges() {
+    /**
+     * Checks for changes to the default data.
+     *
+     * @return Returns true, if there are changes.
+     */
+    private boolean checkChanges() {
         int frequencyTable = (frequency_table_number_stationary_textView.getText().toString().equals("None")) ? 0 :
                 Integer.parseInt(frequency_table_number_stationary_textView.getText().toString());
         int antennaNumber = (number_of_antennas_stationary_textView.getText().toString().equals("None") ? 0 :
@@ -464,7 +467,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                 || storeRate != data[4] || frequency != data[5] || referenceFrequencyStoreRate != data[6];
     }
 
-    public boolean isDataCorrect() {
+    /**
+     * Checks that the data is a valid and correct format.
+     *
+     * @return Returns true, if the data is correct.
+     */
+    private boolean isDataCorrect() {
         return Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString())
                 < Integer.parseInt(scan_rate_seconds_stationary_textView.getText().toString());
     }

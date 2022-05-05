@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,38 +19,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16sp"
-            android:layout_marginEnd="16sp"
             android:layout_marginTop="24sp"
-            android:padding="16sp"
-            android:elevation="4sp"
-            android:visibility="gone"
+            android:layout_marginEnd="16sp"
             android:background="@color/catskill_white"
-            android:orientation="vertical">
+            android:elevation="4sp"
+            android:orientation="vertical"
+            android:padding="16sp"
+            android:visibility="gone">
 
             <TextView
+                style="@style/h1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8sp"
                 android:layout_marginBottom="24sp"
                 android:text="@string/lb_pulse_rate_type"
-                android:textColor="@color/limed_spruce"
-                style="@style/h1"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
+                style="@style/body_large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="48sp"
                 android:text="@string/lb_choose_one"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_large"/>
+                android:textColor="@color/limed_spruce" />
 
             <Button
                 android:id="@+id/select_pulse_rate_button"
+                style="@style/button_primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_select_pulse_rate"
-                style="@style/button_primary"/>
+                android:text="@string/lb_select_pulse_rate" />
 
         </LinearLayout>
 
@@ -59,310 +58,80 @@
             android:id="@+id/select_pulse_rate_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
+                style="@style/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
                 android:layout_marginTop="24sp"
+                android:layout_marginEnd="16sp"
                 android:text="@string/lb_select_pulse_rate"
-                android:textColor="@color/limed_spruce"
-                style="@style/subtitle"/>
+                android:textColor="@color/limed_spruce" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16sp"
                 android:layout_marginVertical="8sp"
-                android:orientation="vertical"
+                android:background="@color/catskill_white"
                 android:elevation="4sp"
-                android:background="@color/catskill_white">
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/fixed_pulse_rate_linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16sp"
+                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:gravity="center">
+                    android:padding="16sp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        style="@style/body_regular"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/lb_fixed_pulse_rate"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
+                        android:textColor="@color/ebony_clay" />
 
                     <ImageView
                         android:id="@+id/fixed_pulse_rate_imageView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
+                        android:background="@drawable/ic_check"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/light_gray"/>
+                    android:background="@color/light_gray" />
 
                 <LinearLayout
                     android:id="@+id/variable_pulse_rate_linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16sp"
+                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:gravity="center">
+                    android:padding="16sp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        style="@style/body_regular"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/lb_variable_pulse_rate"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
+                        android:textColor="@color/ebony_clay" />
 
                     <ImageView
                         android:id="@+id/variable_pulse_rate_imageView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/fixed_filter_type_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:layout_marginTop="24sp"
-                android:text="@string/lb_filter_type"
-                android:textColor="@color/limed_spruce"
-                style="@style/subtitle"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:layout_marginTop="8sp"
-                android:orientation="vertical"
-                android:elevation="4sp"
-                android:background="@color/catskill_white">
-
-                <LinearLayout
-                    android:id="@+id/pattern_matching_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_pattern_matching"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/pattern_matching_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_gray"/>
-
-                <LinearLayout
-                    android:id="@+id/pulses_per_scan_time_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_pulses_per_scan_time"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/pulses_per_scan_time_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/variable_filter_type_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:layout_marginTop="24sp"
-                android:text="@string/lb_filter_type"
-                android:textColor="@color/limed_spruce"
-                style="@style/subtitle"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16sp"
-                android:layout_marginEnd="16sp"
-                android:layout_marginTop="8sp"
-                android:orientation="vertical"
-                android:elevation="4sp"
-                android:background="@color/catskill_white">
-
-                <LinearLayout
-                    android:id="@+id/temperature_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_temperature"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/temperature_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_gray"/>
-
-                <LinearLayout
-                    android:id="@+id/period_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_period"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/period_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_gray"/>
-
-                <LinearLayout
-                    android:id="@+id/altitude_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_altitude"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/altitude_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_gray"/>
-
-                <LinearLayout
-                    android:id="@+id/depth_linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/lb_depth"
-                        android:textColor="@color/ebony_clay"
-                        style="@style/body_regular"/>
-
-                    <ImageView
-                        android:id="@+id/depth_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:background="@drawable/ic_check"/>
+                        android:background="@drawable/ic_check"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -374,8 +143,8 @@
             android:id="@+id/number_of_matches_scrollView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -383,228 +152,235 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16sp"
-                    android:layout_marginEnd="16sp"
                     android:layout_marginTop="24sp"
+                    android:layout_marginEnd="16sp"
                     android:text="@string/lb_number_matches"
-                    android:textColor="@color/limed_spruce"
-                    style="@style/subtitle"/>
+                    android:textColor="@color/limed_spruce" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16sp"
-                    android:layout_marginEnd="16sp"
                     android:layout_marginTop="8sp"
+                    android:layout_marginEnd="16sp"
                     android:layout_marginBottom="16sp"
-                    android:orientation="vertical"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/two_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="2"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/two_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/three_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="3"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/three_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/four_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="4"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/four_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/five_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="5"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/five_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/six_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="6"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/six_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/seven_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="7"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/seven_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:id="@+id/eight_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            style="@style/body_regular"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="8"
                             android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            tools:ignore="HardcodedText" />
 
                         <ImageView
                             android:id="@+id/eight_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@drawable/ic_check"/>
+                            android:background="@drawable/ic_check"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
@@ -618,68 +394,259 @@
             android:id="@+id/pulse_rate_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16sp"
-            android:visibility="gone"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/pulse_rate_textView"
+                style="@style/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8sp"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginTop="16sp"
                 android:layout_marginBottom="8sp"
-                android:textColor="@color/limed_spruce"
-                style="@style/subtitle"/>
+                android:textColor="@color/limed_spruce" />
 
             <EditText
                 android:id="@+id/pulse_rate_editText"
+                style="@style/body_regular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16sp"
                 android:background="@color/catskill_white"
                 android:inputType="number"
                 android:maxLines="1"
-                android:text="0"
+                android:layout_marginHorizontal="16sp"
+                android:padding="16sp"
+                android:elevation="4sp"
                 android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/pulse_rate_tolerance_textView"
+                style="@style/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
                 android:layout_marginTop="24sp"
                 android:layout_marginBottom="8sp"
-                android:textColor="@color/limed_spruce"
-                style="@style/subtitle"/>
+                android:textColor="@color/limed_spruce" />
 
-            <EditText
-                android:id="@+id/pulse_rate_tolerance_editText"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16sp"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginBottom="16sp"
+                android:elevation="4sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/body_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/catskill_white"
+                    android:gravity="center"
+                    android:paddingStart="16sp"
+                    android:text="+/-"
+                    android:textColor="@color/ebony_clay"
+                    tools:ignore="HardcodedText,RtlSymmetry" />
+
+                <EditText
+                    android:id="@+id/pulse_rate_tolerance_editText"
+                    style="@style/body_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/catskill_white"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:paddingHorizontal="4sp"
+                    android:paddingVertical="16sp"
+                    android:textColor="@color/ebony_clay"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/max_min_pulse_rate_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/max_min_pulse_rate_textView"
+                style="@style/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginTop="16sp"
+                android:layout_marginBottom="8sp"
+                android:textColor="@color/limed_spruce" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginBottom="16sp"
+                android:elevation="4sp"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/max_min_pulse_rate_editText"
+                    style="@style/body_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/catskill_white"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:padding="16sp"
+                    android:textColor="@color/ebony_clay"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/period_pulse_rate_textView"
+                    style="@style/body_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/catskill_white"
+                    android:paddingHorizontal="16sp"
+                    android:paddingBottom="16sp"
+                    android:textColor="@color/limed_spruce" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/data_calculation_types_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:layout_marginTop="24sp"
+                android:layout_marginEnd="16sp"
+                android:text="@string/lb_data_calculation_types"
+                android:textColor="@color/limed_spruce" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16sp"
+                android:layout_marginVertical="8sp"
                 android:background="@color/catskill_white"
-                android:inputType="number"
-                android:maxLines="1"
-                android:text="0"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:elevation="4sp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/none_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
+
+                    <TextView
+                        style="@style/body_regular"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/lb_none"
+                        android:textColor="@color/ebony_clay" />
+
+                    <ImageView
+                        android:id="@+id/none_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_check"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/light_gray" />
+
+                <LinearLayout
+                    android:id="@+id/temperature_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
+
+                    <TextView
+                        style="@style/body_regular"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/lb_temperature"
+                        android:textColor="@color/ebony_clay" />
+
+                    <ImageView
+                        android:id="@+id/temperature_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_check"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/light_gray" />
+
+                <LinearLayout
+                    android:id="@+id/period_linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
+
+                    <TextView
+                        style="@style/body_regular"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/lb_period"
+                        android:textColor="@color/ebony_clay" />
+
+                    <ImageView
+                        android:id="@+id/period_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_check"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/save_changes_select_value_button"
+            style="@style/button_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16sp"
             android:layout_marginEnd="16sp"
             android:layout_marginBottom="24sp"
-            android:text="@string/lb_save_changes"
-            style="@style/button_primary"/>
+            android:text="@string/lb_save_changes" />
 
         <include
             layout="@layout/receiver_status"/>

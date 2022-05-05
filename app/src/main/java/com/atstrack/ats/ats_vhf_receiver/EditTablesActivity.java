@@ -12,7 +12,6 @@ import timber.log.Timber;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -21,7 +20,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -96,7 +94,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean state = true;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -105,7 +102,6 @@ public class EditTablesActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -118,7 +114,7 @@ public class EditTablesActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = false;
+    private boolean mConnected = true;
     private String parameter;
 
     // Handles various events fired by the Service.
@@ -136,7 +132,6 @@ public class EditTablesActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     switch (parameter) {
@@ -178,9 +173,9 @@ public class EditTablesActivity extends AppCompatActivity {
      * Service name: StoredData.
      * Characteristic name: FreqTable.
      */
-    public void onClickTable() {
+    private void onClickTable() {
         parameter = "receive";
-        byte[] b = new byte[]{(byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) number};
+        byte[] b = new byte[] {(byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) number};
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
@@ -191,7 +186,7 @@ public class EditTablesActivity extends AppCompatActivity {
      * Service name: StoredData.
      * Characteristic name: FreqTable.
      */
-    public void onReceiveTable() {
+    private void onReceiveTable() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
@@ -227,7 +222,7 @@ public class EditTablesActivity extends AppCompatActivity {
         int index = 10;
         int i = 0;
         while (i < table.length) {
-            table[i] = (table[i] % (Integer.parseInt(Converters.getDecimalValue(b[9])) * 1000));
+            table[i] = (table[i] % (baseFrequency * 1000));
             b[index] = (byte) (table[i] / 256);
             b[index + 1] = (byte) (table[i] % 256);
             i++;
@@ -244,40 +239,40 @@ public class EditTablesActivity extends AppCompatActivity {
     /**
      * Displays a alert dialog for the user to choose to edit the table or delete all frequencies.
      */
-    public void createDialogSelect() {
+    private void createDialogSelect() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view = inflater.inflate(R.layout.layout_dialog, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.options_edit_table, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         Button editTable = view.findViewById(R.id.edit_table_button);
         Button clearTable = view.findViewById(R.id.clear_table_button);
 
-        editTable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                createDialogEdit();
-            }
+        editTable.setOnClickListener(v -> {
+            dialog.dismiss();
+            createDialogEdit();
         });
-        clearTable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle("Discard Changes");
-                builder.setMessage("Are you sure you want to delete all the frequencies in this table?");
-                builder.setPositiveButton("Delete Frequencies", (dialog, which) -> {
-                    table = new int[]{};
-                    isChanged = true;
-                    frequency_table.removeAllViews();
-                    showTable();
-                });
-                builder.setNegativeButton("Cancel", null);
-                AlertDialog dialogI = builder.create();
-                dialogI.show();
-                dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
-                dialog.dismiss();
-            }
+        clearTable.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            builder.setTitle("Discard Changes");
+            builder.setMessage("Are you sure you want to delete all the frequencies in this table?");
+            builder.setPositiveButton("Delete Frequencies", (dialog1, which) -> {
+                table = new int[]{};
+                isChanged = true;
+                frequency_table.removeAllViews();
+                showTable();
+
+                save_changes_button.setVisibility(View.VISIBLE);
+                save_changes_button.setAlpha((float) 1);
+                save_changes_button.setEnabled(true);
+                edit_table_options_linearLayout.setVisibility(View.VISIBLE);
+                edit_table_option_button.setVisibility(View.GONE);
+            });
+            builder.setNegativeButton("Cancel", null);
+            AlertDialog dialogI = builder.create();
+            dialogI.show();
+            dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
+            dialog.dismiss();
         });
         dialog.getWindow().setLayout(widthPixels / 3, LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.setView(view);
@@ -287,34 +282,31 @@ public class EditTablesActivity extends AppCompatActivity {
     /**
      * Displays a alert dialog where the user can edit the frequencies of that table, also check that each frequency is correct.
      */
-    public void createDialogEdit() {
+    private void createDialogEdit() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view = inflater.inflate(R.layout.layout_edit_table, null);
+        View view = inflater.inflate(R.layout.edit_frequencies, null);
         final AlertDialog builder = new AlertDialog.Builder(this).create();
 
         // Does not allow the alert dialog to disappear when touch outside of it
         builder.setCanceledOnTouchOutside(false);
 
         // Asks if you want to lose the data already modified when touching back while the alert dialog is displayed
-        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialogI, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
-                    builder.setTitle("Discard Changes");
-                    builder.setMessage("If you leave without saving you will lose your changes. Do you wish to continue?");
-                    builder.setNegativeButton("Cancel", null);
-                    builder.setPositiveButton("Discard", (dialog, which) -> {
-                        dialogI.dismiss();
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
-                    return true;
-                }
-                return false;
+        builder.setOnKeyListener((dialogI, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(getBaseContext());
+                builder1.setTitle("Discard Changes");
+                builder1.setMessage("If you leave without saving you will lose your changes. Do you wish to continue?");
+                builder1.setNegativeButton("Cancel", null);
+                builder1.setPositiveButton("Discard", (dialog, which) -> {
+                    dialogI.dismiss();
+                });
+                AlertDialog dialog = builder1.create();
+                dialog.show();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
+                return true;
             }
+            return false;
         });
 
         // Defines the size of the alert dialog
@@ -340,26 +332,16 @@ public class EditTablesActivity extends AppCompatActivity {
         for (int i = 0; i < table.length; i++) {
             if (i > 0)
                 frequencies += "" + LF;
-            frequencies = frequencies + table[i];
+            frequencies += table[i];
         }
         // Set the frequencies to edit
         editTable.setText(frequencies);
-        /*editTable.setEnabled(true);
-        editTable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                builder.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-            }
-        });*/
 
         // Keeps keys visible
         editTable.requestFocus();
-        editTable.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus){
-                    builder.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
+        editTable.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus){
+                builder.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             }
         });
 
@@ -368,45 +350,41 @@ public class EditTablesActivity extends AppCompatActivity {
 
         // Copy the initial frequencies
         String initFrequencies = frequencies;
-        undoChanges.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle("Warning");
-                builder.setMessage("Are you sure you want to discard your changes?");
-                builder.setNegativeButton("No", null);
-                builder.setPositiveButton("Yes", (dialog, which) -> {
-                    editTable.getText().clear();
-                    editTable.setText(initFrequencies);
-                });
-                AlertDialog dialogI = builder.create();
-                dialogI.show();
-                dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
-            }
+        undoChanges.setOnClickListener(v -> {
+            AlertDialog.Builder builder12 = new AlertDialog.Builder(v.getContext());
+            builder12.setTitle("Warning");
+            builder12.setMessage("Are you sure you want to discard your changes?");
+            builder12.setNegativeButton("No", null);
+            builder12.setPositiveButton("Yes", (dialog, which) -> {
+                editTable.getText().clear();
+                editTable.setText(initFrequencies);
+            });
+            AlertDialog dialogI = builder12.create();
+            dialogI.show();
+            dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
         });
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String frequencies = String.valueOf(editTable.getText());
-                if (checkFormat(frequencies)) {
-                    if (checkTableLimit()) {
-                        saveChanges(frequencies);
-                        // Removes all frequencies
-                        frequency_table.removeAllViews();
-                        // Set the modified frequencies
-                        showTable();
-                        if (isChanged) { // If changes were made, enables the discard changes button and save changes button
-                            save_changes_button.setAlpha((float) 1);
-                            save_changes_button.setEnabled(true);
-                            edit_table_message_textView.setVisibility(View.GONE);
-                        }
-                        builder.dismiss();
-                    } else {
-                        showWarningDialog("Exceeded Table Limit", "Please enter no more than 100 frequencies.");
+        done.setOnClickListener(v -> {
+            String frequencies1 = String.valueOf(editTable.getText());
+            if (checkFormat(frequencies1)) {
+                if (checkTableLimit()) {
+                    saveChanges(frequencies1);
+                    // Removes all frequencies
+                    frequency_table.removeAllViews();
+                    // Set the modified frequencies
+                    showTable();
+                    if (isChanged) { // If changes were made, enables the discard changes button and save changes button
+                        save_changes_button.setVisibility(View.VISIBLE);
+                        save_changes_button.setAlpha((float) 1);
+                        save_changes_button.setEnabled(true);
+                        edit_table_options_linearLayout.setVisibility(View.VISIBLE);
+                        edit_table_option_button.setVisibility(View.GONE);
                     }
+                    builder.dismiss();
                 } else {
-                    showWarningDialog("Invalid Format or Values", "Please enter valid frequency values, each on a separate line.");
+                    showWarningDialog("Exceeded Table Limit", "Please enter no more than 100 frequencies.");
                 }
+            } else {
+                showWarningDialog("Invalid Format or Values", "Please enter valid frequency values, each on a separate line.");
             }
         });
         builder.setView(view);
@@ -420,31 +398,24 @@ public class EditTablesActivity extends AppCompatActivity {
     /**
      * Checks that all edited frequencies are in the correct format.
      *
-     * @param frequencies The edited frequencies.
+     * @param value The edited frequencies.
      *
      * @return Returns true, if the frequencies are correct.
      */
-    public boolean checkFormat(String frequencies) {
+    private boolean checkFormat(String value) {
         tableLimitEdit = 0;
-        int beginIndex = 0;
-        int endIndex;
         boolean correct = true;
-        while (beginIndex < frequencies.length() && correct) {
-            endIndex = frequencies.indexOf(LF, beginIndex);
-            if (endIndex == -1)
-                endIndex = frequencies.length();
-            // Gets a frequency from the string
-            String frequency = frequencies.substring(beginIndex, endIndex);
-            beginIndex = endIndex + 1;
+
+        String[] frequencies = value.split(String.valueOf(LF));
+        for (String frequency : frequencies) {
             tableLimitEdit++;
-            // Checks that the frequency size is 6
             if (frequency.length() != 6)
                 correct = false;
-            // Checks that the frequency is within the range
-            if ((Integer.parseInt(frequency) < (baseFrequency * 1000))
-                    || (Integer.parseInt(frequency) > (range * 1000) + (baseFrequency * 1000))) //>=
+            else if ((Integer.parseInt(frequency) < (baseFrequency * 1000))
+                    || (Integer.parseInt(frequency) > (baseFrequency + range) * 1000)) //>=
                 correct = false;
         }
+
         return correct;
     }
 
@@ -453,7 +424,7 @@ public class EditTablesActivity extends AppCompatActivity {
      *
      * @return Returns true, if the number of frequencies is less than or equal to 100.
      */
-    public boolean checkTableLimit() {
+    private boolean checkTableLimit() {
         return tableLimitEdit <= 100;
     }
 
@@ -463,12 +434,12 @@ public class EditTablesActivity extends AppCompatActivity {
      * @param error The error name.
      * @param message The message to be displayed.
      */
-    public void showWarningDialog(String error, String message) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+    private void showWarningDialog(String error, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(error);
         builder.setMessage(message);
         builder.setPositiveButton("Ok", null);
-        android.app.AlertDialog dialog = builder.create();
+        AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
     }
@@ -476,31 +447,19 @@ public class EditTablesActivity extends AppCompatActivity {
     /**
      * Saves the edited frequencies and updates the vector containing all the previous frequencies.
      *
-     * @param frequencies The edited frequencies.
+     * @param value The edited frequencies.
      */
-    public void saveChanges(String frequencies) {
+    private void saveChanges(String value) {
         int[] newTable = new int[tableLimitEdit];
-        int beginIndex = 0;
-        int endIndex;
-        int column = 0;
+
         // If the number of edited frequencies is greater than the previous frequencies then it means that there were changes
         if (tableLimitEdit != table.length)
             isChanged = true;
-        while (beginIndex < frequencies.length()) {
-            endIndex = frequencies.indexOf(LF, beginIndex);
-            if (endIndex == -1)
-                endIndex = frequencies.length();
-            // Gets a frequency from the string
-            String frequency = frequencies.substring(beginIndex, endIndex);
-            beginIndex = endIndex + 1;
-            //Add to table
-            newTable[column] = Integer.parseInt(frequency);
-            if (!isChanged) {
-                // If that frequency is different from the previous one then it means that there were changes
-                if (newTable[column] != table[column])
-                    isChanged = true;
-            }
-            column++;
+        String[] list = value.split(String.valueOf(LF));
+        for (int i = 0; i < list.length; i++) {
+            newTable[i] = Integer.parseInt(list[i]);
+            if (!isChanged && newTable[i] != table[i])
+                isChanged = true;
         }
         // The table is updated
         table = newTable;
@@ -525,10 +484,6 @@ public class EditTablesActivity extends AppCompatActivity {
     @OnClick(R.id.edit_table_option_button)
     public void onClickEditTable(View v) {
         createDialogSelect();
-        save_changes_button.setVisibility(View.VISIBLE);
-        edit_table_options_linearLayout.setVisibility(View.VISIBLE);
-        edit_table_message_textView.setVisibility(View.VISIBLE);
-        edit_table_option_button.setVisibility(View.GONE);
     }
 
     @Override
@@ -614,7 +569,6 @@ public class EditTablesActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -635,7 +589,7 @@ public class EditTablesActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected && !state)
+        if (!mConnected)
             showDisconnectionMessage();
         return true;
     }
@@ -647,7 +601,7 @@ public class EditTablesActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
 
         View view = inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
@@ -670,13 +624,13 @@ public class EditTablesActivity extends AppCompatActivity {
         for (int i = 0; i < table.length - 1; i++) {
             newCell();
             textCell.setText(String.valueOf(table[i]));
-            tableRow.addView(textCell, newTableRowParams(0, 0, 0, 16));
+            tableRow.addView(textCell, newTableRowParams(16));
             frequency_table.addView(tableRow);
         }
         if (table.length > 0) {
             newCell();
             textCell.setText(String.valueOf(table[table.length - 1]));
-            tableRow.addView(textCell, newTableRowParams(0, 0, 0, 0));
+            tableRow.addView(textCell, newTableRowParams(0));
             frequency_table.addView(tableRow);
         }
     }
@@ -692,18 +646,15 @@ public class EditTablesActivity extends AppCompatActivity {
     }
 
     /**
-     * Set the margins for the TableRow.
+     * Sets the margins for the TableRow.
      *
-     * @param left The size left margin.
-     * @param top The size top margin.
-     * @param right The size right margin.
      * @param bottom The size bottom margin.
      *
      * @return Returns a LayoutParams with the customize margins.
      */
-    public TableRow.LayoutParams newTableRowParams(int left, int top, int right, int bottom) {
+    private TableRow.LayoutParams newTableRowParams(int bottom) {
         TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(left, top, right, bottom);
+        params.setMargins(0, 0, 0, bottom);
         params.weight = 1;
         return params;
     }
@@ -713,7 +664,7 @@ public class EditTablesActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void downloadData(byte[] data) {
+    private void downloadData(byte[] data) {
         parameter = "";
         isChanged = false;
         save_changes_button.setAlpha((float) 0.6);
@@ -742,7 +693,7 @@ public class EditTablesActivity extends AppCompatActivity {
     private void showMessage(byte[] data) {
         int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Success!");
         if (status == 0)
             builder.setMessage("Completed.");

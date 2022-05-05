@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,8 +18,8 @@
             android:id="@+id/download_data_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -29,13 +28,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16sp"
-                android:textSize="16sp"
-                android:textColor="@color/light_blue"/>
+                android:textColor="@color/light_blue"
+                android:textSize="16sp" />
+
+            <!--ImageView
+                android:id="@+id/iv_ProgressGIF"
+                android:layout_width="170.67dp"
+                android:layout_height="21.33dp"/-->
 
             <ImageView
                 android:id="@+id/iv_ProgressGIF"
-                android:layout_width="170.67dp"
-                android:layout_height="21.33dp"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -43,76 +47,77 @@
             android:id="@+id/menu_manage_receiver_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16sp"
                 android:layout_marginTop="24sp"
-                android:padding="16sp"
-                android:elevation="4sp"
                 android:background="@color/catskill_white"
-                android:orientation="vertical">
+                android:elevation="4sp"
+                android:orientation="vertical"
+                android:padding="16sp">
 
                 <TextView
                     android:id="@+id/memory_used_percent_textView"
+                    style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8sp"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/subtitle"/>
+                    android:textColor="@color/ebony_clay" />
 
                 <ProgressBar
                     android:id="@+id/memory_used_progressBar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="24sp"
-                    android:progressDrawable="@drawable/progress_bar"/>
+                    android:progressDrawable="@drawable/progress_bar" />
 
                 <TextView
                     android:id="@+id/bytes_stored_textView"
+                    style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8sp"
-                    android:textColor="@color/ebony_clay"
-                    style="@style/body_small"/>
+                    android:textColor="@color/ebony_clay" />
 
             </LinearLayout>
 
             <Space
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:ignore="NestedWeights" />
 
             <Button
                 android:id="@+id/erase_data_button"
+                style="@style/button_tertiary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16sp"
                 android:layout_marginBottom="16sp"
-                android:text="@string/lb_erase_data"
-                style="@style/button_tertiary"/>
+                android:text="@string/lb_erase_data" />
 
             <Button
                 android:id="@+id/memory_button"
+                style="@style/button_secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16sp"
                 android:layout_marginBottom="16sp"
-                android:text="@string/lb_view_data"
-                style="@style/button_secondary"/>
+                android:text="@string/lb_view_data" />
 
             <Button
                 android:id="@+id/download_data_button"
+                style="@style/button_primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16sp"
                 android:layout_marginBottom="24sp"
-                android:text="@string/lb_download_data"
-                style="@style/button_primary"/>
+                android:text="@string/lb_download_data" />
 
         </LinearLayout>
 

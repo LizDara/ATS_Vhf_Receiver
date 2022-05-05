@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,7 +16,7 @@
         <WebView
             android:id="@+id/google_drive_webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:visibility="visible"/>
 
@@ -44,14 +43,14 @@
             layout="@layout/toolbar"/>
 
         <TextView
+            style="@style/subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16sp"
-            android:layout_marginEnd="16sp"
             android:layout_marginTop="24sp"
+            android:layout_marginEnd="16sp"
             android:text="@string/lb_select_table"
-            android:textColor="@color/black"
-            style="@style/subtitle"/>
+            android:textColor="@color/black" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -68,40 +67,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table1"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table1_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -110,82 +109,82 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table2"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table2_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/table3"
+                    android:id="@+id/table_3_linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table3"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table3_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -194,40 +193,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table4"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table4_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -236,40 +235,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table5"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table5_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -278,40 +277,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table6"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table6_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -320,40 +319,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table7"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table7_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -362,40 +361,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table8"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table8_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -404,40 +403,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table9"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table9_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -446,40 +445,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table10"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table10_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -488,40 +487,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table11"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table11_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -531,40 +530,40 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
                     android:layout_marginBottom="16sp"
-                    android:padding="16sp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="16sp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/body_small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
                             android:text="@string/lb_table12"
-                            android:textColor="@color/limed_spruce"
-                            style="@style/body_small"/>
+                            android:textColor="@color/limed_spruce" />
 
                         <TextView
                             android:id="@+id/table12_frequency"
+                            style="@style/body_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lb_empty_table"
-                            android:textColor="@color/ebony_clay"
-                            style="@style/body_regular"/>
+                            android:textColor="@color/ebony_clay" />
 
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_next"/>
+                        android:background="@drawable/ic_next" />
 
                 </LinearLayout>
 
@@ -574,13 +573,13 @@
 
         <Button
             android:id="@+id/load_from_file_button"
+            style="@style/button_tertiary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16sp"
             android:layout_marginEnd="16sp"
             android:layout_marginBottom="24sp"
-            android:text="@string/lb_load_table_from_file"
-            style="@style/button_tertiary"/>
+            android:text="@string/lb_load_table_from_file" />
 
         <include
             layout="@layout/receiver_status"/>

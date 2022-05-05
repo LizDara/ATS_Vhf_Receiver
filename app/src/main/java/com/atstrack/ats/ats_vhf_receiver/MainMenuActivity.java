@@ -83,11 +83,12 @@ public class MainMenuActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
+            boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
+            if (result)
+                mConnected = true;
         }
 
         @Override
@@ -180,22 +181,19 @@ public class MainMenuActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-
-        // HAY ERROR CUANDO PRESIONA BACK DE START SCANNING Y VA A RECEIVER OPTIONS PORQUE VUELVE A PREGUNTAR POR LA INFORMACION DEL INTENT Y ESTA YA NO ES ENVIADA :(
-        final Intent intent = getIntent();
         receiverInformation = ReceiverInformation.getReceiverInformation();
         scanning = false;
 
-        boolean isMenu = intent.getBooleanExtra("menu", false);
+        boolean isMenu = getIntent().getBooleanExtra("menu", false);
 
         if (!isMenu) { // Connecting to the selected BLE device
             // Checks if the BLE device is scanning
             parameter = "scanning";
             receiverInformation.setReceiverInformation(
-                    intent.getStringExtra(EXTRAS_DEVICE_NAME),
-                    intent.getStringExtra(EXTRAS_DEVICE_ADDRESS),
-                    intent.getStringExtra(EXTRAS_DEVICE_STATUS),
-                    intent.getStringExtra(EXTRAS_BATTERY));
+                    getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
+                    getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS),
+                    getIntent().getStringExtra(EXTRAS_DEVICE_STATUS),
+                    getIntent().getStringExtra(EXTRAS_BATTERY));
 
             // Initializes the spinner to connect to BLE device
             check_avd_anim.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
@@ -226,12 +224,21 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        mBluetoothLeService.disconnect();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -250,12 +257,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: // Go back to the previous activity
-                finish();
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) { // Go back to the previous activity
+            finish();
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -276,7 +281,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private void showDisconnectionMessage(String message) {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
+        View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         TextView disconnect_message = view.findViewById(R.id.disconnect_message);
@@ -300,7 +305,7 @@ public class MainMenuActivity extends AppCompatActivity {
      */
     private void connectingToDevice() {
         mHandler.postDelayed(() -> {
-            if (mConnected){
+            if (mConnected) {
                 state_textView.setText(R.string.lb_connected);
 
                 // Initializes the check animation when connected successfully
@@ -333,7 +338,7 @@ public class MainMenuActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void download(byte[] data) {
+    private void download(byte[] data) {
         switch (Converters.getHexValue(data[0])) {
             case "00": // The BLE device is not in scanning
                 scanning = false;
@@ -341,10 +346,13 @@ public class MainMenuActivity extends AppCompatActivity {
                 int range = Integer.parseInt(Converters.getDecimalValue(data[2]));
                 int detectionType = Integer.parseInt(Converters.getDecimalValue(data[3]));
                 int statusBytesDefault = Integer.parseInt(Converters.getDecimalValue(data[7]));
+
                 SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-                SharedPreferences.Editor sharedPrefsEdit = sharedPreferences.edit();
-                sharedPrefsEdit.putInt("BaseFrequency", baseFrequency);
-                sharedPrefsEdit.apply();
+                SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
+                sharedPreferencesEdit.putInt("BaseFrequency", baseFrequency);
+                sharedPreferencesEdit.putInt("Range", range);
+                sharedPreferencesEdit.putInt("DetectionType", detectionType);
+                sharedPreferencesEdit.apply();
                 break;
             case "82": // The BLE device is in aerial scanning
                 scanning = true;
@@ -353,6 +361,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 int tableA = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
                 int scanTimeA = Integer.parseInt(Converters.getDecimalValue(data[5]));
                 int timeoutA = Integer.parseInt(Converters.getDecimalValue(data[6]));
+
                 Intent intentA = new Intent(this, AerialScanActivity.class);
                 intentA.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentA.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -372,6 +381,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 int tableS = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
                 int scanTimeS = Integer.parseInt(Converters.getDecimalValue(data[5]));
                 int timeoutS = Integer.parseInt(Converters.getDecimalValue(data[6]));
+
                 Intent intentS = new Intent(this, StationaryScanActivity.class);
                 intentS.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentS.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -384,6 +394,25 @@ public class MainMenuActivity extends AppCompatActivity {
                 intentS.putExtra("seconds", Integer.parseInt(Converters.getDecimalValue(data[21])));
                 startActivity(intentS);
                 break;
+            case "86": // The BLE device is in manual scanning
+                scanning = true;
+                int txTypeM = Integer.parseInt(Converters.getDecimalValue(data[3]));
+                int antennaM = Integer.parseInt(Converters.getDecimalValue(data[4])) / 16;
+                int tableM = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
+                int scanTimeM = Integer.parseInt(Converters.getDecimalValue(data[5]));
+                int timeoutM = Integer.parseInt(Converters.getDecimalValue(data[6]));
+
+                Intent intentM = new Intent(this, ManualScanActivity.class);
+                intentM.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intentM.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intentM.putExtra("scanning", true);
+                intentM.putExtra("year", Integer.parseInt(Converters.getDecimalValue(data[16])));
+                intentM.putExtra("month", Integer.parseInt(Converters.getDecimalValue(data[17])));
+                intentM.putExtra("day", Integer.parseInt(Converters.getDecimalValue(data[18])));
+                intentM.putExtra("hour", Integer.parseInt(Converters.getDecimalValue(data[19])));
+                intentM.putExtra("minute", Integer.parseInt(Converters.getDecimalValue(data[20])));
+                intentM.putExtra("seconds", Integer.parseInt(Converters.getDecimalValue(data[21])));
+                startActivity(intentM);
         }
     }
 }

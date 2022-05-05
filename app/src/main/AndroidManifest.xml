@@ -13,11 +13,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StationaryScanningActivity" />
-        <activity android:name=".AerialScanningActivity" />
-        <activity android:name=".TemporaryStationaryActivity" />
-        <activity android:name=".TemporaryAerialActivity" />
-        <activity android:name=".ReceiverOptionsActivity" />
+        <activity
+            android:name=".ReceiverUpdateActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".StationaryScanningActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AerialScanningActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TemporaryStationaryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TemporaryAerialActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ReceiverOptionsActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SelectValueActivity"
             android:screenOrientation="portrait" />
@@ -84,7 +97,6 @@
             android:name=".BluetoothATS.BluetoothLeService"
             android:enabled="true" />
     </application>
-
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
@@ -92,7 +104,6 @@
     <uses-feature
         android:name="android.hardware.location.gps"
         android:required="true" />
-
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -106,6 +117,7 @@
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 </manifest>

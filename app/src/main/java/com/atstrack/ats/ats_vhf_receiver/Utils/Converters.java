@@ -466,9 +466,9 @@ public class Converters {
         return returnVal;
     }
 
-    public static int strToDecimal(String input) {
+    public static int hexToDecimal(String input) {
         int total = 0;
-        int pot = 0;
+        int pot;
         int multiple = 0;
         int z;
 
@@ -478,7 +478,7 @@ public class Converters {
 
             z = (hexadecimal.length - x - 1);
             pot = 1;
-            for (int y = 0; y < z; y++){
+            for (int y = 0; y < z; y++) {
                 pot *= 16;
             }
 

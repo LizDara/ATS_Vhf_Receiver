@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.refresh_button)
     ImageButton refresh_button;
 
-    boolean isNightModeOn;
-    SharedPreferences.Editor sharedPrefsEdit;
+    private boolean isNightModeOn;
+    private SharedPreferences.Editor sharedPreferencesEditor;
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 8 seconds.
@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler;
-
-    private AnimationDrawable animationDrawable;
 
     // Device scan callback.
     private final BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -133,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         searching_receivers_linearLayout.setVisibility(View.VISIBLE);
         refresh_button.setAlpha((float) 0.6);
         refresh_button.setEnabled(false);
-        mLeDeviceListAdapter.clear();
         scanLeDevice(true);
     }
 
@@ -149,13 +146,12 @@ public class MainActivity extends AppCompatActivity {
     public void onDarkModeClick(View v) {
         if (isNightModeOn) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            sharedPrefsEdit.putBoolean("NightMode", false);
-            sharedPrefsEdit.apply();
+            sharedPreferencesEditor.putBoolean("NightMode", false);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            sharedPrefsEdit.putBoolean("NightMode", true);
-            sharedPrefsEdit.apply();
+            sharedPreferencesEditor.putBoolean("NightMode", true);
         }
+        sharedPreferencesEditor.apply();
     }
 
     @Override
@@ -168,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         String version = "version: " + BuildConfig.VERSION_NAME;
         version_textView.setText(version);
@@ -176,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
         init();
 
         mHandler = new Handler();
+
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -202,10 +198,10 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         SharedPreferences appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0);
-        sharedPrefsEdit = appSettingPrefs.edit();
+        sharedPreferencesEditor = appSettingPrefs.edit();
         isNightModeOn = (hour > 25) ? true : false;
-        sharedPrefsEdit.putBoolean("NightMode", isNightModeOn);
-        sharedPrefsEdit.apply();
+        sharedPreferencesEditor.putBoolean("NightMode", isNightModeOn);
+        sharedPreferencesEditor.apply();
         //isNightModeOn = appSettingPrefs.getBoolean("NightMode", false);
 
         if (isNightModeOn) {
@@ -234,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                Log.i("DeviceScanActivity", "DeviceScanActivity-onResume");
             }
         }
         // Initializes list view adapter.
@@ -249,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // User chose not to enable Bluetooth.
-        Log.i("ERROR", "RQC: "+ requestCode + " RSC: "+ resultCode);
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
             finish();
             return;
@@ -271,13 +265,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            // Stops scanning after a pre-defined scan period.
-
             // Initializes the spinner to search for available devices
-            anim_spinner.setBackgroundResource(R.drawable.connecting_animation);
-            animationDrawable = (AnimationDrawable) anim_spinner.getBackground();
-            animationDrawable.start();
-            /*anim_spinner.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
+            anim_spinner.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
             Drawable drawable = anim_spinner.getDrawable();
             Animatable animatable = (Animatable) drawable;
             AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {
@@ -286,16 +275,23 @@ public class MainActivity extends AppCompatActivity {
                     new Handler().postDelayed(animatable::start, SCAN_PERIOD);
                 }
             });
-            animatable.start();*/
+            animatable.start();
 
+            mLeDeviceListAdapter.clear();
+
+            refresh_button.setAlpha((float) 0.6);
+            refresh_button.setEnabled(false);
             retry_linearLayout.setVisibility(View.GONE);
             retry_button.setVisibility(View.GONE);
+            devices_linearLayout.setVisibility(View.GONE);
             searching_receivers_linearLayout.setVisibility(View.VISIBLE);
+
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+
             mHandler.postDelayed(() -> {
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
                 searching_receivers_linearLayout.setVisibility(View.GONE);
-                animationDrawable.stop();
 
                 if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
                     devices_linearLayout.setVisibility(View.VISIBLE);
@@ -313,9 +309,6 @@ public class MainActivity extends AppCompatActivity {
 
                 invalidateOptionsMenu();
             }, SCAN_PERIOD);
-
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-            Log.i("DeviceScanActivity", "DeviceScanActivity-scanLeDevice");
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
@@ -338,7 +331,10 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
             if (permissionCheck != 0) {
-                this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
+                this.requestPermissions(
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
             }
         }
     }
@@ -346,9 +342,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Checks if location mode is enabled to use.
      *
-     * @return Return true, if the location mode is not off.
+     * @return Returns true, if the location mode is not off.
      */
-    private Boolean isLocationEnable() {
+    private boolean isLocationEnable() {
         int locationMode;
         try {
             locationMode = Settings.Secure.getInt(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_MODE);

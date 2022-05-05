@@ -14,9 +14,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +40,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.UUID;
 
+import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
+
 public class SelectValueActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
@@ -55,28 +60,28 @@ public class SelectValueActivity extends AppCompatActivity {
     LinearLayout non_coded_linearLayout;
     @BindView(R.id.select_pulse_rate_linearLayout)
     LinearLayout select_pulse_rate_linearLayout;
-    @BindView(R.id.fixed_filter_type_linearLayout)
-    LinearLayout fixed_filter_type_linearLayout;
-    @BindView(R.id.variable_filter_type_linearLayout)
-    LinearLayout variable_filter_type_linearLayout;
     @BindView(R.id.number_of_matches_scrollView)
     ScrollView number_of_matches_scrollView;
     @BindView(R.id.fixed_pulse_rate_imageView)
     ImageView fixed_pulse_rate_imageView;
     @BindView(R.id.variable_pulse_rate_imageView)
     ImageView variable_pulse_rate_imageView;
-    @BindView(R.id.pattern_matching_imageView)
-    ImageView pattern_matching_imageView;
-    @BindView(R.id.pulses_per_scan_time_imageView)
-    ImageView pulses_per_scan_time_imageView;
+    @BindView(R.id.max_min_pulse_rate_linearLayout)
+    LinearLayout max_min_pulse_rate_linearLayout;
+    @BindView(R.id.max_min_pulse_rate_textView)
+    TextView max_min_pulse_rate_textView;
+    @BindView(R.id.max_min_pulse_rate_editText)
+    EditText max_min_pulse_rate_editText;
+    @BindView(R.id.period_pulse_rate_textView)
+    TextView period_pulse_rate_textView;
+    @BindView(R.id.data_calculation_types_linearLayout)
+    LinearLayout data_calculation_types_linearLayout;
+    @BindView(R.id.none_imageView)
+    ImageView none_imageView;
     @BindView(R.id.temperature_imageView)
     ImageView temperature_imageView;
     @BindView(R.id.period_imageView)
     ImageView period_imageView;
-    @BindView(R.id.altitude_imageView)
-    ImageView altitude_imageView;
-    @BindView(R.id.depth_imageView)
-    ImageView depth_imageView;
     @BindView(R.id.two_imageView)
     ImageView two_imageView;
     @BindView(R.id.three_imageView)
@@ -107,24 +112,22 @@ public class SelectValueActivity extends AppCompatActivity {
     private final static String TAG = SelectValueActivity.class.getSimpleName();
 
     public static final int PULSE_RATE_TYPE = 1001;
-    public static final int FILTER_TYPE = 1002;
-    public static final int MATCHES_FOR_VALID_PATTERN = 1003;
-    public static final int FIXED_PULSE_RATE = 1004;
-    public static final int VARIABLE_PULSE_RATE = 1005;
-    public static final int PATTERN_MATCHING = 1006;
-    public static final int PULSES_PER_SCAN_TIME = 1007;
-    public static final int TEMPERATURE = 1008;
-    public static final int PERIOD = 1009;
-    public static final int ALTITUDE = 1010;
-    public static final int DEPTH = 1011;
-    public static final int PULSE_RATE_1 = 1012;
-    public static final int PULSE_RATE_2 = 1013;
-    public static final int PULSE_RATE_3 = 1014;
-    public static final int PULSE_RATE_4 = 1015;
+    public static final int MATCHES_FOR_VALID_PATTERN = 1002;
+    public static final int FIXED_PULSE_RATE = 1003;
+    public static final int VARIABLE_PULSE_RATE = 1004;
+    public static final int PULSE_RATE_1 = 1005;
+    public static final int PULSE_RATE_2 = 1006;
+    public static final int PULSE_RATE_3 = 1007;
+    public static final int PULSE_RATE_4 = 1008;
+    public static final int MAX_PULSE_RATE = 1009;
+    public static final int MIN_PULSE_RATE = 1010;
+    public static final int DATA_CALCULATION_TYPES = 1011;
+    public static final int NONE = 1012;
+    public static final int TEMPERATURE = 1013;
+    public static final int PERIOD = 1014;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean state = true;
 
     private int type;
     private int value;
@@ -135,7 +138,6 @@ public class SelectValueActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -148,7 +150,7 @@ public class SelectValueActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = false;
+    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -161,31 +163,68 @@ public class SelectValueActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("txType")) {
+                    if (parameter.equals("txType"))
                         onClickTxType();
-                    }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (type == PULSE_RATE_TYPE)
-                        downloadPulseRateType(packet);
-                    else if (type == MATCHES_FOR_VALID_PATTERN)
-                        downloadMatchesForValidPattern(packet);
-                    else if (type == PULSE_RATE_1)
-                        downloadPulseRate1(packet);
-                    else if (type == PULSE_RATE_2)
-                        downloadPulseRate2(packet);
-                    else if (type == PULSE_RATE_3)
-                        downloadPulseRate3(packet);
-                    else if (type == PULSE_RATE_4)
-                        downloadPulseRate4(packet);
+                    switch (type) {
+                        case PULSE_RATE_TYPE: // Gets the pulse rate type
+                            downloadPulseRateType(packet);
+                            break;
+                        case MATCHES_FOR_VALID_PATTERN: // Gets the matches for valid pattern
+                            downloadMatchesForValidPattern(packet);
+                            break;
+                        case MAX_PULSE_RATE: // Gets the max pulse rate
+                            downloadMaxPulseRate(packet);
+                            break;
+                        case MIN_PULSE_RATE: // Gets the min pulse rate
+                            downloadMinPulseRate(packet);
+                            break;
+                        case DATA_CALCULATION_TYPES: // Gets data calculation types
+
+                        case PULSE_RATE_1: // Gets the pulse rate 1
+                            downloadPulseRate1(packet);
+                            break;
+                        case PULSE_RATE_2: // Gets the pulse rate 2
+                            downloadPulseRate2(packet);
+                            break;
+                        case PULSE_RATE_3: // Gets the pulse rate 3
+                            downloadPulseRate3(packet);
+                            break;
+                        case PULSE_RATE_4: // Gets the pulse rate 4
+                            downloadPulseRate4(packet);
+                            break;
+                    }
                 }
             }
             catch (Exception e) {
                 Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
             }
+        }
+    };
+
+    /**
+     * Change the period while editing the pulse rate.
+     */
+    private TextWatcher textChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            int pulseRate = (max_min_pulse_rate_editText.getText().toString().isEmpty()) ? 0 : Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
+            double period = (max_min_pulse_rate_editText.getText().toString().isEmpty() ||
+                    Integer.parseInt(max_min_pulse_rate_editText.getText().toString()) == 0) ? 0 : (double) 60000 / pulseRate;
+            period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
         }
     };
 
@@ -198,7 +237,12 @@ public class SelectValueActivity extends AppCompatActivity {
         return intentFilter;
     }
 
-    public void onClickTxType() {
+    /**
+     * Requests a read for tx type data.
+     * Service name: Scan.
+     * Characteristic name: Tx type.
+     */
+    private void onClickTxType() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
@@ -225,54 +269,28 @@ public class SelectValueActivity extends AppCompatActivity {
         value = VARIABLE_PULSE_RATE;
     }
 
-    @OnClick(R.id.pattern_matching_linearLayout)
-    public void onClickPatternMatching(View v) {
-        pattern_matching_imageView.setVisibility(View.VISIBLE);
-        pulses_per_scan_time_imageView.setVisibility(View.GONE);
-        value = PATTERN_MATCHING;
-    }
-
-    @OnClick(R.id.pulses_per_scan_time_linearLayout)
-    public void onClickPulsesPerScanTime(View v) {
-        pulses_per_scan_time_imageView.setVisibility(View.VISIBLE);
-        pattern_matching_imageView.setVisibility(View.GONE);
-        value = PULSES_PER_SCAN_TIME;
+    @OnClick(R.id.none_linearLayout)
+    public void onClickNone(View v) {
+        none_imageView.setVisibility(View.VISIBLE);
+        temperature_imageView.setVisibility(View.GONE);
+        period_imageView.setVisibility(View.GONE);
+        value = 0;
     }
 
     @OnClick(R.id.temperature_linearLayout)
     public void onClickTemperature(View v) {
         temperature_imageView.setVisibility(View.VISIBLE);
+        none_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        altitude_imageView.setVisibility(View.GONE);
-        depth_imageView.setVisibility(View.GONE);
-        value = TEMPERATURE;
+        value = 4;
     }
 
     @OnClick(R.id.period_linearLayout)
     public void onClickPeriod(View v) {
         period_imageView.setVisibility(View.VISIBLE);
+        none_imageView.setVisibility(View.GONE);
         temperature_imageView.setVisibility(View.GONE);
-        altitude_imageView.setVisibility(View.GONE);
-        depth_imageView.setVisibility(View.GONE);
-        value = PERIOD;
-    }
-
-    @OnClick(R.id.altitude_linearLayout)
-    public void onClickAltitude(View v) {
-        altitude_imageView.setVisibility(View.VISIBLE);
-        temperature_imageView.setVisibility(View.GONE);
-        period_imageView.setVisibility(View.GONE);
-        depth_imageView.setVisibility(View.GONE);
-        value = ALTITUDE;
-    }
-
-    @OnClick(R.id.depth_linearLayout)
-    public void onClickDepth(View v) {
-        depth_imageView.setVisibility(View.VISIBLE);
-        temperature_imageView.setVisibility(View.GONE);
-        period_imageView.setVisibility(View.GONE);
-        altitude_imageView.setVisibility(View.GONE);
-        value = DEPTH;
+        value = 8;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -362,8 +380,29 @@ public class SelectValueActivity extends AppCompatActivity {
     @OnClick(R.id.save_changes_select_value_button)
     public void onClickSaveChanges(View v) {
         if (type == PULSE_RATE_1 || type == PULSE_RATE_2 || type == PULSE_RATE_3 || type == PULSE_RATE_4) {
-            value = Integer.parseInt(pulse_rate_editText.getText().toString());
-            value = (value * 100) + Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
+            int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
+            int tolerance = Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
+            if (pulseRate > 0 && pulseRate <= 150 && tolerance > 0 && tolerance <= 10) {
+                value = (pulseRate * 100) + tolerance;
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Invalid Format or Values");
+                builder.setMessage("Please enter valid pulse rate or tolerance values.");
+                builder.setPositiveButton("Ok", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
+                return;
+            }
+        } else if (type == MAX_PULSE_RATE || type == MIN_PULSE_RATE) {
+            value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
+        } else if (type == DATA_CALCULATION_TYPES) {
+            if (none_imageView.getVisibility() == View.VISIBLE)
+                value = NONE;
+            else if (temperature_imageView.getVisibility() == View.VISIBLE)
+                value = TEMPERATURE;
+            else if (period_imageView.getVisibility() == View.VISIBLE)
+                value = PERIOD;
         }
         setResult(value);
         finish();
@@ -384,7 +423,6 @@ public class SelectValueActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Get device data from previous activity
-        final Intent intent = getIntent();
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "txType";
 
@@ -392,48 +430,56 @@ public class SelectValueActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        type = intent.getIntExtra("type", 0);
-        if (type == PULSE_RATE_TYPE) {
-            title_toolbar.setText(R.string.pulse_rate_type_options);
-            save_changes_select_value_button.setVisibility(View.GONE);
-        }
-        /*if (type == FIXED_PULSE_RATE) {
-            fixed_filter_type_linearLayout.setVisibility(View.VISIBLE);
-            value = PATTERN_MATCHING;
-            title_toolbar.setText("Filter Type Options");
-        }
-        if (type == VARIABLE_PULSE_RATE) {
-            variable_filter_type_linearLayout.setVisibility(View.VISIBLE);
-            value = TEMPERATURE;
-            title_toolbar.setText("Filter Type Options");
-        }*/
-        if (type == MATCHES_FOR_VALID_PATTERN) {
-            number_of_matches_scrollView.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.matches_for_valid_pattern);
-        }
-        if (type == PULSE_RATE_1) {
-            pulse_rate_textView.setText(R.string.lb_pr1);
-            pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
-            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.target_pulse_rate_1);
-        }
-        if (type == PULSE_RATE_2) {
-            pulse_rate_textView.setText(R.string.lb_pr2);
-            pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
-            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.target_pulse_rate_2);
-        }
-        if (type == PULSE_RATE_3) {
-            pulse_rate_textView.setText(R.string.lb_pr3);
-            pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
-            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.target_pulse_rate_3);
-        }
-        if (type == PULSE_RATE_4) {
-            pulse_rate_textView.setText(R.string.lb_pr4);
-            pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
-            pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.target_pulse_rate_4);
+        type = getIntent().getIntExtra("type", 0);
+        switch (type) {
+            case PULSE_RATE_TYPE:
+                title_toolbar.setText(R.string.pulse_rate_type_options);
+                save_changes_select_value_button.setVisibility(View.GONE);
+                break;
+            case MATCHES_FOR_VALID_PATTERN:
+                title_toolbar.setText(R.string.matches_for_valid_pattern);
+                number_of_matches_scrollView.setVisibility(View.VISIBLE);
+                break;
+            case MAX_PULSE_RATE:
+                title_toolbar.setText(R.string.max_pulse_rate);
+                max_min_pulse_rate_textView.setText(R.string.lb_max_pulse_rate);
+                max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
+                break;
+            case MIN_PULSE_RATE:
+                title_toolbar.setText(R.string.min_pulse_rate);
+                max_min_pulse_rate_textView.setText(R.string.lb_min_pulse_rate);
+                max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
+                break;
+            case DATA_CALCULATION_TYPES:
+                title_toolbar.setText(R.string.optional_data_calculations);
+                data_calculation_types_linearLayout.setVisibility(View.VISIBLE);
+                break;
+            case PULSE_RATE_1:
+                title_toolbar.setText(R.string.target_pulse_rate_1);
+                pulse_rate_textView.setText(R.string.lb_pr1);
+                pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
+                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                break;
+            case PULSE_RATE_2:
+                title_toolbar.setText(R.string.target_pulse_rate_2);
+                pulse_rate_textView.setText(R.string.lb_pr2);
+                pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
+                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                break;
+            case PULSE_RATE_3:
+                title_toolbar.setText(R.string.target_pulse_rate_3);
+                pulse_rate_textView.setText(R.string.lb_pr3);
+                pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
+                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                break;
+            case PULSE_RATE_4:
+                title_toolbar.setText(R.string.target_pulse_rate_4);
+                pulse_rate_textView.setText(R.string.lb_pr4);
+                pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
+                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                break;
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -442,7 +488,7 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { //hago un case por si en un futuro agrego mas opciones
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             finish();
             return true;
         }
@@ -455,7 +501,6 @@ public class SelectValueActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -474,21 +519,25 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected && !state) {
-            showMessageDisconnect();
+        if (!mConnected) {
+            showDisconnectionMessage();
         }
         return true;
     }
 
-    private void showMessageDisconnect() {
+    /**
+     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
+     */
+    private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.disconnect_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
 
+        // The message disappears after a pre-defined period and will search for other available BLE devices again
         int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -499,8 +548,18 @@ public class SelectValueActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
-    public void downloadPulseRateType(byte[] data) {
-        if (Converters.getHexValue(data[1]).equals("20") || Converters.getHexValue(data[1]).equals("04")) {
+    /**
+     * With the received packet, gets pulse rate type and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadPulseRateType(byte[] data) {
+        Log.i(TAG, "Type: " + Converters.getHexValue(data));
+        if (Converters.getHexValue(data[1]).equals("20") || // this is the correct
+                Converters.getHexValue(data[1]).equals("04") ||
+                Converters.getHexValue(data[1]).equals("00") ||
+                Converters.getHexValue(data[1]).equals("E2") ||
+                Converters.getHexValue(data[1]).equals("64")) {
             non_coded_linearLayout.setVisibility(View.VISIBLE);
             value = 0;
         } else if (Converters.getHexValue(data[1]).equals("21")) {
@@ -516,47 +575,126 @@ public class SelectValueActivity extends AppCompatActivity {
         }
     }
 
-    public void downloadMatchesForValidPattern(byte[] data) {
-        if (Converters.getDecimalValue(data[2]).equals("2")) {
-            two_imageView.setVisibility(View.VISIBLE);
-            value = 2;
-        } else if (Converters.getDecimalValue(data[2]).equals("3")) {
-            three_imageView.setVisibility(View.VISIBLE);
-            value = 3;
-        } else if (Converters.getDecimalValue(data[2]).equals("4")) {
-            four_imageView.setVisibility(View.VISIBLE);
-            value = 4;
-        } else if (Converters.getDecimalValue(data[2]).equals("5")) {
-            five_imageView.setVisibility(View.VISIBLE);
-            value = 5;
-        } else if (Converters.getDecimalValue(data[2]).equals("6")) {
-            six_imageView.setVisibility(View.VISIBLE);
-            value = 6;
-        } else if (Converters.getDecimalValue(data[2]).equals("7")) {
-            seven_imageView.setVisibility(View.VISIBLE);
-            value = 7;
-        } else if (Converters.getDecimalValue(data[2]).equals("8")) {
-            eight_imageView.setVisibility(View.VISIBLE);
-            value = 8;
+    /**
+     * With the received packet, gets matches for valid pattern and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadMatchesForValidPattern(byte[] data) {
+        switch (Converters.getDecimalValue(data[2])) {
+            case "2":
+                two_imageView.setVisibility(View.VISIBLE);
+                value = 2;
+                break;
+            case "3":
+                three_imageView.setVisibility(View.VISIBLE);
+                value = 3;
+                break;
+            case "4":
+                four_imageView.setVisibility(View.VISIBLE);
+                value = 4;
+                break;
+            case "5":
+                five_imageView.setVisibility(View.VISIBLE);
+                value = 5;
+                break;
+            case "6":
+                six_imageView.setVisibility(View.VISIBLE);
+                value = 6;
+                break;
+            case "7":
+                seven_imageView.setVisibility(View.VISIBLE);
+                value = 7;
+                break;
+            case "8":
+                eight_imageView.setVisibility(View.VISIBLE);
+                value = 8;
+                break;
         }
     }
 
-    public void downloadPulseRate1(byte[] data) {
+    /**
+     * With the received packet, gets max pulse rate and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadMaxPulseRate(byte[] data) {
+        int maxPulse = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
+        max_min_pulse_rate_editText.setText(String.valueOf(maxPulse));
+        double period = (maxPulse == 0) ? 0 : (double) 60000 / maxPulse;
+        period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
+    }
+
+    /**
+     * With the received packet, gets min pulse rate and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadMinPulseRate(byte[] data) {
+        int minPulse = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        max_min_pulse_rate_editText.setText(String.valueOf(minPulse));
+        double period = (minPulse == 0) ? 0 : (double) 60000 / minPulse;
+        period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
+    }
+
+    /**
+     * With the received packet, gets data calculation types and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadDataCalculation(byte[] data) {
+        switch (Converters.getHexValue(data[11])) {
+            case "00":
+                none_imageView.setVisibility(View.VISIBLE);
+                value = 0;
+                break;
+            case "08":
+                period_imageView.setVisibility(View.VISIBLE);
+                value = 8;
+                break;
+            case "04":
+                temperature_imageView.setVisibility(View.VISIBLE);
+                value = 4;
+                break;
+        }
+    }
+
+    /**
+     * With the received packet, gets pulse rate 1 and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadPulseRate1(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[3]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[4]));
     }
 
-    public void downloadPulseRate2(byte[] data) {
+    /**
+     * With the received packet, gets pulse rate 2 and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadPulseRate2(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[5]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[6]));
     }
 
-    public void downloadPulseRate3(byte[] data) {
+    /**
+     * With the received packet, gets pulse rate 3 and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadPulseRate3(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[7]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[8]));
     }
 
-    public void downloadPulseRate4(byte[] data) {
+    /**
+     * With the received packet, gets pulse rate 4 and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadPulseRate4(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[9]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[10]));
     }

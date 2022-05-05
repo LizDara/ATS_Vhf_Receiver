@@ -36,7 +36,7 @@
     <string name="receiver_options">Receiver Options</string>
     <string name="lb_receiver_configuration">Receiver Configuration</string>
     <string name="lb_manage_receiver">Manage Receiver Data</string>
-    <string name="lb_test_receiver">Test Receiver</string>
+    <string name="lb_diagnostics">Diagnostics</string>
 
     <!--START SCANNING-->
     <string name="lb_manual_scan">Manual Scan</string>
@@ -47,6 +47,7 @@
     <string name="manual_scanning">Manual Scanning</string>
     <string name="lb_current_frequency">Current Frequency</string>
     <string name="lb_frequency">Frequency</string>
+    <string name="lb_gps_data">GPS Data</string>
     <string name="lb_set_frequency">Enter New Frequency</string>
     <string name="lb_start_manual_scan">Start Manual Scan</string>
     <string name="lb_change_frequency">Change Frequency</string>
@@ -54,11 +55,13 @@
     <string name="lb_ready_to_scan">Ready to Scan</string>
     <string name="lb_manual_scanning">Manual Scanning ...</string>
     <string name="lb_scan_details">Scan Details</string>
-    <string name="lb_period">Period (ms)</string>
-    <string name="lb_pulse_rate">Pulse Rate (secs)</string>
-    <string name="lb_signal_strength">Signal Strength (ppm)</string>
-    <string name="lb_record">Recording</string>
-    <string name="lb_stop_scanning">Stop Scanning</string>
+    <string name="lb_edit_frequency">Edit Frequency</string>
+    <string name="lb_code">Code</string>
+    <string name="lb_signal_strength">Signal Strength</string>
+    <string name="lb_detections">Detections</string>
+    <string name="lb_period">Period</string>
+    <string name="lb_pulse_rate">Pulse Rate</string>
+    <string name="lb_record_data">Record Data</string>
 
     <!--AERIAL SCAN-->
     <string name="aerial_scanning">Mobile Scanning</string>
@@ -76,12 +79,15 @@
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
     <string name="lb_table">Table (Index)</string>
     <string name="lb_table_index">Table Index</string>
-    <string name="lb_scan_rate">Scan Time</string>
+    <string name="lb_scan_time">Scan Time</string>
+    <string name="lb_recording">Recording Data ...</string>
+    <string name="lb_data_recorded">Data Recorded Successfully</string>
     <string name="lb_scan_feed">Scan Feed</string>
     <string name="lb_hold">Hold Frequency</string>
     <string name="lb_none">None</string>
     <string name="lb_on">ON</string>
     <string name="lb_off">OFF</string>
+    <string name="lb_stop_scanning">Stop Scanning</string>
 
     <!--TEMPORARY AERIAL-->
     <string name="temporary_aerial">Temporary Mobile Settings</string>
@@ -157,11 +163,22 @@
 
     <!--SET TRANSMITTER TYPE-->
     <string name="set_transmitter_type">Select Detection Filter</string>
+    <string name="pulse_rate_type_options">Pulse Rate Type Options</string>
+    <string name="matches_for_valid_pattern">Matches for Valid Pattern</string>
+    <string name="min_pulse_rate">Minimum Pulse Rate</string>
+    <string name="max_pulse_rate">Maximum Pulse Rate</string>
+    <string name="optional_data_calculations">Optional Data Calculations</string>
+    <string name="target_pulse_rate_1">Target Pulse Rate 1</string>
+    <string name="target_pulse_rate_2">Target Pulse Rate 2</string>
+    <string name="target_pulse_rate_3">Target Pulse Rate 3</string>
+    <string name="target_pulse_rate_4">Target Pulse Rate 4</string>
     <string name="lb_transmitter_detection">Transmitter Detection Filter Options</string>
     <string name="lb_pulse_rate_type">Pulse Rate Type</string>
     <string name="lb_choose_one">Choose one now to setup the detection filters.</string>
-    <string name="lb_filter_type">Filter Type</string>
     <string name="lb_matches_for_valid_pattern">Matches for Valid Pattern</string>
+    <string name="lb_max_pulse_rate">Max Pulse Rate (ppm)</string>
+    <string name="lb_min_pulse_rate">Min Pulse Rate (ppm)</string>
+    <string name="lb_optional_data">Optional Data Calculation</string>
     <string name="lb_target_pulse_rates">Target Pulse Rates</string>
     <string name="lb_pr1">PR1 (ppm)</string>
     <string name="lb_pr1_tolerance">PR1 Tolerance (ppm)</string>
@@ -174,22 +191,13 @@
     <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
     <string name="lb_fixed_pulse_rate">Fixed Pulse Rate</string>
     <string name="lb_variable_pulse_rate">Variable Pulse Rate</string>
-    <string name="lb_pattern_matching">Pattern Matching</string>
-    <string name="lb_pulses_per_scan_time">Pulses Per Scan Time</string>
     <string name="lb_temperature">Temperature</string>
-    <string name="lb_altitude">Altitude</string>
-    <string name="lb_depth">Depth</string>
     <string name="lb_select_type">Select Type:</string>
     <string name="lb_number_matches">Number of Matches</string>
-    <string name="pulse_rate_type_options">Pulse Rate Type Options</string>
-    <string name="matches_for_valid_pattern">Matches for Valid Pattern</string>
     <string name="lb_eiler_coded">Eiler Coded</string>
     <string name="lb_eiler_special_coded">Eiler Special Coded</string>
     <string name="lb_non_coded">Non Coded</string>
-    <string name="target_pulse_rate_1">Target Pulse Rate 1</string>
-    <string name="target_pulse_rate_2">Target Pulse Rate 2</string>
-    <string name="target_pulse_rate_3">Target Pulse Rate 3</string>
-    <string name="target_pulse_rate_4">Target Pulse Rate 4</string>
+    <string name="lb_data_calculation_types">Data Calculation Types</string>
 
     <!--CLONE RECEIVER-->
     <string name="clone_receiver">Clone Receiver</string>
@@ -197,8 +205,8 @@
     <string name="lb_make_sure_receivers">Make sure receivers are on and connected via the clone cable.</string>
     <string name="lb_retry_receiver_search">Retry Receiver Search</string>
     <string name="lb_ready_clone">Ready to Clone</string>
-    <string name="lb_start_cloning">Start Clonning</string>
-    <string name="lb_clonning">Clonning ...</string>
+    <string name="lb_start_cloning">Start Cloning</string>
+    <string name="lb_cloning">Cloning ...</string>
 
     <!--MANAGE RECEIVER DATA-->
     <string name="manage_receiver_data">Manage Receiver Data</string>
@@ -207,12 +215,12 @@
     <string name="lb_erase_data">Delete Data</string>
 
     <!--TEST RECEIVER-->
-    <string name="test_receiver">Test Receiver</string>
-    <string name="lb_running_test">Running Test...</string>
-    <string name="lb_test_complete">Test Complete</string>
+    <string name="receiver_diagnostics">Receiver Diagnostics</string>
+    <string name="lb_running_diagnostics">Running Diagnostics ...</string>
+    <string name="lb_diagnostics_complete">Diagnostics Complete</string>
     <string name="lb_frequency_range">Frequency Range:</string>
-    <string name="lb_battery">Battery (%): </string>
-    <string name="lb_bytes_stored">Bytes Stored: </string>
+    <string name="lb_battery">Battery (%):</string>
+    <string name="lb_bytes_stored">Bytes Stored:</string>
     <string name="lb_memory_used_percent">Memory Used (%):</string>
     <string name="lb_frequency_tables">Frequency Tables:</string>
     <string name="lb_first_table">Table 1:</string>
@@ -227,6 +235,14 @@
     <string name="lb_tenth_table">Table 10:</string>
     <string name="lb_eleventh_table">Table 11:</string>
     <string name="lb_twelfth_table">Table 12:</string>
+    <string name="lb_up_to_date">Up to Date</string>
+    <string name="lb_update_receiver">Update Receiver</string>
+
+    <!--RECEIVER UPDATE-->
+    <string name="receiver_update">Receiver Update</string>
+    <string name="lb_updating_receiver">Updating Receiver</string>
+    <string name="lb_cancel_update">Cancel Update</string>
+    <string name="lb_receiver_is_up">Receiver is up to date</string>
 
     <string-array name="antennas">
         <item>1</item>

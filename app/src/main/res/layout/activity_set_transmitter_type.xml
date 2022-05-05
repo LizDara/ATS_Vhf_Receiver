@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,15 +9,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <include
             layout="@layout/toolbar"/>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1">
 
             <LinearLayout
@@ -27,52 +26,52 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16sp"
-                    android:layout_marginEnd="16sp"
                     android:layout_marginTop="24sp"
+                    android:layout_marginEnd="16sp"
                     android:text="@string/lb_transmitter_detection"
-                    android:textColor="@color/limed_spruce"
-                    style="@style/subtitle"/>
+                    android:textColor="@color/limed_spruce" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16sp"
-                    android:orientation="vertical"
+                    android:background="@color/catskill_white"
                     android:elevation="4sp"
-                    android:background="@color/catskill_white">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/pulse_rate_type_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16sp"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:padding="16sp">
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:layout_weight="1">
+                            android:orientation="vertical">
 
                             <TextView
+                                style="@style/body_small"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
                                 android:text="@string/lb_pulse_rate_type"
-                                android:textColor="@color/limed_spruce"
-                                style="@style/body_small"/>
+                                android:textColor="@color/limed_spruce" />
 
                             <TextView
                                 android:id="@+id/pulse_rate_type_textView"
+                                style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/ebony_clay"
-                                style="@style/body_regular"/>
+                                android:textColor="@color/ebony_clay" />
 
                         </LinearLayout>
 
@@ -80,60 +79,7 @@
                             android:id="@+id/pulse_rate_type_imageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/ic_next"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/filter_type_option_linearLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/light_gray"/>
-
-                        <LinearLayout
-                            android:id="@+id/filter_type_linearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16sp"
-                            android:orientation="horizontal"
-                            android:gravity="center">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical"
-                                android:layout_weight="1">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_filter_type"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
-
-                                <TextView
-                                    android:id="@+id/filter_type_textView"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
-
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/ic_next"/>
-
-                        </LinearLayout>
+                            android:background="@drawable/ic_next" />
 
                     </LinearLayout>
 
@@ -141,49 +87,190 @@
                         android:id="@+id/matches_for_valid_pattern_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/light_gray"/>
+                            android:background="@color/light_gray" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16sp"
+                            android:gravity="center"
                             android:orientation="horizontal"
-                            android:gravity="center">
+                            android:padding="16sp">
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
+                                android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:layout_weight="1">
+                                android:orientation="vertical">
 
                                 <TextView
+                                    style="@style/body_small"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8sp"
                                     android:text="@string/lb_matches_for_valid_pattern"
-                                    android:textColor="@color/limed_spruce"
-                                    style="@style/body_small"/>
+                                    android:textColor="@color/limed_spruce" />
 
                                 <TextView
                                     android:id="@+id/matches_for_valid_pattern_textView"
+                                    style="@style/body_regular"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textColor="@color/ebony_clay"
-                                    style="@style/body_regular"/>
+                                    android:textColor="@color/ebony_clay" />
 
                             </LinearLayout>
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/ic_next"/>
+                                android:background="@drawable/ic_next" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/pulse_rates_linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
+
+                        <LinearLayout
+                            android:id="@+id/max_pulse_rate_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    style="@style/body_small"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8sp"
+                                    android:text="@string/lb_max_pulse_rate"
+                                    android:textColor="@color/limed_spruce" />
+
+                                <TextView
+                                    android:id="@+id/max_pulse_rate_textView"
+                                    style="@style/body_regular"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/ebony_clay" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
+
+                        <LinearLayout
+                            android:id="@+id/min_pulse_rate_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    style="@style/body_small"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8sp"
+                                    android:text="@string/lb_min_pulse_rate"
+                                    android:textColor="@color/limed_spruce" />
+
+                                <TextView
+                                    android:id="@+id/min_pulse_rate_textView"
+                                    style="@style/body_regular"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/ebony_clay" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
+
+                        <LinearLayout
+                            android:id="@+id/optional_data_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    style="@style/body_small"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8sp"
+                                    android:text="@string/lb_optional_data"
+                                    android:textColor="@color/limed_spruce" />
+
+                                <TextView
+                                    android:id="@+id/optional_data_textView"
+                                    style="@style/body_regular"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/ebony_clay" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
 
                         </LinearLayout>
 
@@ -199,81 +286,99 @@
                     android:visibility="gone">
 
                     <TextView
+                        style="@style/subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16sp"
-                        android:layout_marginEnd="16sp"
                         android:layout_marginTop="8sp"
+                        android:layout_marginEnd="16sp"
                         android:text="@string/lb_target_pulse_rates"
-                        android:textColor="@color/limed_spruce"
-                        style="@style/subtitle"/>
+                        android:textColor="@color/limed_spruce" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16sp"
-                        android:orientation="vertical"
+                        android:background="@color/catskill_white"
                         android:elevation="4sp"
-                        android:background="@color/catskill_white">
+                        android:orientation="vertical">
 
                         <LinearLayout
                             android:id="@+id/pr1_linearLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16sp"
+                            android:gravity="center"
                             android:orientation="horizontal"
-                            android:gravity="center">
+                            android:padding="16sp">
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
+                                android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:layout_weight="1">
+                                android:orientation="horizontal">
 
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:orientation="vertical"
-                                    android:layout_weight="1">
+                                    tools:ignore="NestedWeights">
 
                                     <TextView
+                                        style="@style/body_small"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginBottom="8sp"
                                         android:text="@string/lb_pr1"
-                                        android:textColor="@color/limed_spruce"
-                                        style="@style/body_small"/>
+                                        android:textColor="@color/limed_spruce" />
 
                                     <TextView
                                         android:id="@+id/pr1_textView"
+                                        style="@style/body_regular"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/ebony_clay"
-                                        style="@style/body_regular"/>
+                                        android:textColor="@color/ebony_clay" />
 
                                 </LinearLayout>
 
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:layout_weight="1">
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
 
                                     <TextView
+                                        style="@style/body_small"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginBottom="8sp"
                                         android:text="@string/lb_pr1_tolerance"
-                                        android:textColor="@color/limed_spruce"
-                                        style="@style/body_small"/>
+                                        android:textColor="@color/limed_spruce" />
 
-                                    <TextView
-                                        android:id="@+id/pr1_tolerance_textView"
+                                    <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/ebony_clay"
-                                        style="@style/body_regular"/>
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            style="@style/body_regular"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@color/catskill_white"
+                                            android:text="+/-"
+                                            android:textColor="@color/ebony_clay"
+                                            tools:ignore="HardcodedText,RtlSymmetry" />
+
+                                        <TextView
+                                            android:id="@+id/pr1_tolerance_textView"
+                                            style="@style/body_regular"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:paddingHorizontal="8sp"
+                                            android:textColor="@color/ebony_clay" />
+
+                                    </LinearLayout>
 
                                 </LinearLayout>
 
@@ -282,242 +387,288 @@
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/ic_next"/>
+                                android:background="@drawable/ic_next" />
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/other_pulse_rates_linearLayout"
+                        <View
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/light_gray"/>
+                        <LinearLayout
+                            android:id="@+id/pr2_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
 
                             <LinearLayout
-                                android:id="@+id/pr2_linearLayout"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="horizontal"
-                                android:gravity="center">
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:layout_width="0dp"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
-                                    android:layout_weight="1">
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    tools:ignore="NestedWeights">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr2"
+                                        android:textColor="@color/limed_spruce" />
+
+                                    <TextView
+                                        android:id="@+id/pr2_textView"
+                                        style="@style/body_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/ebony_clay" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr2_tolerance"
+                                        android:textColor="@color/limed_spruce" />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
+                                        android:orientation="horizontal">
 
                                         <TextView
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr2"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
-
-                                        <TextView
-                                            android:id="@+id/pr2_textView"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
+                                            android:background="@color/catskill_white"
+                                            android:text="+/-"
                                             android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr2_tolerance"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
+                                            tools:ignore="HardcodedText,RtlSymmetry" />
 
                                         <TextView
                                             android:id="@+id/pr2_tolerance_textView"
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
+                                            android:paddingHorizontal="8sp"
+                                            android:textColor="@color/ebony_clay" />
 
                                     </LinearLayout>
 
                                 </LinearLayout>
 
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/ic_next"/>
-
                             </LinearLayout>
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/light_gray"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
+
+                        <LinearLayout
+                            android:id="@+id/pr3_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
 
                             <LinearLayout
-                                android:id="@+id/pr3_linearLayout"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="horizontal"
-                                android:gravity="center">
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:layout_width="0dp"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
-                                    android:layout_weight="1">
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    tools:ignore="NestedWeights">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr3"
+                                        android:textColor="@color/limed_spruce" />
+
+                                    <TextView
+                                        android:id="@+id/pr3_textView"
+                                        style="@style/body_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/ebony_clay" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr3_tolerance"
+                                        android:textColor="@color/limed_spruce" />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
+                                        android:orientation="horizontal">
 
                                         <TextView
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr3"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
-
-                                        <TextView
-                                            android:id="@+id/pr3_textView"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
+                                            android:background="@color/catskill_white"
+                                            android:text="+/-"
                                             android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr3_tolerance"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
+                                            tools:ignore="HardcodedText,RtlSymmetry" />
 
                                         <TextView
                                             android:id="@+id/pr3_tolerance_textView"
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
+                                            android:paddingHorizontal="8sp"
+                                            android:textColor="@color/ebony_clay" />
 
                                     </LinearLayout>
 
                                 </LinearLayout>
 
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/ic_next"/>
-
                             </LinearLayout>
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/light_gray"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray" />
+
+                        <LinearLayout
+                            android:id="@+id/pr4_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="16sp">
 
                             <LinearLayout
-                                android:id="@+id/pr4_linearLayout"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:padding="16sp"
-                                android:orientation="horizontal"
-                                android:gravity="center">
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:layout_width="0dp"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
-                                    android:layout_weight="1">
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    tools:ignore="NestedWeights">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr4"
+                                        android:textColor="@color/limed_spruce" />
+
+                                    <TextView
+                                        android:id="@+id/pr4_textView"
+                                        style="@style/body_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/ebony_clay"
+                                        tools:ignore="HardcodedText" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        style="@style/body_small"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="8sp"
+                                        android:text="@string/lb_pr4_tolerance"
+                                        android:textColor="@color/limed_spruce" />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
+                                        android:orientation="horizontal">
 
                                         <TextView
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr4"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
-
-                                        <TextView
-                                            android:id="@+id/pr4_textView"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="050"
+                                            android:background="@color/catskill_white"
+                                            android:text="+/-"
                                             android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:layout_weight="1">
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginBottom="8sp"
-                                            android:text="@string/lb_pr4_tolerance"
-                                            android:textColor="@color/limed_spruce"
-                                            style="@style/body_small"/>
+                                            tools:ignore="HardcodedText,RtlSymmetry" />
 
                                         <TextView
                                             android:id="@+id/pr4_tolerance_textView"
+                                            style="@style/body_regular"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="+/-00"
+                                            android:paddingHorizontal="8sp"
                                             android:textColor="@color/ebony_clay"
-                                            style="@style/body_regular"/>
+                                            tools:ignore="HardcodedText" />
 
                                     </LinearLayout>
 
                                 </LinearLayout>
 
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/ic_next"/>
-
                             </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ic_next" />
 
                         </LinearLayout>
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +44,6 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             final String deviceName = device.getName();
             if(deviceName != null) {
                 if (deviceName.contains("ATSvr")) { // add new for filter only ATS Vhf Rec device
-//                    Log.i("DEVICE", deviceName);
-//                    Log.i("RECORD",  Converters.getDecimalValue(scanRecord));
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
                 }
@@ -56,14 +55,22 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
      * Gets the percentage of the device's battery.
      *
      * @param scanRecord The content of the advertisement record offered by the remote device.
+     *
      * @return Return the battery percentage.
      */
-    public String getPercentBattery(byte[] scanRecord) {
+    private String getPercentBattery(byte[] scanRecord) {
         int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
         return Converters.getDecimalValue(scanRecord[firstElement + 5]);
     }
 
-    public String getStatus(byte[] scanRecord) {
+    /**
+     * Gets the status of the devices found.
+     *
+     * @param scanRecord The content of the advertisement record offered by the remote device.
+     *
+     * @return Return the device status.
+     */
+    private String getStatus(byte[] scanRecord) {
         int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
         String status = Converters.getHexValue(scanRecord[firstElement + 6]);
         switch (status) {
@@ -76,7 +83,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             case "83":
                 status = "Scanning, stationary";
                 break;
-            case "85":
+            case "86":
                 status = "Scanning, manual";
                 break;
         }
@@ -88,6 +95,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
      */
     public void clear() {
         mLeDevices.clear();
+        mScanRecords.clear();
     }
 
     @NonNull
@@ -114,7 +122,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         final String type = device.getName().substring(15, 16);
         final String status = getStatus(mScanRecords.get(position));
 
-        holder.deviceName.setText(deviceName + ((type.equals("C")) ? " Coded" : " Non coded") + ", " + status);
+        holder.deviceName.setText(deviceName + ((type.equals("C")) ? " Coded, " : " Non coded, ") + status);
 
         holder.deviceStatus.setText(range + " MHz");
 
@@ -147,25 +155,23 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             deviceName = itemView.findViewById(R.id.device_name_textView);
             percentBattery = itemView.findViewById(R.id.percent_battery_textView);
 
-            device_linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (device == null) return;
-                    if (device.getName().contains("#000000")) { // Error, factory setup required
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setTitle("Error");
-                        builder.setMessage("Factory Setup Required.");
-                        builder.setPositiveButton("OK", null);
-                        builder.show();
-                    } else { // Connects to device
-                        Intent intent = new Intent(context, MainMenuActivity.class);
-                        intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, deviceName.getText().toString());
-                        intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-                        intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_STATUS, deviceStatus.getText().toString());
-                        intent.putExtra(MainMenuActivity.EXTRAS_BATTERY, percentBattery.getText().toString());
-                        intent.putExtra("menu", false);
-                        context.startActivity(intent);
-                    }
+            device_linearLayout.setOnClickListener(view -> {
+                if (device == null) return;
+                if (device.getName().contains("#000000")) { // Error, factory setup required
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Error");
+                    builder.setMessage("Factory Setup Required.");
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                } else { // Connects to device
+                    Intent intent = new Intent(context, MainMenuActivity.class);
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, deviceName.getText().toString());
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_STATUS, deviceStatus.getText().toString());
+                    intent.putExtra(MainMenuActivity.EXTRAS_BATTERY, percentBattery.getText().toString());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("menu", false);
+                    context.startActivity(intent);
                 }
             });
         }

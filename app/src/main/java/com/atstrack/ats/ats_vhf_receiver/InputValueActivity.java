@@ -52,12 +52,8 @@ public class InputValueActivity extends AppCompatActivity {
     TextView device_status_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.spinner_value_linearLayout)
-    LinearLayout spinner_value_linearLayout;
     @BindView(R.id.value_spinner)
     Spinner value_spinner;
-    @BindView(R.id.message_error_textView)
-    TextView message_error_textView;
     @BindView(R.id.set_value_linearLayout)
     LinearLayout set_value_linearLayout;
     @BindView(R.id.store_rate_linearLayout)
@@ -87,7 +83,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean state = true;
 
     private int value;
     private int storeRate = 0;
@@ -99,7 +94,6 @@ public class InputValueActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG,"Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -112,7 +106,7 @@ public class InputValueActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = false;
+    private boolean mConnected = true;
     private String parameter = "";
 
     // Handles various events fired by the Service.
@@ -130,7 +124,6 @@ public class InputValueActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    state = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals("aerial")) { // Gets aerial defaults data
@@ -140,18 +133,26 @@ public class InputValueActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (value == FREQUENCY_TABLE_NUMBER)
-                        downloadTable(packet);
-                    else if (value == SCAN_RATE_SECONDS)
-                        downloadScanRate(packet);
-                    else if (value == NUMBER_OF_ANTENNAS)
-                        downloadAntennas(packet);
-                    else if (value == SCAN_TIMEOUT_SECONDS)
-                        downloadTimeout(packet);
-                    else if (value == STORE_RATE)
-                        downloadStoreRate(packet);
-                    else if (value == REFERENCE_FREQUENCY_STORE_RATE)
-                        downloadReferenceFrequencyStoreRate(packet);
+                    switch (value) {
+                        case FREQUENCY_TABLE_NUMBER: // Gets the frequency table number
+                            downloadTable(packet);
+                            break;
+                        case SCAN_RATE_SECONDS: // Gets the scan rate seconds
+                            downloadScanRate(packet);
+                            break;
+                        case NUMBER_OF_ANTENNAS: // Gets number of antennas
+                            downloadAntennas(packet);
+                            break;
+                        case SCAN_TIMEOUT_SECONDS: // Gets the scan timeout seconds
+                            downloadTimeout(packet);
+                            break;
+                        case STORE_RATE: // Gets the store rate
+                            downloadStoreRate(packet);
+                            break;
+                        case REFERENCE_FREQUENCY_STORE_RATE: // Gets the reference frequency store rate
+                            downloadReferenceFrequencyStoreRate(packet);
+                            break;
+                    }
                 }
             }
             catch (Exception e) {
@@ -339,7 +340,6 @@ public class InputValueActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.d(TAG,"Connect request result= " + result);
         }
     }
 
@@ -358,7 +358,7 @@ public class InputValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected && !state) {
+        if (!mConnected) {
             showDisconnectionMessage();
         }
         return true;
@@ -370,8 +370,8 @@ public class InputValueActivity extends AppCompatActivity {
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
-        View view =inflater.inflate(R.layout.disconnect_message, null);
-        final androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View view = inflater.inflate(R.layout.disconnect_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
         dialog.setView(view);
         dialog.show();
@@ -392,7 +392,7 @@ public class InputValueActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void downloadTable(byte[] data) {
+    private void downloadTable(byte[] data) {
         List<String> tables = new ArrayList<>();
         int positionFrequencyTableNumber = 0;
         byte b = (parameter.equals("aerial")) ? data[6] : data[9];
@@ -407,8 +407,7 @@ public class InputValueActivity extends AppCompatActivity {
         for (int i = 9; i <= 12; i++) {
             if ((b & 1) == 1) {
                 tables.add("Table " + i);
-                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ?
-                        tables.size() - 1 : 0;
+                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ? tables.size() - 1 : 0;
             }
             b = (byte) (b >> 1);
         }
@@ -426,7 +425,7 @@ public class InputValueActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void downloadScanRate(byte[] data) {
+    private void downloadScanRate(byte[] data) {
         if (parameter.equals("aerial")) {
             ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -460,7 +459,7 @@ public class InputValueActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void downloadAntennas(byte[] data) {
+    private void downloadAntennas(byte[] data) {
         ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(this, R.array.antennas, android.R.layout.simple_spinner_item);
         antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(antennasAdapter);
@@ -478,7 +477,7 @@ public class InputValueActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    public void downloadTimeout(byte[] data) {
+    private void downloadTimeout(byte[] data) {
         ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(timeoutAdapter);
@@ -491,7 +490,12 @@ public class InputValueActivity extends AppCompatActivity {
         }
     }
 
-    public void downloadStoreRate(byte[] data) {
+    /**
+     * With the received packet, gets store rate value and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadStoreRate(byte[] data) {
         switch (Converters.getDecimalValue(data[5])) {
             case "0":
                 no_store_rate_imageView.setVisibility(View.VISIBLE);
@@ -514,7 +518,12 @@ public class InputValueActivity extends AppCompatActivity {
         }
     }
 
-    public void downloadReferenceFrequencyStoreRate(byte[] data) {
+    /**
+     * With the received packet, gets reference frequency store rate value and display on the screen.
+     *
+     * @param data The received packet.
+     */
+    private void downloadReferenceFrequencyStoreRate(byte[] data) {
         ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(this, R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
         storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(storeRateAdapter);

@@ -1,88 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16sp"
     android:layout_marginBottom="24sp"
-    android:orientation="vertical"
+    android:background="@color/catskill_white"
     android:elevation="4sp"
-    android:background="@color/catskill_white">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/frequency_table_number_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_frequency_table_number"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/frequency_table_number_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_next"/>
+            android:background="@drawable/ic_next" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/scan_rate_seconds_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_scan_rate_seconds"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/scan_rate_seconds_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -96,37 +95,37 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/scan_timeout_seconds_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_scan_timeout"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/scan_timeout_seconds_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -140,37 +139,37 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/number_of_antennas_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_number_antennas"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/number_of_antennas_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -184,37 +183,37 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/store_rate_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_store_rate"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/store_rate_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -229,37 +228,37 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/reference_frequency_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_reference_frequency"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/frequency_reference_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -273,37 +272,37 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/reference_frequency_store_rate_stationary_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:padding="16sp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
+                style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
                 android:text="@string/lb_reference_frequency_store_rate"
-                android:textColor="@color/limed_spruce"
-                style="@style/body_small"/>
+                android:textColor="@color/limed_spruce" />
 
             <TextView
                 android:id="@+id/reference_frequency_store_rate_stationary_textView"
+                style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay"
-                style="@style/body_regular"/>
+                android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
 
@@ -317,32 +316,32 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16sp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="16sp">
 
         <TextView
+            style="@style/body_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/lb_external_data_transfer"
-            android:textColor="@color/limed_spruce"
-            style="@style/body_small"/>
+            android:textColor="@color/limed_spruce" />
 
         <Space
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/stationary_external_data_transfer_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:thumb="@drawable/thumb_switch"
-            app:track="@drawable/track_switch"/>
+            app:track="@drawable/track_switch" />
 
     </LinearLayout>
 

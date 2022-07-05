@@ -22,6 +22,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -73,6 +75,8 @@ public class ManualScanActivity extends AppCompatActivity {
     Button start_manual_button;
     @BindView(R.id.enter_frequency_editText)
     EditText enter_frequency_editText;
+    @BindView(R.id.ready_to_scan_manual_button)
+    Button ready_to_scan_manual_button;
     @BindView(R.id.manual_scan_linearLayout)
     LinearLayout manual_scan_linearLayout;
     @BindView(R.id.frequency_scan_manual_textView)
@@ -179,6 +183,32 @@ public class ManualScanActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Change the period while editing the pulse rate.
+     */
+    private TextWatcher textChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (enter_frequency_editText.getText().toString().isEmpty()) {
+                ready_to_scan_manual_button.setEnabled(false);
+                ready_to_scan_manual_button.setAlpha((float) 0.6);
+            } else {
+                ready_to_scan_manual_button.setEnabled(true);
+                ready_to_scan_manual_button.setAlpha(1);
+            }
+        }
+    };
+
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
@@ -269,6 +299,7 @@ public class ManualScanActivity extends AppCompatActivity {
         state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
 
         if (isEditFrequency) {
+            isEditFrequency = false;
             title_toolbar.setText(R.string.lb_change_frequency);
             change_frequency_linearLayout.setVisibility(View.VISIBLE);
         } else {
@@ -299,6 +330,13 @@ public class ManualScanActivity extends AppCompatActivity {
         change_frequency_linearLayout.setVisibility(View.VISIBLE);
         ready_manual_scan_LinearLayout.setVisibility(View.GONE);
         enter_frequency_editText.setText("");
+        if (enter_frequency_editText.getText().toString().isEmpty()) {
+            ready_to_scan_manual_button.setEnabled(false);
+            ready_to_scan_manual_button.setAlpha((float) 0.6);
+        } else {
+            ready_to_scan_manual_button.setEnabled(true);
+            ready_to_scan_manual_button.setAlpha((float) 1);
+        }
     }
 
     @OnClick(R.id.ready_to_scan_manual_button)
@@ -389,6 +427,7 @@ public class ManualScanActivity extends AppCompatActivity {
             start_manual_button.setAlpha((float) 0.6);
         }
 
+        enter_frequency_editText.addTextChangedListener(textChangedListener);
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
         range = sharedPreferences.getInt("Range", 0);
@@ -435,7 +474,6 @@ public class ManualScanActivity extends AppCompatActivity {
                 }
             } else {
                 parameter = "stopManual";
-                isEditFrequency = false;
                 mBluetoothLeService.discovering();
             }
             return true;
@@ -541,7 +579,6 @@ public class ManualScanActivity extends AppCompatActivity {
         detectionsTextView.setLayoutParams(params);
 
         TextView mortTextView = new TextView(this);
-        //mortTextView.setText("0");
         mortTextView.setVisibility(View.GONE);
 
         newCode.addView(codeTextView);
@@ -556,7 +593,7 @@ public class ManualScanActivity extends AppCompatActivity {
         scan_details_linearLayout.addView(newCode);
         scan_details_linearLayout.addView(line);
 
-        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort);
+        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort, 0);
     }
 
     /**
@@ -585,7 +622,7 @@ public class ManualScanActivity extends AppCompatActivity {
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
         TextView mortTextView = (TextView) linearLayout.getChildAt(3);
 
-        codeTextView.setText(codeTextView.getText().toString() + (isMort ? " M" : ""));
+        if (!codeTextView.getText().toString().contains(" M") && isMort) codeTextView.setText(codeTextView.getText().toString() + " M");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
         if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
@@ -606,9 +643,7 @@ public class ManualScanActivity extends AppCompatActivity {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             TextView textView = (TextView) linearLayout.getChildAt(0);
 
-            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) {
-                position = i;
-            }
+            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) position = i;
         }
 
         return position;
@@ -624,11 +659,13 @@ public class ManualScanActivity extends AppCompatActivity {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
+        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
 
         int code = Integer.parseInt(codeTextView.getText().toString());
         int detections = Integer.parseInt(detectionsTextView.getText().toString());
+        int mort = Integer.parseInt(mortTextView.getText().toString());
 
-        refreshCode(position, code, signalStrength, detections + 1, isMort);
+        refreshCode(position, code, signalStrength, detections + 1, isMort, mort);
     }
 
     /**
@@ -640,8 +677,8 @@ public class ManualScanActivity extends AppCompatActivity {
      * @param detections Number of signal strength calculated.
      * @param isMort True, if the code is mort.
      */
-    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort) {
-        for (int i = finalPosition; i > 3 ; i -= 2) {
+    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort, int mort) {
+        for (int i = finalPosition; i > 3; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
 
@@ -668,9 +705,9 @@ public class ManualScanActivity extends AppCompatActivity {
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newDetectionsTextView.setText(String.valueOf(detections));
 
-        if (isMort) newMortTextView.setText(String.valueOf(Integer.parseInt(newMortTextView.getText().toString()) + 1));
+        newMortTextView.setText(isMort ? mort + 1 : mort);
         this.detections = detections;
-        mort = Integer.parseInt(newMortTextView.getText().toString());
+        this.mort = Integer.parseInt(newMortTextView.getText().toString());
     }
 
     /**

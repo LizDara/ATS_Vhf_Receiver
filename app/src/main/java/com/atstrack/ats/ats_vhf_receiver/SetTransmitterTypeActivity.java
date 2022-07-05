@@ -175,42 +175,26 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      * Characteristic name: Tx type.
      */
     private void onClickSave() {
-        byte txType = (byte) 0x0;
+        byte txType;
+        byte[] b = new byte[]{0};
         switch (pulse_rate_type_textView.getText().toString()) {
-            case "Eiler Coded":
-                txType = (byte) 0x11;
-                break;
-            case "Eiler Special Coded":
-                txType = (byte) 0x12;
-                break;
-            case "Non Coded":
-                txType = (byte) 0x20;
-                break;
             case "Fixed Pulse Rate":
                 txType = (byte) 0x21;
+                b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
+                        (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
+                        (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
+                        (byte) Integer.parseInt(pr3_textView.getText().toString()), (byte) Integer.parseInt(pr3_tolerance_textView.getText().toString()),
+                        (byte) Integer.parseInt(pr4_textView.getText().toString()), (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString())};
                 break;
             case "Variable Pulse Rate":
                 txType = (byte) 0x22;
+                b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
+                        (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) / 256),
+                        (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) % 256),
+                        (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) / 256),
+                        (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) % 256),
+                        (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
                 break;
-        }
-        byte[] b;
-        if (Converters.getHexValue(txType).equals("21")) {
-            b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
-                    (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
-                    (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
-                    (byte) Integer.parseInt(pr3_textView.getText().toString()), (byte) Integer.parseInt(pr3_tolerance_textView.getText().toString()),
-                    (byte) Integer.parseInt(pr4_textView.getText().toString()), (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString())};
-        } else if (Converters.getHexValue(txType).equals("22")) {
-            b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
-                    (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) / 256),
-                    (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) % 256),
-                    (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) / 256),
-                    (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) % 256),
-                    (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
-        } else {
-            b = new byte[] {(byte) 0x47, txType,
-                    (byte) (matches_for_valid_pattern_textView.getText().equals("") ? 0x0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString())),
-                    (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
         }
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -440,8 +424,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         if (Converters.getHexValue(data[0]).equals("67")) {
             parameter = "";
 
-            matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-
             switch (Converters.getHexValue(data[1])) {
                 case "11":
                     pulse_rate_type_textView.setText(R.string.lb_eiler_coded);
@@ -456,12 +438,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 case "20":
                     pulse_rate_type_textView.setText(R.string.lb_non_coded);
                     matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
+
+                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
+
+                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])),
+                            Integer.parseInt(Converters.getDecimalValue(data[2])), 0, 0, 0, 0, 0, 0, 0, 0};
                     break;
                 case "21":
                     pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
                     target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                     matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
 
+                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
                     pr1_textView.setText(Converters.getDecimalValue(data[3]));
                     pr1_tolerance_textView.setText(Converters.getDecimalValue(data[4]));
                     pr2_textView.setText(Converters.getDecimalValue(data[5]));
@@ -470,6 +458,12 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     pr3_tolerance_textView.setText(Converters.getDecimalValue(data[8]));
                     pr4_textView.setText(Converters.getDecimalValue(data[9]));
                     pr4_tolerance_textView.setText(Converters.getDecimalValue(data[10]));
+
+                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])), Integer.parseInt(Converters.getDecimalValue(data[2])),
+                            Integer.parseInt(Converters.getDecimalValue(data[3])), Integer.parseInt(Converters.getDecimalValue(data[4])),
+                            Integer.parseInt(Converters.getDecimalValue(data[5])), Integer.parseInt(Converters.getDecimalValue(data[6])),
+                            Integer.parseInt(Converters.getDecimalValue(data[7])), Integer.parseInt(Converters.getDecimalValue(data[8])),
+                            Integer.parseInt(Converters.getDecimalValue(data[9])), Integer.parseInt(Converters.getDecimalValue(data[10]))};
                     break;
                 case "22":
                     pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
@@ -477,19 +471,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
                     pulse_rates_linearLayout.setVisibility(View.VISIBLE);
 
+                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
                     int maxPulse = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
                     int minPulse = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
                     max_pulse_rate_textView.setText(String.valueOf(maxPulse));
                     min_pulse_rate_textView.setText(String.valueOf(minPulse));
                     optional_data_textView.setText(R.string.lb_none);
+
+                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])), Integer.parseInt(Converters.getDecimalValue(data[2])),
+                            Integer.parseInt(Converters.getDecimalValue(data[3])), Integer.parseInt(Converters.getDecimalValue(data[4])),
+                            Integer.parseInt(Converters.getDecimalValue(data[5])), Integer.parseInt(Converters.getDecimalValue(data[6])), 0, 0, 0, 0};
                     break;
             }
-
-            this.data = new int[] {Integer.parseInt(Converters.getDecimalValue(data[1])), Integer.parseInt(Converters.getDecimalValue(data[2])),
-                    Integer.parseInt(Converters.getDecimalValue(data[3])), Integer.parseInt(Converters.getDecimalValue(data[4])),
-                    Integer.parseInt(Converters.getDecimalValue(data[5])), Integer.parseInt(Converters.getDecimalValue(data[6])),
-                    Integer.parseInt(Converters.getDecimalValue(data[7])), Integer.parseInt(Converters.getDecimalValue(data[8])),
-                    Integer.parseInt(Converters.getDecimalValue(data[9])), Integer.parseInt(Converters.getDecimalValue(data[10]))};
         }
     }
 
@@ -499,26 +492,19 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      * @return Returns true, if there are changes.
      */
     private boolean checkChanges() {
-        byte txType = (byte) 0x0;
+        byte txType;
+        int matches = (matches_for_valid_pattern_textView.getText().equals("")) ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());
         switch (pulse_rate_type_textView.getText().toString()) {
-            case "Eiler Coded":
-                txType = (byte) 0x11;
-                break;
-            case "Eiler Special Coded":
-                txType = (byte) 0x12;
-                break;
-            case "Non Coded":
-                txType = (byte) 0x20;
-                break;
             case "Fixed Pulse Rate":
                 txType = (byte) 0x21;
                 break;
             case "Variable Pulse Rate":
                 txType = (byte) 0x22;
                 break;
+            default:
+                return false;
         }
 
-        int matches = (matches_for_valid_pattern_textView.getText().equals("")) ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());
         int pr1 = 0;
         int pr2 = 0;
         int pr3 = 0;

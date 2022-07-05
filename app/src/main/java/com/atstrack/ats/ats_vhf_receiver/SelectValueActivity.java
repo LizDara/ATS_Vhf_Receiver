@@ -274,7 +274,7 @@ public class SelectValueActivity extends AppCompatActivity {
         none_imageView.setVisibility(View.VISIBLE);
         temperature_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = 0;
+        value = NONE;
     }
 
     @OnClick(R.id.temperature_linearLayout)
@@ -282,7 +282,7 @@ public class SelectValueActivity extends AppCompatActivity {
         temperature_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = 4;
+        value = TEMPERATURE;
     }
 
     @OnClick(R.id.period_linearLayout)
@@ -290,7 +290,7 @@ public class SelectValueActivity extends AppCompatActivity {
         period_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         temperature_imageView.setVisibility(View.GONE);
-        value = 8;
+        value = PERIOD;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -396,13 +396,6 @@ public class SelectValueActivity extends AppCompatActivity {
             }
         } else if (type == MAX_PULSE_RATE || type == MIN_PULSE_RATE) {
             value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
-        } else if (type == DATA_CALCULATION_TYPES) {
-            if (none_imageView.getVisibility() == View.VISIBLE)
-                value = NONE;
-            else if (temperature_imageView.getVisibility() == View.VISIBLE)
-                value = TEMPERATURE;
-            else if (period_imageView.getVisibility() == View.VISIBLE)
-                value = PERIOD;
         }
         setResult(value);
         finish();
@@ -584,33 +577,27 @@ public class SelectValueActivity extends AppCompatActivity {
         switch (Converters.getDecimalValue(data[2])) {
             case "2":
                 two_imageView.setVisibility(View.VISIBLE);
-                value = 2;
                 break;
             case "3":
                 three_imageView.setVisibility(View.VISIBLE);
-                value = 3;
                 break;
             case "4":
                 four_imageView.setVisibility(View.VISIBLE);
-                value = 4;
                 break;
             case "5":
                 five_imageView.setVisibility(View.VISIBLE);
-                value = 5;
                 break;
             case "6":
                 six_imageView.setVisibility(View.VISIBLE);
-                value = 6;
                 break;
             case "7":
                 seven_imageView.setVisibility(View.VISIBLE);
-                value = 7;
                 break;
             case "8":
                 eight_imageView.setVisibility(View.VISIBLE);
-                value = 8;
                 break;
         }
+        value = Integer.parseInt(Converters.getDecimalValue(data[2]));
     }
 
     /**
@@ -623,6 +610,7 @@ public class SelectValueActivity extends AppCompatActivity {
         max_min_pulse_rate_editText.setText(String.valueOf(maxPulse));
         double period = (maxPulse == 0) ? 0 : (double) 60000 / maxPulse;
         period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
+        value = maxPulse;
     }
 
     /**
@@ -635,6 +623,7 @@ public class SelectValueActivity extends AppCompatActivity {
         max_min_pulse_rate_editText.setText(String.valueOf(minPulse));
         double period = (minPulse == 0) ? 0 : (double) 60000 / minPulse;
         period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
+        value = minPulse;
     }
 
     /**
@@ -646,15 +635,15 @@ public class SelectValueActivity extends AppCompatActivity {
         switch (Converters.getHexValue(data[11])) {
             case "00":
                 none_imageView.setVisibility(View.VISIBLE);
-                value = 0;
+                value = NONE;
                 break;
             case "08":
                 period_imageView.setVisibility(View.VISIBLE);
-                value = 8;
+                value = PERIOD;
                 break;
             case "04":
                 temperature_imageView.setVisibility(View.VISIBLE);
-                value = 4;
+                value = TEMPERATURE;
                 break;
         }
     }
@@ -667,6 +656,7 @@ public class SelectValueActivity extends AppCompatActivity {
     private void downloadPulseRate1(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[3]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[4]));
+        value = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[4]));
     }
 
     /**
@@ -677,6 +667,7 @@ public class SelectValueActivity extends AppCompatActivity {
     private void downloadPulseRate2(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[5]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[6]));
+        value = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[6]));
     }
 
     /**
@@ -687,6 +678,7 @@ public class SelectValueActivity extends AppCompatActivity {
     private void downloadPulseRate3(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[7]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[8]));
+        value = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[8]));
     }
 
     /**
@@ -697,5 +689,6 @@ public class SelectValueActivity extends AppCompatActivity {
     private void downloadPulseRate4(byte[] data) {
         pulse_rate_editText.setText(Converters.getDecimalValue(data[9]));
         pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[10]));
+        value = (Integer.parseInt(Converters.getDecimalValue(data[9])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[10]));
     }
 }

@@ -6,23 +6,35 @@ public class ReceiverInformation {
     private String mDeviceName;
     private String mDeviceAddress;
     private String mDeviceStatus;
-    private String mPercentBattery;
+    private String mDeviceBattery;
 
-    private ReceiverInformation() {}
+    private ReceiverInformation() {
+        mDeviceName = "Unknown";
+        mDeviceAddress = "Unknown";
+        mDeviceStatus = "None";
+        mDeviceBattery = "%";
+    }
 
-    public static ReceiverInformation getReceiverInformation(
-            ) {
+    public static ReceiverInformation getReceiverInformation() {
         if (receiverInformation == null) {
             receiverInformation = new ReceiverInformation();
         }
         return receiverInformation;
     }
 
-    public void setReceiverInformation(String deviceName, String deviceAddress, String deviceStatus, String deviceBattery) {
-        this.mDeviceName = deviceName;
-        this.mDeviceAddress = deviceAddress;
-        this.mDeviceStatus = deviceStatus;
-        this.mPercentBattery = deviceBattery;
+    public void changeInformation(String deviceName, String deviceAddress, String deviceStatus, String deviceBattery) {
+        mDeviceName = deviceName;
+        mDeviceAddress = deviceAddress;
+        mDeviceStatus = deviceStatus;
+        mDeviceBattery = deviceBattery;
+    }
+
+    public void changeDeviceName(String deviceName) {
+        mDeviceName = deviceName;
+    }
+
+    public void changeDeviceBattery(String deviceBattery) {
+        mDeviceBattery = deviceBattery;
     }
 
     public String getDeviceName() {
@@ -38,6 +50,6 @@ public class ReceiverInformation {
     }
 
     public String getPercentBattery() {
-        return mPercentBattery;
+        return mDeviceBattery;
     }
 }

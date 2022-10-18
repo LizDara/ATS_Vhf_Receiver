@@ -219,7 +219,7 @@ public class ManualScanActivity extends AppCompatActivity {
     }
 
     /**
-        * Writes the aerial scan data for start to scan.
+     * Writes the aerial scan data for start to scan.
      * Service name: Scan.
      * Characteristic name: Manual.
      */
@@ -242,7 +242,7 @@ public class ManualScanActivity extends AppCompatActivity {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
         mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
-        Log.i(TAG, "Start Data");
+        Log.i(TAG, "Start Data "+Converters.getDecimalValue(b));
 
         isScanning = true;
         title_toolbar.setText(R.string.lb_manual_scanning);
@@ -404,6 +404,12 @@ public class ManualScanActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
+        enter_frequency_editText.addTextChangedListener(textChangedListener);
+        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
+        range = sharedPreferences.getInt("Range", 0);
+        detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
+
         if (isScanning) { // The device is already scanning
             parameter = "sendLog";
             year = getIntent().getExtras().getInt("year");
@@ -422,16 +428,15 @@ public class ManualScanActivity extends AppCompatActivity {
             state_view.setBackgroundResource(R.drawable.scanning_animation);
             animationDrawable = (AnimationDrawable) state_view.getBackground();
             animationDrawable.start();
+
+            int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+            code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+            period_textView.setVisibility(visibility);
+            pulse_rate_textView.setVisibility(visibility);
         } else { // Gets manual defaults data
             start_manual_button.setEnabled(false);
             start_manual_button.setAlpha((float) 0.6);
         }
-
-        enter_frequency_editText.addTextChangedListener(textChangedListener);
-        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
-        range = sharedPreferences.getInt("Range", 0);
-        detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -661,7 +666,7 @@ public class ManualScanActivity extends AppCompatActivity {
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
         TextView mortTextView = (TextView) linearLayout.getChildAt(3);
 
-        int code = Integer.parseInt(codeTextView.getText().toString());
+        int code = Integer.parseInt(codeTextView.getText().toString().replace(" M", ""));
         int detections = Integer.parseInt(detectionsTextView.getText().toString());
         int mort = Integer.parseInt(mortTextView.getText().toString());
 

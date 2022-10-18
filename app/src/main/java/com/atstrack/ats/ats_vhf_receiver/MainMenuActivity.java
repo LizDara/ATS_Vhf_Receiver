@@ -25,7 +25,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -189,7 +188,7 @@ public class MainMenuActivity extends AppCompatActivity {
         if (!isMenu) { // Connecting to the selected BLE device
             // Checks if the BLE device is scanning
             parameter = "scanning";
-            receiverInformation.setReceiverInformation(
+            receiverInformation.changeInformation(
                     getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
                     getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS),
                     getIntent().getStringExtra(EXTRAS_DEVICE_STATUS),

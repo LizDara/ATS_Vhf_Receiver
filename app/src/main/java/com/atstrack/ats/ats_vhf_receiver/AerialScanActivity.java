@@ -104,6 +104,7 @@ public class AerialScanActivity extends AppCompatActivity {
     private AnimationDrawable animationDrawable;
 
     private int baseFrequency;
+    private byte detectionType;
     private int selectedTable;
     private int autoRecord;
     private int code;
@@ -319,6 +320,15 @@ public class AerialScanActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
+        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
+        detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
+
+        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        period_textView.setVisibility(visibility);
+        pulse_rate_textView.setVisibility(visibility);
+
         if (isScanning) { // The device is already scanning
             parameter = "sendLog";
             year = getIntent().getExtras().getInt("year");
@@ -340,9 +350,6 @@ public class AerialScanActivity extends AppCompatActivity {
         } else { // Gets aerial defaults data
             parameter = "aerial";
         }
-
-        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -477,6 +484,7 @@ public class AerialScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
+        Log.i(TAG, "DATA: " + Converters.getDecimalValue(data));//solo sevian 5 en code
         switch (Converters.getHexValue(data[0])) {
             case "82":
                 startScanAerialFirstPart(data);
@@ -507,8 +515,13 @@ public class AerialScanActivity extends AppCompatActivity {
     private void startScanAerialFirstPart(byte[] data) {
         selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
         autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-        //txType = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
         year = Integer.parseInt(Converters.getDecimalValue(data[6]));
+
+        byte detectionType = (byte) (Integer.parseInt(Converters.getDecimalValue(data[4])) % 16);
+        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        period_textView.setVisibility(visibility);
+        pulse_rate_textView.setVisibility(visibility);
     }
 
     /**
@@ -561,7 +574,7 @@ public class AerialScanActivity extends AppCompatActivity {
         if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
             refreshFirstCode(signalStrength, mort > 0);
         } else if ((position = positionCode(code)) != 0) {
-            refreshPosition(position, signalStrength);
+            refreshPosition(position, signalStrength, mort > 0);
         } else {
             createCodeDetail(code, signalStrength, detections, mort > 0);
         }
@@ -582,7 +595,7 @@ public class AerialScanActivity extends AppCompatActivity {
         if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
             refreshFirstCode(signalStrength, mort > 1);
         } else if ((position = positionCode(code)) != 0) {
-            refreshPosition(position, signalStrength);
+            refreshPosition(position, signalStrength, mort > 0);
         } else {
             createCodeDetail(code, signalStrength, detections, mort > 0);
         }
@@ -647,7 +660,7 @@ public class AerialScanActivity extends AppCompatActivity {
         scan_details_linearLayout.addView(newCode);
         scan_details_linearLayout.addView(line);
 
-        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort);
+        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort, 0);
     }
 
     /**
@@ -711,14 +724,17 @@ public class AerialScanActivity extends AppCompatActivity {
      * @param position Number of position in the table to update.
      * @param signalStrength Number of signal strength.
      */
-    private void refreshPosition(int position, int signalStrength) {
+    private void refreshPosition(int position, int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
-        int code = Integer.parseInt(codeTextView.getText().toString());
-        int detections = Integer.parseInt(detectionsTextView.getText().toString());
+        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
 
-        refreshCode(position, code, signalStrength, detections + 1, codeTextView.getText().toString().contains(" M"));
+        int code = Integer.parseInt(codeTextView.getText().toString().replace(" M", ""));
+        int detections = Integer.parseInt(detectionsTextView.getText().toString());
+        int mort = Integer.parseInt(mortTextView.getText().toString());
+
+        refreshCode(position, code, signalStrength, detections + 1, isMort, mort);
     }
 
     /**
@@ -730,7 +746,7 @@ public class AerialScanActivity extends AppCompatActivity {
      * @param detections Number of signal strength calculated.
      * @param isMort True, if the code is mort.
      */
-    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort) {
+    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort, int mort) {
         for (int i = finalPosition; i > 3 ; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
@@ -752,11 +768,16 @@ public class AerialScanActivity extends AppCompatActivity {
         TextView newCodeTextView = (TextView) linearLayout.getChildAt(0);
         TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(1);
         TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newMortTextView = (TextView) linearLayout.getChildAt(3);
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + "Size: " + scan_details_linearLayout.getChildCount());
 
         newCodeTextView.setText(code + (isMort ? " M" : ""));
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newDetectionsTextView.setText(String.valueOf(detections));
+
+        newMortTextView.setText(isMort ? mort + 1 : mort);
+        this.detections =  detections;
+        this.mort = Integer.parseInt(newMortTextView.getText().toString());
     }
 
     /**

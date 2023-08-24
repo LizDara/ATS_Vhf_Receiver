@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/connect_image"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="130sp"
     android:layout_height="wrap_content"
     android:background="@color/catskill_white"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:gravity="center">
 
-    <Button
-        android:id="@+id/edit_table_button"
-        android:layout_width="@dimen/connect_image"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/mountain_meadow"
-        android:gravity="center"
-        android:text="@string/lb_edit_table"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/clear_table_button"
-        android:layout_width="@dimen/connect_image"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/mountain_meadow"
-        android:gravity="center"
-        android:text="@string/lb_clear_table"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        <Button
+            android:id="@+id/edit_table_button"
+            android:layout_width="@dimen/connect_image"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/mountain_meadow"
+            android:gravity="center"
+            android:text="Edit Table"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/clear_table_button"
+            android:layout_width="@dimen/connect_image"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/mountain_meadow"
+            android:gravity="center"
+            android:text="Clear Table"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</RelativeLayout>

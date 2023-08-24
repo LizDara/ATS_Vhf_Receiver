@@ -1,6 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -9,8 +8,8 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -116,7 +115,7 @@ public class ReceiverUpdateActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };

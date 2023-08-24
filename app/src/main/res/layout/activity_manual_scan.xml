@@ -202,8 +202,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/button_small_height"
                     android:paddingHorizontal="8sp"
-                    android:text="@string/lb_edit_frequency"
-                    android:textColor="@color/ebony_clay" />
+                    android:text="@string/lb_edit_frequency" />
 
             </LinearLayout>
 

@@ -1,14 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import timber.log.Timber;
-
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -36,18 +28,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
@@ -60,6 +49,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class GetDataActivity extends AppCompatActivity {
 
@@ -95,6 +91,7 @@ public class GetDataActivity extends AppCompatActivity {
     public final static char CR = (char) 0x0D;
     public final static char LF = (char) 0x0A;
     private static final int REQUEST_CODE_SIGN_IN = 1;
+    private static final int WAITING_PERIOD = 1000;
 
     FileOutputStream stream;
     File newFile;
@@ -106,13 +103,15 @@ public class GetDataActivity extends AppCompatActivity {
     private Snapshots processDataCollector;
     private int finalPageNumber;
     private int pageNumber;
+    private int totalPackagesNumber;
+    private int packetNumber;
     private int percent;
-    private boolean begin;
     private boolean error;
 
     private AnimationDrawable animationDrawable;
 
-    private Handler handler;
+    private Handler processHandler;
+    private Handler receiveHandler;
     private DriveServiceHelper driveServiceHelper;
 
     private ReceiverInformation receiverInformation;
@@ -138,7 +137,8 @@ public class GetDataActivity extends AppCompatActivity {
     };
 
     private boolean mConnected = true;
-    private String parameter;
+    private String parameter = "";
+    private String secondParameter = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -161,44 +161,63 @@ public class GetDataActivity extends AppCompatActivity {
                         case "test": // Gets memory used and byte stored
                             onClickTest();
                             break;
-                        case "downloadData": //Downloads raw bytes
+                        /*case "readData": // Gets pages total number
+                            onClickReadData();
+                            break;*/
+                        case "downloadData": // Downloads raw bytes
                             onClickDownloadData();
                             break;
-                        case "eraseData": // Deletes data
-                            onClickEraseData();
+                        case "response": // Response about erase data
+                            onClickResponse();
                             break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    Log.i(TAG, parameter + ": " + Converters.getHexValue(packet));
                     if (packet == null) return;
-                    if (parameter.equals("downloadData")) {
-                        // Gets raw data in pages, each page contains 2048 bytes.
-                        // 8 packets of 244 bytes and one of 96 bytes
-                        if (begin) { // Start download with an 8-byte packet
-                            // Only the first packet received contains 8 bytes
-                            // The first package indicates the total number of pages and the current page
-                            finalPageNumber = findPageNumber(new byte[]{packet[0], packet[1], packet[2], packet[3]});
-                            pageNumber = findPageNumber(new byte[]{packet[4], packet[5], packet[6], packet[7]});
-                            error = false;
-                            percent = 0;
-                            begin = false;
-                            percentage_textView.setText(percent + "%");
-                            // The list that stores the raw and processed data
-                            snapshotArray = new ArrayList<>();
-                            // size is defined
-                            rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE);
-                        } else {
-                            downloadData(packet);
-                        }
+                    switch (parameter) {
+                        /*case "readData": // Gets pages total number
+                            readData(packet);
+                            break;*/
+                        case "downloadData":
+                            // Gets raw data in pages, each page contains 2048 bytes.
+                            // 8 packets of 244 bytes and one of 96 bytes
+                            if (packet.length == 4)
+                                readData(packet);
+                            else
+                                downloadData(packet);
+                            break;
+                        case "test": // Gets memory used and byte stored
+                            downloadTest(packet);
+                            break;
+                        case "response": // Response about erase data
+                            downloadResponse(packet);
+                            break;
                     }
-                    if (parameter.equals("eraseData")) // Deletes data
-                        showMessage(packet);
-                    if (parameter.equals("test")) // Gets memory used and byte stored
-                        downloadTest(packet);
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
+            }
+        }
+    };
+
+    private final BroadcastReceiver mSecondGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                final String action = intent.getAction();
+                Log.i(TAG, "BROADCAST RECEIVER 1: " + action);
+                if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
+                    if ("eraseData".equals(secondParameter)) { // Deletes data
+                        onClickEraseData();
+                    } else if ("readData".equals(secondParameter)) {
+                        onClickReadData();
+                    }
+                }
+            }
+            catch (Exception e) {
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -209,6 +228,12 @@ public class GetDataActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+    private static IntentFilter makeSecondGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
         return intentFilter;
     }
 
@@ -224,20 +249,46 @@ public class GetDataActivity extends AppCompatActivity {
     }
 
     /**
+     * Requests a read for get BLE device data before download data.
+     * Service name: Stored Data.
+     * Characteristic name: Study Data.
+     */
+    private void onClickReadData() {
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
+        boolean result = mBluetoothLeService.readCharacteristicDiagnosticResponse(service, characteristic);
+
+        if (result)
+            secondParameter = "";
+    }
+
+    /**
      * Requests a download data for the user.
      * Service name: Stored Data.
      * Characteristic name: Study Data.
      */
     private void onClickDownloadData() {
+        secondParameter = "readData";
+
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
 
-        menu_manage_receiver_linearLayout.setVisibility(View.GONE);
-        download_data_linearLayout.setVisibility(View.VISIBLE);
-        progressGIF.setBackgroundResource(R.drawable.connecting_animation);
-        animationDrawable = (AnimationDrawable) progressGIF.getBackground();
-        animationDrawable.start();
+        new Handler().postDelayed(() -> {
+            mBluetoothLeService.discoveringSecond();
+        }, WAITING_PERIOD);
+    }
+
+    private void onClickResponse() {
+        secondParameter = "eraseData";
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
+        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
+
+        new Handler().postDelayed(() -> {
+            mBluetoothLeService.discoveringSecond();
+        }, WAITING_PERIOD);
     }
 
     /**
@@ -250,27 +301,47 @@ public class GetDataActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+
+        if (result) {
+            secondParameter = "";
+            menu_manage_receiver_linearLayout.setVisibility(View.GONE);
+            download_data_linearLayout.setVisibility(View.VISIBLE);
+            progressGIF.setBackgroundResource(R.drawable.connecting_animation);
+            animationDrawable = (AnimationDrawable) progressGIF.getBackground();
+            animationDrawable.start();
+        }
     }
 
     @OnClick(R.id.download_data_button)
     public void onClickDownloadData(View v) {
         parameter = "downloadData";
-        begin = true;
         mBluetoothLeService.discovering();
     }
 
     @OnClick(R.id.erase_data_button)
     public void onClickEraseData(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Warning");
-        builder.setMessage("Are you sure you want to delete data?");
-        builder.setNegativeButton("Cancel", null);
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            parameter = "eraseData";
-            mBluetoothLeService.discovering();
-        });
+        if (!bytes_stored_textView.getText().toString().contains("(0 bytes")) {
+            builder.setTitle("Warning");
+            builder.setMessage("Are you sure you want to delete data?");
+            builder.setNegativeButton("Cancel", null);
+            builder.setPositiveButton("Delete", (dialog, which) -> {
+                parameter = "response";
+                mBluetoothLeService.discovering();
+            });
+        } else {
+            builder.setTitle("Erase Data");
+            builder.setMessage("There is no data to delete.");
+            builder.setPositiveButton("OK", null);
+        }
         builder.show();
+    }
+
+    @OnClick(R.id.memory_button)
+    public void onClickMemory(View v) {
+        parameter = "";
+        mBluetoothLeService.discovering();
     }
 
     @Override
@@ -296,7 +367,8 @@ public class GetDataActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        handler = new Handler();
+        processHandler = new Handler();
+        receiveHandler = new Handler();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -315,6 +387,7 @@ public class GetDataActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        registerReceiver(mSecondGattUpdateReceiver, makeSecondGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
@@ -324,6 +397,7 @@ public class GetDataActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
+        unregisterReceiver(mSecondGattUpdateReceiver);
     }
 
     @Override
@@ -386,6 +460,29 @@ public class GetDataActivity extends AppCompatActivity {
     }
 
     /**
+     * Displays a message indicating whether the writing was successful.
+     *
+     * @param data This packet indicates the writing status.
+     */
+    private void downloadResponse(byte[] data) {
+        animationDrawable.stop();
+        download_data_linearLayout.setVisibility(View.GONE);
+        menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Erase Data");
+        if (Converters.getHexValue(data).equals("DD 00 BB EE "))
+            builder.setMessage("Completed.");
+        else
+            builder.setMessage("Not Completed.");
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            finish();
+        });
+        builder.show();
+
+    }
+
+    /**
      * Finds the page number of a 4-byte packet.
      *
      * @param packet The received packet.
@@ -416,15 +513,9 @@ public class GetDataActivity extends AppCompatActivity {
         int frequency = 0;
         int frequencyTableIndex = 0;
         int year;
-        int month = 0;
-        int day = 0;
-        int hour = 0;
-        int minute = 0;
-        int seconds = 0;
-        int julianDay = 0;
-
+        Calendar calendar = Calendar.getInstance();
         String format = Converters.getHexValue(packet[0]);
-        //Log.i(TAG, "PACKET[0]: "+ Converters.getHexValue(packet[0]));
+
         if (format.equals("83") || format.equals("82")) {
 
             data += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + CR + LF;
@@ -432,30 +523,26 @@ public class GetDataActivity extends AppCompatActivity {
             index += 8;
 
             while (index < packet.length) {
-
-                //Log.i(TAG, Converters.getHexValue(packet[index]));
                 if (Converters.getHexValue(packet[index]).equals("F0")) {
                     frequency = (baseFrequency * 1000) + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
                             Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
                     frequencyTableIndex = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
 
                     int date = Converters.hexToDecimal(
-                            Converters.getHexValue(packet[index + 4]) +
-                                    Converters.getHexValue(packet[index + 5]) +
-                                    Converters.getHexValue(packet[index + 6]));
-                    //Log.i(TAG, "DATE: " + date);
-                    month = date / 1000000;
-                    date = date % 1000000;
-                    day = date / 10000;
-                    date = date % 10000;
-                    hour = date / 100;
-                    minute = date % 100;
-                    seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(year + 2000, month - 1, day);
-                    julianDay = calendar.get(Calendar.DAY_OF_YEAR);
+                            Converters.getHexValue(packet[index + 4]) + Converters.getHexValue(packet[index + 5]) + Converters.getHexValue(packet[index + 6]));
 
-                    //Log.i(TAG, "Y: " + year + " M: " + month + " D: " + day + " H: " + hour + " M: " + minute + " S: " + seconds + " J: " + julianDay);
+                    int month = date / 1000000;
+                    date = date % 1000000;
+                    int day = date / 10000;
+                    date = date % 10000;
+                    int hour = date / 100;
+                    int minute = date % 100;
+                    int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    calendar.set(year + 2000, month - 1, day);
+                    calendar.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, seconds);
+                    Log.i(TAG, "Y: " + (calendar.get(Calendar.YEAR) - 2000) + " M: " + (calendar.get(Calendar.MONTH) + 1) + " D: " + calendar.get(Calendar.DAY_OF_MONTH) + " H: " + calendar.get(Calendar.HOUR_OF_DAY) + " M: " + calendar.get(Calendar.MINUTE) + " S: " + calendar.get(Calendar.SECOND) + " J: " + calendar.get(Calendar.DAY_OF_YEAR));
 
                 } else if (Converters.getHexValue(packet[index]).equals("F1")) {
                     String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
@@ -468,10 +555,13 @@ public class GetDataActivity extends AppCompatActivity {
                     int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
                     int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
                     int numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    calendar.add(Calendar.SECOND, secondsOffset);
+                    Log.i(TAG, "Y: " + (calendar.get(Calendar.YEAR) - 2000) + " M: " + (calendar.get(Calendar.MONTH) + 1) + " D: " + calendar.get(Calendar.DAY_OF_MONTH) + " H: " + calendar.get(Calendar.HOUR_OF_DAY) + " M: " + calendar.get(Calendar.MINUTE) + " S: " + calendar.get(Calendar.SECOND) + " J: " + calendar.get(Calendar.DAY_OF_YEAR));
 
-                    data += year + ", " + julianDay + ", " + hour + ", " + minute + ", " + (seconds + secondsOffset) + ", " + antenna + ", " +
-                            frequencyTableIndex + ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
-                            ", 0, 0, 0, " + (month + "/" + day + "/" + year) + ", 0" + CR + LF;
+                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
+                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
+                            ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
+                            ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
 
                 } else if (Converters.getHexValue(packet[index]).equals("F2")) {
                     String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
@@ -484,9 +574,10 @@ public class GetDataActivity extends AppCompatActivity {
                     int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
                     int numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
 
-                    data += year + ", " + julianDay + ", " + hour + ", " + minute + ", " + seconds + ", " + antenna + ", " +
-                            frequencyTableIndex + ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
-                            ", 0, 0, 0, " + (month + "/" + day + "/" + year) + ", 0" + CR + LF;
+                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
+                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
+                            ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
+                            ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
 
                 } else if (Converters.getHexValue(packet[index]).equals("E1") || Converters.getHexValue(packet[index]).equals("E2")) {
                     String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
@@ -494,10 +585,13 @@ public class GetDataActivity extends AppCompatActivity {
                     int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
                     int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) % 10;
                     int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4])) + 200;
+                    calendar.add(Calendar.SECOND, secondsOffset);
+                    Log.i(TAG, "Y: " + (calendar.get(Calendar.YEAR) - 2000) + " M: " + (calendar.get(Calendar.MONTH) + 1) + " D: " + calendar.get(Calendar.DAY_OF_MONTH) + " H: " + calendar.get(Calendar.HOUR_OF_DAY) + " M: " + calendar.get(Calendar.MINUTE) + " S: " + calendar.get(Calendar.SECOND) + " J: " + calendar.get(Calendar.DAY_OF_YEAR));
 
-                    data += year + ", " + julianDay + ", " + hour + ", " + minute + ", " + (seconds + secondsOffset) + ", " +
-                            antenna + ", " + frequencyTableIndex + ", " + frequencyText + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " +
-                            (month + "/" + day + "/" + year) + ", 0" + CR + LF;
+                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
+                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
+                            ", " + frequencyText + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
+                            "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
                 }
 
                 index += 8;
@@ -510,13 +604,13 @@ public class GetDataActivity extends AppCompatActivity {
                     Converters.getHexValue(packet[3]) +
                             Converters.getHexValue(packet[4]) +
                             Converters.getHexValue(packet[5]));
-            month = date / 1000000;
+            int month = date / 1000000;
             date = date % 1000000;
-            day = date / 10000;
+            int day = date / 10000;
             date = date % 10000;
-            hour = date / 100;
-            minute = date % 100;
-            seconds = Integer.parseInt(Converters.getDecimalValue(packet[6]));
+            int hour = date / 100;
+            int minute = date % 100;
+            int seconds = Integer.parseInt(Converters.getDecimalValue(packet[6]));
 
             index += 8;
 
@@ -533,64 +627,106 @@ public class GetDataActivity extends AppCompatActivity {
         return data;
     }
 
+    private void readData(byte[] packet) {
+        // The first package indicates the total number of pages and the current page
+        finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]});
+        pageNumber = -1;
+        totalPackagesNumber = finalPageNumber * 9;
+        packetNumber = 0; // 9 data packages of 228 bytes
+        error = false;
+        percent = 0;
+        percentage_textView.setText(percent + "%");
+
+        snapshotArray = new ArrayList<>(); // The list that stores the raw and processed data
+        rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
+
+        if (finalPageNumber == 0) { // No data to download
+            animationDrawable.stop();
+            download_data_linearLayout.setVisibility(View.GONE);
+            menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
+            showPrintDialog("Message", "No data to download.", 1);
+            parameter = "";
+        } else {
+            menu_manage_receiver_linearLayout.setVisibility(View.GONE);
+            download_data_linearLayout.setVisibility(View.VISIBLE);
+            progressGIF.setBackgroundResource(R.drawable.connecting_animation);
+            animationDrawable = (AnimationDrawable) progressGIF.getBackground();
+            animationDrawable.start();
+
+            receiveHandler.postDelayed(() -> {
+                if (!rawDataCollector.isFilled() && !error) {
+                    showPrintDialog("Message", "Timeout error.", 1);
+                    parameter = "";
+                    error = true;
+                    printSnapshotFiles();
+                }
+            }, 4000 * finalPageNumber);
+        }
+    }
+
+    private boolean isErrorPacket(byte[] packet) {
+        return (Converters.getHexValue(packet).equals("AA BB CC DD EE "));
+    }
+
+    private boolean isTransmissionDone(byte[] packet) {
+        return Converters.getHexValue(packet).equals("DD 00 BB EE ");
+    }
+
     /**
      * With the received packet, gets the raw data.
      *
      * @param packet The received packet.
      */
     private void downloadData(byte[] packet) {
-        if (snapshotArray.size() == 0)
-            Timber.tag("DCA:dD 344").d("Collection begins");
-        if (packet.length == 4) { // A 4-byte packet contains the current page number
-            if (finalPageNumber == 0) { // No data to download
-                animationDrawable.stop();
-                download_data_linearLayout.setVisibility(View.GONE);
-                menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
-                showPrintDialog("Message", "No data to download.", 1);
-                parameter = "";
-                return;
-            }
-            if ((pageNumber + 1) == findPageNumber(packet) && (pageNumber + 1) < finalPageNumber) {
-                // The current page number must be one more than the previous one and less than the total number of pages
-                pageNumber = findPageNumber(packet);
-                // Download percentage is updated
-                percent = (int) ((((float) pageNumber / (float) finalPageNumber)) * 100);
-                percentage_textView.setText(percent + "%");
-            } else { // Shows an error and stops downloading
-                animationDrawable.stop();
-                download_data_linearLayout.setVisibility(View.GONE);
-                menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
-                showPrintDialog("Error", "Download error.", 1);
-                parameter = "";
-            }
-        } else if (packet.length == 5) { //Shows an error when the packet contains 5 bytes and stops downloading
+        if (packet.length == 5 && isErrorPacket(packet)) { //Shows an error when the packet contains 5 bytes and stops downloading
             Log.i(TAG, Converters.getHexValue(packet));
             animationDrawable.stop();
             download_data_linearLayout.setVisibility(View.GONE);
             menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
             showPrintDialog("Error", "Download error.", 1);
+            error = true;
             parameter = "";
-        } else { // Copy the downloaded package
-            Log.i(TAG, "SIZE: " + packet.length + " PAGE: " + pageNumber);
-            rawDataCollector.processSnapshotRaw(packet);
-            if (rawDataCollector.isFilled()) {
-                // Completed the download and have to process the data
-                percent = 100;
-                percentage_textView.setText(percent + "%");
-                handler.postDelayed(() -> {
-                    snapshotArray.add(rawDataCollector);
-                    String processData = readPacket(rawDataCollector.getSnapshot());
+        } else if (packet.length == 4 && rawDataCollector.isFilled() && isTransmissionDone(packet)) {
+            // Completed the download and have to process the data
+            percent = 100;
+            percentage_textView.setText(percent + "%");
+            Log.i(TAG, "RAW DATA COLLECTOR IS FILLED.");
+            processHandler.postDelayed(() -> {
+                snapshotArray.add(rawDataCollector);
+                String processData = readPacket(rawDataCollector.getSnapshot());
 
-                    if (!error) { // Adds the data to the list if you didn't find any errors during processing
-                        byte[] data = Converters.convertToUTF8(processData);
-                        processDataCollector = new Snapshots(data.length);
-                        processDataCollector.processSnapshot(data);
-                        snapshotArray.add(processDataCollector);
-                    }
+                if (!error) { // Adds the data to the list if you didn't find any errors during processing
+                    byte[] data = Converters.convertToUTF8(processData);
+                    processDataCollector = new Snapshots(data.length);
+                    processDataCollector.processSnapshot(data);
+                    snapshotArray.add(processDataCollector);
+                }
+                parameter = "";
+                printSnapshotFiles();
+            }, 1500);
+        } else { // Copy the downloaded package
+            packetNumber++;
+            // Download percentage is updated
+            percent = (int) ((((float) packetNumber / (float) totalPackagesNumber)) * 100);
+            percentage_textView.setText(percent + "%");
+            if (packetNumber % 9 == 0) { //Get current page number when is first package
+                if ((pageNumber + 1) == findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}) && (pageNumber + 1) < finalPageNumber) {
+                    // The current page number must be one more than the previous one and less than the total number of pages
+                    pageNumber++;
+                    byte[] newPacket = new byte[224];
+                    System.arraycopy(packet, 0, newPacket, 0, 224);
+                    packet = newPacket;
+                } else { // Shows an error and stops downloading
+                    animationDrawable.stop();
+                    download_data_linearLayout.setVisibility(View.GONE);
+                    menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
+                    showPrintDialog("Error", "Download error.", 1);
+                    error = true;
                     parameter = "";
-                    printSnapshotFiles();
-                }, 1500);
+                }
             }
+            rawDataCollector.processSnapshotRaw(packet);
+            Log.i(TAG, "PAGE: " + pageNumber + " PACKET: " + packetNumber + " IS FILLED: " + rawDataCollector.isFilled() + " PERCENT: " + percent);
         }
     }
 
@@ -603,7 +739,7 @@ public class GetDataActivity extends AppCompatActivity {
         String msg;
         try {
             //set the directory path
-            root = new File(Environment.getExternalStorageDirectory(), "atstrack");
+            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
             if (!root.exists()) {
                 outcome = root.mkdirs();
                 if (!outcome)
@@ -637,7 +773,7 @@ public class GetDataActivity extends AppCompatActivity {
                 animationDrawable.stop();
                 download_data_linearLayout.setVisibility(View.GONE);
                 menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
-                Timber.tag("DCA:psF 543").d("%s byte(s) downloaded successfully. No fails!", (Snapshots.BYTES_PER_PAGE * finalPageNumber));
+                Log.i(TAG, "%s byte(s) downloaded successfully. No fails!");
                 msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded successfully.";
                 if (error) {
                     msg += " No data found in bytes downloaded. No file was generated.";
@@ -647,10 +783,11 @@ public class GetDataActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
+            Log.i(TAG, e.toString());
             animationDrawable.stop();
             download_data_linearLayout.setVisibility(View.GONE);
             menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
-            Timber.tag("DCA:psF 552").e(e, "%s fail(s), %ss byte(s) downloaded in total.", 0, (Snapshots.BYTES_PER_PAGE * finalPageNumber));
+            Log.i(TAG, "%s fail(s), %ss byte(s) downloaded in total.");
             msg = "Download finished: "+ (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded.";
             if (error) {
                 msg += " No data found in bytes downloaded. No file was generated.";
@@ -711,13 +848,12 @@ public class GetDataActivity extends AppCompatActivity {
 
             credential.setSelectedAccount(googleSignInAccount.getAccount());
 
-            Drive googleDriveService = new Drive.Builder(
-                    AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("ATS VHF Receiver").build();
+            Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("ATS VHF Receiver").build();
 
             driveServiceHelper = new DriveServiceHelper(googleDriveService);
 
             uploadFile();
-        }).addOnFailureListener(e -> Timber.i(e.toString()));
+        }).addOnFailureListener(e -> Log.i(TAG, e.toString()));
     }
 
     /**
@@ -736,23 +872,5 @@ public class GetDataActivity extends AppCompatActivity {
             progressDialog.dismiss();
             Toast.makeText(getApplicationContext(), "Check your Google Drive Api key", Toast.LENGTH_LONG).show();
         });
-    }
-
-    /**
-     * Displays a message indicating whether the writing was successful.
-     *
-     * @param data This packet indicates the writing status.
-     */
-    private void showMessage(byte[] data) {
-        int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Success!");
-        if (status == 0)
-            builder.setMessage("Completed.");
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            finish();
-        });
-        builder.show();
     }
 }

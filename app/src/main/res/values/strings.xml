@@ -129,13 +129,16 @@
     <string name="lb_table11">Table 11</string>
     <string name="lb_table12">Table 12</string>
     <string name="lb_empty_table">0 frequencies</string>
-    <string name="lb_discard_changes">Undo Changes</string>
-    <string name="lb_edit_table">Edit Table</string>
-    <string name="lb_edit_table_in_order">Edit table in order to save changes</string>
+    <string name="lb_delete_frequencies">Delete Frequencies</string>
+    <string name="lb_add_frequency">Add Frequency</string>
+    <string name="lb_tap_frequency">Tap Frequency to Edit</string>
+    <string name="lb_enter_new_frequency">Enter New Frequency</string>
+    <string name="lb_select_frequencies_delete">Select Frequencies to Delete</string>
+    <string name="lb_frequency_modified">Frequency Modified!</string>
+    <string name="lb_frequency_added">Frequency Added!</string>
+    <string name="lb_frequencies_deleted">Frequencies Deleted!</string>
+    <string name="lb_no_frequencies">No frequencies in this table.</string>
     <string name="lb_save_changes">Save Changes</string>
-    <string name="lb_clear_table">Clear Table</string>
-    <string name="lb_undo_changes">Undo Changes</string>
-    <string name="lb_done">Done</string>
 
     <!--EDIT RECEIVER DEFAULTS-->
     <string name="edit_receiver_defaults">Edit Receiver Defaults</string>

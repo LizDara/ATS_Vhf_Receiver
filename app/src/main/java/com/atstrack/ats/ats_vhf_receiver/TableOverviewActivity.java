@@ -1,13 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class TableOverviewActivity extends AppCompatActivity {
@@ -98,7 +99,6 @@ public class TableOverviewActivity extends AppCompatActivity {
     private int[][] tables;
     private int baseFrequency;
     private int range;
-    private boolean isFile = false;
 
     /*private DriveServiceHelper driveServiceHelper;
     private String fileUrl;
@@ -146,15 +146,15 @@ public class TableOverviewActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("frequencies")) // Gets the number of frequencies from each table
+                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
                         onClickFrequencies();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameter.equals("frequencies")) // Gets the number of frequencies from each table
+                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
                         downloadData(packet);
                 }
             } catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -179,17 +179,6 @@ public class TableOverviewActivity extends AppCompatActivity {
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
-    /*@OnClick(R.id.ok_drive_button)
-    public void onClickOK(View v) {
-        fileId = findFileId();
-        requestSignIn();
-    }
-
-    public String findFileId() {
-        String[] word = fileUrl.split("/");
-        return word[5];
-    }*/
-
     @OnClick(R.id.load_from_file_button)
     public void onClickLoadTablesFromFile(View v) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -203,7 +192,18 @@ public class TableOverviewActivity extends AppCompatActivity {
         google_drive_linearLayout.setVisibility(View.VISIBLE);*/
     }
 
-    /*private class Callback extends WebViewClient {
+    /*@OnClick(R.id.ok_drive_button)
+    public void onClickOK(View v) {
+        fileId = findFileId();
+        requestSignIn();
+    }
+
+    public String findFileId() {
+        String[] word = fileUrl.split("/");
+        return word[5];
+    }
+
+    private class Callback extends WebViewClient {
         @Override
         public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
             return true;
@@ -363,7 +363,8 @@ public class TableOverviewActivity extends AppCompatActivity {
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         // Gets the number of frequencies from each table
-        parameter = "frequencies";
+        parameter = "tables";
+        tables = new int[12][];
 
         //google_drive_webView.getSettings().setJavaScriptEnabled(true);
         //google_drive_webView.setWebViewClient(new Callback());
@@ -381,15 +382,14 @@ public class TableOverviewActivity extends AppCompatActivity {
                 File myFile = new File(uriString);
                 String path = myFile.getAbsolutePath();
                 if (uriString.startsWith("content://")) {
-                    Cursor cursor = null;
-                    try {
-                        cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null);
+                    try (Cursor cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null)) {
                         if (cursor != null && cursor.moveToFirst()) {
-                            String fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                            @SuppressLint("Range") String fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                            Log.i(TAG, "FILE NAME: " + fileName);
                             readFile(path);
                         }
-                    } finally {
-                        cursor.close();
+                    } catch (Exception ex) {
+                        Log.i(TAG, "Cursor exception: " + ex.toString());
                     }
                 } else if (uriString.startsWith("file://")) {
                     readFile(path);
@@ -471,27 +471,53 @@ public class TableOverviewActivity extends AppCompatActivity {
      */
     private void readFile(String path) {
         if (isExternalStorageReadable()) {
-            StringBuilder stringBuilder = new StringBuilder();
             try {
                 // Gets the selected file
-                File file = new File(Environment.getExternalStorageDirectory(), findPath(path));
+                String newPath = findPath(path);
+                Log.i(TAG, "NEW PATH: " + newPath);
+                File file = new File(Environment.getExternalStorageDirectory(), newPath);
                 FileInputStream fileInputStream = new FileInputStream(file);
 
-                if (fileInputStream != null) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-                    BufferedReader bufferedReader =  new BufferedReader(inputStreamReader);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader =  new BufferedReader(inputStreamReader);
 
-                    String line;
-                    this.data = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                    tables = new int[12][];
-                    LinkedList<String> tableList = new LinkedList<>();
-                    while ((line = bufferedReader.readLine()) != null) { // Reads each line of the file and add it to the list
-                        stringBuilder.append(line + "\n");
-                        tableList.add(line);
+                String line;
+                int tableNumber = 0;
+                List<Integer> frequenciesList = new LinkedList<>();
+                while ((line = bufferedReader.readLine()) != null) { // Reads each line of the file and add it to the list
+                    if (line.toUpperCase().contains("TABLE")) {
+                        if (tableNumber > 0) {
+                            data[tableNumber] = frequenciesList.size();
+                            tables[tableNumber - 1] = new int[frequenciesList.size()];
+                            for (int i = 0; i < frequenciesList.size(); i++)
+                                tables[tableNumber - 1][i] = frequenciesList.get(i);
+                        }
+                        tableNumber = Integer.parseInt(line.toUpperCase().replace("TABLE", "").replace(" ", ""));
+                        frequenciesList = new LinkedList<>();
+                    } else {
+                        frequenciesList.add(Integer.parseInt(line));
                     }
-                    setData(tableList);
-                    fileInputStream.close();
-                }
+                } //Last table in the file
+                data[tableNumber] = frequenciesList.size();
+                tables[tableNumber - 1] = new int[frequenciesList.size()];
+                for (int i = 0; i < frequenciesList.size(); i++)
+                    tables[tableNumber - 1][i] = frequenciesList.get(i);
+
+                parameter = "";
+                table1_frequency.setText(data[1] + " frequencies");
+                table2_frequency.setText(data[2] + " frequencies");
+                table3_frequency.setText(data[3] + " frequencies");
+                table4_frequency.setText(data[4] + " frequencies");
+                table5_frequency.setText(data[5] + " frequencies");
+                table6_frequency.setText(data[6] + " frequencies");
+                table7_frequency.setText(data[7] + " frequencies");
+                table8_frequency.setText(data[8] + " frequencies");
+                table9_frequency.setText(data[9] + " frequencies");
+                table10_frequency.setText(data[10] + " frequencies");
+                table11_frequency.setText(data[11] + " frequencies");
+                table12_frequency.setText(data[12] + " frequencies");
+
+                fileInputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -522,206 +548,39 @@ public class TableOverviewActivity extends AppCompatActivity {
      * @return Returns true, if external storage is readable.
      */
     private boolean isExternalStorageReadable() {
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-                || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Processes the frequencies from each table that are in the list.
-     *
-     * @param tableList This list contains the lines read from the file.
-     */
-    private void setData(LinkedList<String> tableList) {
-        isFile = true;
-        String line = tableList.removeFirst();
-        int[] table = new int[100];
-        if (line.equals("TABLE1") || line.equals("TABLE1 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE2") && !line.equals("TABLE2 ")) {
-                data[1]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[0] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE2") || line.equals("TABLE2 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE3") && !line.equals("TABLE3 ")) {
-                data[2]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[1] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE3") || line.equals("TABLE3 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE4") && !line.equals("TABLE4 ")) {
-                data[3]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[2] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE4") || line.equals("TABLE4 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE5") && !line.equals("TABLE5 ")) {
-                data[4]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[3] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE5") || line.equals("TABLE5 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE6") && !line.equals("TABLE6 ")) {
-                data[5]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[4] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE6") || line.equals("TABLE6 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE7") && !line.equals("TABLE7 ")) {
-                data[6]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[5] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE7") || line.equals("TABLE7 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE8") && !line.equals("TABLE8 ")) {
-                data[7]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[6] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE8") || line.equals("TABLE8 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE9") && !line.equals("TABLE9 ")) {
-                data[8]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[7] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE9") || line.equals("TABLE9 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE10") && !line.equals("TABLE10 ")) {
-                data[9]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[8] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE10") || line.equals("TABLE10 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE11") && !line.equals("TABLE11 ")) {
-                data[10]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[9] = table;
-        }
-        table = new int[100];
-        if (line.equals("TABLE11") || line.equals("TABLE11 ")) {
-            line = tableList.removeFirst();
-            int index = 0;
-            while (!line.equals("TABLE12") && !line.equals("TABLE12 ")) {
-                data[11]++;
-                table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-                line = tableList.removeFirst();
-                index++;
-            }
-            tables[10] = table;
-        }
-        table = new int[100];
-        int index = 0;
-        while (!tableList.isEmpty()) {
-            line = tableList.removeFirst();
-            table[index] = Integer.parseInt(line.replaceAll(" ", ""));
-            data[12]++;
-            index++;
-        }
-        tables[11] = table;
-
-
-        table1_frequency.setText(data[1] + " frequencies");
-        table2_frequency.setText(data[2] + " frequencies");
-        table3_frequency.setText(data[3] + " frequencies");
-        table4_frequency.setText(data[4] + " frequencies");
-        table5_frequency.setText(data[5] + " frequencies");
-        table6_frequency.setText(data[6] + " frequencies");
-        table7_frequency.setText(data[7] + " frequencies");
-        table8_frequency.setText(data[8] + " frequencies");
-        table9_frequency.setText(data[9] + " frequencies");
-        table10_frequency.setText(data[10] + " frequencies");
-        table11_frequency.setText(data[11] + " frequencies");
-        table12_frequency.setText(data[12] + " frequencies");
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
     }
 
     /**
      * With the received packet, gets the number of frequencies from each table and display on the screen.
      *
-     * @param data The received packet.
+     * @param packet The received packet.
      */
-    private void downloadData(byte[] data) {
-        if (data.length == 1) {
+    private void downloadData(byte[] packet) {
+        if (packet.length == 1) {
             mBluetoothLeService.discovering();
         } else {
-            table1_frequency.setText(Converters.getDecimalValue(data[1]) + " frequencies");
-            table2_frequency.setText(Converters.getDecimalValue(data[2]) + " frequencies");
-            table3_frequency.setText(Converters.getDecimalValue(data[3]) + " frequencies");
-            table4_frequency.setText(Converters.getDecimalValue(data[4]) + " frequencies");
-            table5_frequency.setText(Converters.getDecimalValue(data[5]) + " frequencies");
-            table6_frequency.setText(Converters.getDecimalValue(data[6]) + " frequencies");
-            table7_frequency.setText(Converters.getDecimalValue(data[7]) + " frequencies");
-            table8_frequency.setText(Converters.getDecimalValue(data[8]) + " frequencies");
-            table9_frequency.setText(Converters.getDecimalValue(data[9]) + " frequencies");
-            table10_frequency.setText(Converters.getDecimalValue(data[10]) + " frequencies");
-            table11_frequency.setText(Converters.getDecimalValue(data[11]) + " frequencies");
-            table12_frequency.setText(Converters.getDecimalValue(data[12]) + " frequencies");
+            Log.i(TAG, "TOTALES: " + Converters.getDecimalValue(packet));
+            table1_frequency.setText(Converters.getDecimalValue(packet[1]) + " frequencies");
+            table2_frequency.setText(Converters.getDecimalValue(packet[2]) + " frequencies");
+            table3_frequency.setText(Converters.getDecimalValue(packet[3]) + " frequencies");
+            table4_frequency.setText(Converters.getDecimalValue(packet[4]) + " frequencies");
+            table5_frequency.setText(Converters.getDecimalValue(packet[5]) + " frequencies");
+            table6_frequency.setText(Converters.getDecimalValue(packet[6]) + " frequencies");
+            table7_frequency.setText(Converters.getDecimalValue(packet[7]) + " frequencies");
+            table8_frequency.setText(Converters.getDecimalValue(packet[8]) + " frequencies");
+            table9_frequency.setText(Converters.getDecimalValue(packet[9]) + " frequencies");
+            table10_frequency.setText(Converters.getDecimalValue(packet[10]) + " frequencies");
+            table11_frequency.setText(Converters.getDecimalValue(packet[11]) + " frequencies");
+            table12_frequency.setText(Converters.getDecimalValue(packet[12]) + " frequencies");
 
-            baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[13]));
-            range = Integer.parseInt(Converters.getDecimalValue(data[14]));
+            baseFrequency = Integer.parseInt(Converters.getDecimalValue(packet[13]));
+            range = Integer.parseInt(Converters.getDecimalValue(packet[14]));
 
-            this.data = new int[data.length];
-            for (int i = 0; i < data.length; i++) {
-                this.data[i] = data[i];
+            data = new int[packet.length];
+            for (int i = 0; i < packet.length; i++) {
+                data[i] = Integer.parseInt(Converters.getDecimalValue(packet[i]));
             }
         }
     }
@@ -734,13 +593,12 @@ public class TableOverviewActivity extends AppCompatActivity {
     private void setTableData(int number) {
         Intent intent = new Intent(this, EditTablesActivity.class);
         intent.putExtra("number", number);
-        intent.putExtra("total", (int)data[number]);
-        if (isFile) {
+        intent.putExtra("total", data[number]);
+        intent.putExtra("baseFrequency", baseFrequency);
+        intent.putExtra("range", range);
+        intent.putExtra("isFile", tables[number - 1] != null);
+        if (tables[number - 1] != null)
             intent.putExtra("frequencies", tables[number - 1]);
-        } else {
-            intent.putExtra("baseFrequency", baseFrequency);
-            intent.putExtra("range", range);
-        }
         startActivity(intent);
     }
 }

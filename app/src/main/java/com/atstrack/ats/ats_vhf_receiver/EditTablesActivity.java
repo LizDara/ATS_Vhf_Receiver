@@ -1,26 +1,26 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,11 +28,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -42,11 +41,20 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_blue;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.limed_spruce;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_next;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border_enter;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border_enter_error;
 
 public class EditTablesActivity extends AppCompatActivity {
 
@@ -62,35 +70,55 @@ public class EditTablesActivity extends AppCompatActivity {
     TextView device_status_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.number_table_textView)
-    TextView number_table_textView;
-    @BindView(R.id.frequency_table)
-    TableLayout frequency_table;
-    @BindView(R.id.edit_table_options_linearLayout)
-    LinearLayout edit_table_options_linearLayout;
-    @BindView(R.id.edit_table_message_textView)
-    TextView edit_table_message_textView;
+    @BindView(R.id.frequencies_overview_linearLayout)
+    LinearLayout frequencies_overview_linearLayout;
+    @BindView(R.id.edit_options_linearLayout)
+    LinearLayout edit_options_linearLayout;
+    @BindView(R.id.message_linearLayout)
+    LinearLayout message_linearLayout;
+    @BindView(R.id.message_textView)
+    TextView message_textView;
+    @BindView(R.id.frequencies_linearLayout)
+    LinearLayout frequencies_linearLayout;
+    @BindView(R.id.frequency_edit_linearLayout)
+    LinearLayout frequency_edit_linearLayout;
+    @BindView(R.id.enter_frequency_textView)
+    TextView enter_frequency_textView;
+    @BindView(R.id.frequency_editText)
+    EditText frequency_editText;
+    @BindView(R.id.edit_frequency_message_textView)
+    TextView edit_frequency_message_textView;
     @BindView(R.id.save_changes_button)
     Button save_changes_button;
-    @BindView(R.id.edit_table_option_button)
-    Button edit_table_option_button;
+    @BindView(R.id.delete_frequencies_linearLayout)
+    LinearLayout delete_frequencies_linearLayout;
+    @BindView(R.id.select_frequencies_linearLayout)
+    LinearLayout select_frequencies_linearLayout;
+    @BindView(R.id.delete_selected_frequencies_button)
+    Button delete_selected_frequencies_button;
+    @BindView(R.id.no_frequencies_linearLayout)
+    LinearLayout no_frequencies_linearLayout;
 
     final private String TAG = EditTablesActivity.class.getSimpleName();
 
-    private int[] table;
+    private int[] originalTable;
     private int number;
     private int totalFrequencies;
     private int baseFrequency;
-    private int range;
+    private int frequencyRange;
     private boolean isFile;
+    private List<Integer> editedFrequencies;
 
-    private TextView textCell;
-    private TableRow tableRow;
-    private int widthPixels;
-    private int heightPixels;
-    private int tableLimitEdit;
-    private final static char LF  = (char) 0x0A;
-    private boolean isChanged;
+    private LinearLayout linearLayout;
+    private TextView textView;
+    private ImageView imageView;
+    private CheckBox checkBox;
+
+    private int selectedFrequencyIndex;
+    private int selectedFrequency;
+    private boolean closedMessage;
+    private Handler handlerMessage;
+    private int numberOfSelected;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
@@ -115,7 +143,7 @@ public class EditTablesActivity extends AppCompatActivity {
     };
 
     private boolean mConnected = true;
-    private String parameter;
+    private String parameter = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -147,14 +175,42 @@ public class EditTablesActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameter.equals("receive")) // Gets the frequencies from a table
+                    Log.i(TAG, Converters.getHexValue(packet));
+                    if (parameter.equals("table")) // Gets the frequencies from a table
                         downloadData(packet);
-                    else if (parameter.equals("sendTable")) // Sends the modified frequencies
-                        showMessage(packet);
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
+            }
+        }
+    };
+
+    /**
+     * Change the period while editing the pulse rate.
+     */
+    private TextWatcher textChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (frequency_editText.getText().toString().isEmpty()) {
+                save_changes_button.setEnabled(false);
+                save_changes_button.setAlpha((float) 0.6);
+            } else {
+                save_changes_button.setEnabled(true);
+                save_changes_button.setAlpha(1);
+                enter_frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), light_blue));
+                frequency_editText.setBackground(ContextCompat.getDrawable(getBaseContext(), border_enter));
+                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
             }
         }
     };
@@ -174,11 +230,55 @@ public class EditTablesActivity extends AppCompatActivity {
      * Characteristic name: FreqTable.
      */
     private void onClickTable() {
-        parameter = "receive";
+        /*parameter = "receive";
         byte[] b = new byte[] {(byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) 0x7E, (byte) number};
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);*/
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic;
+        Log.i(TAG, "CHARACTERISTIC TABLE " + number);
+        switch (number) {
+            case 1:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_1;
+                break;
+            case 2:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_2;
+                break;
+            case 3:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_3;
+                break;
+            case 4:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_4;
+                break;
+            case 5:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_5;
+                break;
+            case 6:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_6;
+                break;
+            case 7:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_7;
+                break;
+            case 8:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_8;
+                break;
+            case 9:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_9;
+                break;
+            case 10:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_10;
+                break;
+            case 11:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_11;
+                break;
+            case 12:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_12;
+                break;
+            default:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
+        }
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
     /**
@@ -189,6 +289,7 @@ public class EditTablesActivity extends AppCompatActivity {
     private void onReceiveTable() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
+        Log.i(TAG, "PREVIOUS TO NOTIFICATION READ");
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
@@ -216,207 +317,66 @@ public class EditTablesActivity extends AppCompatActivity {
         b[5] = (byte) mm;
         b[6] = (byte) ss;
         b[7] = (byte) number;//frequency number table
-        b[8] = (byte) table.length;//Number of frequencies in the table
-        b[9] = (byte) baseFrequency;//base frequency
+        b[8] = (byte) editedFrequencies.size();//Number of frequencies in the table
+        b[9] = (byte) (baseFrequency / 1000);//base frequency
 
         int index = 10;
         int i = 0;
-        while (i < table.length) {
-            table[i] = (table[i] % (baseFrequency * 1000));
-            b[index] = (byte) (table[i] / 256);
-            b[index + 1] = (byte) (table[i] % 256);
+        while (i < editedFrequencies.size()) {
+            b[index] = (byte) ((editedFrequencies.get(i) - baseFrequency) / 256);
+            b[index + 1] = (byte) ((editedFrequencies.get(i) - baseFrequency) % 256);
             i++;
             index += 2;
         }
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
-        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
-
-        finish();
-    }
-
-    /**
-     * Displays a alert dialog for the user to choose to edit the table or delete all frequencies.
-     */
-    private void createDialogSelect() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-
-        View view = inflater.inflate(R.layout.options_edit_table, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
-        Button editTable = view.findViewById(R.id.edit_table_button);
-        Button clearTable = view.findViewById(R.id.clear_table_button);
-
-        editTable.setOnClickListener(v -> {
-            dialog.dismiss();
-            createDialogEdit();
-        });
-        clearTable.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setTitle("Discard Changes");
-            builder.setMessage("Are you sure you want to delete all the frequencies in this table?");
-            builder.setPositiveButton("Delete Frequencies", (dialog1, which) -> {
-                table = new int[]{};
-                isChanged = true;
-                frequency_table.removeAllViews();
-                showTable();
-
-                save_changes_button.setVisibility(View.VISIBLE);
-                save_changes_button.setAlpha((float) 1);
-                save_changes_button.setEnabled(true);
-                edit_table_options_linearLayout.setVisibility(View.VISIBLE);
-                edit_table_option_button.setVisibility(View.GONE);
-            });
-            builder.setNegativeButton("Cancel", null);
-            AlertDialog dialogI = builder.create();
-            dialogI.show();
-            dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
-            dialog.dismiss();
-        });
-        dialog.getWindow().setLayout(widthPixels / 3, LinearLayout.LayoutParams.WRAP_CONTENT);
-        dialog.setView(view);
-        dialog.show();
-    }
-
-    /**
-     * Displays a alert dialog where the user can edit the frequencies of that table, also check that each frequency is correct.
-     */
-    private void createDialogEdit() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-
-        View view = inflater.inflate(R.layout.edit_frequencies, null);
-        final AlertDialog builder = new AlertDialog.Builder(this).create();
-
-        // Does not allow the alert dialog to disappear when touch outside of it
-        builder.setCanceledOnTouchOutside(false);
-
-        // Asks if you want to lose the data already modified when touching back while the alert dialog is displayed
-        builder.setOnKeyListener((dialogI, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(getBaseContext());
-                builder1.setTitle("Discard Changes");
-                builder1.setMessage("If you leave without saving you will lose your changes. Do you wish to continue?");
-                builder1.setNegativeButton("Cancel", null);
-                builder1.setPositiveButton("Discard", (dialog, which) -> {
-                    dialogI.dismiss();
-                });
-                AlertDialog dialog = builder1.create();
-                dialog.show();
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
-                return true;
-            }
-            return false;
-        });
-
-        // Defines the size of the alert dialog
-        ScrollView editScrollView = view.findViewById(R.id.edit_table_scrollView);
-        ViewGroup.LayoutParams params = editScrollView.getLayoutParams();
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        params.height = heightPixels / 3;
-        editScrollView.setLayoutParams(params);
-
-        // Customizes the style of the alert dialog
-        TextView title = new TextView(this);
-        title.setText("Edit Table " + number);
-        title.setPadding(100, 80, 10, 10);
-        title.setTextSize(20);
-        title.setTypeface(null, Typeface.BOLD);
-        title.setBackgroundColor(ContextCompat.getColor(this, catskill_white));
-        title.setTextColor(ContextCompat.getColor(this, light_blue));
-        builder.setCustomTitle(title);
-
-        EditText editTable = view.findViewById(R.id.edit_table_editText);
-        String frequencies = "";
-
-        for (int i = 0; i < table.length; i++) {
-            if (i > 0)
-                frequencies += "" + LF;
-            frequencies += table[i];
+        UUID characteristic;
+        switch (number) {
+            case 1:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_1;
+                break;
+            case 2:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_2;
+                break;
+            case 3:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_3;
+                break;
+            case 4:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_4;
+                break;
+            case 5:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_5;
+                break;
+            case 6:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_6;
+                break;
+            case 7:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_7;
+                break;
+            case 8:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_8;
+                break;
+            case 9:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_9;
+                break;
+            case 10:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_10;
+                break;
+            case 11:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_11;
+                break;
+            case 12:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_12;
+                break;
+            default:
+                characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         }
-        // Set the frequencies to edit
-        editTable.setText(frequencies);
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        // Keeps keys visible
-        editTable.requestFocus();
-        editTable.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus){
-                builder.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-            }
-        });
-
-        Button undoChanges = view.findViewById(R.id.undo_changes_button);
-        Button done = view.findViewById(R.id.done_button);
-
-        // Copy the initial frequencies
-        String initFrequencies = frequencies;
-        undoChanges.setOnClickListener(v -> {
-            AlertDialog.Builder builder12 = new AlertDialog.Builder(v.getContext());
-            builder12.setTitle("Warning");
-            builder12.setMessage("Are you sure you want to discard your changes?");
-            builder12.setNegativeButton("No", null);
-            builder12.setPositiveButton("Yes", (dialog, which) -> {
-                editTable.getText().clear();
-                editTable.setText(initFrequencies);
-            });
-            AlertDialog dialogI = builder12.create();
-            dialogI.show();
-            dialogI.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
-        });
-        done.setOnClickListener(v -> {
-            String frequencies1 = String.valueOf(editTable.getText());
-            if (checkFormat(frequencies1)) {
-                if (checkTableLimit()) {
-                    saveChanges(frequencies1);
-                    // Removes all frequencies
-                    frequency_table.removeAllViews();
-                    // Set the modified frequencies
-                    showTable();
-                    if (isChanged) { // If changes were made, enables the discard changes button and save changes button
-                        save_changes_button.setVisibility(View.VISIBLE);
-                        save_changes_button.setAlpha((float) 1);
-                        save_changes_button.setEnabled(true);
-                        edit_table_options_linearLayout.setVisibility(View.VISIBLE);
-                        edit_table_option_button.setVisibility(View.GONE);
-                    }
-                    builder.dismiss();
-                } else {
-                    showWarningDialog("Exceeded Table Limit", "Please enter no more than 100 frequencies.");
-                }
-            } else {
-                showWarningDialog("Invalid Format or Values", "Please enter valid frequency values, each on a separate line.");
-            }
-        });
-        builder.setView(view);
-        builder.show();
-
-        // Enables the keys when the alert dialog appears
-        builder.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        builder.getWindow().setLayout(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-    }
-
-    /**
-     * Checks that all edited frequencies are in the correct format.
-     *
-     * @param value The edited frequencies.
-     *
-     * @return Returns true, if the frequencies are correct.
-     */
-    private boolean checkFormat(String value) {
-        tableLimitEdit = 0;
-        boolean correct = true;
-
-        String[] frequencies = value.split(String.valueOf(LF));
-        for (String frequency : frequencies) {
-            tableLimitEdit++;
-            if (frequency.length() != 6)
-                correct = false;
-            else if ((Integer.parseInt(frequency) < (baseFrequency * 1000))
-                    || (Integer.parseInt(frequency) > (baseFrequency + range) * 1000)) //>=
-                correct = false;
-        }
-
-        return correct;
+        if (result)
+            showMessage(0);
+        else
+            showMessage(2);
     }
 
     /**
@@ -424,66 +384,90 @@ public class EditTablesActivity extends AppCompatActivity {
      *
      * @return Returns true, if the number of frequencies is less than or equal to 100.
      */
-    private boolean checkTableLimit() {
-        return tableLimitEdit <= 100;
+    private boolean isWithinLimit() {
+        return editedFrequencies.size() <= 100;
     }
 
-    /**
-     * Displays a specific error message.
-     *
-     * @param error The error name.
-     * @param message The message to be displayed.
-     */
-    private void showWarningDialog(String error, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(error);
-        builder.setMessage(message);
-        builder.setPositiveButton("Ok", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
+    @OnClick(R.id.delete_frequencies_button)
+    public void onClickDeleteFrequencies(View v) {
+        frequencies_overview_linearLayout.setVisibility(View.GONE);
+        delete_frequencies_linearLayout.setVisibility(View.VISIBLE);
+        title_toolbar.setText(R.string.lb_delete_frequencies);
+
+        delete_selected_frequencies_button.setEnabled(false);
+        delete_selected_frequencies_button.setAlpha((float) 0.6);
     }
 
-    /**
-     * Saves the edited frequencies and updates the vector containing all the previous frequencies.
-     *
-     * @param value The edited frequencies.
-     */
-    private void saveChanges(String value) {
-        int[] newTable = new int[tableLimitEdit];
+    @OnClick(R.id.add_frequency_button)
+    public void onClickAddFrequency(View v) {
+        if (isWithinLimit()) {
+            frequencies_overview_linearLayout.setVisibility(View.GONE);
+            frequency_edit_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.lb_add_frequency);
+            enter_frequency_textView.setText(R.string.lb_enter_new_frequency);
 
-        // If the number of edited frequencies is greater than the previous frequencies then it means that there were changes
-        if (tableLimitEdit != table.length)
-            isChanged = true;
-        String[] list = value.split(String.valueOf(LF));
-        for (int i = 0; i < list.length; i++) {
-            newTable[i] = Integer.parseInt(list[i]);
-            if (!isChanged && newTable[i] != table[i])
-                isChanged = true;
+            enter_frequency_textView.setTextColor(ContextCompat.getColor(this, light_blue));
+            frequency_editText.setBackground(ContextCompat.getDrawable(this, border_enter));
+            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(this, slate_gray));
+            save_changes_button.setText(R.string.lb_add_frequency);
+            save_changes_button.setEnabled(false);
+            save_changes_button.setAlpha((float) 0.6);
+        } else {
+            showMessage(1);
         }
-        // The table is updated
-        table = newTable;
     }
 
-    @OnClick(R.id.edit_frequency_table_button)
-    public void onClickEditDefaults(View v) {
-        createDialogSelect();
-    }
-
-    @OnClick(R.id.discard_changes_button)
-    public void onClickDiscardChanges(View v) {
-        finish();
+    @OnClick(R.id.close_message_imageView)
+    public void onClickCloseMessage(View v) {
+        closedMessage = true;
+        edit_options_linearLayout.setVisibility(View.VISIBLE);
+        message_linearLayout.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.save_changes_button)
     public void onClickSaveChanges(View v) {
-        parameter = "sendTable";
-        mBluetoothLeService.discovering();
+        int frequency = Integer.parseInt(frequency_editText.getText().toString());
+        if (frequency >= baseFrequency && frequency <= frequencyRange) {
+            frequencies_overview_linearLayout.setVisibility(View.VISIBLE);
+            frequency_edit_linearLayout.setVisibility(View.GONE);
+            frequency_editText.setText("");
+            if (selectedFrequency != 0) {
+                if (selectedFrequency != frequency)
+                    changeSelectedFrequency(frequency);
+            } else {
+                addFrequency(frequency);
+            }
+            title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+        } else {
+            enter_frequency_textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+            frequency_editText.setBackground(ContextCompat.getDrawable(this, border_enter_error));
+            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(this, tall_poppy));
+            save_changes_button.setEnabled(false);
+            save_changes_button.setAlpha((float) 0.6);
+        }
     }
 
-    @OnClick(R.id.edit_table_option_button)
-    public void onClickEditTable(View v) {
-        createDialogSelect();
+    @OnClick(R.id.delete_selected_frequencies_button)
+    public void onClickDeleteSelectedFrequencies(View v) {
+        frequencies_overview_linearLayout.setVisibility(View.VISIBLE);
+        delete_frequencies_linearLayout.setVisibility(View.GONE);
+        deleteFrequencies();
+        title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+    }
+
+    @OnClick(R.id.add_new_frequency_button)
+    public void onClickAddNewFrequency(View v) {
+        no_frequencies_linearLayout.setVisibility(View.GONE);
+        frequency_edit_linearLayout.setVisibility(View.VISIBLE);
+        title_toolbar.setText(R.string.lb_add_frequency);
+        enter_frequency_textView.setText(R.string.lb_enter_new_frequency);
+
+        enter_frequency_textView.setTextColor(ContextCompat.getColor(this, light_blue));
+        frequency_editText.setBackground(ContextCompat.getDrawable(this, border_enter));
+        edit_frequency_message_textView.setTextColor(ContextCompat.getColor(this, slate_gray));
+        save_changes_button.setText(R.string.lb_add_frequency);
+        save_changes_button.setEnabled(false);
+        save_changes_button.setAlpha((float) 0.6);
     }
 
     @Override
@@ -492,20 +476,24 @@ public class EditTablesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_tables);
         ButterKnife.bind(this);
 
+        // Gets the table number to ask its frequencies
+        number = getIntent().getExtras().getInt("number");
+        totalFrequencies = getIntent().getExtras().getInt("total");
+
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText(R.string.edit_frequency_tables);
+        title_toolbar.setText("Table " + number + " (" + totalFrequencies + " Frequencies)");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Gets the size of the cell phone screen in pixels
-        widthPixels = getResources().getDisplayMetrics().widthPixels;
-        heightPixels = getResources().getDisplayMetrics().heightPixels;
-
-        isChanged = false;
+        selectedFrequency = 0;
+        selectedFrequencyIndex = -1;
+        editedFrequencies = new LinkedList<>();
+        handlerMessage = new Handler();
+        numberOfSelected = 0;
 
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
@@ -514,26 +502,29 @@ public class EditTablesActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        // Gets the table number to ask its frequencies
-        number = getIntent().getExtras().getInt("number");
         // Gets the number of frequencies from that table
-        totalFrequencies = getIntent().getExtras().getInt("total");
-        number_table_textView.setText("Table " + number);
+        baseFrequency = getIntent().getExtras().getInt("baseFrequency") * 1000;
+        frequencyRange = ((getIntent().getExtras().getInt("range") + (baseFrequency / 1000)) * 1000) - 1;
+
+        frequency_editText.addTextChangedListener(textChangedListener);
+        String message = "Please ensure your new frequency is within in the permitted range of " + baseFrequency + " to " + frequencyRange + ".";
+        edit_frequency_message_textView.setText(message);
 
         isFile = getIntent().getExtras().getBoolean("isFile");
         if (isFile) { // Asks for the frequencies obtained from a file
-            int[] fileTable = getIntent().getExtras().getIntArray("frequencies");
-            table = new int[totalFrequencies];
-            if (table.length >= 0) System.arraycopy(fileTable, 0, table, 0, table.length);
+            originalTable = getIntent().getExtras().getIntArray("frequencies");
+            editedFrequencies = new LinkedList<>();
+            for (int frequency : originalTable)
+                editedFrequencies.add(frequency);
 
             showTable();
         } else { // Asks for the frequencies from that table, the frequency base and range
-            baseFrequency = getIntent().getExtras().getInt("baseFrequency");
-            range = getIntent().getExtras().getInt("range");
             if (totalFrequencies > 0) { // Asks for the frequencies from the table
                 parameter = "table";
             } else { // Initializes empty
-                downloadData(new byte[]{});
+                originalTable = new int[]{};
+                no_frequencies_linearLayout.setVisibility(View.VISIBLE);
+                frequencies_overview_linearLayout.setVisibility(View.GONE);
             }
         }
 
@@ -544,7 +535,7 @@ public class EditTablesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (isChanged) { // Asks if you want to lose changes
+            /*if (isChanged) { // Asks if you want to lose changes
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Discard Changes");
                 builder.setMessage("If you leave without saving you will lose your changes. Do you wish to continue?");
@@ -558,7 +549,33 @@ public class EditTablesActivity extends AppCompatActivity {
             } else {
                 finish();
             }
-            return true;
+            return true;*/
+            if (frequencies_overview_linearLayout.getVisibility() == View.VISIBLE
+                    || no_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
+                if (existChanges()) {
+                    parameter = "sendTable";
+                    mBluetoothLeService.discovering();
+                } else {
+                    finish();
+                }
+            } else if (frequency_edit_linearLayout.getVisibility() == View.VISIBLE) {
+                frequency_edit_linearLayout.setVisibility(View.GONE);
+                frequencies_overview_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+                selectedFrequency = 0;
+                selectedFrequencyIndex = -1;
+                frequency_editText.setText("");
+            } else if (delete_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
+                for (int i = 0; i < select_frequencies_linearLayout.getChildCount(); i++) {
+                    LinearLayout linearLayout = (LinearLayout) select_frequencies_linearLayout.getChildAt(i);
+                    CheckBox checkBox = (CheckBox) linearLayout.getChildAt(0);
+                    if (checkBox.isChecked())
+                        checkBox.setChecked(false);
+                }
+                delete_frequencies_linearLayout.setVisibility(View.GONE);
+                frequencies_overview_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -621,40 +638,108 @@ public class EditTablesActivity extends AppCompatActivity {
      * Displays the frequencies on the screen.
      */
     private void showTable() {
-        for (int i = 0; i < table.length - 1; i++) {
-            newCell();
-            textCell.setText(String.valueOf(table[i]));
-            tableRow.addView(textCell, newTableRowParams(16));
-            frequency_table.addView(tableRow);
+        for (int i = 0; i < editedFrequencies.size(); i++) {
+            createNewFrequencyCell(i);
+            createNewFrequencyDeleteCell(i);
         }
-        if (table.length > 0) {
-            newCell();
-            textCell.setText(String.valueOf(table[table.length - 1]));
-            tableRow.addView(textCell, newTableRowParams(0));
-            frequency_table.addView(tableRow);
-        }
+    }
+
+    private void createNewFrequencyCell(int index) {
+        newFrequencyCell();
+        textView.setText(String.valueOf(editedFrequencies.get(index)));
+        linearLayout.addView(textView);
+        linearLayout.addView(imageView);
+        linearLayout.setOnClickListener(view -> {
+            selectedFrequency = editedFrequencies.get(index);
+            selectedFrequencyIndex = index;
+            frequencies_overview_linearLayout.setVisibility(View.GONE);
+            frequency_edit_linearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText("Edit Frequency " + selectedFrequency);
+            enter_frequency_textView.setText(R.string.lb_enter_frequency);
+
+            enter_frequency_textView.setTextColor(ContextCompat.getColor(this, light_blue));
+            frequency_editText.setBackground(ContextCompat.getDrawable(this, border_enter));
+            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(this, slate_gray));
+            save_changes_button.setText(R.string.lb_save_changes);
+            save_changes_button.setEnabled(false);
+            save_changes_button.setAlpha((float) 0.6);
+        });
+        frequencies_linearLayout.addView(linearLayout);
+    }
+
+    private void createNewFrequencyDeleteCell(int index) {
+        newFrequencyDeleteCell();
+        textView.setText(String.valueOf(editedFrequencies.get(index)));
+        checkBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                delete_selected_frequencies_button.setEnabled(true);
+                delete_selected_frequencies_button.setAlpha((float) 1);
+                numberOfSelected++;
+            } else {
+                numberOfSelected--;
+                if (numberOfSelected == 0) {
+                    delete_selected_frequencies_button.setEnabled(false);
+                    delete_selected_frequencies_button.setAlpha((float) 0.6);
+                }
+            }
+        });
+        linearLayout.addView(checkBox);
+        linearLayout.addView(textView);
+        select_frequencies_linearLayout.addView(linearLayout);
     }
 
     /**
      * Initializes the customize TextView.
      */
-    private void newCell() {
-        tableRow = new TableRow(this);
-        textCell = new TextView(this);
-        textCell.setTextSize(16);
-        textCell.setTextColor(ContextCompat.getColor(this, light_blue));
+    private void newFrequencyCell() {
+        linearLayout = new LinearLayout(this);
+        linearLayout.setBackgroundColor(ContextCompat.getColor(this, catskill_white));
+        linearLayout.setLayoutParams(newLinearLayoutParams());
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setElevation(4);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setPadding(32, 32, 32, 32);
+
+        textView = new TextView(this);
+        textView.setTextSize(16);
+        textView.setTextColor(ContextCompat.getColor(this, limed_spruce));
+        textView.setLayoutParams(newTextViewParams());
+
+        imageView = new ImageView(this);
+        imageView.setBackground(ContextCompat.getDrawable(this, ic_next));
+    }
+
+    private void newFrequencyDeleteCell() {
+        linearLayout = new LinearLayout(this);
+        linearLayout.setBackgroundColor(ContextCompat.getColor(this, catskill_white));
+        linearLayout.setLayoutParams(newLinearLayoutParams());
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setElevation(4);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setPadding(32, 32, 32, 32);
+
+        checkBox = new CheckBox(this);
+
+        textView = new TextView(this);
+        textView.setTextSize(16);
+        textView.setTextColor(ContextCompat.getColor(this, limed_spruce));
+        textView.setLayoutParams(newTextViewParams());
     }
 
     /**
-     * Sets the margins for the TableRow.
-     *
-     * @param bottom The size bottom margin.
+     * Sets the margins for the LinearLayout.
      *
      * @return Returns a LayoutParams with the customize margins.
      */
-    private TableRow.LayoutParams newTableRowParams(int bottom) {
+    private LinearLayout.LayoutParams newLinearLayoutParams() {
         TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(0, 0, 0, bottom);
+        params.setMargins(0, 0, 0, 32);
+        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+        return params;
+    }
+
+    private ViewGroup.LayoutParams newTextViewParams() {
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.weight = 1;
         return params;
     }
@@ -666,38 +751,120 @@ public class EditTablesActivity extends AppCompatActivity {
      */
     private void downloadData(byte[] data) {
         parameter = "";
-        isChanged = false;
-        save_changes_button.setAlpha((float) 0.6);
-        save_changes_button.setEnabled(false);
-        table = new int[totalFrequencies];
-
+        originalTable = new int[totalFrequencies];
         int index = 10;
         int i = 0;
-        while (i < table.length) {
+        while (i < originalTable.length) {
             int frequency = (Integer.parseInt(Converters.getDecimalValue(data[index])) * 256) +
                     Integer.parseInt(Converters.getDecimalValue(data[index + 1]));
-            table[i] = (baseFrequency * 1000) + frequency;
+            originalTable[i] = baseFrequency + frequency;
+            editedFrequencies.add(originalTable[i]);
             i++;
             index += 2;
         }
 
-        frequency_table.removeAllViews();
+        frequencies_linearLayout.removeAllViews();
         showTable();
+    }
+
+    private void changeSelectedFrequency(int frequency) {
+        edit_options_linearLayout.setVisibility(View.GONE);
+        message_linearLayout.setVisibility(View.VISIBLE);
+        message_textView.setText(R.string.lb_frequency_modified);
+
+        // Change frequency cell
+        LinearLayout linearLayout = (LinearLayout) frequencies_linearLayout.getChildAt(selectedFrequencyIndex);
+        TextView textView = (TextView) linearLayout.getChildAt(0);
+        textView.setText(String.valueOf(frequency));
+
+        // Change frequency delete cell
+        LinearLayout linearLayoutSelectDelete = (LinearLayout) select_frequencies_linearLayout.getChildAt(selectedFrequencyIndex);
+        TextView textViewSelectDelete = (TextView) linearLayoutSelectDelete.getChildAt(1);
+        textViewSelectDelete.setText(String.valueOf(frequency));
+
+        editedFrequencies.set(selectedFrequencyIndex, frequency);
+        closedMessage = false;
+        selectedFrequency = 0;
+        selectedFrequencyIndex = -1;
+
+        manageMessage();
+    }
+
+    private void addFrequency(int frequency) {
+        closedMessage = false;
+        edit_options_linearLayout.setVisibility(View.GONE);
+        message_linearLayout.setVisibility(View.VISIBLE);
+        message_textView.setText(R.string.lb_frequency_added);
+
+        int index = editedFrequencies.size();
+        editedFrequencies.add(frequency);
+        createNewFrequencyCell(index);
+        createNewFrequencyDeleteCell(index);
+
+        manageMessage();
+    }
+
+    private void deleteFrequencies() {
+        int index = 0;
+        while (index < select_frequencies_linearLayout.getChildCount()) {
+            LinearLayout linearLayout = (LinearLayout) select_frequencies_linearLayout.getChildAt(index);
+            CheckBox checkBox = (CheckBox) linearLayout.getChildAt(0);
+            if (checkBox.isChecked()) {
+                editedFrequencies.remove(index);
+                frequencies_linearLayout.removeViewAt(index);
+                select_frequencies_linearLayout.removeViewAt(index);
+            } else {
+                index++;
+            }
+        }
+        if (frequencies_linearLayout.getChildCount() == 0) {
+            no_frequencies_linearLayout.setVisibility(View.VISIBLE);
+            frequencies_overview_linearLayout.setVisibility(View.GONE);
+            frequencies_linearLayout.removeAllViews();
+        }
+    }
+
+    private void manageMessage() {
+        int MESSAGE_PERIOD = 3000;
+        handlerMessage.postDelayed(() -> {
+            if (!closedMessage) {
+                closedMessage = true;
+                edit_options_linearLayout.setVisibility(View.VISIBLE);
+                message_linearLayout.setVisibility(View.GONE);
+            }
+        }, MESSAGE_PERIOD);
+    }
+
+    private boolean existChanges() {
+        if (originalTable.length != editedFrequencies.size())
+            return true;
+        for (int i = 0; i < originalTable.length; i++) {
+            if (originalTable[i] != editedFrequencies.get(i))
+                return true;
+        }
+        return false;
     }
 
     /**
      * Displays a message indicating whether the writing was successful.
      *
-     * @param data This packet indicates the writing status.
+     * @param status This number indicates the writing status.
      */
-    private void showMessage(byte[] data) {
-        int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
-
+    private void showMessage(int status) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Success!");
-        if (status == 0)
+        builder.setTitle("Message!");
+        if (status == 0) {
             builder.setMessage("Completed.");
-        builder.setPositiveButton("OK", null);
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                finish();
+            });
+        } else if (status == 2) {
+            builder.setMessage("Not completed.");
+            builder.setPositiveButton("OK", null);
+        } else if (status == 1) {
+            builder.setMessage("Exceeded Table Limit. Please enter no more than 100 frequencies.");
+            builder.setPositiveButton("OK", null);
+        }
         builder.show();
     }
 }

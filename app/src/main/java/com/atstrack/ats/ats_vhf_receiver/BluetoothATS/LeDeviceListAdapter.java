@@ -47,6 +47,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
                 }
+                Log.i("Devices", deviceName);
             }
         }
     }

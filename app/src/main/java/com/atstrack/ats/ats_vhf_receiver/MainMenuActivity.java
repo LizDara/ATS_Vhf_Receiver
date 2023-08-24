@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -10,8 +9,8 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,7 +67,7 @@ public class MainMenuActivity extends AppCompatActivity {
     public static final String EXTRAS_DEVICE_STATUS = "DEVICE_STATUS";
     public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
     private static final long MESSAGE_PERIOD = 1000;
-    private static final long CONNECT_PERIOD = 3000;
+    private static final long CONNECT_PERIOD = 1500;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
@@ -81,13 +81,16 @@ public class MainMenuActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
-                finish();
+            if (mBluetoothLeService != null) {
+                if (!mBluetoothLeService.initialize()) {
+                    Log.d(TAG, "Unable to initialize Bluetooth");
+                    finish();
+                }
+                // Automatically connects to the device upon successful start-up initialization.
+                boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
+                if (result)
+                    mConnected = true;
             }
-            // Automatically connects to the device upon successful start-up initialization.
-            boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            if (result)
-                mConnected = true;
         }
 
         @Override
@@ -125,7 +128,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -238,6 +241,7 @@ public class MainMenuActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
+            Log.d(TAG, "Connect request result=" + result);
         }
     }
 

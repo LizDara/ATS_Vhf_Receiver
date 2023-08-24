@@ -1,6 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -8,8 +7,8 @@ import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -48,6 +47,7 @@ import java.util.UUID;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
+import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
 
 public class ManualScanActivity extends AppCompatActivity {
 
@@ -98,9 +98,11 @@ public class ManualScanActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
+    private static final int WAITING_PERIOD = 1000;
 
     private boolean isScanning;
     private boolean isEditFrequency;
+    private boolean previousScanning;
 
     private int baseFrequency;
     private int range;
@@ -139,6 +141,7 @@ public class ManualScanActivity extends AppCompatActivity {
 
     private boolean mConnected = true;
     private String parameter = "";
+    private String parameterWrite = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -157,19 +160,8 @@ public class ManualScanActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    switch (parameter) {
-                        case "startManual": // Starts to scan
-                            onClickStart();
-                            break;
-                        case "sendLog": // Receives the data
-                            onClickLog();
-                            break;
-                        case "stopManual": // Stops scan
-                            onClickStop();
-                            break;
-                        case "recordData": // Records a code
-                            onClickRecord();
-                            break;
+                    if ("sendLog".equals(parameter)) { // Receives the data
+                        onClickLog();
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
@@ -178,7 +170,33 @@ public class ManualScanActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
+            }
+        }
+    };
+
+    private final BroadcastReceiver mGattUpdateReceiverWrite = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                final String action = intent.getAction();
+                Log.i(TAG, "BROADCAST RECEIVER 1: " + action);
+                if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
+                    switch (parameterWrite) {
+                        case "startManual": // Starts to scan
+                            onClickStart();
+                            break;
+                        case "stopManual": // Stops scan
+                            onClickStop();
+                            break;
+                        case "recordData": // Records a code
+                            onClickRecord();
+                            break;
+                    }
+                }
+            }
+            catch (Exception e) {
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -218,14 +236,18 @@ public class ManualScanActivity extends AppCompatActivity {
         return intentFilter;
     }
 
+    private static IntentFilter makeGattUpdateIntentFilterWrite() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        return intentFilter;
+    }
+
     /**
      * Writes the aerial scan data for start to scan.
      * Service name: Scan.
      * Characteristic name: Manual.
      */
     private void onClickStart() {
-        parameter = "sendLog";
-
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         int YY = currentDate.get(Calendar.YEAR);
         int MM = currentDate.get(Calendar.MONTH);
@@ -241,25 +263,28 @@ public class ManualScanActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
-        Log.i(TAG, "Start Data "+Converters.getDecimalValue(b));
+        isScanning = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        isScanning = true;
-        title_toolbar.setText(R.string.lb_manual_scanning);
-        ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-        manual_scan_linearLayout.setVisibility(View.VISIBLE);
-        record_data_manual_button.setVisibility(View.VISIBLE);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        if (isScanning) {
+            parameterWrite = "";
+            title_toolbar.setText(R.string.lb_manual_scanning);
+            ready_manual_scan_LinearLayout.setVisibility(View.GONE);
+            manual_scan_linearLayout.setVisibility(View.VISIBLE);
+            record_data_manual_button.setVisibility(View.VISIBLE);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        state_view.setBackgroundResource(R.drawable.scanning_animation);
-        animationDrawable = (AnimationDrawable) state_view.getBackground();
-        animationDrawable.start();
+            state_view.setBackgroundResource(R.drawable.scanning_animation);
+            animationDrawable = (AnimationDrawable) state_view.getBackground();
+            animationDrawable.start();
 
-        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
-        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-        period_textView.setVisibility(visibility);
-        pulse_rate_textView.setVisibility(visibility);
-        frequency_scan_manual_textView.setText((String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3)));
+            int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+            code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+            period_textView.setVisibility(visibility);
+            pulse_rate_textView.setVisibility(visibility);
+            frequency_scan_manual_textView.setText((String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3)));
+
+            device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, manual"));
+        }
     }
 
     /**
@@ -268,10 +293,15 @@ public class ManualScanActivity extends AppCompatActivity {
      * Characteristic name: SendLog.
      */
     private void onClickLog() {
+        parameterWrite = "startManual";
+
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
-        Log.i(TAG, "Log Data");
+
+        new Handler().postDelayed(() -> {
+            mBluetoothLeService.discoveringSecond();
+        }, WAITING_PERIOD);
     }
 
     /**
@@ -280,31 +310,34 @@ public class ManualScanActivity extends AppCompatActivity {
      * Characteristic name: Manual.
      */
     private void onClickStop() {
-        parameter = "";
         byte[] b = new byte[] {(byte) 0x87};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
-        Log.i(TAG, "Stop Data");
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        clear();
-        isScanning = false;
-        animationDrawable.stop();
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-        manual_scan_linearLayout.setVisibility(View.GONE);
-        record_data_manual_button.setAlpha((float) 1);
-        record_data_manual_button.setEnabled(true);
-        record_data_manual_button.setVisibility(View.GONE);
-        state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+        if (result) {
+            clear();
+            isScanning = false;
+            animationDrawable.stop();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+            manual_scan_linearLayout.setVisibility(View.GONE);
+            record_data_manual_button.setAlpha((float) 1);
+            record_data_manual_button.setEnabled(true);
+            record_data_manual_button.setVisibility(View.GONE);
+            state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
 
-        if (isEditFrequency) {
-            isEditFrequency = false;
-            title_toolbar.setText(R.string.lb_change_frequency);
-            change_frequency_linearLayout.setVisibility(View.VISIBLE);
-        } else {
-            title_toolbar.setText(R.string.manual_scanning);
-            ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+            device_name_textView.setText(receiverInformation.getDeviceName());
+
+            if (isEditFrequency) {
+                isEditFrequency = false;
+                title_toolbar.setText(R.string.lb_change_frequency);
+                change_frequency_linearLayout.setVisibility(View.VISIBLE);
+            } else {
+                title_toolbar.setText(R.string.manual_scanning);
+                ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+            }
+            parameter = "";
         }
     }
 
@@ -312,16 +345,17 @@ public class ManualScanActivity extends AppCompatActivity {
      * Records the specific code information, the code received.
      */
     public void onClickRecord() {
-        parameter = "sendLog";
         byte[] b = new byte[] {(byte) 0x8C, (byte) detections, (byte) mort, (byte) code};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
         Log.i(TAG, "RECORD: " + Converters.getDecimalValue(b));
 
-        record_data_manual_button.setAlpha((float) 0.6);
-        record_data_manual_button.setEnabled(false);
+        if (result) {
+            record_data_manual_button.setAlpha((float) 0.6);
+            record_data_manual_button.setEnabled(false);
+        }
     }
 
     @OnClick(R.id.enter_new_frequency_button)
@@ -342,7 +376,7 @@ public class ManualScanActivity extends AppCompatActivity {
     @OnClick(R.id.ready_to_scan_manual_button)
     public void onClickReadyToScan(View v) {
         newFrequency = (enter_frequency_editText.getText().toString().isEmpty()) ? 0 : Integer.parseInt(enter_frequency_editText.getText().toString());
-        if (newFrequency > (baseFrequency * 1000) && newFrequency < (baseFrequency + range) * 1000) {
+        if (newFrequency >= (baseFrequency * 1000) && newFrequency < (baseFrequency + range) * 1000) {
             frequency_manual_textView.setText(String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3));
             title_toolbar.setText(R.string.manual_scanning);
             change_frequency_linearLayout.setVisibility(View.GONE);
@@ -362,21 +396,21 @@ public class ManualScanActivity extends AppCompatActivity {
 
     @OnClick(R.id.start_manual_button)
     public void onClickStartManual(View v) {
-        parameter = "startManual";
+        parameter = "sendLog";
         mBluetoothLeService.discovering();
     }
 
     @OnClick(R.id.edit_frequency_button)
     public void onClickEditFrequency(View v) {
-        parameter = "stopManual";
+        parameterWrite = "stopManual";
         isEditFrequency = true;
-        mBluetoothLeService.discovering();
+        mBluetoothLeService.discoveringSecond();
     }
 
     @OnClick(R.id.record_data_manual_button)
     public void onClickRecordData(View v) {
-        parameter = "recordData";
-        mBluetoothLeService.discovering();
+        parameterWrite = "recordData";
+        mBluetoothLeService.discoveringSecond();
     }
 
     @Override
@@ -411,6 +445,7 @@ public class ManualScanActivity extends AppCompatActivity {
         detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
 
         if (isScanning) { // The device is already scanning
+            previousScanning = true;
             parameter = "sendLog";
             year = getIntent().getExtras().getInt("year");
             month = getIntent().getExtras().getInt("month");
@@ -434,6 +469,7 @@ public class ManualScanActivity extends AppCompatActivity {
             period_textView.setVisibility(visibility);
             pulse_rate_textView.setVisibility(visibility);
         } else { // Gets manual defaults data
+            previousScanning = false;
             start_manual_button.setEnabled(false);
             start_manual_button.setAlpha((float) 0.6);
         }
@@ -446,6 +482,7 @@ public class ManualScanActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiverWrite, makeGattUpdateIntentFilterWrite());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
@@ -455,6 +492,7 @@ public class ManualScanActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
+        unregisterReceiver(mGattUpdateReceiverWrite);
     }
 
     @Override
@@ -478,8 +516,8 @@ public class ManualScanActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             } else {
-                parameter = "stopManual";
-                mBluetoothLeService.discovering();
+                parameterWrite = "stopManual";
+                mBluetoothLeService.discoveringSecond();
             }
             return true;
         }
@@ -567,19 +605,19 @@ public class ManualScanActivity extends AppCompatActivity {
 
         TextView codeTextView = new TextView(this);
         codeTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        codeTextView.setTextAppearance(this, R.style.body_regular);
+        codeTextView.setTextAppearance(body_regular);
         codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         codeTextView.setLayoutParams(params);
 
         TextView signalStrengthTextView = new TextView(this);
         signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextAppearance(body_regular);
         signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         signalStrengthTextView.setLayoutParams(params);
 
         TextView detectionsTextView = new TextView(this);
         detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(this, R.style.body_regular);
+        detectionsTextView.setTextAppearance(body_regular);
         detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         detectionsTextView.setLayoutParams(params);
 
@@ -698,6 +736,10 @@ public class ManualScanActivity extends AppCompatActivity {
             TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(2);
             TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(2);
             lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+
+            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastMortTextView.setText(penultimateMortTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
@@ -710,9 +752,10 @@ public class ManualScanActivity extends AppCompatActivity {
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newDetectionsTextView.setText(String.valueOf(detections));
 
-        newMortTextView.setText(isMort ? mort + 1 : mort);
+        newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
         this.detections = detections;
-        this.mort = Integer.parseInt(newMortTextView.getText().toString());
+        this.mort = isMort ? mort + 1 : mort;
+        Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
 
     /**

@@ -1,14 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -123,12 +122,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (parameter.equals("stationary")) // Gets stationary defaults data
                         downloadData(packet);
-                    else if (parameter.equals("save")) // Save stationary defaults data
-                        showMessage(packet);
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -184,9 +181,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        finish();
+        if (result)
+            showMessage(0);
+        else
+            showMessage(2);
     }
 
     @OnClick(R.id.frequency_table_number_stationary_linearLayout)
@@ -311,7 +311,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                     parameter = "save";
                     mBluetoothLeService.discovering();
                 } else {
-                    showMessage(new byte[]{(byte) 1});
+                    showMessage(1);
                 }
             } else {
                 finish();
@@ -416,22 +416,26 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     /**
      * Displays a message indicating whether the writing was successful.
      *
-     * @param data This packet indicates the writing status.
+     * @param status This number indicates the writing status.
      */
-    private void showMessage(byte[] data) {
-        int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
-
+    private void showMessage(int status) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Message!");
-        if (status == 0) {
-            builder.setMessage("Completed.");
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                finish();
-            });
-        }
-        if (status == 1) {
-            builder.setMessage("Data incorrect.");
-            builder.setPositiveButton("OK", null);
+        switch (status) {
+            case 0:
+                builder.setMessage("Completed.");
+                builder.setPositiveButton("OK", (dialog, which) -> {
+                    finish();
+                });
+                break;
+            case 1:
+                builder.setMessage("Data incorrect.");
+                builder.setPositiveButton("OK", null);
+                break;
+            case 2:
+                builder.setMessage("Not completed.");
+                builder.setPositiveButton("OK", null);
+                break;
         }
         builder.show();
     }

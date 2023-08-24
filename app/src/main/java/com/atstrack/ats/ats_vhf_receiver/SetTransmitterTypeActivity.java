@@ -1,14 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,6 +17,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -144,7 +144,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -199,8 +199,12 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
-        finish();
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+
+        if (result)
+            showMessage(0);
+        else
+            showMessage(2);
     }
 
     @OnClick(R.id.pulse_rate_type_linearLayout)
@@ -531,5 +535,25 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
 
         return (data[0] != Integer.parseInt(Converters.getDecimalValue(txType)) || data[1] != matches || data[2] != pr1 || data[3] != prt1 ||
                 data[4] != pr2 || data[5] != prt2 || data[6] != pr3 || data[7] != prt3 || data[8] != pr4 || data[9] != prt4);
+    }
+
+    /**
+     * Displays a message indicating whether the writing was successful.
+     *
+     * @param status This number indicates the writing status.
+     */
+    private void showMessage(int status) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Success!");
+        if (status == 0) {
+            builder.setMessage("Completed.");
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                finish();
+            });
+        } else if (status == 2) {
+            builder.setMessage("Not completed.");
+            builder.setPositiveButton("OK", null);
+        }
+        builder.show();
     }
 }

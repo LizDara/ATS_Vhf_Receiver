@@ -1,13 +1,12 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -156,7 +155,7 @@ public class InputValueActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -274,7 +273,7 @@ public class InputValueActivity extends AppCompatActivity {
             setResult(frequencyTableNumber);
         }
         if (value == NUMBER_OF_ANTENNAS) { // Sends the number of antennas
-            int numberAntennas = value_spinner.getSelectedItemPosition();
+            int numberAntennas = value_spinner.getSelectedItemPosition() + 1;
             setResult(numberAntennas);
         }
         if (value == SCAN_TIMEOUT_SECONDS) { // Sends scan timeout value

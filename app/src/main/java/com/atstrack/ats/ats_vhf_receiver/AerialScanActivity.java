@@ -1,13 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
+
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
+import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
 
 public class AerialScanActivity extends AppCompatActivity {
 
@@ -97,9 +98,10 @@ public class AerialScanActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private boolean response = true;
+    private static final int WAITING_PERIOD = 1000;
 
     private boolean isScanning;
+    private boolean previousScanning;
 
     private AnimationDrawable animationDrawable;
 
@@ -137,7 +139,8 @@ public class AerialScanActivity extends AppCompatActivity {
     };
 
     private boolean mConnected = true;
-        private String parameter = "";
+    private String parameter = "";
+    private String parameterWrite = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -149,6 +152,7 @@ public class AerialScanActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
+                Log.i(TAG, "BROADCAST RECEIVER: " + action);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                     invalidateOptionsMenu();
@@ -160,18 +164,13 @@ public class AerialScanActivity extends AppCompatActivity {
                         case "aerial": // Gets aerial defaults data
                             onClickAerial();
                             break;
-                        case "startAerial": // Starts to scan
-                            onClickStart();
-                            break;
                         case "sendLog": // Receives the data
                             onClickLog();
-                            break;
-                        case "stopAerial": // Stops scan
-                            onClickStop();
                             break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    Log.i(TAG, "BROADCAST, " + parameter + ": " + Converters.getHexValue(packet));
                     switch (parameter) {
                         case "aerial": // Gets aerial defaults data
                             downloadData(packet);
@@ -179,14 +178,34 @@ public class AerialScanActivity extends AppCompatActivity {
                         case "sendLog": // Receives the data
                             setCurrentLog(packet);
                             break;
+                    }
+                }
+            }
+            catch (Exception e) {
+                Log.i(TAG, e.toString());
+            }
+        }
+    };
+
+    private final BroadcastReceiver mGattUpdateReceiverWrite = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                final String action = intent.getAction();
+                Log.i(TAG, "BROADCAST RECEIVER 1: " + action);
+                if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
+                    switch (parameterWrite) {
+                        case "startAerial": // Starts to scan
+                            onClickStart();
+                            break;
                         case "stopAerial": // Stops scan
-                            showMessage(packet);
+                            onClickStop();
                             break;
                     }
                 }
             }
             catch (Exception e) {
-                Timber.tag("DCA:BR 198").e(e, "Unexpected error.");
+                Log.i(TAG, e.toString());
             }
         }
     };
@@ -197,6 +216,12 @@ public class AerialScanActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilterWrite() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
         return intentFilter;
     }
 
@@ -217,8 +242,6 @@ public class AerialScanActivity extends AppCompatActivity {
      * Characteristic name: Aerial.
      */
     private void onClickStart() {
-        parameter = "sendLog";
-
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         int YY = currentDate.get(Calendar.YEAR);
         int MM = currentDate.get(Calendar.MONTH);
@@ -231,21 +254,26 @@ public class AerialScanActivity extends AppCompatActivity {
         byte[] b = new byte[] {
                 (byte) 0x82, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable};
 
+        Log.i(TAG, "On Click Start Aerial");
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, true);
+        isScanning = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        isScanning = true;
-        title_toolbar.setText(R.string.lb_aerial_scanning);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
-        aerial_result_linearLayout.setVisibility(View.VISIBLE);
-        hold_aerial_button.setVisibility(View.VISIBLE);
+        if (isScanning) {
+            parameterWrite = "";
+            title_toolbar.setText(R.string.lb_aerial_scanning);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+            ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
+            aerial_result_linearLayout.setVisibility(View.VISIBLE);
+            hold_aerial_button.setVisibility(View.VISIBLE);
 
-        state_view.setBackgroundResource(R.drawable.scanning_animation);
-        animationDrawable = (AnimationDrawable) state_view.getBackground();
-        animationDrawable.start();
-        frequency_aerial_textView.setText("0");
+            state_view.setBackgroundResource(R.drawable.scanning_animation);
+            animationDrawable = (AnimationDrawable) state_view.getBackground();
+            animationDrawable.start();
+            frequency_aerial_textView.setText("");
+
+            device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, mobile"));
+        }
     }
 
     /**
@@ -254,9 +282,16 @@ public class AerialScanActivity extends AppCompatActivity {
      * Characteristic name: SendLog.
      */
     private void onClickLog() {
+        parameterWrite = "startAerial";
+        Log.i(TAG, "On Click Log Aerial");
+
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
+
+        new Handler().postDelayed(() -> {
+            mBluetoothLeService.discoveringSecond();
+        }, WAITING_PERIOD);
     }
 
     /**
@@ -265,35 +300,47 @@ public class AerialScanActivity extends AppCompatActivity {
      * Characteristic name: Aerial.
      */
     private void onClickStop() {
-        parameter = "aerial";
         byte[] b = new byte[] {(byte) 0x87};
+        Log.i(TAG, "START STOP AERIAL");
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL;
-        mBluetoothLeService.writeCharacteristic(service, characteristic, b, false);
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        clear();
-        isScanning = false;
-        animationDrawable.stop();
-        state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-        aerial_result_linearLayout.setVisibility(View.GONE);
-        hold_aerial_button.setVisibility(View.GONE);
-        ready_aerial_scan_LinearLayout.setVisibility(View.VISIBLE);
-        title_toolbar.setText(R.string.aerial_scanning);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+        if (result) {
+            clear();
+            isScanning = false;
+            animationDrawable.stop();
+            state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+            aerial_result_linearLayout.setVisibility(View.GONE);
+            hold_aerial_button.setVisibility(View.GONE);
+            ready_aerial_scan_LinearLayout.setVisibility(View.VISIBLE);
+            title_toolbar.setText(R.string.aerial_scanning);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
-        mBluetoothLeService.discovering();
+            device_name_textView.setText(receiverInformation.getDeviceName());
+
+            if (previousScanning) {
+                parameter = "aerial";
+                new Handler().postDelayed(() -> {
+                    mBluetoothLeService.discovering();
+                }, WAITING_PERIOD);
+            } else {
+                parameter = "";
+            }
+        }
     }
 
     @OnClick(R.id.edit_aerial_settings_button)
     public void onClickEditAerialSettings(View v) {
+        parameter = "aerial";
         Intent intent = new Intent(this, AerialDefaultsActivity.class);
         startActivity(intent);
     }
 
     @OnClick(R.id.start_aerial_button)
     public void onClickStartAerial(View v) {
-        parameter = "startAerial";
+        parameter = "sendLog";
         mBluetoothLeService.discovering();
     }
 
@@ -322,7 +369,7 @@ public class AerialScanActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
-        detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
+        detectionType = (byte) sharedPreferences.getInt("DetectionType", 0);
 
         int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
         code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
@@ -330,6 +377,7 @@ public class AerialScanActivity extends AppCompatActivity {
         pulse_rate_textView.setVisibility(visibility);
 
         if (isScanning) { // The device is already scanning
+            previousScanning = true;
             parameter = "sendLog";
             year = getIntent().getExtras().getInt("year");
             month = getIntent().getExtras().getInt("month");
@@ -348,6 +396,7 @@ public class AerialScanActivity extends AppCompatActivity {
             animationDrawable = (AnimationDrawable) state_view.getBackground();
             animationDrawable.start();
         } else { // Gets aerial defaults data
+            previousScanning = false;
             parameter = "aerial";
         }
 
@@ -364,8 +413,9 @@ public class AerialScanActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             } else {
-                parameter = "stopAerial";
-                mBluetoothLeService.discovering();
+                parameterWrite = "stopAerial";
+                mBluetoothLeService.discoveringSecond();
+                Log.i(TAG, "STOP AERIAL");
             }
             return true;
         }
@@ -380,8 +430,8 @@ public class AerialScanActivity extends AppCompatActivity {
             builder.setTitle("Stop Aerial");
             builder.setMessage("Are you sure you want to stop scanning?");
             builder.setPositiveButton("OK", (dialog, which) -> {
-                parameter = "stopAerial";
-                mBluetoothLeService.discovering();
+                parameterWrite = "stopAerial";
+                mBluetoothLeService.discoveringSecond();
             });
             builder.setNegativeButton("Cancel", null);
             AlertDialog dialog = builder.create();
@@ -394,6 +444,7 @@ public class AerialScanActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiverWrite, makeGattUpdateIntentFilterWrite());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
@@ -403,6 +454,7 @@ public class AerialScanActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
+        unregisterReceiver(mGattUpdateReceiverWrite);
     }
 
     @Override
@@ -448,23 +500,19 @@ public class AerialScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (!response) {
-            showMessage(new byte[]{0});
-            response = true;
-        }
         if (data.length == 1) {
             parameter = "aerial";
             mBluetoothLeService.discovering();
-        }
-        if (Converters.getHexValue(data[0]).equals("6D")) {
+        } else if (Converters.getHexValue(data[0]).equals("6D")) {
+            parameter = "";
             if (Integer.parseInt(Converters.getDecimalValue(data[1])) == 0) { // There are no tables with frequencies to scan
                 selected_frequency_aerial_textView.setText(R.string.lb_none);
-                frequency_empty_textView.setVisibility(View.VISIBLE);
+                //frequency_empty_textView.setVisibility(View.VISIBLE);
                 start_aerial_button.setEnabled(false);
                 start_aerial_button.setAlpha((float) 0.6);
             } else { // Shows the table to be scanned
                 selected_frequency_aerial_textView.setText(Converters.getDecimalValue(data[1]));
-                frequency_empty_textView.setVisibility(View.GONE);
+                //frequency_empty_textView.setVisibility(View.GONE);
                 start_aerial_button.setEnabled(true);
                 start_aerial_button.setAlpha((float) 1);
             }
@@ -484,7 +532,6 @@ public class AerialScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        Log.i(TAG, "DATA: " + Converters.getDecimalValue(data));//solo sevian 5 en code
         switch (Converters.getHexValue(data[0])) {
             case "82":
                 startScanAerialFirstPart(data);
@@ -551,7 +598,8 @@ public class AerialScanActivity extends AppCompatActivity {
         seconds = Integer.parseInt(Converters.getDecimalValue(data[7]));
         currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;*/
 
-        if (Integer.parseInt(frequency_aerial_textView.getText().toString().replace(".", "")) != frequency) {
+        if (!frequency_aerial_textView.getText().equals("") &&
+                Integer.parseInt(frequency_aerial_textView.getText().toString().replace(".", "")) != frequency) {
             clear();
         }
 
@@ -633,25 +681,29 @@ public class AerialScanActivity extends AppCompatActivity {
 
         TextView codeTextView = new TextView(this);
         codeTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        codeTextView.setTextAppearance(this, R.style.body_regular);
+        codeTextView.setTextAppearance(body_regular);
         codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         codeTextView.setLayoutParams(params);
 
         TextView signalStrengthTextView = new TextView(this);
         signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextAppearance(body_regular);
         signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         signalStrengthTextView.setLayoutParams(params);
 
         TextView detectionsTextView = new TextView(this);
         detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(this, R.style.body_regular);
+        detectionsTextView.setTextAppearance(body_regular);
         detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         detectionsTextView.setLayoutParams(params);
+
+        TextView mortTextView = new TextView(this);
+        mortTextView.setVisibility(View.GONE);
 
         newCode.addView(codeTextView);
         newCode.addView(signalStrengthTextView);
         newCode.addView(detectionsTextView);
+        newCode.addView(mortTextView);
 
         LinearLayout line = new LinearLayout(this);
         line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
@@ -660,7 +712,7 @@ public class AerialScanActivity extends AppCompatActivity {
         scan_details_linearLayout.addView(newCode);
         scan_details_linearLayout.addView(line);
 
-        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort, 0);
+        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections + 1, isMort, 0); //detections start in 1
     }
 
     /**
@@ -710,9 +762,8 @@ public class AerialScanActivity extends AppCompatActivity {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             TextView textView = (TextView) linearLayout.getChildAt(0);
 
-            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) {
+            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code)
                 position = i;
-            }
         }
 
         return position;
@@ -762,6 +813,10 @@ public class AerialScanActivity extends AppCompatActivity {
             TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(2);
             TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(2);
             lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+
+            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastMortTextView.setText(penultimateMortTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
@@ -769,15 +824,15 @@ public class AerialScanActivity extends AppCompatActivity {
         TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(1);
         TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(2);
         TextView newMortTextView = (TextView) linearLayout.getChildAt(3);
-        Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + "Size: " + scan_details_linearLayout.getChildCount());
 
         newCodeTextView.setText(code + (isMort ? " M" : ""));
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newDetectionsTextView.setText(String.valueOf(detections));
 
-        newMortTextView.setText(isMort ? mort + 1 : mort);
+        newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
         this.detections =  detections;
-        this.mort = Integer.parseInt(newMortTextView.getText().toString());
+        this.mort = isMort ? mort + 1 : mort;
+        Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
 
     /**
@@ -869,6 +924,8 @@ public class AerialScanActivity extends AppCompatActivity {
      * Clears the screen to start displaying the data.
      */
     private void clear() {
+        table_aerial_textView.setText("");
+        frequency_aerial_textView.setText("");
         int count = scan_details_linearLayout.getChildCount();
 
         while (count > 2) {

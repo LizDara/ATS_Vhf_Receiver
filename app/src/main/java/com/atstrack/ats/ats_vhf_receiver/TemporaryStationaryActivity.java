@@ -155,9 +155,11 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
      * Characteristic name: Stationary.
      */
     private void onClickSave() {
-        int info = (Integer.parseInt(frequency_table_number_stationary_textView.getText().toString()) * 16)
-                + ((number_of_antennas_stationary_textView.getText().toString().equals("None")) ? 0 :
-                Integer.parseInt(number_of_antennas_stationary_textView.getText().toString()));
+        int tableNumber = frequency_table_number_stationary_textView.getText().toString().equals("None")
+                ? 0 : Integer.parseInt(frequency_table_number_stationary_textView.getText().toString());
+        int antennasNumber = number_of_antennas_stationary_textView.getText().toString().equals("None") ? 0 :
+                Integer.parseInt(number_of_antennas_stationary_textView.getText().toString());
+        int info = (tableNumber * 16) + antennasNumber;
         int scanRate = Integer.parseInt(scan_rate_seconds_stationary_textView.getText().toString());
         int scanTimeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int storeRate;
@@ -353,6 +355,11 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
+    }
+
     /**
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      */
@@ -430,6 +437,12 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     Intent intent = new Intent(this, StationaryScanActivity.class);
                     intent.putExtra("scanning", false);
+                    intent.putExtra("temporary", true);
+                    intent.putExtra("tableNumber", frequency_table_number_stationary_textView.getText());
+                    intent.putExtra("scanTime", scan_rate_seconds_stationary_textView.getText());
+                    intent.putExtra("timeout", scan_timeout_seconds_stationary_textView.getText());
+                    intent.putExtra("antennasNumber", number_of_antennas_stationary_textView.getText());
+                    intent.putExtra("storeRate", store_rate_stationary_textView.getText());
                     startActivity(intent);
                 });
                 break;

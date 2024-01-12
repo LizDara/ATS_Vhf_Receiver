@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -165,6 +166,11 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     builder.setPositiveButton("OK", null);
                     builder.show();
                 } else { // Connects to device
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("Defaults", 0);
+                    SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
+                    sharedPreferencesEdit.putInt("BaseFrequency", Integer.parseInt(device.getName().substring(12, 15)));
+                    sharedPreferencesEdit.putInt("Range", Integer.parseInt(device.getName().substring(17)));
+
                     Intent intent = new Intent(context, MainMenuActivity.class);
                     intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, deviceName.getText().toString());
                     intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());

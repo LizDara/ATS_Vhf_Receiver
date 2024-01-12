@@ -22,4 +22,5 @@
     <dimen name="receiver_image">200sp</dimen>
     <dimen name="receiver_logo">256sp</dimen>
     <dimen name="disconnect_message">312sp</dimen>
+    <dimen name="border_radius">50sp</dimen>
 </resources>

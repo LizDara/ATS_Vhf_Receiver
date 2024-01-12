@@ -181,10 +181,14 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
             case "Fixed Pulse Rate":
                 txType = (byte) 0x21;
                 b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
-                        (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
-                        (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
-                        (byte) Integer.parseInt(pr3_textView.getText().toString()), (byte) Integer.parseInt(pr3_tolerance_textView.getText().toString()),
-                        (byte) Integer.parseInt(pr4_textView.getText().toString()), (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString())};
+                        (byte) Integer.parseInt(pr1_textView.getText().toString()),
+                        (!pr1_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()) : 0,
+                        (byte) Integer.parseInt(pr2_textView.getText().toString()),
+                        (!pr2_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()) : 0,
+                        (byte) Integer.parseInt(pr3_textView.getText().toString()),
+                        (!pr3_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr3_tolerance_textView.getText().toString()) : 0,
+                        (byte) Integer.parseInt(pr4_textView.getText().toString()),
+                        (!pr4_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString()) : 0};
                 break;
             case "Variable Pulse Rate":
                 txType = (byte) 0x22;
@@ -394,6 +398,11 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         if (!mConnected)
             showDisconnectionMessage();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
     }
 
     /**

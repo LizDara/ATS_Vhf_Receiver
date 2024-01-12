@@ -30,8 +30,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -46,7 +48,13 @@ import java.util.UUID;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
+import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_delete;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_delete;
 import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
 
 public class ManualScanActivity extends AppCompatActivity {
@@ -65,18 +73,24 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView percent_battery_textView;
     @BindView(R.id.ready_manual_scan_linearLayout)
     LinearLayout ready_manual_scan_LinearLayout;
-    @BindView(R.id.change_frequency_linearLayout)
-    LinearLayout change_frequency_linearLayout;
+    @BindView(R.id.frequency_edit_linearLayout)
+    LinearLayout frequency_edit_linearLayout;
     @BindView(R.id.frequency_manual_textView)
     TextView frequency_manual_textView;
     @BindView(R.id.manual_gps_switch)
     SwitchCompat manual_gps_switch;
     @BindView(R.id.start_manual_button)
     Button start_manual_button;
-    @BindView(R.id.enter_frequency_editText)
-    EditText enter_frequency_editText;
-    @BindView(R.id.ready_to_scan_manual_button)
-    Button ready_to_scan_manual_button;
+    @BindView(R.id.frequency_textView)
+    TextView frequency_textView;
+    @BindView(R.id.line_frequency_view)
+    View line_frequency_view;
+    @BindView(R.id.edit_frequency_message_textView)
+    TextView edit_frequency_message_textView;
+    @BindView(R.id.number_buttons_linearLayout)
+    LinearLayout number_buttons_linearLayout;
+    @BindView(R.id.save_changes_button)
+    Button save_changes_button;
     @BindView(R.id.manual_scan_linearLayout)
     LinearLayout manual_scan_linearLayout;
     @BindView(R.id.frequency_scan_manual_textView)
@@ -91,8 +105,8 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView pulse_rate_textView;
     @BindView(R.id.line_view)
     View line_view;
-    @BindView(R.id.record_data_manual_button)
-    Button record_data_manual_button;
+    @BindView(R.id.record_data_manual_linearLayout)
+    LinearLayout record_data_manual_linearLayout;
 
     private final static String TAG = ManualScanActivity.class.getSimpleName();
 
@@ -105,7 +119,7 @@ public class ManualScanActivity extends AppCompatActivity {
     private boolean previousScanning;
 
     private int baseFrequency;
-    private int range;
+    private int frequencyRange;
     private byte detectionType;
     private int newFrequency;
     private int code;
@@ -119,6 +133,8 @@ public class ManualScanActivity extends AppCompatActivity {
     private int seconds;
 
     private AnimationDrawable animationDrawable;
+    private LinearLayout linearLayoutBaseFrequency;
+    private Button buttonBaseFrequency;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -162,6 +178,8 @@ public class ManualScanActivity extends AppCompatActivity {
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if ("sendLog".equals(parameter)) { // Receives the data
                         onClickLog();
+                    } else if ("sendLogScanning".equals(parameter)) {
+                        onClickLogScanning();
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
@@ -217,12 +235,16 @@ public class ManualScanActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            if (enter_frequency_editText.getText().toString().isEmpty()) {
-                ready_to_scan_manual_button.setEnabled(false);
-                ready_to_scan_manual_button.setAlpha((float) 0.6);
+            if (frequency_textView.getText().toString().length() == 6) {
+                save_changes_button.setEnabled(true);
+                save_changes_button.setAlpha(1);
+                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
+                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
             } else {
-                ready_to_scan_manual_button.setEnabled(true);
-                ready_to_scan_manual_button.setAlpha(1);
+                save_changes_button.setEnabled(false);
+                save_changes_button.setAlpha((float) 0.6);
+                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
+                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
             }
         }
     };
@@ -257,8 +279,8 @@ public class ManualScanActivity extends AppCompatActivity {
         int ss = currentDate.get(Calendar.SECOND);
         year = YY % 100;
 
-        byte[] b = new byte[] {(byte) 0x86, (byte) ((newFrequency - (baseFrequency * 1000)) / 256),
-                (byte) ((newFrequency - (baseFrequency * 1000)) % 256), (byte) (manual_gps_switch.isChecked() ? 0x80 : 0x0),
+        byte[] b = new byte[] {(byte) 0x86, (byte) ((newFrequency - baseFrequency) / 256),
+                (byte) ((newFrequency - baseFrequency) % 256), (byte) (manual_gps_switch.isChecked() ? 0x80 : 0x0),
                 (byte) year, (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -268,9 +290,8 @@ public class ManualScanActivity extends AppCompatActivity {
         if (isScanning) {
             parameterWrite = "";
             title_toolbar.setText(R.string.lb_manual_scanning);
-            ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-            manual_scan_linearLayout.setVisibility(View.VISIBLE);
-            record_data_manual_button.setVisibility(View.VISIBLE);
+            setVisibility("scanning");
+            record_data_manual_linearLayout.setVisibility(View.VISIBLE);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
             state_view.setBackgroundResource(R.drawable.scanning_animation);
@@ -321,10 +342,9 @@ public class ManualScanActivity extends AppCompatActivity {
             isScanning = false;
             animationDrawable.stop();
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-            manual_scan_linearLayout.setVisibility(View.GONE);
-            record_data_manual_button.setAlpha((float) 1);
-            record_data_manual_button.setEnabled(true);
-            record_data_manual_button.setVisibility(View.GONE);
+            record_data_manual_linearLayout.setAlpha((float) 1);
+            record_data_manual_linearLayout.setEnabled(true);
+            record_data_manual_linearLayout.setVisibility(View.GONE);
             state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
 
             device_name_textView.setText(receiverInformation.getDeviceName());
@@ -332,10 +352,10 @@ public class ManualScanActivity extends AppCompatActivity {
             if (isEditFrequency) {
                 isEditFrequency = false;
                 title_toolbar.setText(R.string.lb_change_frequency);
-                change_frequency_linearLayout.setVisibility(View.VISIBLE);
+                setVisibility("change");
             } else {
                 title_toolbar.setText(R.string.manual_scanning);
-                ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+                setVisibility("overview");
             }
             parameter = "";
         }
@@ -353,34 +373,39 @@ public class ManualScanActivity extends AppCompatActivity {
         Log.i(TAG, "RECORD: " + Converters.getDecimalValue(b));
 
         if (result) {
-            record_data_manual_button.setAlpha((float) 0.6);
-            record_data_manual_button.setEnabled(false);
+            record_data_manual_linearLayout.setAlpha((float) 0.6);
+            record_data_manual_linearLayout.setEnabled(false);
         }
+    }
+
+    private void onClickLogScanning() {
+        parameter = "sendLog";
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
+        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
     @OnClick(R.id.enter_new_frequency_button)
     public void onClickEnterNewFrequency(View v) {
         title_toolbar.setText(R.string.lb_change_frequency);
-        change_frequency_linearLayout.setVisibility(View.VISIBLE);
-        ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-        enter_frequency_editText.setText("");
-        if (enter_frequency_editText.getText().toString().isEmpty()) {
-            ready_to_scan_manual_button.setEnabled(false);
-            ready_to_scan_manual_button.setAlpha((float) 0.6);
-        } else {
-            ready_to_scan_manual_button.setEnabled(true);
-            ready_to_scan_manual_button.setAlpha((float) 1);
-        }
+        setVisibility("change");
+        frequency_textView.setText(R.string.lb_enter_frequency_digits);
+        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
+        line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
+        edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
+        save_changes_button.setText(R.string.lb_change_frequency);
+        save_changes_button.setEnabled(false);
+        save_changes_button.setAlpha((float) 0.6);
     }
 
-    @OnClick(R.id.ready_to_scan_manual_button)
-    public void onClickReadyToScan(View v) {
-        newFrequency = (enter_frequency_editText.getText().toString().isEmpty()) ? 0 : Integer.parseInt(enter_frequency_editText.getText().toString());
-        if (newFrequency >= (baseFrequency * 1000) && newFrequency < (baseFrequency + range) * 1000) {
+    @OnClick(R.id.save_changes_button)
+    public void onClickSaveChanges(View v) {
+        newFrequency = (frequency_textView.getText().toString().isEmpty()) ? 0 : Integer.parseInt(frequency_textView.getText().toString());
+        if (newFrequency >= baseFrequency && newFrequency <= frequencyRange) {
             frequency_manual_textView.setText(String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3));
             title_toolbar.setText(R.string.manual_scanning);
-            change_frequency_linearLayout.setVisibility(View.GONE);
-            ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+            setVisibility("overview");
             start_manual_button.setEnabled(true);
             start_manual_button.setAlpha(1);
         } else {
@@ -407,7 +432,7 @@ public class ManualScanActivity extends AppCompatActivity {
         mBluetoothLeService.discoveringSecond();
     }
 
-    @OnClick(R.id.record_data_manual_button)
+    @OnClick(R.id.record_data_manual_linearLayout)
     public void onClickRecordData(View v) {
         parameterWrite = "recordData";
         mBluetoothLeService.discoveringSecond();
@@ -438,15 +463,19 @@ public class ManualScanActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        enter_frequency_editText.addTextChangedListener(textChangedListener);
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
-        range = sharedPreferences.getInt("Range", 0);
+        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
+        int range = sharedPreferences.getInt("Range", 0);
         detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
+        frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
+
+        frequency_textView.addTextChangedListener(textChangedListener);
+        String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
+        edit_frequency_message_textView.setText(message);
 
         if (isScanning) { // The device is already scanning
             previousScanning = true;
-            parameter = "sendLog";
+            parameter = "sendLogScanning";
             year = getIntent().getExtras().getInt("year");
             month = getIntent().getExtras().getInt("month");
             day = getIntent().getExtras().getInt("day");
@@ -454,9 +483,8 @@ public class ManualScanActivity extends AppCompatActivity {
             minute = getIntent().getExtras().getInt("minute");
             seconds = getIntent().getExtras().getInt("seconds");
 
-            ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-            manual_scan_linearLayout.setVisibility(View.VISIBLE);
-            record_data_manual_button.setVisibility(View.VISIBLE);
+            setVisibility("scanning");
+            record_data_manual_linearLayout.setVisibility(View.VISIBLE);
             title_toolbar.setText(R.string.lb_aerial_scanning);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
@@ -469,6 +497,7 @@ public class ManualScanActivity extends AppCompatActivity {
             period_textView.setVisibility(visibility);
             pulse_rate_textView.setVisibility(visibility);
         } else { // Gets manual defaults data
+            setVisibility("overview");
             previousScanning = false;
             start_manual_button.setEnabled(false);
             start_manual_button.setAlpha((float) 0.6);
@@ -476,6 +505,7 @@ public class ManualScanActivity extends AppCompatActivity {
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        createNumberButtons(range);
     }
 
     @Override
@@ -506,9 +536,8 @@ public class ManualScanActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
-                if (change_frequency_linearLayout.getVisibility() == View.VISIBLE) {
-                    change_frequency_linearLayout.setVisibility(View.GONE);
-                    ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+                if (frequency_edit_linearLayout.getVisibility() == View.VISIBLE) {
+                    setVisibility("overview");
                 } else {
                     Intent intent = new Intent(this, StartScanningActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -554,14 +583,139 @@ public class ManualScanActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    private void setVisibility(String value) {
+        switch (value) {
+            case "overview":
+                ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
+                frequency_edit_linearLayout.setVisibility(View.GONE);
+                manual_scan_linearLayout.setVisibility(View.GONE);
+                break;
+            case "change":
+                ready_manual_scan_LinearLayout.setVisibility(View.GONE);
+                frequency_edit_linearLayout.setVisibility(View.VISIBLE);
+                manual_scan_linearLayout.setVisibility(View.GONE);
+                break;
+            case "scanning":
+                ready_manual_scan_LinearLayout.setVisibility(View.GONE);
+                frequency_edit_linearLayout.setVisibility(View.GONE);
+                manual_scan_linearLayout.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void createNumberButtons(int range) {
+        int baseNumber = baseFrequency / 1000;
+        for (int i = 0; i < range / 4; i++) {
+            newBaseLinearLayout();
+            for (int j = 0; j < 4; j++) {
+                newBaseButton(baseNumber);
+                int finalBaseNumber = baseNumber;
+                buttonBaseFrequency.setOnClickListener(view -> {
+                    if (frequency_textView.getText().toString().isEmpty() || frequency_textView.getText().toString().length() > 6) {
+                        frequency_textView.setText(String.valueOf(finalBaseNumber));
+                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), ebony_clay));
+                    }
+                });
+                linearLayoutBaseFrequency.addView(buttonBaseFrequency);
+                baseNumber++;
+            }
+            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
+        }
+
+        Space space = new Space(this);
+        space.setLayoutParams(newLinearLayoutParams());
+        number_buttons_linearLayout.addView(space);
+
+        int number = 1;
+        for (int i = 0; i < 3; i++) {
+            newBaseLinearLayout();
+            for (int j = 0; j < 4; j++) {
+                if (number == 10) {
+                    Space spaceBaseFrequency = new Space(this);
+                    spaceBaseFrequency.setLayoutParams(newButtonParams());
+                    linearLayoutBaseFrequency.addView(spaceBaseFrequency);
+                }else if (number == 11) {
+                    ImageView imageViewBaseFrequency = new ImageView(this);
+                    imageViewBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_delete));
+                    imageViewBaseFrequency.setImageDrawable(ContextCompat.getDrawable(this, ic_delete));
+                    imageViewBaseFrequency.setLayoutParams(newButtonDeleteParams());
+                    imageViewBaseFrequency.setPadding(50, 0, 50, 0);
+                    imageViewBaseFrequency.setOnClickListener(view -> {
+                        if (!frequency_textView.getText().toString().isEmpty()) {
+                            String previous = frequency_textView.getText().toString();
+                            frequency_textView.setText(previous.substring(0, previous.length() - 1));
+                        }
+                    });
+                    linearLayoutBaseFrequency.addView(imageViewBaseFrequency);
+                } else {
+                    newBaseButton(number);
+                    int finalNumber = number;
+                    buttonBaseFrequency.setOnClickListener(view -> {
+                        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
+                            String previous = frequency_textView.getText().toString();
+                            frequency_textView.setText(previous + finalNumber);
+                        }
+                    });
+                    linearLayoutBaseFrequency.addView(buttonBaseFrequency);
+                }
+                if (number == 9) number = 0;
+                else if (number == 0) number = 10;
+                else number++;
+            }
+            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
+        }
+    }
+
+    private void newBaseLinearLayout() {
+        linearLayoutBaseFrequency = new LinearLayout(this);
+        linearLayoutBaseFrequency.setLayoutParams(newLinearLayoutParams());
+        linearLayoutBaseFrequency.setOrientation(LinearLayout.HORIZONTAL);
+    }
+
+    private void newBaseButton(int baseNumber) {
+        buttonBaseFrequency = new Button(this);
+        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, border));
+        buttonBaseFrequency.setTextSize(16);
+        buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        buttonBaseFrequency.setText(String.valueOf(baseNumber));
+        buttonBaseFrequency.setLayoutParams(newButtonParams());
+    }
+
+    /**
+     * Sets the margins for the LinearLayout.
+     *
+     * @return Returns a LayoutParams with the customize margins.
+     */
+    private LinearLayout.LayoutParams newLinearLayoutParams() {
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.setMargins(0, 0, 0, 32);
+        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+        return params;
+    }
+
+    private LinearLayout.LayoutParams newButtonParams() {
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.setMargins(16, 0, 16, 0);
+        params.weight = 1;
+        return params;
+    }
+
+    private LinearLayout.LayoutParams newButtonDeleteParams() {
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.setMargins(16, 0, 16, 0);
+        params.height = GridLayout.LayoutParams.MATCH_PARENT;
+        params.weight = 1;
+        return params;
+    }
+
     /**
      * With the received packet, gets the data of scanning.
      *
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        int frequency = (baseFrequency * 1000) +
-                ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) + (Integer.parseInt(Converters.getDecimalValue(data[2]))));
+        int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+                (Integer.parseInt(Converters.getDecimalValue(data[2]))));
         frequency_scan_manual_textView.setText((String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3)));
 
         int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));

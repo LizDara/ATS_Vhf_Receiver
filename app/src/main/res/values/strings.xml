@@ -42,6 +42,8 @@
     <string name="lb_manual_scan">Manual Scan</string>
     <string name="lb_aerial_scan">Mobile Scan</string>
     <string name="lb_stationary_scan">Stationary Scan</string>
+    <string name="lb_warning_no_tables">Warning: All frequency tables are empty. You must fill one before  starting a mobile or stationary scan.</string>
+    <string name="lb_go_tables">Go to Frequency Tables</string>
 
     <!--MANUAL SCAN-->
     <string name="manual_scanning">Manual Scanning</string>
@@ -77,13 +79,15 @@
     <string name="lb_frequency_empty">All Frequency Tables are Empty</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
-    <string name="lb_table">Table (Index)</string>
-    <string name="lb_table_index">Table Index</string>
+    <string name="lb_table_total">Table Total</string>
+    <string name="lb_table_index">Current Index</string>
+    <string name="lb_edit_table"><u>Edit Table</u></string>
     <string name="lb_scan_time">Scan Time</string>
     <string name="lb_recording">Recording Data ...</string>
     <string name="lb_data_recorded">Data Recorded Successfully</string>
     <string name="lb_scan_feed">Scan Feed</string>
     <string name="lb_hold">Hold Frequency</string>
+    <string name="lb_release">Release Frequency</string>
     <string name="lb_none">None</string>
     <string name="lb_on">ON</string>
     <string name="lb_off">OFF</string>
@@ -91,6 +95,15 @@
 
     <!--TEMPORARY AERIAL-->
     <string name="temporary_aerial">Temporary Mobile Settings</string>
+    
+    <!--EDIT TABLE SCAN-->
+    <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
+    <string name="lb_delete_frequency_scan">Delete Current Frequency From Table</string>
+    <string name="lb_merge_table_scan">Merge Table Into Table</string>
+    <string name="lb_merge_tables">Merge Tables</string>
+    <string name="lb_select_table_merge">Select tables to merge into scan table</string>
+    <string name="lb_frequency_deleted">Frequency Deleted</string>
+    <string name="lb_tables_merged">Tables Merged</string>
 
     <!--STATIONARY SCAN-->
     <string name="stationary_scanning">Stationary Scanning</string>
@@ -129,14 +142,15 @@
     <string name="lb_table11">Table 11</string>
     <string name="lb_table12">Table 12</string>
     <string name="lb_empty_table">0 frequencies</string>
+    <string name="lb_all_frequencies">All Frequencies</string>
     <string name="lb_delete_frequencies">Delete Frequencies</string>
     <string name="lb_add_frequency">Add Frequency</string>
-    <string name="lb_tap_frequency">Tap Frequency to Edit</string>
-    <string name="lb_enter_new_frequency">Enter New Frequency</string>
+    <string name="lb_tap_frequency">Tap to Edit</string>
+    <string name="lb_enter_frequency_digits">Enter Frequency Digits</string>
     <string name="lb_select_frequencies_delete">Select Frequencies to Delete</string>
-    <string name="lb_frequency_modified">Frequency Modified!</string>
-    <string name="lb_frequency_added">Frequency Added!</string>
-    <string name="lb_frequencies_deleted">Frequencies Deleted!</string>
+    <string name="lb_frequency_saved">Frequency Saved</string>
+    <string name="lb_frequency_added">Frequency Added</string>
+    <string name="lb_frequencies_deleted">Frequencies Deleted</string>
     <string name="lb_no_frequencies">No frequencies in this table.</string>
     <string name="lb_save_changes">Save Changes</string>
 
@@ -214,8 +228,20 @@
     <!--MANAGE RECEIVER DATA-->
     <string name="manage_receiver_data">Manage Receiver Data</string>
     <string name="lb_view_data">View Data</string>
-    <string name="lb_download_data">Download Data</string>
-    <string name="lb_erase_data">Delete Data</string>
+    <string name="lb_download_data">Download Receiver Data</string>
+    <string name="lb_erase_data">Delete Receiver Data</string>
+    <string name="lb_begin_download_note">Note: preparing the file requires downloading the data, then processing it in real time. These steps can take several minutes to complete.</string>
+    <string name="lb_begin_download">Begin Download</string>
+    <string name="lb_downloading_data">Downloading Data</string>
+    <string name="lb_processing_data">Processing Data</string>
+    <string name="lb_preparing_file">Preparing File</string>
+    <string name="lb_cancel_download">Cancel Download</string>
+    <string name="lb_download_complete">Download Complete</string>
+    <string name="lb_open_file">Open File Location</string>
+    <string name="lb_return">Return to Main Menu</string>
+    <string name="lb_delete_all">Are you sure you want to delete all receiver data?</string>
+    <string name="lb_return_screen">Return to Data Screen</string>
+    <string name="lb_deletion_complete">Deletion Complete</string>
 
     <!--TEST RECEIVER-->
     <string name="receiver_diagnostics">Receiver Diagnostics</string>

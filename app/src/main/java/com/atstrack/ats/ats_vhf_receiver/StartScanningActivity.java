@@ -22,10 +22,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+
+import java.util.UUID;
 
 public class StartScanningActivity extends AppCompatActivity {
 
@@ -41,8 +46,14 @@ public class StartScanningActivity extends AppCompatActivity {
     TextView device_status_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
+    @BindView(R.id.menu_scan_linearLayout)
+    LinearLayout menu_scan_linearLayout;
+    @BindView(R.id.warning_no_tables_linearLayout)
+    LinearLayout warning_no_tables_linearLayout;
 
     private final static String TAG = StartScanningActivity.class.getSimpleName();
+
+    private boolean isEmpty;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
@@ -67,6 +78,7 @@ public class StartScanningActivity extends AppCompatActivity {
     };
 
     private boolean mConnected = true;
+    private String parameter = "";
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -84,6 +96,13 @@ public class StartScanningActivity extends AppCompatActivity {
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
                     invalidateOptionsMenu();
+                } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
+                        onClickTables();
+                } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+                    byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
+                        downloadData(packet);
                 }
             }
             catch (Exception e) {
@@ -101,6 +120,17 @@ public class StartScanningActivity extends AppCompatActivity {
         return intentFilter;
     }
 
+    /**
+     * Requests a read for get the number of frequencies from each table and display it.
+     * Service name: StoredData.
+     * Characteristic name: FreqTable.
+     */
+    private void onClickTables() {
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+    }
+
     @OnClick(R.id.start_manual_scan_button)
     public void onClickStartManualScan(View v) {
         Intent intent = new Intent(this, ManualScanActivity.class);
@@ -110,14 +140,32 @@ public class StartScanningActivity extends AppCompatActivity {
 
     @OnClick(R.id.start_aerial_scan_button)
     public void onClickStartAerialScan(View v) {
-        Intent intent = new Intent(this, AerialScanningActivity.class);
-        startActivity(intent);
+        if (isEmpty) {
+            menu_scan_linearLayout.setVisibility(View.GONE);
+            warning_no_tables_linearLayout.setVisibility(View.VISIBLE);
+        } else {
+            Intent intent = new Intent(this, AerialScanningActivity.class);
+            startActivity(intent);
+        }
     }
 
     @OnClick(R.id.start_stationary_scan_button)
     public void onClickStartStationaryScan(View v) {
-        Intent intent = new Intent(this, StationaryScanningActivity.class);
+        if (isEmpty) {
+            menu_scan_linearLayout.setVisibility(View.GONE);
+            warning_no_tables_linearLayout.setVisibility(View.VISIBLE);
+        } else {
+            Intent intent = new Intent(this, StationaryScanningActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @OnClick(R.id.go_tables_button)
+    public void onClickGoTables(View v) {
+        Intent intent = new Intent(this, TableOverviewActivity.class);
         startActivity(intent);
+        menu_scan_linearLayout.setVisibility(View.VISIBLE);
+        warning_no_tables_linearLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -137,6 +185,10 @@ public class StartScanningActivity extends AppCompatActivity {
 
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        parameter = "tables";
+        isEmpty = false;
+        menu_scan_linearLayout.setVisibility(View.VISIBLE);
+        warning_no_tables_linearLayout.setVisibility(View.GONE);
 
         device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
@@ -210,5 +262,19 @@ public class StartScanningActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }, MESSAGE_PERIOD);
+    }
+
+    /**
+     * With the received packet, gets the number of frequencies from each table and display on the screen.
+     *
+     * @param packet The received packet.
+     */
+    private void downloadData(byte[] packet) {
+        if (packet.length == 1) {
+            mBluetoothLeService.discovering();
+        } else {
+            isEmpty = packet[1] == 0 && packet[2] == 0 && packet[3] == 0 && packet[4] == 0 && packet[5] == 0 && packet[6] == 0
+                    && packet[7] == 0 && packet[8] == 0 && packet[9] == 0 && packet[10] == 0 && packet[11] == 0 && packet[12] == 0;
+        }
     }
 }

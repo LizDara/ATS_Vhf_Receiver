@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pulse_rate_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/pulse_rate_textView"
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="16sp"
+        android:layout_marginBottom="8sp"
+        android:textColor="@color/limed_spruce" />
+
+    <EditText
+        android:id="@+id/pulse_rate_editText"
+        style="@style/body_regular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/catskill_white"
+        android:inputType="number"
+        android:maxLines="1"
+        android:layout_marginHorizontal="16sp"
+        android:padding="16sp"
+        android:elevation="4sp"
+        android:textColor="@color/ebony_clay"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/pulse_rate_tolerance_textView"
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="24sp"
+        android:layout_marginBottom="8sp"
+        android:textColor="@color/limed_spruce" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="16sp"
+        android:elevation="4sp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/body_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/catskill_white"
+            android:gravity="center"
+            android:paddingStart="16sp"
+            android:text="+/-"
+            android:textColor="@color/ebony_clay"
+            tools:ignore="HardcodedText,RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/pulse_rate_tolerance_editText"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/catskill_white"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingHorizontal="4sp"
+            android:paddingVertical="16sp"
+            android:textColor="@color/ebony_clay"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+</LinearLayout>

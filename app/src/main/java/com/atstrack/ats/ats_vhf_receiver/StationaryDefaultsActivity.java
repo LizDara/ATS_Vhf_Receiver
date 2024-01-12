@@ -156,9 +156,11 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
      * Characteristic name: Stationary.
      */
     private void onClickSave() {
-        int info = (Integer.parseInt(frequency_table_number_stationary_textView.getText().toString()) * 16)
-                + ((number_of_antennas_stationary_textView.getText().toString().equals("None")) ? 0 :
-                Integer.parseInt(number_of_antennas_stationary_textView.getText().toString()));
+        int tableNumber = frequency_table_number_stationary_textView.getText().toString().equals("None")
+                ? 0 : Integer.parseInt(frequency_table_number_stationary_textView.getText().toString());
+        int antennasNumber = number_of_antennas_stationary_textView.getText().toString().equals("None") ? 0 :
+                Integer.parseInt(number_of_antennas_stationary_textView.getText().toString());
+        int info = (tableNumber * 16) + antennasNumber;
         int scanRate = Integer.parseInt(scan_rate_seconds_stationary_textView.getText().toString());
         int scanTimeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int storeRate;
@@ -348,6 +350,11 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         if (!mConnected)
             showDisconnectionMessage();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
     }
 
     /**

@@ -182,7 +182,7 @@ public class SelectValueActivity extends AppCompatActivity {
                             downloadMinPulseRate(packet);
                             break;
                         case DATA_CALCULATION_TYPES: // Gets data calculation types
-
+                            downloadDataCalculation(packet);
                         case PULSE_RATE_1: // Gets the pulse rate 1
                             downloadPulseRate1(packet);
                             break;
@@ -249,8 +249,7 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @OnClick(R.id.select_pulse_rate_button)
     public void onClickSelectPulseRate(View v) {
-        non_coded_linearLayout.setVisibility(View.GONE);
-        select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+        setVisibility("pulseRateTypes");
         save_changes_select_value_button.setVisibility(View.VISIBLE);
     }
 
@@ -429,44 +428,52 @@ public class SelectValueActivity extends AppCompatActivity {
                 save_changes_select_value_button.setVisibility(View.GONE);
                 break;
             case MATCHES_FOR_VALID_PATTERN:
+                setVisibility("matches");
                 title_toolbar.setText(R.string.matches_for_valid_pattern);
                 number_of_matches_scrollView.setVisibility(View.VISIBLE);
                 break;
             case MAX_PULSE_RATE:
+                setVisibility("maxMin");
                 title_toolbar.setText(R.string.max_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_max_pulse_rate);
                 max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
             case MIN_PULSE_RATE:
+                setVisibility("maxMin");
                 title_toolbar.setText(R.string.min_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_min_pulse_rate);
                 max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
             case DATA_CALCULATION_TYPES:
+                setVisibility("calculation");
                 title_toolbar.setText(R.string.optional_data_calculations);
                 data_calculation_types_linearLayout.setVisibility(View.VISIBLE);
                 break;
             case PULSE_RATE_1:
+                setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_1);
                 pulse_rate_textView.setText(R.string.lb_pr1);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
                 pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
             case PULSE_RATE_2:
+                setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_2);
                 pulse_rate_textView.setText(R.string.lb_pr2);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
                 pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
             case PULSE_RATE_3:
+                setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_3);
                 pulse_rate_textView.setText(R.string.lb_pr3);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
                 pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
             case PULSE_RATE_4:
+                setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_4);
                 pulse_rate_textView.setText(R.string.lb_pr4);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
@@ -517,6 +524,11 @@ public class SelectValueActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
+    }
+
     /**
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      */
@@ -540,6 +552,59 @@ public class SelectValueActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    private void setVisibility(String value) {
+        switch (value) {
+            case "nonCoded":
+                non_coded_linearLayout.setVisibility(View.VISIBLE);
+                select_pulse_rate_linearLayout.setVisibility(View.GONE);
+                number_of_matches_scrollView.setVisibility(View.GONE);
+                pulse_rate_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
+                data_calculation_types_linearLayout.setVisibility(View.GONE);
+                break;
+            case "pulseRateTypes":
+                non_coded_linearLayout.setVisibility(View.GONE);
+                select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                number_of_matches_scrollView.setVisibility(View.GONE);
+                pulse_rate_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
+                data_calculation_types_linearLayout.setVisibility(View.GONE);
+                break;
+            case "matches":
+                non_coded_linearLayout.setVisibility(View.GONE);
+                select_pulse_rate_linearLayout.setVisibility(View.GONE);
+                number_of_matches_scrollView.setVisibility(View.VISIBLE);
+                pulse_rate_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
+                data_calculation_types_linearLayout.setVisibility(View.GONE);
+                break;
+            case "pulseRateValues":
+                non_coded_linearLayout.setVisibility(View.GONE);
+                select_pulse_rate_linearLayout.setVisibility(View.GONE);
+                number_of_matches_scrollView.setVisibility(View.GONE);
+                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
+                data_calculation_types_linearLayout.setVisibility(View.GONE);
+                break;
+            case "maxMin":
+                non_coded_linearLayout.setVisibility(View.GONE);
+                select_pulse_rate_linearLayout.setVisibility(View.GONE);
+                number_of_matches_scrollView.setVisibility(View.GONE);
+                pulse_rate_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                data_calculation_types_linearLayout.setVisibility(View.GONE);
+                break;
+            case "calculation":
+                non_coded_linearLayout.setVisibility(View.GONE);
+                select_pulse_rate_linearLayout.setVisibility(View.GONE);
+                number_of_matches_scrollView.setVisibility(View.GONE);
+                pulse_rate_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
+                data_calculation_types_linearLayout.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
     /**
      * With the received packet, gets pulse rate type and display on the screen.
      *
@@ -552,15 +617,15 @@ public class SelectValueActivity extends AppCompatActivity {
                 Converters.getHexValue(data[1]).equals("00") ||
                 Converters.getHexValue(data[1]).equals("E2") ||
                 Converters.getHexValue(data[1]).equals("64")) {
-            non_coded_linearLayout.setVisibility(View.VISIBLE);
+            setVisibility("nonCoded");
             value = 0;
         } else if (Converters.getHexValue(data[1]).equals("21")) {
-            select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            setVisibility("pulseRateTypes");
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
             save_changes_select_value_button.setVisibility(View.VISIBLE);
             value = FIXED_PULSE_RATE;
         } else if (Converters.getHexValue(data[1]).equals("22")) {
-            select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+            setVisibility("pulseRateTypes");
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
             save_changes_select_value_button.setVisibility(View.VISIBLE);
             value = FIXED_PULSE_RATE;

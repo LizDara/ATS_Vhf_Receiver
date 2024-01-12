@@ -105,6 +105,7 @@ public class StationaryScanningActivity extends AppCompatActivity {
     public void onClickStationaryScanDefaults(View v) {
         Intent intent = new Intent(this, StationaryScanActivity.class);
         intent.putExtra("scanning", false);
+        intent.putExtra("temporary", false);
         startActivity(intent);
     }
 

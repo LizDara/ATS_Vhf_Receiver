@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/athens_gray"
     tools:context=".ManualScanActivity">
 
@@ -16,275 +15,41 @@
         <include
             layout="@layout/toolbar"/>
 
-        <LinearLayout
-            android:id="@+id/ready_manual_scan_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginVertical="8sp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:visibility="visible">
+        <include
+            layout="@layout/manual_current_settings"/>
 
-            <TextView
-                style="@style/subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_current_frequency" />
+        <include
+            layout="@layout/frequency_edit"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16sp"
-                android:background="@color/catskill_white"
-                android:elevation="4sp"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:padding="16sp">
-
-                    <TextView
-                        style="@style/body_small"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8sp"
-                        android:text="@string/lb_frequency"
-                        android:textColor="@color/limed_spruce" />
-
-                    <TextView
-                        android:id="@+id/frequency_manual_textView"
-                        style="@style/body_regular"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/ebony_clay" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1sp"
-                    android:background="@color/light_gray"
-                    tools:ignore="SmallSp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16sp">
-
-                    <TextView
-                        style="@style/body_small"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/lb_gps_data"
-                        android:textColor="@color/limed_spruce" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/manual_gps_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:thumb="@drawable/thumb_switch"
-                        app:track="@drawable/track_switch" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                tools:ignore="NestedWeights" />
-
-            <Button
-                android:id="@+id/enter_new_frequency_button"
-                style="@style/button_secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginHorizontal="16sp"
-                android:text="@string/lb_set_frequency" />
-
-            <Button
-                android:id="@+id/start_manual_button"
-                style="@style/button_primary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_start_manual_scan" />
-
-        </LinearLayout>
+        <include
+            layout="@layout/manual_scanning"/>
 
         <LinearLayout
-            android:id="@+id/change_frequency_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginVertical="8sp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_enter_frequency" />
-
-            <EditText
-                android:id="@+id/enter_frequency_editText"
-                style="@style/body_regular"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16sp"
-                android:background="@color/catskill_white"
-                android:elevation="4sp"
-                android:inputType="number"
-                android:padding="16sp" />
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                tools:ignore="NestedWeights" />
-
-            <Button
-                android:id="@+id/ready_to_scan_manual_button"
-                style="@style/button_primary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_ready_to_scan" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/manual_scan_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8sp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/subtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lb_scan_details"
-                    android:textColor="@color/ebony_clay" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/edit_frequency_button"
-                    style="@style/button_tertiary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/button_small_height"
-                    android:paddingHorizontal="8sp"
-                    android:text="@string/lb_edit_frequency" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16sp"
-                android:layout_marginBottom="16sp"
-                android:background="@color/catskill_white"
-                android:elevation="4sp"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="16sp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/body_small"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8sp"
-                            android:text="@string/lb_frequency"
-                            android:textColor="@color/limed_spruce" />
-
-                        <TextView
-                            android:id="@+id/frequency_scan_manual_textView"
-                            style="@style/body_regular"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/ebony_clay" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/minus_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="18sp"
-                        android:background="@drawable/ic_ellipse"
-                        android:src="@drawable/ic_minus" />
-
-                    <ImageView
-                        android:id="@+id/plus_imageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/ic_ellipse"
-                        android:src="@drawable/ic_plus" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1sp"
-                    android:background="@color/light_gray"
-                    tools:ignore="SmallSp" />
-
-                <include
-                    layout="@layout/scan_details"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/record_data_manual_button"
+            android:id="@+id/record_data_manual_linearLayout"
             style="@style/button_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16sp"
             android:layout_marginBottom="24sp"
-            android:text="@string/lb_record_data"
-            android:visibility="gone" />
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/record_data_imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8sp"
+                android:background="@drawable/ic_record_light" />
+
+            <TextView
+                android:id="@+id/record_data_textView"
+                style="@style/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_record_data"
+                android:textColor="@color/white_ice" />
+
+        </LinearLayout>
 
         <include
             layout="@layout/receiver_status"/>

@@ -37,6 +37,12 @@
         <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
 
+    <style name="button_small" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/body_small</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
     <style name="text_button" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/text_button</item>
         <item name="android:fontFamily">@font/roboto_regular</item>
@@ -86,7 +92,7 @@
         <item name="android:background">@drawable/button_primary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
         <item name="android:height">@dimen/button_small_height</item>
-        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/white_ice</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -95,7 +101,7 @@
         <item name="android:background">@drawable/button_secondary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
         <item name="android:height">@dimen/button_small_height</item>
-        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/mountain_meadow</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -112,8 +118,8 @@
     <style name="button_tertiary_small" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/button_tertiary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_small_height</item>
-        <item name="android:textAppearance">@style/button</item>
+        <item name="android:height">@dimen/paragraph_small</item>
+        <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/limed_spruce</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -127,6 +133,16 @@
         <item name="android:padding">@dimen/text_button</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/limed_spruce</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="button_cancel" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_delete</item>
+        <item name="circleRadius">@dimen/border_radius</item>
+        <item name="android:elevation">@dimen/elevation_button</item>
+        <item name="android:height">@dimen/button_height</item>
+        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textColor">@color/white_ice</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

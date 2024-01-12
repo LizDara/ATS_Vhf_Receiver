@@ -269,6 +269,11 @@ public class TemporaryAerialActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
+    }
+
     /**
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      */
@@ -326,6 +331,11 @@ public class TemporaryAerialActivity extends AppCompatActivity {
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     Intent intent = new Intent(this, AerialScanActivity.class);
                     intent.putExtra("scanning", false);
+                    intent.putExtra("temporary", true);
+                    intent.putExtra("scanTime", scan_rate_seconds_aerial_textView.getText());
+                    intent.putExtra("tableNumber", frequency_table_number_aerial_textView.getText());
+                    intent.putExtra("gps", aerial_gps_switch.isChecked() ? "ON" : "OFF");
+                    intent.putExtra("autoRecord", aerial_auto_record_switch.isChecked() ? "ON" : "OFF");
                     startActivity(intent);
                 });
                 break;

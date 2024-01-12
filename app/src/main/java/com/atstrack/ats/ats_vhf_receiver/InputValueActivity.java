@@ -314,8 +314,10 @@ public class InputValueActivity extends AppCompatActivity {
 
         if (value == STORE_RATE) {
             store_rate_linearLayout.setVisibility(View.VISIBLE);
+            set_value_linearLayout.setVisibility(View.GONE);
         } else {
             set_value_linearLayout.setVisibility(View.VISIBLE);
+            store_rate_linearLayout.setVisibility(View.GONE);
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -361,6 +363,11 @@ public class InputValueActivity extends AppCompatActivity {
             showDisconnectionMessage();
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
     }
 
     /**

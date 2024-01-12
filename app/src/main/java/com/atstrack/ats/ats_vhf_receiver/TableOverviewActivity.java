@@ -147,7 +147,7 @@ public class TableOverviewActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals("tables")) // Gets the number of frequencies from each table
-                        onClickFrequencies();
+                        onClickTables();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (parameter.equals("tables")) // Gets the number of frequencies from each table
@@ -173,7 +173,7 @@ public class TableOverviewActivity extends AppCompatActivity {
      * Service name: StoredData.
      * Characteristic name: FreqTable.
      */
-    private void onClickFrequencies() {
+    private void onClickTables() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
@@ -474,7 +474,6 @@ public class TableOverviewActivity extends AppCompatActivity {
             try {
                 // Gets the selected file
                 String newPath = findPath(path);
-                Log.i(TAG, "NEW PATH: " + newPath);
                 File file = new File(Environment.getExternalStorageDirectory(), newPath);
                 FileInputStream fileInputStream = new FileInputStream(file);
 
@@ -561,7 +560,6 @@ public class TableOverviewActivity extends AppCompatActivity {
         if (packet.length == 1) {
             mBluetoothLeService.discovering();
         } else {
-            Log.i(TAG, "TOTALES: " + Converters.getDecimalValue(packet));
             table1_frequency.setText(Converters.getDecimalValue(packet[1]) + " frequencies");
             table2_frequency.setText(Converters.getDecimalValue(packet[2]) + " frequencies");
             table3_frequency.setText(Converters.getDecimalValue(packet[3]) + " frequencies");

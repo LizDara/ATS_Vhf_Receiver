@@ -150,6 +150,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         int info = (aerial_gps_switch.isChecked() ? 1 : 0) << 7;
         info = info | ((aerial_auto_record_switch.isChecked() ? 1 : 0) << 6);
         float scanRate = Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString());
+        Log.i(TAG, frequency_table_number_aerial_textView.getText().toString());
         int frequencyTableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
                 Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
@@ -266,6 +267,11 @@ public class AerialDefaultsActivity extends AppCompatActivity {
             showDisconnectionMessage();
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Button Pressed");
     }
 
     /**

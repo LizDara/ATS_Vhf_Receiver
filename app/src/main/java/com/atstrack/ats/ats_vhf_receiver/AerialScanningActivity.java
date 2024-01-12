@@ -105,6 +105,7 @@ public class AerialScanningActivity extends AppCompatActivity {
     public void onClickAerialScanDefaults(View v) {
         Intent intent = new Intent(this, AerialScanActivity.class);
         intent.putExtra("scanning", false);
+        intent.putExtra("temporary", false);
         startActivity(intent);
     }
 

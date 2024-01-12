@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menu_scan_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/start_manual_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="24sp"
+        android:text="@string/lb_manual_scan" />
+
+    <Button
+        android:id="@+id/start_aerial_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_aerial_scan" />
+
+    <Button
+        android:id="@+id/start_stationary_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:text="@string/lb_stationary_scan" />
+
+</LinearLayout>

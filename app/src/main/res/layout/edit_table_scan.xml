@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_table_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/add_frequency_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="24sp"
+        android:text="@string/lb_add_frequency_scan" />
+
+    <Button
+        android:id="@+id/delete_frequency_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="16sp"
+        android:text="@string/lb_delete_frequency_scan" />
+
+    <Button
+        android:id="@+id/merge_table_scan_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_merge_table_scan" />
+
+</LinearLayout>

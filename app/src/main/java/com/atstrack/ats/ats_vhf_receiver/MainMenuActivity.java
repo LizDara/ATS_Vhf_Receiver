@@ -46,7 +46,7 @@ public class MainMenuActivity extends AppCompatActivity {
     @BindView(R.id.menu_linearLayout)
     LinearLayout menu_linearLayout;
     @BindView(R.id.vhf_constraintLayout)
-    ConstraintLayout vhf_linearLayout;
+    ConstraintLayout vhf_constraintLayout;
     @BindView(R.id.state_textView)
     TextView state_textView;
     @BindView(R.id.status_device_menu_textView)
@@ -211,9 +211,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
             mHandlerMenu = new Handler();
             mHandler = new Handler();
+            menu_linearLayout.setVisibility(View.GONE);
             connectingToDevice();
         } else { // Only displays the main menu
-            vhf_linearLayout.setVisibility(View.GONE);
+            vhf_constraintLayout.setVisibility(View.GONE);
             menu_linearLayout.setVisibility(View.VISIBLE);
             connecting_device_linearLayout.setVisibility(View.GONE);
         }
@@ -326,7 +327,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 mHandlerMenu.postDelayed(() -> {
                     if (!scanning) { // After connecting displays the main menu
                         menu_linearLayout.setVisibility(View.VISIBLE);
-                        vhf_linearLayout.setVisibility(View.GONE);
+                        vhf_constraintLayout.setVisibility(View.GONE);
                         connecting_device_linearLayout.setVisibility(View.GONE);
                     }
                 }, MESSAGE_PERIOD);

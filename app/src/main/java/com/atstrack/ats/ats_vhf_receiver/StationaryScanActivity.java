@@ -95,6 +95,8 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView period_textView;
     @BindView(R.id.pulse_rate_textView)
     TextView pulse_rate_textView;
+    @BindView(R.id.detections_textView)
+    TextView detections_textView;
     @BindView(R.id.line_view)
     View line_view;
 
@@ -169,6 +171,9 @@ public class StationaryScanActivity extends AppCompatActivity {
                             break;
                         case "sendLog": // Receives the data
                             onClickLog();
+                            break;
+                        case "sendLogScanning":
+                            onClickLogScanning();
                             break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
@@ -327,6 +332,14 @@ public class StationaryScanActivity extends AppCompatActivity {
         }
     }
 
+    private void onClickLogScanning() {
+        parameter = "sendLog";
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
+        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
+    }
+
     @OnClick(R.id.edit_stationary_settings_button)
     public void onClickEditStationarySettings(View v) {
         parameter = "stationary";
@@ -369,12 +382,13 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
         code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        detections_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         period_textView.setVisibility(visibility);
         pulse_rate_textView.setVisibility(visibility);
 
         if (isScanning) { // The device is already scanning
             previousScanning = true;
-            parameter = "sendLog";
+            parameter = "sendLogScanning";
             year = getIntent().getExtras().getInt("year");
             month = getIntent().getExtras().getInt("month");
             day = getIntent().getExtras().getInt("day");
@@ -390,9 +404,25 @@ public class StationaryScanActivity extends AppCompatActivity {
             state_view.setBackgroundResource(R.drawable.scanning_animation);
             animationDrawable = (AnimationDrawable) state_view.getBackground();
             animationDrawable.start();
-        } else { // Gets aerial defaults data
+        } else { // Gets aerial defaults or temporary data
+            boolean isTemporary = getIntent().getExtras().getBoolean("temporary");
+            if (isTemporary) {
+                String tableNumber = getIntent().getExtras().getString("tableNumber");
+                String scanTime = getIntent().getExtras().getString("scanTime");
+                String timeout = getIntent().getExtras().getString("timeout");
+                String antennasNumber = getIntent().getExtras().getString("antennasNumber");
+                String storeRate = getIntent().getExtras().getString("storeRate");
+                selected_frequency_stationary_textView.setText(tableNumber);
+                scan_rate_stationary_textView.setText(scanTime);
+                timeout_stationary_textView.setText(timeout);
+                number_antennas_stationary_textView.setText(antennasNumber);
+                store_rateC_stationary_textView.setText(storeRate);
+            } else {
+                parameter = "stationary";
+            }
             previousScanning = false;
-            parameter = "stationary";
+            ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
+            stationary_result_linearLayout.setVisibility(View.GONE);
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -530,6 +560,7 @@ public class StationaryScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
+        Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
             case "83":
                 startScanStationaryFirstPart(data);
@@ -595,7 +626,7 @@ public class StationaryScanActivity extends AppCompatActivity {
      */
     private void logScanHeader(byte[] data) {
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
-                Integer.parseInt(Converters.getDecimalValue(data[2])) + 150000;
+                Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
         /*int date = Converters.hexToDecimal(Converters.getHexValue(data[4]) + Converters.getHexValue(data[5]) + Converters.getHexValue(data[6]));
         month = date / 1000000;
         date = date % 1000000;
@@ -606,12 +637,13 @@ public class StationaryScanActivity extends AppCompatActivity {
         seconds = Integer.parseInt(Converters.getDecimalValue(data[7]));
         currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;*/
 
-        if (!frequency_stationary_textView.getText().equals("") &&
+        /*if (!frequency_stationary_textView.getText().equals("") &&
                 Integer.parseInt(frequency_stationary_textView.getText().toString().replace(".", "")) != frequency) {
             clear();
-        }
+        }*/
+        clear();
 
-        table_stationary_textView.setText(selectedTable + " (" + Converters.getDecimalValue(data[3]) + ")");
+        table_stationary_textView.setText(Converters.getDecimalValue(data[3]));
         frequency_stationary_textView.setText(String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3));
         current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
     }
@@ -633,7 +665,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         } else if ((position = positionCode(code)) != 0) {
             refreshPosition(position, signalStrength, mort > 0);
         } else {
-            createCodeDetail(code, signalStrength, detections, mort > 0);
+            createCodeDetail(code, signalStrength, detections + 1, mort > 0);
         }
     }
 
@@ -646,15 +678,17 @@ public class StationaryScanActivity extends AppCompatActivity {
         int position;
         int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
         int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
-        int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int detections = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+                Integer.parseInt(Converters.getDecimalValue(data[7]));
+        int mort = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
+                Integer.parseInt(Converters.getDecimalValue(data[5]));
 
         if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
             refreshFirstCode(signalStrength, mort > 0);
         } else if ((position = positionCode(code)) != 0) {
             refreshPosition(position, signalStrength, mort > 0);
         } else {
-            createCodeDetail(code, signalStrength, detections, mort > 0);
+            createCodeDetail(code, signalStrength, detections + 1, mort > 0);
         }
     }
 

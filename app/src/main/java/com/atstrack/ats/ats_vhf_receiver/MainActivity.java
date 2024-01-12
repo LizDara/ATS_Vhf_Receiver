@@ -194,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
      * Initializes the app theme and checks permissions to use bluetooth and storage.
      */
     private void init() {
+        searching_receivers_constraintLayout.setVisibility(View.GONE);
+
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         SharedPreferences appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0);
         sharedPreferencesEditor = appSettingPrefs.edit();

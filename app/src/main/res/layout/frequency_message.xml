@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16sp"
+    android:layout_marginEnd="16sp"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
+    android:orientation="vertical"
+    android:visibility="visible">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="48sp"
+        android:layout_marginBottom="24sp"
+        android:src="@drawable/ic_checked"/>
+
+    <TextView
+        android:id="@+id/state_message_textView"
+        style="@style/h1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48sp"
+        android:gravity="center"
+        android:textColor="@color/ebony_clay" />
+
+</LinearLayout>

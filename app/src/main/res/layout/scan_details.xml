@@ -61,6 +61,7 @@
                 android:textColor="@color/limed_spruce" />
 
             <TextView
+                android:id="@+id/detections_textView"
                 style="@style/body_small"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

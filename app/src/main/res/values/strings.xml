@@ -48,39 +48,46 @@
     <!--MANUAL SCAN-->
     <string name="manual_scanning">Manual Scanning</string>
     <string name="lb_current_frequency">Current Frequency</string>
-    <string name="lb_frequency">Frequency</string>
+    <string name="lb_starting_frequency">Starting Frequency</string>
     <string name="lb_gps_data">GPS Data</string>
-    <string name="lb_set_frequency">Enter New Frequency</string>
+    <string name="lb_set_frequency">Edit Starting Frequency</string>
     <string name="lb_start_manual_scan">Start Manual Scan</string>
     <string name="lb_change_frequency">Change Frequency</string>
     <string name="lb_enter_frequency">Enter Frequency</string>
     <string name="lb_ready_to_scan">Ready to Scan</string>
     <string name="lb_manual_scanning">Manual Scanning ...</string>
-    <string name="lb_scan_details">Scan Details</string>
+    <string name="lb_saving_targets">Saving targets ...</string>
     <string name="lb_edit_frequency">Edit Frequency</string>
     <string name="lb_code">Code</string>
     <string name="lb_signal_strength">Signal Strength</string>
     <string name="lb_detections">Detections</string>
+    <string name="lb_mortality">Mortality</string>
     <string name="lb_period">Period</string>
     <string name="lb_pulse_rate">Pulse Rate</string>
     <string name="lb_record_data">Record Data</string>
+    <string name="lb_id_audio">ID Audio</string>
+    <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
+    <string name="lb_auto_recording">Auto-recording</string>
 
     <!--AERIAL SCAN-->
     <string name="aerial_scanning">Mobile Scanning</string>
     <string name="lb_scan_defaults">Scan With Default Settings</string>
     <string name="lb_scan_temporary">Scan With Temporary Settings</string>
     <string name="lb_current_settings">Current Settings</string>
-    <string name="lb_scan_rate_seconds">Scan Time (seconds)</string>
+    <string name="lb_scan_time_seconds">Scan Time (Seconds)</string>
+    <string name="lb_scan_rate">Scan Rate</string>
     <string name="lb_selected_frequency">Selected Frequency Table</string>
     <string name="lb_number_antennas">Number of Antennas</string>
     <string name="lb_gps">GPS</string>
     <string name="lb_auto_record">Auto Record</string>
     <string name="lb_edit_settings">Edit Settings</string>
-    <string name="lb_frequency_empty">All Frequency Tables are Empty</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
+    <string name="lb_scan_details">Scan Details</string>
+    <string name="lb_frequency">Frequency</string>
     <string name="lb_table_total">Table Total</string>
-    <string name="lb_table_index">Current Index</string>
+    <string name="lb_table_index">Table Index</string>
+    <string name="lb_current_index">Current Index</string>
     <string name="lb_edit_table"><u>Edit Table</u></string>
     <string name="lb_scan_time">Scan Time</string>
     <string name="lb_recording">Recording Data ...</string>
@@ -92,10 +99,11 @@
     <string name="lb_on">ON</string>
     <string name="lb_off">OFF</string>
     <string name="lb_stop_scanning">Stop Scanning</string>
+    <string name="lb_stop_recording">Stop Recording</string>
 
     <!--TEMPORARY AERIAL-->
     <string name="temporary_aerial">Temporary Mobile Settings</string>
-    
+
     <!--EDIT TABLE SCAN-->
     <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
     <string name="lb_delete_frequency_scan">Delete Current Frequency From Table</string>
@@ -107,13 +115,14 @@
 
     <!--STATIONARY SCAN-->
     <string name="stationary_scanning">Stationary Scanning</string>
-    <string name="lb_store_rate">Store Rate</string>
+    <string name="lb_store_rate">Store Rate (Minutes)</string>
     <string name="lb_external_data_transfer">External Data Transfer</string>
     <string name="lb_reference_frequency">Reference Frequency</string>
+    <string name="lb_reference_frequency_value">Reference Frequency Value</string>
     <string name="lb_timeout">Timeout (seconds)</string>
     <string name="lb_start_stationary_scan">Start Stationary Scan</string>
     <string name="lb_stationary_scanning">Stationary Scanning ...</string>
-    <string name="lb_current_antenna">Current Antenna</string>
+    <string name="lb_current_antenna">Antenna #</string>
 
     <!--TEMPORARY STATIONARY-->
     <string name="temporary_stationary">Temporary Stationary Settings</string>
@@ -162,13 +171,18 @@
     <!--AERIAL DEFAULTS-->
     <string name="aerial_defaults">Mobile Default Settings</string>
     <string name="lb_aerial_settings">Mobile Settings</string>
-    <string name="lb_frequency_table_number">Frequency Table Number</string>
+    <string name="lb_scan_table">Scan Table</string>
     <string name="lb_set_value">Set value</string>
 
     <!--STATIONARY DEFAULTS-->
     <string name="stationary_defaults">Stationary Default Settings</string>
+    <string name="tables_scan">Frequency Tables to Scan</string>
+    <string name="temporary_tables_scan">Temporary Frequency Tables to Scan</string>
+    <string name="store_rate">Store Rate</string>
+    <string name="temporary_store_rate">Temporary Store Rate</string>
     <string name="lb_stationary_settings">Stationary Settings</string>
-    <string name="lb_scan_timeout">Scan Timeout (seconds)</string>
+    <string name="lb_scan_tables">Scan Tables</string>
+    <string name="lb_scan_timeout">Timeout (Seconds)</string>
     <string name="lb_select_store_rate">Select Store Rate</string>
     <string name="lb_no_store_rate">No Store Rate</string>
     <string name="lb_5_minutes">5 minutes</string>
@@ -176,7 +190,7 @@
     <string name="lb_20_minutes">20 minutes</string>
     <string name="lb_30_minutes">30 minutes</string>
     <string name="lb_60_minutes">60 minutes</string>
-    <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate</string>
+    <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate (Minutes)</string>
 
     <!--SET TRANSMITTER TYPE-->
     <string name="set_transmitter_type">Select Detection Filter</string>
@@ -227,10 +241,12 @@
 
     <!--MANAGE RECEIVER DATA-->
     <string name="manage_receiver_data">Manage Receiver Data</string>
-    <string name="lb_view_data">View Data</string>
-    <string name="lb_download_data">Download Receiver Data</string>
-    <string name="lb_erase_data">Delete Receiver Data</string>
+    <string name="lb_view_data">View Data in Memory</string>
+    <string name="lb_download_data">Download Data in Memory</string>
+    <string name="lb_erase_data">Delete Receiver Data in Memory</string>
+    <string name="lb_delete_receiver_data">Delete Receiver Data</string>
     <string name="lb_begin_download_note">Note: preparing the file requires downloading the data, then processing it in real time. These steps can take several minutes to complete.</string>
+    <string name="lb_download_receiver_data">Download Receiver Data</string>
     <string name="lb_begin_download">Begin Download</string>
     <string name="lb_downloading_data">Downloading Data</string>
     <string name="lb_processing_data">Processing Data</string>
@@ -239,7 +255,8 @@
     <string name="lb_download_complete">Download Complete</string>
     <string name="lb_open_file">Open File Location</string>
     <string name="lb_return">Return to Main Menu</string>
-    <string name="lb_delete_all">Are you sure you want to delete all receiver data?</string>
+    <string name="lb_delete_all">Are you sure you want to delete all data blocks in memory?</string>
+    <string name="lb_deleting">Deleting Memory ...</string>
     <string name="lb_return_screen">Return to Data Screen</string>
     <string name="lb_deletion_complete">Deletion Complete</string>
 

@@ -1,4 +1,4 @@
-package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
+package com.atstrack.ats.ats_vhf_receiver.Adapters;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
@@ -26,12 +26,14 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
 
     private ArrayList<BluetoothDevice> mLeDevices;
     private ArrayList<byte[]> mScanRecords;
-    private Context context;
+    private final Context context;
+    private LayoutInflater inflater;
 
     public LeDeviceListAdapter(Context context) {
         mLeDevices = new ArrayList<>();
         mScanRecords = new ArrayList<>();
         this.context = context;
+        inflater = LayoutInflater.from(context);
     }
 
     /**
@@ -44,7 +46,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         if(!mLeDevices.contains(device)) {
             final String deviceName = device.getName();
             if(deviceName != null) {
-                if (deviceName.contains("ATSvr")) { // add new for filter only ATS Vhf Rec device
+                if (deviceName.contains("ATSvr")) { // filter only ATS Vhf Rec device
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
                 }
@@ -80,6 +82,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                 status = "Not scanning";
                 break;
             case "82":
+            case "81":
                 status = "Scanning, mobile";
                 break;
             case "83":
@@ -87,6 +90,9 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                 break;
             case "86":
                 status = "Scanning, manual";
+                break;
+            default:
+                status = "None";
                 break;
         }
         return status;
@@ -103,7 +109,6 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.receiver_status, parent, false);
         view.setElevation(4);
         return new MyViewHolder(view);
@@ -116,19 +121,25 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         String percent = getPercentBattery(mScanRecords.get(position));
 
         final String deviceName = device.getName().substring(0, 7);
-        final int baseFrequency = Integer.parseInt(device.getName().substring(12, 15)) * 1000;
-        final int frequencyRange = ((Integer.parseInt(device.getName().substring(17)) + (baseFrequency / 1000)) * 1000) - 1;
-        final String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-" +
-                String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
+        if (!deviceName.equals("#000000")) {
+            final int baseFrequency = Integer.parseInt(device.getName().substring(12, 15)) * 1000;
+            final int frequencyRange = ((Integer.parseInt(device.getName().substring(17)) + (baseFrequency / 1000)) * 1000) - 1;
+            final String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-" +
+                    String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
 
-        final String type = device.getName().substring(15, 16);
-        final String status = getStatus(mScanRecords.get(position));
+            final String type = device.getName().substring(15, 16);
+            final String status = getStatus(mScanRecords.get(position));
 
-        holder.deviceName.setText(deviceName + ((type.equals("C")) ? " Coded, " : " Non coded, ") + status);
+            holder.deviceName.setText(deviceName + ((type.equals("C")) ? " Coded, " : " Non coded, ") + status);
 
-        holder.deviceStatus.setText(range + " MHz");
+            holder.deviceStatus.setText(range + " MHz");
 
-        holder.percentBattery.setText(percent + "%");
+            holder.percentBattery.setText(percent + "%");
+        } else {
+            holder.deviceName.setText(deviceName);
+            holder.deviceStatus.setText("None");
+            holder.percentBattery.setText("0%");
+        }
         holder.device = mLeDevices.get(position);
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(32, 16, 32, 16);
@@ -141,7 +152,6 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-
         LinearLayout receiver_status;
         LinearLayout device_linearLayout;
         TextView deviceName;

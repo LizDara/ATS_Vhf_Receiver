@@ -30,6 +30,9 @@
             layout="@layout/delete_data_receiver"/>
 
         <include
+            layout="@layout/deleting_data_receiver"/>
+
+        <include
             layout="@layout/deletion_data_receiver_complete"/>
 
         <include

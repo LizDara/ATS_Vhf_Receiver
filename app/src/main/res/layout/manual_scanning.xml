@@ -11,16 +11,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16sp"
-        android:gravity="center"
+        android:layout_marginVertical="16sp"
+        android:layout_marginHorizontal="32sp"
         android:orientation="horizontal">
 
         <TextView
-            style="@style/subtitle"
+            android:id="@+id/saving_targets_textView"
+            style="@style/body_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lb_scan_details"
-            android:textColor="@color/ebony_clay" />
+            android:layout_gravity="bottom"
+            android:text="@string/lb_saving_targets"
+            android:textColor="@color/ebony_clay"
+            android:visibility="gone" />
 
         <Space
             android:layout_width="0dp"
@@ -28,12 +31,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/edit_frequency_button"
-            style="@style/button_tertiary"
+            android:id="@+id/record_data_manual_button"
+            style="@style/button_primary_small"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_small_height"
-            android:paddingHorizontal="8sp"
-            android:text="@string/lb_edit_frequency" />
+            android:paddingHorizontal="10sp"
+            android:text="@string/lb_record_data" />
 
     </LinearLayout>
 
@@ -49,48 +52,58 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="16sp">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_frequency"
+                android:textColor="@color/limed_spruce" />
 
-                <TextView
-                    style="@style/body_small"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/minus_imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8sp"
-                    android:text="@string/lb_frequency"
-                    android:textColor="@color/limed_spruce" />
+                    android:background="@drawable/ic_decrease"/>
 
                 <TextView
                     android:id="@+id/frequency_scan_manual_textView"
-                    style="@style/body_regular"
+                    style="@style/body_large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/ebony_clay" />
+                    android:layout_marginHorizontal="16sp"
+                    android:textColor="@color/ebony_clay"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/plus_imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_increase"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/edit_frequency_button"
+                    style="@style/button_tertiary_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/button_small_height"
+                    android:paddingHorizontal="10sp"
+                    android:text="@string/lb_edit_frequency" />
 
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/minus_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="18sp"
-                android:background="@drawable/ic_ellipse"
-                android:src="@drawable/ic_minus" />
-
-            <ImageView
-                android:id="@+id/plus_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_ellipse"
-                android:src="@drawable/ic_plus" />
 
         </LinearLayout>
 
@@ -99,6 +112,63 @@
             android:layout_height="1sp"
             android:background="@color/light_gray"
             tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:id="@+id/audio_manual_linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="16sp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/body_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8sp"
+                        android:text="@string/lb_id_audio"
+                        android:textColor="@color/limed_spruce" />
+
+                    <TextView
+                        android:id="@+id/id_audio_manual_textView"
+                        style="@style/body_large"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/ebony_clay"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/edit_audio_manual_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="@string/lb_edit_audio_options"
+                    android:textColor="@color/limed_spruce" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:background="@color/light_gray"
+                tools:ignore="SmallSp" />
+
+        </LinearLayout>
 
         <include
             layout="@layout/scan_details"/>

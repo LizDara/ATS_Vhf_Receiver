@@ -1,8 +1,9 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -17,46 +18,30 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Space;
-import android.widget.TableRow;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyDeleteListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
-
-import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.limed_spruce;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_delete;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_delete;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_next;
 
 public class EditTablesActivity extends AppCompatActivity {
 
@@ -76,52 +61,31 @@ public class EditTablesActivity extends AppCompatActivity {
     LinearLayout frequencies_overview_linearLayout;
     @BindView(R.id.edit_options_linearLayout)
     LinearLayout edit_options_linearLayout;
-    @BindView(R.id.frequencies_linearLayout)
-    LinearLayout frequencies_linearLayout;
-    @BindView(R.id.frequency_edit_linearLayout)
-    LinearLayout frequency_edit_linearLayout;
-    @BindView(R.id.frequency_textView)
-    TextView frequency_textView;
-    @BindView(R.id.line_frequency_view)
-    View line_frequency_view;
-    @BindView(R.id.edit_frequency_message_textView)
-    TextView edit_frequency_message_textView;
-    @BindView(R.id.number_buttons_linearLayout)
-    LinearLayout number_buttons_linearLayout;
-    @BindView(R.id.save_changes_button)
-    Button save_changes_button;
     @BindView(R.id.all_frequencies_checkBox)
     CheckBox all_frequencies_checkBox;
     @BindView(R.id.delete_frequencies_linearLayout)
     LinearLayout delete_frequencies_linearLayout;
-    @BindView(R.id.select_frequencies_linearLayout)
-    LinearLayout select_frequencies_linearLayout;
     @BindView(R.id.delete_selected_frequencies_button)
     Button delete_selected_frequencies_button;
     @BindView(R.id.no_frequencies_linearLayout)
     LinearLayout no_frequencies_linearLayout;
+    @BindView(R.id.frequencies_listView)
+    ListView frequencies_listView;
+    @BindView(R.id.frequencies_delete_listView)
+    ListView frequencies_delete_listView;
 
     final private String TAG = EditTablesActivity.class.getSimpleName();
 
     private int[] originalTable;
+    private FrequencyListAdapter frequencyListAdapter;
+    private FrequencyDeleteListAdapter frequencyDeleteListAdapter;
     private int number;
     private int originalTotalFrequencies;
     private int baseFrequency;
-    private int frequencyRange;
+    private int range;
     private boolean isFile;
-    private List<Integer> editedFrequencies;
 
-    private LinearLayout linearLayoutFrequency;
-    private TextView textViewFrequency;
-    private ImageView imageViewFrequency;
-    private CheckBox checkBoxFrequency;
-    private LinearLayout linearLayoutBaseFrequency;
-    private Button buttonBaseFrequency;
-
-    private int selectedFrequencyIndex;
-    private int selectedFrequency;
     private Handler handlerMessage;
-    private int numberOfSelected;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
@@ -189,35 +153,21 @@ public class EditTablesActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * Change the period while editing the pulse rate.
-     */
-    private TextWatcher textChangedListener = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            if (frequency_textView.getText().toString().length() == 6) {
-                save_changes_button.setEnabled(true);
-                save_changes_button.setAlpha(1);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            } else {
-                save_changes_button.setEnabled(false);
-                save_changes_button.setAlpha((float) 0.6);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
-            }
-        }
-    };
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (ValueCodes.CANCELLED == result.getResultCode())
+                    return;
+                if (ValueCodes.RESULT_OK == result.getResultCode()) {
+                    int position = result.getData().getExtras().getInt("position");
+                    int frequency = result.getData().getExtras().getInt("frequency");
+                    if (position != -1) {
+                        if (frequencyListAdapter.getFrequency(position) != frequency)
+                            changeSelectedFrequency(frequency, position);
+                    } else {
+                        addFrequency(frequency);
+                    }
+                }
+            });
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -314,14 +264,14 @@ public class EditTablesActivity extends AppCompatActivity {
         b[5] = (byte) mm;
         b[6] = (byte) ss;
         b[7] = (byte) number;//frequency number table
-        b[8] = (byte) editedFrequencies.size();//Number of frequencies in the table
+        b[8] = (byte) frequencyListAdapter.getCount();//Number of frequencies in the table
         b[9] = (byte) (baseFrequency / 1000);//base frequency
 
         int index = 10;
         int i = 0;
-        while (i < editedFrequencies.size()) {
-            b[index] = (byte) ((editedFrequencies.get(i) - baseFrequency) / 256);
-            b[index + 1] = (byte) ((editedFrequencies.get(i) - baseFrequency) % 256);
+        while (i < frequencyListAdapter.getCount()) {
+            b[index] = (byte) ((frequencyListAdapter.getFrequency(i) - baseFrequency) / 256);
+            b[index + 1] = (byte) ((frequencyListAdapter.getFrequency(i) - baseFrequency) % 256);
             i++;
             index += 2;
         }
@@ -376,57 +326,28 @@ public class EditTablesActivity extends AppCompatActivity {
             showMessage(2);
     }
 
-    /**
-     * Checks that the number of frequencies is not greater than 100.
-     *
-     * @return Returns true, if the number of frequencies is less than or equal to 100.
-     */
-    private boolean isWithinLimit() {
-        return editedFrequencies.size() <= 100;
-    }
-
     @OnClick(R.id.delete_frequencies_button)
     public void onClickDeleteFrequencies(View v) {
         setVisibility("delete");
-        title_toolbar.setText(R.string.lb_delete_frequencies);
+
+        frequencyDeleteListAdapter.setStateSelected(false);
+        frequencyDeleteListAdapter.notifyDataSetChanged();
 
         delete_selected_frequencies_button.setEnabled(false);
         delete_selected_frequencies_button.setAlpha((float) 0.6);
     }
 
-    @OnClick(R.id.add_frequency_button)
+    @OnClick({R.id.add_frequency_button, R.id.add_new_frequency_button})
     public void onClickAddFrequency(View v) {
         if (isWithinLimit()) {
-            setVisibility("edit");
-            title_toolbar.setText(R.string.lb_add_frequency);
-
-            frequency_textView.setText(R.string.lb_enter_frequency_digits);
-            frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            save_changes_button.setText(R.string.lb_add_frequency);
-            save_changes_button.setEnabled(false);
-            save_changes_button.setAlpha((float) 0.6);
+            Intent intent = new Intent(this, EnterFrequencyActivity.class);
+            intent.putExtra("title", "Add Frequency");
+            intent.putExtra("position", -1);
+            intent.putExtra("baseFrequency", baseFrequency);
+            intent.putExtra("range", range);
+            launcher.launch(intent);
         } else {
             showMessage(1);
-        }
-    }
-
-    @OnClick(R.id.save_changes_button)
-    public void onClickSaveChanges(View v) {
-        int frequency = Integer.parseInt(frequency_textView.getText().toString());
-        if (frequency >= baseFrequency && frequency <= frequencyRange) {
-            if (selectedFrequency != 0) {
-                if (selectedFrequency != frequency)
-                    changeSelectedFrequency(frequency);
-            } else {
-                addFrequency(frequency);
-            }
-        } else {
-            line_frequency_view.setBackgroundColor(ContextCompat.getColor(this, tall_poppy));
-            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(this, tall_poppy));
-            save_changes_button.setEnabled(false);
-            save_changes_button.setAlpha((float) 0.6);
         }
     }
 
@@ -435,27 +356,9 @@ public class EditTablesActivity extends AppCompatActivity {
         deleteFrequencies();
     }
 
-    @OnClick(R.id.add_new_frequency_button)
-    public void onClickAddNewFrequency(View v) {
-        setVisibility("edit");
-        title_toolbar.setText(R.string.lb_add_frequency);
-
-        frequency_textView.setText(R.string.lb_enter_frequency_digits);
-        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-        line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-        edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-        save_changes_button.setText(R.string.lb_add_frequency);
-        save_changes_button.setEnabled(false);
-        save_changes_button.setAlpha((float) 0.6);
-    }
-
     @OnClick(R.id.all_frequencies_checkBox)
     public void onClickAllFrequencies(View v) {
-        for (int i = 0; i < select_frequencies_linearLayout.getChildCount(); i++) {
-            LinearLayout linearLayout = (LinearLayout) select_frequencies_linearLayout.getChildAt(i);
-            CheckBox checkBox = (CheckBox) linearLayout.getChildAt(0);
-            checkBox.setChecked(all_frequencies_checkBox.isChecked());
-        }
+        changeAllCheckBox(all_frequencies_checkBox.isChecked());
     }
 
     @Override
@@ -477,11 +380,7 @@ public class EditTablesActivity extends AppCompatActivity {
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        selectedFrequency = 0;
-        selectedFrequencyIndex = -1;
-        editedFrequencies = new LinkedList<>();
         handlerMessage = new Handler();
-        numberOfSelected = 0;
 
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
@@ -490,24 +389,21 @@ public class EditTablesActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        // Gets the number of frequencies from that table
         baseFrequency = getIntent().getExtras().getInt("baseFrequency") * 1000;
-        int range = getIntent().getExtras().getInt("range");
-        frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
-
-        frequency_textView.addTextChangedListener(textChangedListener);
-        String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
-        edit_frequency_message_textView.setText(message);
+        range = getIntent().getExtras().getInt("range");
 
         isFile = getIntent().getExtras().getBoolean("isFile");
         if (isFile) { // Asks for the frequencies obtained from a file
             setVisibility("overview");
             originalTable = getIntent().getExtras().getIntArray("frequencies");
-            editedFrequencies = new LinkedList<>();
+            ArrayList<Integer> frequencies = new ArrayList<>();
             for (int frequency : originalTable)
-                editedFrequencies.add(frequency);
+                frequencies.add(frequency);
 
-            showTable();
+            frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher);
+            frequencies_listView.setAdapter(frequencyListAdapter);
+            frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
+            frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
         } else { // Asks for the frequencies from that table, the frequency base and range
             if (originalTotalFrequencies > 0) { // Asks for the frequencies from the table
                 parameter = "table";
@@ -520,7 +416,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-        createNumberButtons(range);
     }
 
     @Override
@@ -534,21 +429,10 @@ public class EditTablesActivity extends AppCompatActivity {
                 } else {
                     finish();
                 }
-            } else if (frequency_edit_linearLayout.getVisibility() == View.VISIBLE) {
-                setVisibility("overview");
-                title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
-                selectedFrequency = 0;
-                selectedFrequencyIndex = -1;
-                frequency_textView.setText(R.string.lb_enter_frequency_digits);
             } else if (delete_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
-                for (int i = 0; i < select_frequencies_linearLayout.getChildCount(); i++) {
-                    LinearLayout linearLayout = (LinearLayout) select_frequencies_linearLayout.getChildAt(i);
-                    CheckBox checkBox = (CheckBox) linearLayout.getChildAt(0);
-                    if (checkBox.isChecked())
-                        checkBox.setChecked(false);
-                }
                 setVisibility("overview");
-                title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+                title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getCount() + " Frequencies)");
+                changeAllCheckBox(false);
             }
         }
         return super.onOptionsItemSelected(item);
@@ -613,238 +497,34 @@ public class EditTablesActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    /**
+     * Checks that the number of frequencies is not greater than 100.
+     *
+     * @return Returns true, if the number of frequencies is less than or equal to 100.
+     */
+    private boolean isWithinLimit() {
+        return frequencyListAdapter.getCount() < 100;
+    }
+
     private void setVisibility(String value) {
         switch (value) {
             case "overview":
                 frequencies_overview_linearLayout.setVisibility(View.VISIBLE);
                 no_frequencies_linearLayout.setVisibility(View.GONE);
-                frequency_edit_linearLayout.setVisibility(View.GONE);
                 delete_frequencies_linearLayout.setVisibility(View.GONE);
                 break;
             case "none":
                 frequencies_overview_linearLayout.setVisibility(View.GONE);
                 no_frequencies_linearLayout.setVisibility(View.VISIBLE);
-                frequency_edit_linearLayout.setVisibility(View.GONE);
-                delete_frequencies_linearLayout.setVisibility(View.GONE);
-                break;
-            case "edit":
-                frequencies_overview_linearLayout.setVisibility(View.GONE);
-                no_frequencies_linearLayout.setVisibility(View.GONE);
-                frequency_edit_linearLayout.setVisibility(View.VISIBLE);
                 delete_frequencies_linearLayout.setVisibility(View.GONE);
                 break;
             case "delete":
                 frequencies_overview_linearLayout.setVisibility(View.GONE);
                 no_frequencies_linearLayout.setVisibility(View.GONE);
-                frequency_edit_linearLayout.setVisibility(View.GONE);
                 delete_frequencies_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText(R.string.lb_delete_frequencies);
                 break;
         }
-    }
-
-    private void createNumberButtons(int range) {
-        int baseNumber = baseFrequency / 1000;
-        for (int i = 0; i < range / 4; i++) {
-            newBaseLinearLayout();
-            for (int j = 0; j < 4; j++) {
-                newBaseButton(baseNumber);
-                int finalBaseNumber = baseNumber;
-                buttonBaseFrequency.setOnClickListener(view -> {
-                    if (frequency_textView.getText().toString().isEmpty() || frequency_textView.getText().toString().length() > 6) {
-                        frequency_textView.setText(String.valueOf(finalBaseNumber));
-                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), ebony_clay));
-                    }
-                });
-                linearLayoutBaseFrequency.addView(buttonBaseFrequency);
-                baseNumber++;
-            }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
-        }
-
-        Space space = new Space(this);
-        space.setLayoutParams(newLinearLayoutParams());
-        number_buttons_linearLayout.addView(space);
-
-        int number = 1;
-        for (int i = 0; i < 3; i++) {
-            newBaseLinearLayout();
-            for (int j = 0; j < 4; j++) {
-                if (number == 10) {
-                    Space spaceBaseFrequency = new Space(this);
-                    spaceBaseFrequency.setLayoutParams(newButtonParams());
-                    linearLayoutBaseFrequency.addView(spaceBaseFrequency);
-                }else if (number == 11) {
-                    ImageView imageViewBaseFrequency = new ImageView(this);
-                    imageViewBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_delete));
-                    imageViewBaseFrequency.setImageDrawable(ContextCompat.getDrawable(this, ic_delete));
-                    imageViewBaseFrequency.setLayoutParams(newButtonDeleteParams());
-                    imageViewBaseFrequency.setPadding(50, 0, 50, 0);
-                    imageViewBaseFrequency.setOnClickListener(view -> {
-                        if (!frequency_textView.getText().toString().isEmpty()) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous.substring(0, previous.length() - 1));
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(imageViewBaseFrequency);
-                } else {
-                    newBaseButton(number);
-                    int finalNumber = number;
-                    buttonBaseFrequency.setOnClickListener(view -> {
-                        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous + finalNumber);
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(buttonBaseFrequency);
-                }
-                if (number == 9) number = 0;
-                else if (number == 0) number = 10;
-                else number++;
-            }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
-        }
-    }
-
-    private void newBaseLinearLayout() {
-        linearLayoutBaseFrequency = new LinearLayout(this);
-        linearLayoutBaseFrequency.setLayoutParams(newLinearLayoutParams());
-        linearLayoutBaseFrequency.setOrientation(LinearLayout.HORIZONTAL);
-    }
-
-    private void newBaseButton(int baseNumber) {
-        buttonBaseFrequency = new Button(this);
-        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, border));
-        buttonBaseFrequency.setTextSize(16);
-        buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        buttonBaseFrequency.setText(String.valueOf(baseNumber));
-        buttonBaseFrequency.setLayoutParams(newButtonParams());
-    }
-
-    /**
-     * Displays the frequencies on the screen.
-     */
-    private void showTable() {
-        for (int i = 0; i < editedFrequencies.size(); i++) {
-            createNewFrequencyCell(i);
-            createNewFrequencyDeleteCell(i);
-        }
-    }
-
-    private void createNewFrequencyCell(int index) {
-        newFrequencyCell();
-        textViewFrequency.setText(String.valueOf(editedFrequencies.get(index)));
-        linearLayoutFrequency.addView(textViewFrequency);
-        linearLayoutFrequency.addView(imageViewFrequency);
-        linearLayoutFrequency.setOnClickListener(view -> {
-            selectedFrequency = editedFrequencies.get(index);
-            selectedFrequencyIndex = index;
-            setVisibility("edit");
-            title_toolbar.setText("Edit Frequency " + selectedFrequency);
-
-            frequency_textView.setText(R.string.lb_enter_frequency_digits);
-            frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-            edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            save_changes_button.setText(R.string.lb_save_changes);
-            save_changes_button.setEnabled(false);
-            save_changes_button.setAlpha((float) 0.6);
-        });
-        frequencies_linearLayout.addView(linearLayoutFrequency);
-    }
-
-    private void createNewFrequencyDeleteCell(int index) {
-        newFrequencyDeleteCell();
-        textViewFrequency.setText(String.valueOf(editedFrequencies.get(index)));
-        checkBoxFrequency.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if (isChecked) {
-                delete_selected_frequencies_button.setEnabled(true);
-                delete_selected_frequencies_button.setAlpha((float) 1);
-                numberOfSelected++;
-                if (numberOfSelected == select_frequencies_linearLayout.getChildCount())
-                    all_frequencies_checkBox.setChecked(true);
-            } else {
-                numberOfSelected--;
-                if (numberOfSelected == 0) {
-                    delete_selected_frequencies_button.setEnabled(false);
-                    delete_selected_frequencies_button.setAlpha((float) 0.6);
-                } else if (numberOfSelected == select_frequencies_linearLayout.getChildCount() - 1)
-                    all_frequencies_checkBox.setChecked(false);
-            }
-        });
-        linearLayoutFrequency.addView(checkBoxFrequency);
-        linearLayoutFrequency.addView(textViewFrequency);
-        select_frequencies_linearLayout.addView(linearLayoutFrequency);
-    }
-
-    /**
-     * Initializes the customize TextView.
-     */
-    private void newFrequencyCell() {
-        linearLayoutFrequency = new LinearLayout(this);
-        linearLayoutFrequency.setBackgroundColor(ContextCompat.getColor(this, catskill_white));
-        linearLayoutFrequency.setLayoutParams(newLinearLayoutParams());
-        linearLayoutFrequency.setOrientation(LinearLayout.HORIZONTAL);
-        linearLayoutFrequency.setElevation(4);
-        linearLayoutFrequency.setGravity(Gravity.CENTER);
-        linearLayoutFrequency.setPadding(32, 32, 32, 32);
-
-        textViewFrequency = new TextView(this);
-        textViewFrequency.setTextSize(16);
-        textViewFrequency.setTextColor(ContextCompat.getColor(this, limed_spruce));
-        textViewFrequency.setLayoutParams(newTextViewParams());
-
-        imageViewFrequency = new ImageView(this);
-        imageViewFrequency.setBackground(ContextCompat.getDrawable(this, ic_next));
-    }
-
-    private void newFrequencyDeleteCell() {
-        linearLayoutFrequency = new LinearLayout(this);
-        linearLayoutFrequency.setBackgroundColor(ContextCompat.getColor(this, catskill_white));
-        linearLayoutFrequency.setLayoutParams(newLinearLayoutParams());
-        linearLayoutFrequency.setOrientation(LinearLayout.HORIZONTAL);
-        linearLayoutFrequency.setElevation(4);
-        linearLayoutFrequency.setGravity(Gravity.CENTER);
-        linearLayoutFrequency.setPadding(32, 32, 32, 32);
-
-        checkBoxFrequency = new CheckBox(this);
-
-        textViewFrequency = new TextView(this);
-        textViewFrequency.setTextSize(16);
-        textViewFrequency.setTextColor(ContextCompat.getColor(this, limed_spruce));
-        textViewFrequency.setLayoutParams(newTextViewParams());
-    }
-
-    /**
-     * Sets the margins for the LinearLayout.
-     *
-     * @return Returns a LayoutParams with the customize margins.
-     */
-    private LinearLayout.LayoutParams newLinearLayoutParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(0, 0, 0, 32);
-        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
-        return params;
-    }
-
-    private ViewGroup.LayoutParams newTextViewParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.weight = 1;
-        return params;
-    }
-
-    private LinearLayout.LayoutParams newButtonParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.weight = 1;
-        return params;
-    }
-
-    private LinearLayout.LayoutParams newButtonDeleteParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.height = GridLayout.LayoutParams.MATCH_PARENT;
-        params.weight = 1;
-        return params;
     }
 
     /**
@@ -855,62 +535,66 @@ public class EditTablesActivity extends AppCompatActivity {
     private void downloadData(byte[] data) {
         parameter = "";
         originalTable = new int[originalTotalFrequencies];
+        ArrayList<Integer> frequencies = new ArrayList<>();
         int index = 10;
         int i = 0;
         while (i < originalTable.length) {
             int frequency = (Integer.parseInt(Converters.getDecimalValue(data[index])) * 256) +
                     Integer.parseInt(Converters.getDecimalValue(data[index + 1]));
             originalTable[i] = baseFrequency + frequency;
-            editedFrequencies.add(originalTable[i]);
+            frequencies.add(originalTable[i]);
             i++;
             index += 2;
         }
 
-        frequencies_linearLayout.removeAllViews();
-        showTable();
+        frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher);
+        frequencies_listView.setAdapter(frequencyListAdapter);
+        frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
+        frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
     }
 
-    private void changeSelectedFrequency(int frequency) {
-        // Change frequency cell
-        LinearLayout linearLayout = (LinearLayout) frequencies_linearLayout.getChildAt(selectedFrequencyIndex);
-        TextView textView = (TextView) linearLayout.getChildAt(0);
-        textView.setText(String.valueOf(frequency));
-
-        // Change frequency delete cell
-        LinearLayout linearLayoutSelectDelete = (LinearLayout) select_frequencies_linearLayout.getChildAt(selectedFrequencyIndex);
-        TextView textViewSelectDelete = (TextView) linearLayoutSelectDelete.getChildAt(1);
-        textViewSelectDelete.setText(String.valueOf(frequency));
-
-        editedFrequencies.set(selectedFrequencyIndex, frequency);
-        selectedFrequency = 0;
-        selectedFrequencyIndex = -1;
+    private void changeSelectedFrequency(int frequency, int position) {
+        frequencyListAdapter.setFrequency(position, frequency);
+        frequencyListAdapter.notifyDataSetChanged();
+        frequencyDeleteListAdapter.notifyDataSetChanged();
 
         manageMessage(R.string.lb_frequency_saved, false);
     }
 
     private void addFrequency(int frequency) {
-        int index = editedFrequencies.size();
-        editedFrequencies.add(frequency);
-        createNewFrequencyCell(index);
-        createNewFrequencyDeleteCell(index);
+        frequencyDeleteListAdapter.addFrequency(frequency);
+        frequencyListAdapter.notifyDataSetChanged();
+        frequencyDeleteListAdapter.notifyDataSetChanged();
 
         manageMessage(R.string.lb_frequency_added, false);
     }
 
+    private void changeAllCheckBox(boolean isChecked) {
+        frequencyDeleteListAdapter.setStateSelected(isChecked);
+        frequencyDeleteListAdapter.notifyDataSetChanged();
+
+        if (isChecked) {
+            delete_selected_frequencies_button.setEnabled(true);
+            delete_selected_frequencies_button.setAlpha(1);
+        } else {
+            delete_selected_frequencies_button.setEnabled(false);
+            delete_selected_frequencies_button.setAlpha((float) 0.6);
+        }
+    }
+
     private void deleteFrequencies() {
         int index = 0;
-        while (index < select_frequencies_linearLayout.getChildCount()) {
-            LinearLayout linearLayout = (LinearLayout) select_frequencies_linearLayout.getChildAt(index);
-            CheckBox checkBox = (CheckBox) linearLayout.getChildAt(0);
-            if (checkBox.isChecked()) {
-                editedFrequencies.remove(index);
-                frequencies_linearLayout.removeViewAt(index);
-                select_frequencies_linearLayout.removeViewAt(index);
+        while (index < frequencyDeleteListAdapter.getCount()) {
+            if (frequencyDeleteListAdapter.isSelected(index)) {
+                frequencyDeleteListAdapter.removeFrequency(index);
             } else {
                 index++;
             }
         }
-        manageMessage(R.string.lb_frequencies_deleted, frequencies_linearLayout.getChildCount() == 0);
+        frequencyListAdapter.notifyDataSetChanged();
+        frequencyDeleteListAdapter.notifyDataSetChanged();
+
+        manageMessage(R.string.lb_frequencies_deleted, frequencyListAdapter.getCount() == 0);
     }
 
     private void manageMessage(int idStringMessage, boolean isEmpty) {
@@ -924,22 +608,22 @@ public class EditTablesActivity extends AppCompatActivity {
         dialog.setView(view);
         dialog.show();
 
-        int MESSAGE_PERIOD = 3000;
+        int MESSAGE_PERIOD = 1000;
         handlerMessage.postDelayed(() -> {
             dialog.dismiss();
             if (isEmpty)
                 setVisibility("none");
             else
                 setVisibility("overview");
-            title_toolbar.setText("Table " + number + " (" + editedFrequencies.size() + " Frequencies)");
+            title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getCount() + " Frequencies)");
         }, MESSAGE_PERIOD);
     }
 
     private boolean existChanges() {
-        if (originalTable.length != editedFrequencies.size())
+        if (originalTable.length != frequencyListAdapter.getCount())
             return true;
         for (int i = 0; i < originalTable.length; i++) {
-            if (originalTable[i] != editedFrequencies.get(i))
+            if (originalTable[i] != frequencyListAdapter.getFrequency(i))
                 return true;
         }
         return false;

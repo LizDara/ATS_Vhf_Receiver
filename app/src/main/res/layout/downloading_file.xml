@@ -44,8 +44,8 @@
                 android:layout_weight="1"
                 tools:ignore="NestedWeights" />
 
-            <ImageView
-                android:id="@+id/downloading_imageView"
+            <ProgressBar
+                android:id="@+id/downloading_progressBar"
                 android:layout_width="@dimen/line_height"
                 android:layout_height="@dimen/line_height" />
 
@@ -84,10 +84,11 @@
                 android:layout_weight="1"
                 tools:ignore="NestedWeights" />
 
-            <ImageView
-                android:id="@+id/processing_imageView"
+            <ProgressBar
+                android:id="@+id/processing_progressBar"
                 android:layout_width="@dimen/line_height"
-                android:layout_height="@dimen/line_height" />
+                android:layout_height="@dimen/line_height"
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -124,10 +125,11 @@
                 android:layout_weight="1"
                 tools:ignore="NestedWeights" />
 
-            <ImageView
-                android:id="@+id/preparing_imageView"
+            <ProgressBar
+                android:id="@+id/preparing_progressBar"
                 android:layout_width="@dimen/line_height"
-                android:layout_height="@dimen/line_height" />
+                android:layout_height="@dimen/line_height"
+                android:visibility="gone" />
 
         </LinearLayout>
 

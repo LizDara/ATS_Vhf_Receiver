@@ -20,7 +20,8 @@
         <TextView
             style="@style/subtitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
             android:text="@string/lb_tap_frequency"
             android:textColor="@color/black" />
 
@@ -40,21 +41,14 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <ListView
+        android:id="@+id/frequencies_listView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:ignore="NestedWeights">
-
-        <LinearLayout
-            android:id="@+id/frequencies_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16sp"
-            android:layout_marginEnd="16sp"
-            android:orientation="vertical" />
-
-    </ScrollView>
+        android:padding="16sp"
+        android:dividerHeight="16sp"
+        android:divider="@color/transparent"/>
 
     <Button
         android:id="@+id/add_frequency_button"

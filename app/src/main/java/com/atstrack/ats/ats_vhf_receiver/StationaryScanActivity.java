@@ -75,8 +75,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView timeout_stationary_textView;
     @BindView(R.id.edit_stationary_settings_button)
     TextView edit_stationary_defaults_textView;
-    @BindView(R.id.frequency_empty_textView)
-    TextView frequency_empty_textView;
     @BindView(R.id.start_stationary_button)
     Button start_stationary_button;
     @BindView(R.id.stationary_result_linearLayout)
@@ -95,8 +93,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView period_textView;
     @BindView(R.id.pulse_rate_textView)
     TextView pulse_rate_textView;
-    @BindView(R.id.detections_textView)
-    TextView detections_textView;
     @BindView(R.id.line_view)
     View line_view;
 
@@ -113,17 +109,13 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     private int baseFrequency;
     private byte detectionType;
-    private int selectedTable;
+    private int firstTable;
+    private int secondTable;
+    private int thirdTable;
     private int numberAntennas;
     private int code;
     private int detections;
     private int mort;
-    private int year;
-    private int month;
-    private int day;
-    private int hour;
-    private int minute;
-    private int seconds;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -256,9 +248,9 @@ public class StationaryScanActivity extends AppCompatActivity {
         int hh = currentDate.get(Calendar.HOUR_OF_DAY);
         int mm =  currentDate.get(Calendar.MINUTE);
         int ss = currentDate.get(Calendar.SECOND);
-        year = YY % 100;
 
-        byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable};
+        byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss,
+                (byte) firstTable, (byte) secondTable, (byte) thirdTable};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
@@ -266,17 +258,8 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         if (isScanning) {
             parameterWrite = "";
-            title_toolbar.setText(R.string.lb_stationary_scanning);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-            ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
-            stationary_result_linearLayout.setVisibility(View.VISIBLE);
-
-            state_view.setBackgroundResource(R.drawable.scanning_animation);
-            animationDrawable = (AnimationDrawable) state_view.getBackground();
-            animationDrawable.start();
+            setVisibility("scanning");
             frequency_stationary_textView.setText("");
-
-            device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, stationary"));
         }
     }
 
@@ -312,15 +295,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         if (result) {
             clear();
             isScanning = false;
-            animationDrawable.stop();
-            state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-            stationary_result_linearLayout.setVisibility(View.GONE);
-            ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.stationary_scanning);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-            device_name_textView.setText(receiverInformation.getDeviceName());
-
+            setVisibility("overview");
             if (previousScanning) {
                 parameter = "stationary";
                 new Handler().postDelayed(() -> {
@@ -361,9 +336,7 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText(R.string.stationary_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -378,32 +351,17 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
-        detectionType = (byte) sharedPreferences.getInt("DetectionType", 0);
-
-        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
-        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-        detections_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-        period_textView.setVisibility(visibility);
-        pulse_rate_textView.setVisibility(visibility);
 
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = "sendLogScanning";
-            year = getIntent().getExtras().getInt("year");
-            month = getIntent().getExtras().getInt("month");
-            day = getIntent().getExtras().getInt("day");
-            hour = getIntent().getExtras().getInt("hour");
-            minute = getIntent().getExtras().getInt("minute");
-            seconds = getIntent().getExtras().getInt("seconds");
+            setVisibility("scanning");
 
-            ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
-            stationary_result_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.lb_stationary_scanning);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-
-            state_view.setBackgroundResource(R.drawable.scanning_animation);
-            animationDrawable = (AnimationDrawable) state_view.getBackground();
-            animationDrawable.start();
+            detectionType = (byte) sharedPreferences.getInt("DetectionType", 0);
+            int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+            code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+            period_textView.setVisibility(visibility);
+            pulse_rate_textView.setVisibility(visibility);
         } else { // Gets aerial defaults or temporary data
             boolean isTemporary = getIntent().getExtras().getBoolean("temporary");
             if (isTemporary) {
@@ -421,8 +379,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 parameter = "stationary";
             }
             previousScanning = false;
-            ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
-            stationary_result_linearLayout.setVisibility(View.GONE);
+            setVisibility("overview");
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -518,6 +475,29 @@ public class StationaryScanActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    private void setVisibility(String value) {
+        switch (value) {
+            case "overview":
+                ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
+                stationary_result_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.stationary_scanning);
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+                device_name_textView.setText(receiverInformation.getDeviceName());
+                break;
+            case "scanning":
+                ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
+                stationary_result_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText(R.string.lb_stationary_scanning);
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+                state_view.setBackgroundResource(R.drawable.scanning_animation);
+                animationDrawable = (AnimationDrawable) state_view.getBackground();
+                animationDrawable.start();
+                device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, stationary"));
+                break;
+        }
+    }
+
     /**
      * With the received packet, gets stationary defaults data.
      *
@@ -529,19 +509,24 @@ public class StationaryScanActivity extends AppCompatActivity {
             mBluetoothLeService.discovering();
         } else if (Converters.getHexValue(data[0]).equals("6C")) {
             parameter = "";
-            selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1])) / 16;
-            if (selectedTable == 0) { // There are no tables with frequencies to scan
+            firstTable = Integer.parseInt(Converters.getDecimalValue(data[9]));
+            secondTable = Integer.parseInt(Converters.getDecimalValue(data[10]));
+            thirdTable = Integer.parseInt(Converters.getDecimalValue(data[11]));
+            String tables = "";
+            for (int i = 9; i < data.length; i++) {
+                if (data[i] != 0)
+                    tables += Converters.getDecimalValue(data[i]) + ", ";
+            }
+            if (tables.equals("")) { // There are no tables with frequencies to scan
                 selected_frequency_stationary_textView.setText(R.string.lb_none);
-                //frequency_empty_textView.setVisibility(View.VISIBLE);
                 start_stationary_button.setEnabled(false);
                 start_stationary_button.setAlpha((float) 0.6);
             } else { // Shows the table to be scanned
-                selected_frequency_stationary_textView.setText(String.valueOf(selectedTable));
-                //frequency_empty_textView.setVisibility(View.GONE);
+                selected_frequency_stationary_textView.setText(tables.substring(0, tables.length() - 2));
                 start_stationary_button.setEnabled(true);
                 start_stationary_button.setAlpha((float) 1);
             }
-            numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1])) % 16;
+            numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
             number_antennas_stationary_textView.setText((numberAntennas == 0) ? "None" : String.valueOf(numberAntennas));
             scan_rate_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             timeout_stationary_textView.setText(Converters.getDecimalValue(data[4]));
@@ -552,6 +537,10 @@ public class StationaryScanActivity extends AppCompatActivity {
                         Converters.getDecimalValue(data[5]));
             }
         }
+    }
+
+    private String getFrequency(int frequency) {
+        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
     }
 
     /**
@@ -592,11 +581,9 @@ public class StationaryScanActivity extends AppCompatActivity {
      * @param data The stationary data packet.
      */
     private void startScanStationaryFirstPart(byte[] data) {
-        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1])) / 16;
-        numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1])) % 16;
-        year = Integer.parseInt(Converters.getDecimalValue(data[6]));
+        numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
 
-        byte detectionType = (byte) (Integer.parseInt(Converters.getDecimalValue(data[4])) % 16);
+        detectionType = (byte) (Integer.parseInt(Converters.getDecimalValue(data[4])) % 16);
         int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
         code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         period_textView.setVisibility(visibility);
@@ -609,6 +596,7 @@ public class StationaryScanActivity extends AppCompatActivity {
      * @param data The stationary data packet.
      */
     private void startScanStationarySecondPart(byte[] data) {
+
     }
 
     /**
@@ -627,24 +615,10 @@ public class StationaryScanActivity extends AppCompatActivity {
     private void logScanHeader(byte[] data) {
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
-        /*int date = Converters.hexToDecimal(Converters.getHexValue(data[4]) + Converters.getHexValue(data[5]) + Converters.getHexValue(data[6]));
-        month = date / 1000000;
-        date = date % 1000000;
-        day = date / 10000;
-        date = date % 10000;
-        hour = date / 100;
-        minute = date % 100;
-        seconds = Integer.parseInt(Converters.getDecimalValue(data[7]));
-        currentData += month + "/" + day + "/" + year + "       " + hour + ":" + minute + ":" + seconds;*/
-
-        /*if (!frequency_stationary_textView.getText().equals("") &&
-                Integer.parseInt(frequency_stationary_textView.getText().toString().replace(".", "")) != frequency) {
-            clear();
-        }*/
         clear();
 
         table_stationary_textView.setText(Converters.getDecimalValue(data[3]));
-        frequency_stationary_textView.setText(String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3));
+        frequency_stationary_textView.setText(getFrequency(frequency));
         current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
     }
 
@@ -728,24 +702,31 @@ public class StationaryScanActivity extends AppCompatActivity {
         codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         codeTextView.setLayoutParams(params);
 
-        TextView signalStrengthTextView = new TextView(this);
-        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(body_regular);
-        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        signalStrengthTextView.setLayoutParams(params);
-
         TextView detectionsTextView = new TextView(this);
         detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
         detectionsTextView.setTextAppearance(body_regular);
         detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         detectionsTextView.setLayoutParams(params);
 
+        TextView mortalityTextView = new TextView(this);
+        mortalityTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        mortalityTextView.setTextAppearance(body_regular);
+        mortalityTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        mortalityTextView.setLayoutParams(params);
+
+        TextView signalStrengthTextView = new TextView(this);
+        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        signalStrengthTextView.setTextAppearance(body_regular);
+        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        signalStrengthTextView.setLayoutParams(params);
+
         TextView mortTextView = new TextView(this);
         mortTextView.setVisibility(View.GONE);
 
         newCode.addView(codeTextView);
-        newCode.addView(signalStrengthTextView);
         newCode.addView(detectionsTextView);
+        newCode.addView(mortalityTextView);
+        newCode.addView(signalStrengthTextView);
         newCode.addView(mortTextView);
 
         LinearLayout line = new LinearLayout(this);
@@ -769,7 +750,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
 
-        return Integer.parseInt(codeTextView.getText().toString().replace(" M", "")) == code;
+        return Integer.parseInt(codeTextView.getText().toString()) == code;
     }
 
     /**
@@ -779,12 +760,12 @@ public class StationaryScanActivity extends AppCompatActivity {
      */
     private void refreshFirstCode(int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
-        TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(1);
-        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView mortalityTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+        TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        if (!codeTextView.getText().toString().contains(" M") && isMort) codeTextView.setText(codeTextView.getText().toString() + " M");
+        mortalityTextView.setText(isMort ? "M" : "-");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
         if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
@@ -803,13 +784,11 @@ public class StationaryScanActivity extends AppCompatActivity {
         int position = 0;
         for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
-            TextView textView = (TextView) linearLayout.getChildAt(0);
+            TextView codeTextView = (TextView) linearLayout.getChildAt(0);
 
-            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) {
+            if (Integer.parseInt(codeTextView.getText().toString()) == code)
                 position = i;
-            }
         }
-
         return position;
     }
 
@@ -822,10 +801,10 @@ public class StationaryScanActivity extends AppCompatActivity {
     private void refreshPosition(int position, int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        int code = Integer.parseInt(codeTextView.getText().toString().replace(" M", ""));
+        int code = Integer.parseInt(codeTextView.getText().toString());
         int detections = Integer.parseInt(detectionsTextView.getText().toString());
         int mort = Integer.parseInt(mortTextView.getText().toString());
 
@@ -850,30 +829,36 @@ public class StationaryScanActivity extends AppCompatActivity {
             TextView penultimateCodeTextView = (TextView) penultimateLinearLayout.getChildAt(0);
             lastCodeTextView.setText(penultimateCodeTextView.getText());
 
-            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(1);
-            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(1);
-            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
-
-            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(2);
-            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(1);
             lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
 
-            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(3);
-            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            TextView lastMortalityTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimateMortalityTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            lastMortalityTextView.setText(penultimateMortalityTextView.getText());
+
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
+
+            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(4);
+            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(4);
             lastMortTextView.setText(penultimateMortTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView newCodeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newMortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newMortalityTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newMortTextView = (TextView) linearLayout.getChildAt(4);
 
-        newCodeTextView.setText(code + (isMort ? " M" : ""));
-        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
+        newCodeTextView.setText(String.valueOf(code));
         newDetectionsTextView.setText(String.valueOf(detections));
-
+        newMortalityTextView.setText(isMort ? "M" : "-");
+        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
+
         this.detections =  detections;
         this.mort = isMort ? mort + 1 : mort;
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
@@ -897,32 +882,32 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         TextView periodTextView = new TextView(this);
         periodTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        periodTextView.setTextAppearance(this, R.style.body_regular);
+        periodTextView.setTextAppearance(body_regular);
         periodTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         periodTextView.setLayoutParams(params);
 
+        TextView detectionsTextView = new TextView(this);
+        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        detectionsTextView.setTextAppearance(body_regular);
+        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        detectionsTextView.setLayoutParams(params);
+
         TextView pulseRateTextView = new TextView(this);
         pulseRateTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        pulseRateTextView.setTextAppearance(this, R.style.body_regular);
+        pulseRateTextView.setTextAppearance(body_regular);
         pulseRateTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         pulseRateTextView.setLayoutParams(params);
 
         TextView signalStrengthTextView = new TextView(this);
         signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextAppearance(body_regular);
         signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         signalStrengthTextView.setLayoutParams(params);
 
-        TextView detectionsTextView = new TextView(this);
-        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(this, R.style.body_regular);
-        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        detectionsTextView.setLayoutParams(params);
-
         newNonCoded.addView(periodTextView);
+        newNonCoded.addView(detectionsTextView);
         newNonCoded.addView(pulseRateTextView);
         newNonCoded.addView(signalStrengthTextView);
-        newNonCoded.addView(detectionsTextView);
 
         LinearLayout line = new LinearLayout(this);
         line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
@@ -939,29 +924,29 @@ public class StationaryScanActivity extends AppCompatActivity {
             TextView penultimatePeriodTextView = (TextView) penultimateLinearLayout.getChildAt(0);
             lastPeriodTextView.setText(penultimatePeriodTextView.getText());
 
-            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(1);
-            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+
+            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(2);
             lastPulseRateTextView.setText(penultimatePulseRateTextView.getText());
 
-            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(2);
-            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
             lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
-
-            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(3);
-            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(3);
-            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView newPeriodTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
 
         newPeriodTextView.setText(String.valueOf(period));
+        newDetectionsTextView.setText(String.valueOf(detections));
         newPulseRateTextView.setText(String.valueOf(pulseRate));
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
-        newDetectionsTextView.setText(String.valueOf(detections));
     }
 
     /**
@@ -974,21 +959,5 @@ public class StationaryScanActivity extends AppCompatActivity {
             scan_details_linearLayout.removeViewAt(2);
             count--;
         }
-    }
-
-    /**
-     * Displays a message indicating whether the writing was successful.
-     *
-     * @param data This packet indicates the writing status.
-     */
-    private void showMessage(byte[] data) {
-        int status = Integer.parseInt(Converters.getDecimalValue(data[0]));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Success!");
-        if (status == 0)
-            builder.setMessage("Completed.");
-        builder.setPositiveButton("OK", null);
-        builder.show();
     }
 }

@@ -19,37 +19,7 @@
             layout="@layout/manual_current_settings"/>
 
         <include
-            layout="@layout/frequency_edit"/>
-
-        <include
             layout="@layout/manual_scanning"/>
-
-        <LinearLayout
-            android:id="@+id/record_data_manual_linearLayout"
-            style="@style/button_primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16sp"
-            android:layout_marginBottom="24sp"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-            <ImageView
-                android:id="@+id/record_data_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8sp"
-                android:background="@drawable/ic_record_light" />
-
-            <TextView
-                android:id="@+id/record_data_textView"
-                style="@style/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lb_record_data"
-                android:textColor="@color/white_ice" />
-
-        </LinearLayout>
 
         <include
             layout="@layout/receiver_status"/>

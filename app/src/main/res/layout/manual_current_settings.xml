@@ -29,23 +29,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="16sp">
 
-            <TextView
-                style="@style/body_small"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:text="@string/lb_frequency"
-                android:textColor="@color/limed_spruce" />
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/frequency_manual_textView"
-                style="@style/body_regular"
+                <TextView
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8sp"
+                    android:text="@string/lb_starting_frequency"
+                    android:textColor="@color/limed_spruce" />
+
+                <TextView
+                    android:id="@+id/frequency_manual_textView"
+                    style="@style/body_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ebony_clay" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/enter_new_frequency_button"
+                style="@style/button_tertiary_small"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay" />
+                android:layout_height="@dimen/button_small_height"
+                android:paddingHorizontal="10sp"
+                android:text="@string/lb_set_frequency" />
 
         </LinearLayout>
 
@@ -90,15 +106,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         tools:ignore="NestedWeights" />
-
-    <Button
-        android:id="@+id/enter_new_frequency_button"
-        style="@style/button_secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginHorizontal="16sp"
-        android:text="@string/lb_set_frequency" />
 
     <Button
         android:id="@+id/start_manual_button"

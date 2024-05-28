@@ -133,8 +133,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/center">
 
-        <ImageView
-            android:id="@+id/anim_spinner"
+        <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -150,7 +150,7 @@
             android:textColor="@color/ebony_clay"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/anim_spinner" />
+            app:layout_constraintTop_toBottomOf="@id/progressBar" />
 
     </LinearLayout>
 

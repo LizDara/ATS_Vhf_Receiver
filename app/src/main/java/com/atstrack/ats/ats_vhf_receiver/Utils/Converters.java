@@ -1,5 +1,3 @@
-
-
 /*
  * Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules
  * Contact: support@bluegiga.com.
@@ -19,9 +17,7 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import android.text.TextUtils;
-
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 
 // Converters - converts value between different numeral system
 public class Converters {
@@ -55,15 +51,6 @@ public class Converters {
         return new String(hexChars);
     }
 
-    // Gets value in ascii system
-    public static String getAsciiValue(byte value[]) {
-        if (value == null) {
-            return "";
-        }
-
-        return new String(value);
-    }
-
     // Gets value in decimal system
     public static String getDecimalValue(byte value[]) {
         if (value == null) {
@@ -81,67 +68,6 @@ public class Converters {
     public static String getDecimalValue(byte b) {
         String result = "";
         result += ((int) b & 0xff);
-
-        return result;
-    }
-
-    // Gets value in decimal system for single byte
-    public static String getDecimalValueFromTwosComplement(byte b) {
-        // the first bit of the byte in twos complement
-        String result = "" + b;
-
-        if ((b & 0xa0) > 0) {
-            int val = b;
-            val = ~val & 0xff;
-            val = val + 0x01;
-
-            // the sign of the value
-            int sign = (b >>> 7) & 0x01;
-            sign = sign > 0 ? -1 : 1;
-
-            result = "" + (sign * val);
-        }
-        return result;
-    }
-
-    public static String getDecimalValueFromTwosComplement(String binaryString) {
-        // default to hex value
-
-        if (binaryString.length() > 64) {
-            String binAsHex = (new BigInteger(binaryString, 2)).toString(16);
-            return "0x" + binAsHex;
-        }
-
-        // prepend the sign up to 64 bits
-        String result;
-        String stringPrependExtendSign = binaryString;
-        for (int i = 0; i < 64 - binaryString.length(); i++) {
-            stringPrependExtendSign = binaryString.substring(0, 1) + stringPrependExtendSign;
-        }
-
-        // flip the bits (needed for negative numbers)
-        String flippedBits = "";
-        for (int i = 0; i < 64; i++) {
-            if (binaryString.subSequence(0, 1).equals("1")) {
-                // flip bits if negative twos complement negative
-                if (stringPrependExtendSign.substring(i, i + 1).equals("1")) {
-                    flippedBits += 0;
-                } else {
-                    flippedBits += 1;
-                }
-            }
-        }
-
-        // if prepended sign extension is negative, add one to flipped bits and make long neg.
-        if (binaryString.subSequence(0, 1).equals("1")) {
-            // finish twos complement calculation if negative twos complement number
-            long flippedBitsAsLong = Long.parseLong(flippedBits, 2);
-            flippedBitsAsLong += 1;
-            flippedBitsAsLong = -1 * flippedBitsAsLong;
-            result = "" + flippedBitsAsLong;
-        } else {
-            result = "" + Long.parseLong(stringPrependExtendSign, 2);
-        }
 
         return result;
     }

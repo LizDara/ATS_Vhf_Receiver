@@ -41,6 +41,16 @@
                 android:visibility="visible" />
 
             <TextView
+                android:id="@+id/detections_textView"
+                style="@style/body_small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/lb_detections"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
                 android:id="@+id/pulse_rate_textView"
                 style="@style/body_small"
                 android:layout_width="0dp"
@@ -52,22 +62,22 @@
                 android:visibility="visible" />
 
             <TextView
+                android:id="@+id/mortality_textView"
+                style="@style/body_small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/lb_mortality"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
                 style="@style/body_small"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/lb_signal_strength"
-                android:textColor="@color/limed_spruce" />
-
-            <TextView
-                android:id="@+id/detections_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_detections"
                 android:textColor="@color/limed_spruce" />
 
         </LinearLayout>

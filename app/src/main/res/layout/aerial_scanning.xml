@@ -11,7 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16sp"
+        android:layout_marginVertical="16sp"
+        android:layout_marginHorizontal="32sp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -28,7 +29,7 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/edit_settings_aerial_button"
+            android:id="@+id/record_data_aerial_button"
             style="@style/button_primary_small"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_small_height"
@@ -81,8 +82,7 @@
                 android:id="@+id/decrease_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_decrease_light"
-                android:enabled="false" />
+                android:background="@drawable/ic_decrease"/>
 
             <TextView
                 android:id="@+id/frequency_aerial_textView"
@@ -97,8 +97,7 @@
                 android:id="@+id/increase_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_increase_light"
-                android:enabled="false" />
+                android:background="@drawable/ic_increase"/>
 
             <Space
                 android:layout_width="0dp"
@@ -124,16 +123,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16sp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:padding="16sp">
+                android:orientation="vertical">
 
                 <TextView
                     style="@style/body_small"
@@ -143,37 +142,35 @@
                     android:text="@string/lb_table_index"
                     android:textColor="@color/limed_spruce" />
 
-                <TextView
-                    android:id="@+id/table_index_aerial_textView"
-                    style="@style/body_regular"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/ebony_clay" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/left_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_left"
+                        android:enabled="false" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:padding="16sp">
+                    <TextView
+                        android:id="@+id/table_index_aerial_textView"
+                        style="@style/body_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16sp"
+                        android:textColor="@color/ebony_clay" />
 
-                <TextView
-                    style="@style/body_small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8sp"
-                    android:text="@string/lb_table_total"
-                    android:textColor="@color/limed_spruce" />
+                    <ImageView
+                        android:id="@+id/right_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_right"
+                        android:enabled="false" />
 
-                <TextView
-                    android:id="@+id/table_total_textView"
-                    style="@style/body_regular"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/ebony_clay" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -182,8 +179,7 @@
                 style="@style/button_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16sp"
-                android:layout_marginBottom="8sp"
+                android:layout_marginBottom="4sp"
                 android:layout_weight="1"
                 android:enabled="false"
                 android:gravity="end"
@@ -197,6 +193,64 @@
             android:layout_height="1sp"
             android:background="@color/light_gray"
             tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:id="@+id/audio_aerial_linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="16sp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/body_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8sp"
+                        android:text="@string/lb_id_audio"
+                        android:textColor="@color/limed_spruce" />
+
+                    <TextView
+                        android:id="@+id/id_audio_aerial_textView"
+                        style="@style/body_large"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/ebony_clay"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/edit_audio_aerial_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8sp"
+                    android:gravity="end"
+                    android:text="@string/lb_edit_audio_options"
+                    android:textColor="@color/limed_spruce" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:background="@color/light_gray"
+                tools:ignore="SmallSp" />
+
+        </LinearLayout>
 
         <include
             layout="@layout/scan_details"/>

@@ -1,5 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,7 +33,10 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class SetTransmitterTypeActivity extends AppCompatActivity {
@@ -90,7 +95,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
-    private int[] data;
+    Map<String, Object> originalData;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -148,6 +153,64 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
             }
         }
     };
+
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (ValueCodes.CANCELLED == result.getResultCode())
+                    return;
+                int value = result.getData().getExtras().getInt(ValueCodes.VALUE);
+                switch (result.getResultCode()) {
+                    case ValueCodes.PULSE_RATE_TYPE: // Gets the modified pulse rate type
+                        if (value == ValueCodes.FIXED_PULSE_RATE) {
+                            pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
+                            target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                            pulse_rates_linearLayout.setVisibility(View.GONE);
+                        } else {
+                            pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
+                            target_pulse_rate_linearLayout.setVisibility(View.GONE);
+                            pulse_rates_linearLayout.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                    case ValueCodes.MATCHES_FOR_VALID_PATTERN: // Gets the modified matches for valid pattern
+                        matches_for_valid_pattern_textView.setText(String.valueOf(value));
+                        break;
+                    case ValueCodes.MAX_PULSE_RATE: // Gets the modified max pulse rate
+                        max_pulse_rate_textView.setText(String.valueOf(value));
+                        break;
+                    case ValueCodes.MIN_PULSE_RATE:
+                        min_pulse_rate_textView.setText(String.valueOf(value));
+                        break;
+                    case ValueCodes.DATA_CALCULATION_TYPES:
+                        switch (value) {
+                            case ValueCodes.NONE:
+                                optional_data_textView.setText(R.string.lb_none);
+                                break;
+                            case ValueCodes.TEMPERATURE:
+                                optional_data_textView.setText(R.string.lb_temperature);
+                                break;
+                            case ValueCodes.PERIOD:
+                                optional_data_textView.setText(R.string.lb_period);
+                                break;
+                        }
+                        break;
+                    case ValueCodes.PULSE_RATE_1:
+                        pr1_textView.setText(String.valueOf(value / 100));
+                        pr1_tolerance_textView.setText(String.valueOf(value % 100));
+                        break;
+                    case ValueCodes.PULSE_RATE_2:
+                        pr2_textView.setText(String.valueOf(value / 100));
+                        pr2_tolerance_textView.setText(String.valueOf(value % 100));
+                        break;
+                    case ValueCodes.PULSE_RATE_3:
+                        pr3_textView.setText(String.valueOf(value / 100));
+                        pr3_tolerance_textView.setText(String.valueOf(value % 100));
+                        break;
+                    case ValueCodes.PULSE_RATE_4:
+                        pr4_textView.setText(String.valueOf(value / 100));
+                        pr4_tolerance_textView.setText(String.valueOf(value % 100));
+                        break;
+                }
+            });
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -214,64 +277,64 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     @OnClick(R.id.pulse_rate_type_linearLayout)
     public void onClickPulseRateType(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.PULSE_RATE_TYPE);
-        startActivityForResult(intent, SelectValueActivity.PULSE_RATE_TYPE);
+        intent.putExtra("type", ValueCodes.PULSE_RATE_TYPE);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.matches_for_valid_pattern_linearLayout)
     public void onClickMatchesValidPattern(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.MATCHES_FOR_VALID_PATTERN);
-        startActivityForResult(intent, SelectValueActivity.MATCHES_FOR_VALID_PATTERN);
+        intent.putExtra("type", ValueCodes.MATCHES_FOR_VALID_PATTERN);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.max_pulse_rate_linearLayout)
     public void onClickMaxPulseRate(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.MAX_PULSE_RATE);
-        startActivityForResult(intent, SelectValueActivity.MAX_PULSE_RATE);
+        intent.putExtra("type", ValueCodes.MAX_PULSE_RATE);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.min_pulse_rate_linearLayout)
     public void onClickMinPulseRate(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.MIN_PULSE_RATE);
-        startActivityForResult(intent, SelectValueActivity.MIN_PULSE_RATE);
+        intent.putExtra("type", ValueCodes.MIN_PULSE_RATE);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.optional_data_linearLayout)
     public void onClickOptionalDataCalculations(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.DATA_CALCULATION_TYPES);
-        startActivityForResult(intent, SelectValueActivity.DATA_CALCULATION_TYPES);
+        intent.putExtra("type", ValueCodes.DATA_CALCULATION_TYPES);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.pr1_linearLayout)
     public void onClickPR1(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.PULSE_RATE_1);
-        startActivityForResult(intent, SelectValueActivity.PULSE_RATE_1);
+        intent.putExtra("type", ValueCodes.PULSE_RATE_1);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.pr2_linearLayout)
     public void onClickPR2(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.PULSE_RATE_2);
-        startActivityForResult(intent, SelectValueActivity.PULSE_RATE_2);
+        intent.putExtra("type", ValueCodes.PULSE_RATE_2);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.pr3_linearLayout)
     public void onClickPR3(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.PULSE_RATE_3);
-        startActivityForResult(intent, SelectValueActivity.PULSE_RATE_3);
+        intent.putExtra("type", ValueCodes.PULSE_RATE_3);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.pr4_linearLayout)
     public void onClickPR4(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", SelectValueActivity.PULSE_RATE_4);
-        startActivityForResult(intent, SelectValueActivity.PULSE_RATE_4);
+        intent.putExtra("type", ValueCodes.PULSE_RATE_4);
+        launcher.launch(intent);
     }
 
     @Override
@@ -297,64 +360,10 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
+        originalData = new HashMap();
+
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 0)
-            return;
-        if (requestCode == SelectValueActivity.PULSE_RATE_TYPE) {
-            if (resultCode == SelectValueActivity.FIXED_PULSE_RATE) {
-                pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
-                target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-                pulse_rates_linearLayout.setVisibility(View.GONE);
-            } else {
-                pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
-                target_pulse_rate_linearLayout.setVisibility(View.GONE);
-                pulse_rates_linearLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        if (requestCode == SelectValueActivity.MATCHES_FOR_VALID_PATTERN) {
-            matches_for_valid_pattern_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == SelectValueActivity.MAX_PULSE_RATE) {
-            max_pulse_rate_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == SelectValueActivity.MIN_PULSE_RATE) {
-            min_pulse_rate_textView.setText(String.valueOf(resultCode));
-        }
-        if (requestCode == SelectValueActivity.DATA_CALCULATION_TYPES) {
-            switch (resultCode) {
-                case SelectValueActivity.NONE:
-                    optional_data_textView.setText(R.string.lb_none);
-                    break;
-                case SelectValueActivity.TEMPERATURE:
-                    optional_data_textView.setText(R.string.lb_temperature);
-                    break;
-                case SelectValueActivity.PERIOD:
-                    optional_data_textView.setText(R.string.lb_period);
-                    break;
-            }
-        }
-        if (requestCode == SelectValueActivity.PULSE_RATE_1) {
-            pr1_textView.setText(String.valueOf(resultCode / 100));
-            pr1_tolerance_textView.setText(String.valueOf(resultCode % 100));
-        }
-        if (requestCode == SelectValueActivity.PULSE_RATE_2) {
-            pr2_textView.setText(String.valueOf(resultCode / 100));
-            pr2_tolerance_textView.setText(String.valueOf(resultCode % 100));
-        }
-        if (requestCode == SelectValueActivity.PULSE_RATE_3) {
-            pr3_textView.setText(String.valueOf(resultCode / 100));
-            pr3_tolerance_textView.setText(String.valueOf(resultCode % 100));
-        }
-        if (requestCode == SelectValueActivity.PULSE_RATE_4) {
-            pr4_textView.setText(String.valueOf(resultCode / 100));
-            pr4_tolerance_textView.setText(String.valueOf(resultCode % 100));
-        }
     }
 
     @Override
@@ -409,6 +418,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      */
     private void showDisconnectionMessage() {
+        parameter = "";
         LayoutInflater inflater = LayoutInflater.from(this);
 
         View view = inflater.inflate(R.layout.disconnect_message, null);
@@ -437,6 +447,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         if (Converters.getHexValue(data[0]).equals("67")) {
             parameter = "";
 
+            int pulseRateType = Integer.parseInt(Converters.getDecimalValue(data[1]));
+            int matches = Integer.parseInt(Converters.getDecimalValue(data[2]));
+            int pulseRate1 = 0;
+            int pulseRate2 = 0;
+            int pulseRate3 = 0;
+            int pulseRate4 = 0;
+            int pulseRateTolerance1 = 0;
+            int pulseRateTolerance2 = 0;
+            int pulseRateTolerance3 = 0;
+            int pulseRateTolerance4 = 0;
+            int maxPulseRate = 0;
+            int minPulseRate = 0;
             switch (Converters.getHexValue(data[1])) {
                 case "11":
                     pulse_rate_type_textView.setText(R.string.lb_eiler_coded);
@@ -453,9 +475,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
 
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-
-                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])),
-                            Integer.parseInt(Converters.getDecimalValue(data[2])), 0, 0, 0, 0, 0, 0, 0, 0};
                     break;
                 case "21":
                     pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
@@ -472,11 +491,14 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     pr4_textView.setText(Converters.getDecimalValue(data[9]));
                     pr4_tolerance_textView.setText(Converters.getDecimalValue(data[10]));
 
-                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])), Integer.parseInt(Converters.getDecimalValue(data[2])),
-                            Integer.parseInt(Converters.getDecimalValue(data[3])), Integer.parseInt(Converters.getDecimalValue(data[4])),
-                            Integer.parseInt(Converters.getDecimalValue(data[5])), Integer.parseInt(Converters.getDecimalValue(data[6])),
-                            Integer.parseInt(Converters.getDecimalValue(data[7])), Integer.parseInt(Converters.getDecimalValue(data[8])),
-                            Integer.parseInt(Converters.getDecimalValue(data[9])), Integer.parseInt(Converters.getDecimalValue(data[10]))};
+                    pulseRate1 = Integer.parseInt(Converters.getDecimalValue(data[3]));
+                    pulseRateTolerance1 = Integer.parseInt(Converters.getDecimalValue(data[4]));
+                    pulseRate2 = Integer.parseInt(Converters.getDecimalValue(data[5]));
+                    pulseRateTolerance2 = Integer.parseInt(Converters.getDecimalValue(data[6]));
+                    pulseRate3 = Integer.parseInt(Converters.getDecimalValue(data[7]));
+                    pulseRateTolerance3 = Integer.parseInt(Converters.getDecimalValue(data[8]));
+                    pulseRate4 = Integer.parseInt(Converters.getDecimalValue(data[9]));
+                    pulseRateTolerance4 = Integer.parseInt(Converters.getDecimalValue(data[10]));
                     break;
                 case "22":
                     pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
@@ -485,17 +507,25 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     pulse_rates_linearLayout.setVisibility(View.VISIBLE);
 
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    int maxPulse = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
-                    int minPulse = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-                    max_pulse_rate_textView.setText(String.valueOf(maxPulse));
-                    min_pulse_rate_textView.setText(String.valueOf(minPulse));
+                    maxPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
+                    minPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+                    max_pulse_rate_textView.setText(String.valueOf(maxPulseRate));
+                    min_pulse_rate_textView.setText(String.valueOf(minPulseRate));
                     optional_data_textView.setText(R.string.lb_none);
-
-                    this.data = new int[]{Integer.parseInt(Converters.getDecimalValue(data[1])), Integer.parseInt(Converters.getDecimalValue(data[2])),
-                            Integer.parseInt(Converters.getDecimalValue(data[3])), Integer.parseInt(Converters.getDecimalValue(data[4])),
-                            Integer.parseInt(Converters.getDecimalValue(data[5])), Integer.parseInt(Converters.getDecimalValue(data[6])), 0, 0, 0, 0};
                     break;
             }
+            originalData.put("PulseRateType", pulseRateType);
+            originalData.put("Matches", matches);
+            originalData.put("PulseRate1", pulseRate1);
+            originalData.put("PulseRate2", pulseRate2);
+            originalData.put("PulseRate3", pulseRate3);
+            originalData.put("PulseRate4", pulseRate4);
+            originalData.put("PulseRateTolerance1", pulseRateTolerance1);
+            originalData.put("PulseRateTolerance2", pulseRateTolerance2);
+            originalData.put("PulseRateTolerance3", pulseRateTolerance3);
+            originalData.put("PulseRateTolerance4", pulseRateTolerance4);
+            originalData.put("MaxPulseRate", maxPulseRate);
+            originalData.put("MinPulseRate", minPulseRate);
         }
     }
 
@@ -505,45 +535,46 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      * @return Returns true, if there are changes.
      */
     private boolean checkChanges() {
-        byte txType;
-        int matches = (matches_for_valid_pattern_textView.getText().equals("")) ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());
+        byte pulseRateType;
+        int matches = (matches_for_valid_pattern_textView.getText().equals(""))
+                ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());;
+        int pulseRate1 = 0;
+        int pulseRate2 = 0;
+        int pulseRate3 = 0;
+        int pulseRate4 = 0;
+        int pulseRateTolerance1 = 0;
+        int pulseRateTolerance2 = 0;
+        int pulseRateTolerance3 = 0;
+        int pulseRateTolerance4 = 0;
+        int maxPulseRate = 0;
+        int minPulseRate = 0;
         switch (pulse_rate_type_textView.getText().toString()) {
             case "Fixed Pulse Rate":
-                txType = (byte) 0x21;
+                pulseRateType = (byte) 0x21;
+                pulseRate1 = Integer.parseInt(pr1_textView.getText().toString());
+                pulseRate2 = Integer.parseInt(pr2_textView.getText().toString());
+                pulseRate3 = Integer.parseInt(pr3_textView.getText().toString());
+                pulseRate4 = Integer.parseInt(pr4_textView.getText().toString());
+                pulseRateTolerance1 = Integer.parseInt(pr1_tolerance_textView.getText().toString());
+                pulseRateTolerance2 = Integer.parseInt(pr2_tolerance_textView.getText().toString());
+                pulseRateTolerance3 = Integer.parseInt(pr3_tolerance_textView.getText().toString());
+                pulseRateTolerance4 = Integer.parseInt(pr4_tolerance_textView.getText().toString());
                 break;
             case "Variable Pulse Rate":
-                txType = (byte) 0x22;
+                pulseRateType = (byte) 0x22;
+                maxPulseRate = Integer.parseInt(max_pulse_rate_textView.getText().toString());
+                minPulseRate = Integer.parseInt(min_pulse_rate_textView.getText().toString());
                 break;
             default:
                 return false;
         }
-
-        int pr1 = 0;
-        int pr2 = 0;
-        int pr3 = 0;
-        int pr4 = 0;
-        int prt1 = 0;
-        int prt2 = 0;
-        int prt3 = 0;
-        int prt4 = 0;
-        if (Converters.getHexValue(txType).equals("21")) {
-            pr1 = Integer.parseInt(pr1_textView.getText().toString());
-            pr2 = Integer.parseInt(pr2_textView.getText().toString());
-            pr3 = Integer.parseInt(pr3_textView.getText().toString());
-            pr4 = Integer.parseInt(pr4_textView.getText().toString());
-            prt1 = Integer.parseInt(pr1_tolerance_textView.getText().toString());
-            prt2 = Integer.parseInt(pr2_tolerance_textView.getText().toString());
-            prt3 = Integer.parseInt(pr3_tolerance_textView.getText().toString());
-            prt4 = Integer.parseInt(pr4_tolerance_textView.getText().toString());
-        } else if (Converters.getHexValue(txType).equals("22")) {
-            pr1 = Integer.parseInt(max_pulse_rate_textView.getText().toString()) / 256;
-            prt1 = Integer.parseInt(max_pulse_rate_textView.getText().toString()) % 256;
-            pr2 = Integer.parseInt(min_pulse_rate_textView.getText().toString()) / 256;
-            prt2 = Integer.parseInt(min_pulse_rate_textView.getText().toString()) % 256;
-        }
-
-        return (data[0] != Integer.parseInt(Converters.getDecimalValue(txType)) || data[1] != matches || data[2] != pr1 || data[3] != prt1 ||
-                data[4] != pr2 || data[5] != prt2 || data[6] != pr3 || data[7] != prt3 || data[8] != pr4 || data[9] != prt4);
+        return (int) originalData.get("PulseRateType") != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
+                || (int) originalData.get("Matches") != matches || (int) originalData.get("PulseRate1") != pulseRate1
+                || (int) originalData.get("PulseRate2") != pulseRate2 || (int) originalData.get("PulseRate3") != pulseRate3
+                || (int) originalData.get("PulseRate4") != pulseRate4 || (int) originalData.get("PulseRateTolerance1") != pulseRateTolerance1
+                || (int) originalData.get("PulseRateTolerance2") != pulseRateTolerance2 || (int) originalData.get("PulseRateTolerance3") != pulseRateTolerance3
+                || (int) originalData.get("PulseRateTolerance4") != pulseRateTolerance4 || (int) originalData.get("MaxPulseRate") != maxPulseRate
+                || (int) originalData.get("MinPulseRate") != minPulseRate;
     }
 
     /**

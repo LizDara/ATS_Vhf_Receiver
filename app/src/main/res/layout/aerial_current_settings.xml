@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_rate_seconds"
+                android:text="@string/lb_scan_time_seconds"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -149,17 +149,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         tools:ignore="NestedWeights" />
-
-    <TextView
-        android:id="@+id/frequency_empty_textView"
-        style="@style/body_small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16sp"
-        android:gravity="center"
-        android:text="@string/lb_frequency_empty"
-        android:textColor="@color/tall_poppy"
-        android:visibility="gone" />
 
     <Button
         android:id="@+id/edit_aerial_settings_button"

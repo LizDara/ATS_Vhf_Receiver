@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/delete_linearLayout"
+    android:id="@+id/deleting_linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
@@ -14,23 +14,21 @@
         android:background="@color/catskill_white"
         android:elevation="4sp"
         android:orientation="vertical"
+        android:gravity="center"
         android:padding="16sp">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16sp"/>
 
         <TextView
             style="@style/h2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/lb_delete_all"
+            android:text="@string/lb_deleting"
             android:textColor="@color/black" />
-
-        <Button
-            android:id="@+id/delete_receiver_button"
-            style="@style/button_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32sp"
-            android:text="@string/lb_delete_receiver_data" />
 
     </LinearLayout>
 

@@ -240,8 +240,7 @@ public class TestReceiverActivity extends AppCompatActivity {
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-        // Loading the test
-        runningTest();
+        runningTest(); // Loading the test
     }
 
     @Override
@@ -409,7 +408,7 @@ public class TestReceiverActivity extends AppCompatActivity {
         ImageView spinner_testing = view.findViewById(R.id.spinner_testing);
         TextView state_test_textView = view.findViewById(R.id.state_test_textView);
 
-        spinner_testing.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
+        spinner_testing.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
         Drawable drawable1 = spinner_testing.getDrawable();
         Animatable animatable1 = (Animatable) drawable1;
         AnimatedVectorDrawableCompat.registerAnimationCallback(drawable1, new Animatable2Compat.AnimationCallback() {
@@ -425,7 +424,7 @@ public class TestReceiverActivity extends AppCompatActivity {
 
         mHandlerTest.postDelayed(() -> {
             state_test_textView.setText(R.string.lb_diagnostics_complete);
-            spinner_testing.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.check_avd_anim));
+            spinner_testing.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.check_avd_anim));
             Drawable drawable2 = spinner_testing.getDrawable();
             Animatable animatable2 = (Animatable) drawable2;
             AnimatedVectorDrawableCompat.registerAnimationCallback(drawable2, new Animatable2Compat.AnimationCallback() {

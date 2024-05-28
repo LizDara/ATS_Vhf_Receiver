@@ -1,5 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -17,7 +19,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,12 +42,12 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
@@ -54,7 +55,11 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_delete;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease_light;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_delete;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase_light;
 import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
 
 public class ManualScanActivity extends AppCompatActivity {
@@ -73,24 +78,10 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView percent_battery_textView;
     @BindView(R.id.ready_manual_scan_linearLayout)
     LinearLayout ready_manual_scan_LinearLayout;
-    @BindView(R.id.frequency_edit_linearLayout)
-    LinearLayout frequency_edit_linearLayout;
     @BindView(R.id.frequency_manual_textView)
     TextView frequency_manual_textView;
     @BindView(R.id.manual_gps_switch)
     SwitchCompat manual_gps_switch;
-    @BindView(R.id.start_manual_button)
-    Button start_manual_button;
-    @BindView(R.id.frequency_textView)
-    TextView frequency_textView;
-    @BindView(R.id.line_frequency_view)
-    View line_frequency_view;
-    @BindView(R.id.edit_frequency_message_textView)
-    TextView edit_frequency_message_textView;
-    @BindView(R.id.number_buttons_linearLayout)
-    LinearLayout number_buttons_linearLayout;
-    @BindView(R.id.save_changes_button)
-    Button save_changes_button;
     @BindView(R.id.manual_scan_linearLayout)
     LinearLayout manual_scan_linearLayout;
     @BindView(R.id.frequency_scan_manual_textView)
@@ -105,8 +96,16 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView pulse_rate_textView;
     @BindView(R.id.line_view)
     View line_view;
-    @BindView(R.id.record_data_manual_linearLayout)
-    LinearLayout record_data_manual_linearLayout;
+    @BindView(R.id.record_data_manual_button)
+    Button record_data_manual_button;
+    @BindView(R.id.audio_manual_linearLayout)
+    LinearLayout audio_manual_linearLayout;
+    @BindView(R.id.minus_imageView)
+    ImageView minus_imageView;
+    @BindView(R.id.plus_imageView)
+    ImageView plus_imageView;
+    @BindView(R.id.saving_targets_textView)
+    TextView saving_targets_textView;
 
     private final static String TAG = ManualScanActivity.class.getSimpleName();
 
@@ -116,25 +115,17 @@ public class ManualScanActivity extends AppCompatActivity {
 
     private boolean isScanning;
     private boolean isEditFrequency;
-    private boolean previousScanning;
 
     private int baseFrequency;
     private int frequencyRange;
+    private int range;
     private byte detectionType;
     private int newFrequency;
     private int code;
     private int detections;
     private int mort;
-    private int year;
-    private int month;
-    private int day;
-    private int hour;
-    private int minute;
-    private int seconds;
 
     private AnimationDrawable animationDrawable;
-    private LinearLayout linearLayoutBaseFrequency;
-    private Button buttonBaseFrequency;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -210,6 +201,12 @@ public class ManualScanActivity extends AppCompatActivity {
                         case "recordData": // Records a code
                             onClickRecord();
                             break;
+                        case "decrease":
+                            onClickDecrease();
+                            break;
+                        case "increase":
+                            onClickIncrease();
+                            break;
                     }
                 }
             }
@@ -219,35 +216,18 @@ public class ManualScanActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * Change the period while editing the pulse rate.
-     */
-    private TextWatcher textChangedListener = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            if (frequency_textView.getText().toString().length() == 6) {
-                save_changes_button.setEnabled(true);
-                save_changes_button.setAlpha(1);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-            } else {
-                save_changes_button.setEnabled(false);
-                save_changes_button.setAlpha((float) 0.6);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
-            }
-        }
-    };
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (ValueCodes.CANCELLED == result.getResultCode()) {
+                    setVisibility("overview");
+                }
+                if (ValueCodes.RESULT_OK == result.getResultCode()) {
+                    newFrequency = result.getData().getExtras().getInt("frequency");
+                    frequency_manual_textView.setText(getFrequency(newFrequency));
+                    parameter = "sendLog";
+                    mBluetoothLeService.discovering();
+                }
+            });
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -277,34 +257,25 @@ public class ManualScanActivity extends AppCompatActivity {
         int hh = currentDate.get(Calendar.HOUR_OF_DAY);
         int mm =  currentDate.get(Calendar.MINUTE);
         int ss = currentDate.get(Calendar.SECOND);
-        year = YY % 100;
 
         byte[] b = new byte[] {(byte) 0x86, (byte) ((newFrequency - baseFrequency) / 256),
                 (byte) ((newFrequency - baseFrequency) % 256), (byte) (manual_gps_switch.isChecked() ? 0x80 : 0x0),
-                (byte) year, (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss};
+                (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss};
 
+        Log.i(TAG, "On Click Start Manual: " + Converters.getHexValue(b));
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
         isScanning = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
         if (isScanning) {
             parameterWrite = "";
-            title_toolbar.setText(R.string.lb_manual_scanning);
             setVisibility("scanning");
-            record_data_manual_linearLayout.setVisibility(View.VISIBLE);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-
-            state_view.setBackgroundResource(R.drawable.scanning_animation);
-            animationDrawable = (AnimationDrawable) state_view.getBackground();
-            animationDrawable.start();
 
             int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
             code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
             period_textView.setVisibility(visibility);
             pulse_rate_textView.setVisibility(visibility);
-            frequency_scan_manual_textView.setText((String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3)));
-
-            device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, manual"));
+            frequency_scan_manual_textView.setText(getFrequency(newFrequency));
         }
     }
 
@@ -340,21 +311,16 @@ public class ManualScanActivity extends AppCompatActivity {
         if (result) {
             clear();
             isScanning = false;
-            animationDrawable.stop();
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-            record_data_manual_linearLayout.setAlpha((float) 1);
-            record_data_manual_linearLayout.setEnabled(true);
-            record_data_manual_linearLayout.setVisibility(View.GONE);
-            state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-
-            device_name_textView.setText(receiverInformation.getDeviceName());
 
             if (isEditFrequency) {
                 isEditFrequency = false;
-                title_toolbar.setText(R.string.lb_change_frequency);
-                setVisibility("change");
+                Intent intent = new Intent(this, EnterFrequencyActivity.class);
+                intent.putExtra("title", "Change Frequency");
+                intent.putExtra("baseFrequency", baseFrequency);
+                intent.putExtra("range", range);
+                launcher.launch(intent);
             } else {
-                title_toolbar.setText(R.string.manual_scanning);
+                animationDrawable.stop();
                 setVisibility("overview");
             }
             parameter = "";
@@ -364,7 +330,7 @@ public class ManualScanActivity extends AppCompatActivity {
     /**
      * Records the specific code information, the code received.
      */
-    public void onClickRecord() {
+    private void onClickRecord() {
         byte[] b = new byte[] {(byte) 0x8C, (byte) detections, (byte) mort, (byte) code};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -373,8 +339,9 @@ public class ManualScanActivity extends AppCompatActivity {
         Log.i(TAG, "RECORD: " + Converters.getDecimalValue(b));
 
         if (result) {
-            record_data_manual_linearLayout.setAlpha((float) 0.6);
-            record_data_manual_linearLayout.setEnabled(false);
+            saving_targets_textView.setVisibility(View.GONE);
+            record_data_manual_button.setAlpha(1);
+            record_data_manual_button.setEnabled(true);
         }
     }
 
@@ -386,37 +353,51 @@ public class ManualScanActivity extends AppCompatActivity {
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
-    @OnClick(R.id.enter_new_frequency_button)
-    public void onClickEnterNewFrequency(View v) {
-        title_toolbar.setText(R.string.lb_change_frequency);
-        setVisibility("change");
-        frequency_textView.setText(R.string.lb_enter_frequency_digits);
-        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-        line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-        edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
-        save_changes_button.setText(R.string.lb_change_frequency);
-        save_changes_button.setEnabled(false);
-        save_changes_button.setAlpha((float) 0.6);
+    private void onClickDecrease() {
+        byte[] b = new byte[] {(byte) 0x5E, (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256)};
+        Log.i(TAG, "DECREASE FREQUENCY AERIAL");
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+
+        if (result) {
+            if (newFrequency == baseFrequency) {
+                minus_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease_light));
+                minus_imageView.setEnabled(false);
+            } else if (newFrequency == frequencyRange - 1) {
+                plus_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase));
+                plus_imageView.setEnabled(true);
+            }
+        }
     }
 
-    @OnClick(R.id.save_changes_button)
-    public void onClickSaveChanges(View v) {
-        newFrequency = (frequency_textView.getText().toString().isEmpty()) ? 0 : Integer.parseInt(frequency_textView.getText().toString());
-        if (newFrequency >= baseFrequency && newFrequency <= frequencyRange) {
-            frequency_manual_textView.setText(String.valueOf(newFrequency).substring(0, 3) + "." + String.valueOf(newFrequency).substring(3));
-            title_toolbar.setText(R.string.manual_scanning);
-            setVisibility("overview");
-            start_manual_button.setEnabled(true);
-            start_manual_button.setAlpha(1);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Invalid Format or Values");
-            builder.setMessage("Please enter valid frequency values.");
-            builder.setPositiveButton("Ok", null);
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
+    private void onClickIncrease() {
+        byte[] b = new byte[] {(byte) 0x5F, (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256)};
+        Log.i(TAG, "INCREASE FREQUENCY AERIAL");
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+
+        if (result) {
+            if (newFrequency == baseFrequency + 1) {
+                minus_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease));
+                minus_imageView.setEnabled(true);
+            } else if (newFrequency == frequencyRange) {
+                plus_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase_light));
+                plus_imageView.setEnabled(false);
+            }
         }
+    }
+
+    @OnClick(R.id.enter_new_frequency_button)
+    public void onClickEnterNewFrequency(View v) {
+        Intent intent = new Intent(this, EnterFrequencyActivity.class);
+        intent.putExtra("title", "Change Frequency");
+        intent.putExtra("baseFrequency", baseFrequency);
+        intent.putExtra("range", range);
+        launcher.launch(intent);
     }
 
     @OnClick(R.id.start_manual_button)
@@ -427,14 +408,32 @@ public class ManualScanActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_frequency_button)
     public void onClickEditFrequency(View v) {
-        parameterWrite = "stopManual";
         isEditFrequency = true;
+        parameterWrite = "stopManual";
         mBluetoothLeService.discoveringSecond();
     }
 
-    @OnClick(R.id.record_data_manual_linearLayout)
+    @OnClick(R.id.record_data_manual_button)
     public void onClickRecordData(View v) {
         parameterWrite = "recordData";
+        mBluetoothLeService.discoveringSecond();
+
+        saving_targets_textView.setVisibility(View.VISIBLE);
+        record_data_manual_button.setAlpha((float) 0.6);
+        record_data_manual_button.setEnabled(false);
+    }
+
+    @OnClick(R.id.minus_imageView)
+    public void onClickMinus(View v) {
+        newFrequency = getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) - 1;
+        parameterWrite = "decrease";
+        mBluetoothLeService.discoveringSecond();
+    }
+
+    @OnClick(R.id.plus_imageView)
+    public void onClickPlus(View v) {
+        newFrequency = getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) + 1;
+        parameterWrite = "increase";
         mBluetoothLeService.discoveringSecond();
     }
 
@@ -449,8 +448,6 @@ public class ManualScanActivity extends AppCompatActivity {
         title_toolbar.setText(R.string.manual_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-        isScanning = false;
-        isEditFrequency = false;
 
         // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -465,47 +462,28 @@ public class ManualScanActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
-        int range = sharedPreferences.getInt("Range", 0);
-        detectionType =(byte) sharedPreferences.getInt("DetectionType", 0);
+        range = sharedPreferences.getInt("Range", 0);
+        detectionType = (byte) sharedPreferences.getInt("DetectionType", 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
+        isEditFrequency = false;
 
-        frequency_textView.addTextChangedListener(textChangedListener);
-        String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
-        edit_frequency_message_textView.setText(message);
+        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
+        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        audio_manual_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        period_textView.setVisibility(visibility);
+        pulse_rate_textView.setVisibility(visibility);
+
+        frequency_manual_textView.setText(getFrequency(baseFrequency));
 
         if (isScanning) { // The device is already scanning
-            previousScanning = true;
             parameter = "sendLogScanning";
-            year = getIntent().getExtras().getInt("year");
-            month = getIntent().getExtras().getInt("month");
-            day = getIntent().getExtras().getInt("day");
-            hour = getIntent().getExtras().getInt("hour");
-            minute = getIntent().getExtras().getInt("minute");
-            seconds = getIntent().getExtras().getInt("seconds");
-
             setVisibility("scanning");
-            record_data_manual_linearLayout.setVisibility(View.VISIBLE);
-            title_toolbar.setText(R.string.lb_aerial_scanning);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-
-            state_view.setBackgroundResource(R.drawable.scanning_animation);
-            animationDrawable = (AnimationDrawable) state_view.getBackground();
-            animationDrawable.start();
-
-            int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
-            code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-            period_textView.setVisibility(visibility);
-            pulse_rate_textView.setVisibility(visibility);
         } else { // Gets manual defaults data
             setVisibility("overview");
-            previousScanning = false;
-            start_manual_button.setEnabled(false);
-            start_manual_button.setAlpha((float) 0.6);
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-        createNumberButtons(range);
     }
 
     @Override
@@ -536,14 +514,10 @@ public class ManualScanActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
-                if (frequency_edit_linearLayout.getVisibility() == View.VISIBLE) {
-                    setVisibility("overview");
-                } else {
-                    Intent intent = new Intent(this, StartScanningActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
+                Intent intent = new Intent(this, StartScanningActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             } else {
                 parameterWrite = "stopManual";
                 mBluetoothLeService.discoveringSecond();
@@ -587,125 +561,31 @@ public class ManualScanActivity extends AppCompatActivity {
         switch (value) {
             case "overview":
                 ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
-                frequency_edit_linearLayout.setVisibility(View.GONE);
                 manual_scan_linearLayout.setVisibility(View.GONE);
-                break;
-            case "change":
-                ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-                frequency_edit_linearLayout.setVisibility(View.VISIBLE);
-                manual_scan_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.manual_scanning);
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+                device_name_textView.setText(receiverInformation.getDeviceName());
                 break;
             case "scanning":
                 ready_manual_scan_LinearLayout.setVisibility(View.GONE);
-                frequency_edit_linearLayout.setVisibility(View.GONE);
                 manual_scan_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText(R.string.lb_manual_scanning);
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+                state_view.setBackgroundResource(R.drawable.scanning_animation);
+                animationDrawable = (AnimationDrawable) state_view.getBackground();
+                animationDrawable.start();
+                device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, manual"));
                 break;
         }
     }
 
-    private void createNumberButtons(int range) {
-        int baseNumber = baseFrequency / 1000;
-        for (int i = 0; i < range / 4; i++) {
-            newBaseLinearLayout();
-            for (int j = 0; j < 4; j++) {
-                newBaseButton(baseNumber);
-                int finalBaseNumber = baseNumber;
-                buttonBaseFrequency.setOnClickListener(view -> {
-                    if (frequency_textView.getText().toString().isEmpty() || frequency_textView.getText().toString().length() > 6) {
-                        frequency_textView.setText(String.valueOf(finalBaseNumber));
-                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), ebony_clay));
-                    }
-                });
-                linearLayoutBaseFrequency.addView(buttonBaseFrequency);
-                baseNumber++;
-            }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
-        }
-
-        Space space = new Space(this);
-        space.setLayoutParams(newLinearLayoutParams());
-        number_buttons_linearLayout.addView(space);
-
-        int number = 1;
-        for (int i = 0; i < 3; i++) {
-            newBaseLinearLayout();
-            for (int j = 0; j < 4; j++) {
-                if (number == 10) {
-                    Space spaceBaseFrequency = new Space(this);
-                    spaceBaseFrequency.setLayoutParams(newButtonParams());
-                    linearLayoutBaseFrequency.addView(spaceBaseFrequency);
-                }else if (number == 11) {
-                    ImageView imageViewBaseFrequency = new ImageView(this);
-                    imageViewBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_delete));
-                    imageViewBaseFrequency.setImageDrawable(ContextCompat.getDrawable(this, ic_delete));
-                    imageViewBaseFrequency.setLayoutParams(newButtonDeleteParams());
-                    imageViewBaseFrequency.setPadding(50, 0, 50, 0);
-                    imageViewBaseFrequency.setOnClickListener(view -> {
-                        if (!frequency_textView.getText().toString().isEmpty()) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous.substring(0, previous.length() - 1));
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(imageViewBaseFrequency);
-                } else {
-                    newBaseButton(number);
-                    int finalNumber = number;
-                    buttonBaseFrequency.setOnClickListener(view -> {
-                        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous + finalNumber);
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(buttonBaseFrequency);
-                }
-                if (number == 9) number = 0;
-                else if (number == 0) number = 10;
-                else number++;
-            }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
-        }
+    private String getFrequency(int frequency) {
+        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
     }
 
-    private void newBaseLinearLayout() {
-        linearLayoutBaseFrequency = new LinearLayout(this);
-        linearLayoutBaseFrequency.setLayoutParams(newLinearLayoutParams());
-        linearLayoutBaseFrequency.setOrientation(LinearLayout.HORIZONTAL);
-    }
-
-    private void newBaseButton(int baseNumber) {
-        buttonBaseFrequency = new Button(this);
-        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, border));
-        buttonBaseFrequency.setTextSize(16);
-        buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        buttonBaseFrequency.setText(String.valueOf(baseNumber));
-        buttonBaseFrequency.setLayoutParams(newButtonParams());
-    }
-
-    /**
-     * Sets the margins for the LinearLayout.
-     *
-     * @return Returns a LayoutParams with the customize margins.
-     */
-    private LinearLayout.LayoutParams newLinearLayoutParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(0, 0, 0, 32);
-        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
-        return params;
-    }
-
-    private LinearLayout.LayoutParams newButtonParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.weight = 1;
-        return params;
-    }
-
-    private LinearLayout.LayoutParams newButtonDeleteParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.height = GridLayout.LayoutParams.MATCH_PARENT;
-        params.weight = 1;
-        return params;
+    private int getFrequencyNumber(String frequency) {
+        return Integer.parseInt(frequency.replace(".", ""));
     }
 
     /**
@@ -714,9 +594,13 @@ public class ManualScanActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
+        Log.i(TAG, Converters.getHexValue(data));
+        if (Converters.getHexValue(data[0]).equals("A1"))
+            return;
         int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 (Integer.parseInt(Converters.getDecimalValue(data[2]))));
-        frequency_scan_manual_textView.setText((String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3)));
+        frequency_scan_manual_textView.setText(getFrequency(frequency));
+        frequency_manual_textView.setText(getFrequency(frequency));
 
         int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
 
@@ -763,24 +647,31 @@ public class ManualScanActivity extends AppCompatActivity {
         codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         codeTextView.setLayoutParams(params);
 
-        TextView signalStrengthTextView = new TextView(this);
-        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(body_regular);
-        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        signalStrengthTextView.setLayoutParams(params);
-
         TextView detectionsTextView = new TextView(this);
         detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
         detectionsTextView.setTextAppearance(body_regular);
         detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         detectionsTextView.setLayoutParams(params);
 
+        TextView mortalityTextView = new TextView(this);
+        mortalityTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        mortalityTextView.setTextAppearance(body_regular);
+        mortalityTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        mortalityTextView.setLayoutParams(params);
+
+        TextView signalStrengthTextView = new TextView(this);
+        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        signalStrengthTextView.setTextAppearance(body_regular);
+        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        signalStrengthTextView.setLayoutParams(params);
+
         TextView mortTextView = new TextView(this);
         mortTextView.setVisibility(View.GONE);
 
         newCode.addView(codeTextView);
-        newCode.addView(signalStrengthTextView);
         newCode.addView(detectionsTextView);
+        newCode.addView(mortalityTextView);
+        newCode.addView(signalStrengthTextView);
         newCode.addView(mortTextView);
 
         LinearLayout line = new LinearLayout(this);
@@ -804,7 +695,7 @@ public class ManualScanActivity extends AppCompatActivity {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
 
-        return Integer.parseInt(codeTextView.getText().toString().replace(" M", "")) == code;
+        return Integer.parseInt(codeTextView.getText().toString()) == code;
     }
 
     /**
@@ -814,12 +705,12 @@ public class ManualScanActivity extends AppCompatActivity {
      */
     private void refreshFirstCode(int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
-        TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(1);
-        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView mortalityTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+        TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        if (!codeTextView.getText().toString().contains(" M") && isMort) codeTextView.setText(codeTextView.getText().toString() + " M");
+        mortalityTextView.setText(isMort ? "M" : "-");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
         if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
@@ -838,11 +729,11 @@ public class ManualScanActivity extends AppCompatActivity {
         int position = 0;
         for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
-            TextView textView = (TextView) linearLayout.getChildAt(0);
+            TextView codeTextView = (TextView) linearLayout.getChildAt(0);
 
-            if (Integer.parseInt(textView.getText().toString().replace(" M", "")) == code) position = i;
+            if (Integer.parseInt(codeTextView.getText().toString()) == code)
+                position = i;
         }
-
         return position;
     }
 
@@ -855,10 +746,10 @@ public class ManualScanActivity extends AppCompatActivity {
     private void refreshPosition(int position, int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView detectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView mortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        int code = Integer.parseInt(codeTextView.getText().toString().replace(" M", ""));
+        int code = Integer.parseInt(codeTextView.getText().toString());
         int detections = Integer.parseInt(detectionsTextView.getText().toString());
         int mort = Integer.parseInt(mortTextView.getText().toString());
 
@@ -875,7 +766,7 @@ public class ManualScanActivity extends AppCompatActivity {
      * @param isMort True, if the code is mort.
      */
     private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort, int mort) {
-        for (int i = finalPosition; i > 3; i -= 2) {
+        for (int i = finalPosition; i > 3 ; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
 
@@ -883,31 +774,37 @@ public class ManualScanActivity extends AppCompatActivity {
             TextView penultimateCodeTextView = (TextView) penultimateLinearLayout.getChildAt(0);
             lastCodeTextView.setText(penultimateCodeTextView.getText());
 
-            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(1);
-            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(1);
-            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
-
-            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(2);
-            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(1);
             lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
 
-            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(3);
-            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            TextView lastMortalityTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimateMortalityTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            lastMortalityTextView.setText(penultimateMortalityTextView.getText());
+
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
+
+            TextView lastMortTextView = (TextView) lastLinearLayout.getChildAt(4);
+            TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(4);
             lastMortTextView.setText(penultimateMortTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView newCodeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newMortTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newMortalityTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newMortTextView = (TextView) linearLayout.getChildAt(4);
 
-        newCodeTextView.setText(code + (isMort ? " M" : ""));
-        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
+        newCodeTextView.setText(String.valueOf(code));
         newDetectionsTextView.setText(String.valueOf(detections));
-
+        newMortalityTextView.setText(isMort ? "M" : "-");
+        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
-        this.detections = detections;
+
+        this.detections =  detections;
         this.mort = isMort ? mort + 1 : mort;
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
@@ -930,32 +827,32 @@ public class ManualScanActivity extends AppCompatActivity {
 
         TextView periodTextView = new TextView(this);
         periodTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        periodTextView.setTextAppearance(this, R.style.body_regular);
+        periodTextView.setTextAppearance(body_regular);
         periodTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         periodTextView.setLayoutParams(params);
 
+        TextView detectionsTextView = new TextView(this);
+        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        detectionsTextView.setTextAppearance(body_regular);
+        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        detectionsTextView.setLayoutParams(params);
+
         TextView pulseRateTextView = new TextView(this);
         pulseRateTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        pulseRateTextView.setTextAppearance(this, R.style.body_regular);
+        pulseRateTextView.setTextAppearance(body_regular);
         pulseRateTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         pulseRateTextView.setLayoutParams(params);
 
         TextView signalStrengthTextView = new TextView(this);
         signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(this, R.style.body_regular);
+        signalStrengthTextView.setTextAppearance(body_regular);
         signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
         signalStrengthTextView.setLayoutParams(params);
 
-        TextView detectionsTextView = new TextView(this);
-        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(this, R.style.body_regular);
-        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        detectionsTextView.setLayoutParams(params);
-
         newNonCoded.addView(periodTextView);
+        newNonCoded.addView(detectionsTextView);
         newNonCoded.addView(pulseRateTextView);
         newNonCoded.addView(signalStrengthTextView);
-        newNonCoded.addView(detectionsTextView);
 
         LinearLayout line = new LinearLayout(this);
         line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
@@ -972,29 +869,29 @@ public class ManualScanActivity extends AppCompatActivity {
             TextView penultimatePeriodTextView = (TextView) penultimateLinearLayout.getChildAt(0);
             lastPeriodTextView.setText(penultimatePeriodTextView.getText());
 
-            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(1);
-            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
+
+            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(2);
             lastPulseRateTextView.setText(penultimatePulseRateTextView.getText());
 
-            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(2);
-            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
             lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
-
-            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(3);
-            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(3);
-            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
         }
 
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView newPeriodTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(3);
+        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(2);
+        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
 
         newPeriodTextView.setText(String.valueOf(period));
-        newPulseRateTextView.setText(String.format("%.2f", pulseRate));
-        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newDetectionsTextView.setText(String.valueOf(detections));
+        newPulseRateTextView.setText(String.valueOf(pulseRate));
+        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
     }
 
     /**

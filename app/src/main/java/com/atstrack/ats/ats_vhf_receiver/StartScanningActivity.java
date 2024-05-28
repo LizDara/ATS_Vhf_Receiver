@@ -90,6 +90,7 @@ public class StartScanningActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
+                Log.i(TAG, "Action: " + action);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                     invalidateOptionsMenu();
@@ -223,13 +224,17 @@ public class StartScanningActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            Intent intent = new Intent(this, MainMenuActivity.class);
-            // In the MainMenuActivity, only displays the main menu
-            intent.putExtra("menu", true);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
+            if (warning_no_tables_linearLayout.getVisibility() == View.VISIBLE) {
+                menu_scan_linearLayout.setVisibility(View.VISIBLE);
+                warning_no_tables_linearLayout.setVisibility(View.GONE);
+            } else {
+                Intent intent = new Intent(this, MainMenuActivity.class); // In the MainMenuActivity, only displays the main menu
+                intent.putExtra("menu", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

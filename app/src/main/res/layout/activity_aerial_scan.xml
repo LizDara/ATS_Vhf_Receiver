@@ -24,9 +24,6 @@
             layout="@layout/edit_table_scan"/>
 
         <include
-            layout="@layout/frequency_edit"/>
-
-        <include
             layout="@layout/merge_tables_scan"/>
 
         <include

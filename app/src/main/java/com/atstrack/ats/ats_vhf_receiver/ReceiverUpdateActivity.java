@@ -157,7 +157,7 @@ public class ReceiverUpdateActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        updating_receiver_imageView.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
+        updating_receiver_imageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
         Drawable drawable = updating_receiver_imageView.getDrawable();
         Animatable animatable = (Animatable) drawable;
         AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {

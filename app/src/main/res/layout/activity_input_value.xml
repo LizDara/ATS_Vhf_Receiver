@@ -21,6 +21,9 @@
             layout="@layout/store_rate_values"/>
 
         <include
+            layout="@layout/merge_tables_scan"/>
+
+        <include
             layout="@layout/receiver_status"/>
 
     </LinearLayout>

@@ -3,9 +3,6 @@ package com.atstrack.ats.ats_vhf_receiver;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -18,9 +15,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -55,8 +48,6 @@ public class MainMenuActivity extends AppCompatActivity {
     TextView disconnect_button;
     @BindView(R.id.connecting_device_linearLayout)
     LinearLayout connecting_device_linearLayout;
-    @BindView(R.id.check_avd_anim)
-    ImageView check_avd_anim;
     @BindView(R.id.percent_battery_menu_textView)
     TextView percent_battery_menu;
 
@@ -101,6 +92,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private boolean mConnected = false;
     private String parameter;
+    private String secondParameter;
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -112,6 +104,7 @@ public class MainMenuActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
+                Log.i(TAG, action);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                     invalidateOptionsMenu();
@@ -119,12 +112,31 @@ public class MainMenuActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("scanning")) // Checks if the BLE device is scanning
+                    if (parameter.equals("scanning"))
                         onClickScanning();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameter.equals("scanning")) // Checks if the BLE device is scanning
-                        download(packet);
+                    if (Converters.getHexValue(packet[0]).equals("50")) // Checks if the BLE device is scanning
+                        downloadScanning(packet);
+                    else if (packet.length == 22) //Get scan data
+                        downloadBoardState(packet);
+                }
+            }
+            catch (Exception e) {
+                Log.i(TAG, e.toString());
+            }
+        }
+    };
+
+    private final BroadcastReceiver mSecondGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                final String action = intent.getAction();
+                if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
+                    if (secondParameter.equals("boardState")) { // Checks if the BLE device is scanning
+                        onClickBoardState();
+                    }
                 }
             }
             catch (Exception e) {
@@ -142,15 +154,35 @@ public class MainMenuActivity extends AppCompatActivity {
         return intentFilter;
     }
 
+    private static IntentFilter makeSecondGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        return intentFilter;
+    }
+
     /**
      * Requests a read for check if the BLE device is scanning.
      * Service name: Diagnostic.
-     * Characteristic name: BoardStatus.
+     * Characteristic name: BoardState.
      */
-    private void onClickScanning() {
+    private void onClickBoardState() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;
-        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_BOARD_STATUS;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_BOARD_STATE;
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+        secondParameter = "";
+        parameter = "boardState";
+    }
+
+    private void onClickScanning() {
+        secondParameter = "boardState";
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
+        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
+
+        new Handler().postDelayed(() -> {
+            mBluetoothLeService.discoveringSecond();
+        }, MESSAGE_PERIOD);
     }
 
     @OnClick(R.id.disconnect_button)
@@ -179,8 +211,7 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
         ButterKnife.bind(this);
 
-        // Keep screen on
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // Keep screen on
 
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
@@ -189,25 +220,12 @@ public class MainMenuActivity extends AppCompatActivity {
         boolean isMenu = getIntent().getBooleanExtra("menu", false);
 
         if (!isMenu) { // Connecting to the selected BLE device
-            // Checks if the BLE device is scanning
-            parameter = "scanning";
+            parameter = "scanning"; // Checks if the BLE device is scanning
             receiverInformation.changeInformation(
                     getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
                     getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS),
                     getIntent().getStringExtra(EXTRAS_DEVICE_STATUS),
                     getIntent().getStringExtra(EXTRAS_BATTERY));
-
-            // Initializes the spinner to connect to BLE device
-            check_avd_anim.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
-            Drawable drawable = check_avd_anim.getDrawable();
-            Animatable animatable = (Animatable) drawable;
-            AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    new Handler().postDelayed(() -> animatable.start(), CONNECT_PERIOD);
-                }
-            });
-            animatable.start();
 
             mHandlerMenu = new Handler();
             mHandler = new Handler();
@@ -240,6 +258,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        registerReceiver(mSecondGattUpdateReceiver, makeSecondGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG, "Connect request result=" + result);
@@ -250,6 +269,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
+        unregisterReceiver(mSecondGattUpdateReceiver);
     }
 
     @Override
@@ -312,18 +332,6 @@ public class MainMenuActivity extends AppCompatActivity {
             if (mConnected) {
                 state_textView.setText(R.string.lb_connected);
 
-                // Initializes the check animation when connected successfully
-                check_avd_anim.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.check_avd_anim));
-                Drawable drawable = check_avd_anim.getDrawable();
-                Animatable animatable = (Animatable) drawable;
-                AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {
-                    @Override
-                    public void onAnimationEnd(Drawable drawable) {
-                        new Handler().postDelayed(() -> animatable.start(), MESSAGE_PERIOD);
-                    }
-                });
-                animatable.start();
-
                 mHandlerMenu.postDelayed(() -> {
                     if (!scanning) { // After connecting displays the main menu
                         menu_linearLayout.setVisibility(View.VISIBLE);
@@ -342,81 +350,52 @@ public class MainMenuActivity extends AppCompatActivity {
      *
      * @param data The received packet.
      */
-    private void download(byte[] data) {
-        switch (Converters.getHexValue(data[0])) {
-            case "00": // The BLE device is not in scanning
-                scanning = false;
-                int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[1]));
-                int range = Integer.parseInt(Converters.getDecimalValue(data[2]));
-                int detectionType = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                int statusBytesDefault = Integer.parseInt(Converters.getDecimalValue(data[7]));
+    private void downloadBoardState(byte[] data) {
+        parameter = "scanning";
+        Log.i(TAG, "BoardState: " + Converters.getHexValue(data));
+        int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        int range = Integer.parseInt(Converters.getDecimalValue(data[2]));
+        int detectionType = Integer.parseInt(Converters.getDecimalValue(data[3]));
 
-                SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-                SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
-                sharedPreferencesEdit.putInt("BaseFrequency", baseFrequency);
-                sharedPreferencesEdit.putInt("Range", range);
-                sharedPreferencesEdit.putInt("DetectionType", detectionType);
-                sharedPreferencesEdit.apply();
-                break;
+        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+        SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
+        sharedPreferencesEdit.putInt("BaseFrequency", baseFrequency);
+        sharedPreferencesEdit.putInt("Range", range);
+        sharedPreferencesEdit.putInt("DetectionType", detectionType);
+        sharedPreferencesEdit.apply();
+    }
+
+    private void downloadScanning(byte[] data) {
+        parameter = "";
+        Log.i(TAG, "Scanning: " + Converters.getHexValue(data));
+        if (data[1] == 0)
+            return;
+        Intent intent = new Intent();
+        scanning = true;
+        switch (Converters.getHexValue(data[1])) {
             case "82": // The BLE device is in aerial scanning
-                scanning = true;
-                int txTypeA = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                int antennaA = Integer.parseInt(Converters.getDecimalValue(data[4])) / 16;
-                int tableA = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
-                int scanTimeA = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int timeoutA = Integer.parseInt(Converters.getDecimalValue(data[6]));
-
-                Intent intentA = new Intent(this, AerialScanActivity.class);
-                intentA.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentA.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intentA.putExtra("scanning", true);
-                intentA.putExtra("year", Integer.parseInt(Converters.getDecimalValue(data[16])));
-                intentA.putExtra("month", Integer.parseInt(Converters.getDecimalValue(data[17])));
-                intentA.putExtra("day", Integer.parseInt(Converters.getDecimalValue(data[18])));
-                intentA.putExtra("hour", Integer.parseInt(Converters.getDecimalValue(data[19])));
-                intentA.putExtra("minute", Integer.parseInt(Converters.getDecimalValue(data[20])));
-                intentA.putExtra("seconds", Integer.parseInt(Converters.getDecimalValue(data[21])));
-                startActivity(intentA);
+            case "81":
+                int autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+                int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
+                        + Integer.parseInt(Converters.getDecimalValue(data[17]));
+                int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
+                        + Integer.parseInt(Converters.getDecimalValue(data[8]));
+                intent = new Intent(this, AerialScanActivity.class);
+                intent.putExtra("isHold", Converters.getHexValue(data[1]).equals("81"));
+                intent.putExtra("autoRecord", autoRecord == 1);
+                intent.putExtra("frequency", currentFrequency);
+                intent.putExtra("index", currentIndex);
                 break;
             case "83": // The BLE device is in stationary scanning
-                scanning = true;
-                int txTypeS = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                int antennaS = Integer.parseInt(Converters.getDecimalValue(data[4])) / 16;
-                int tableS = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
-                int scanTimeS = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int timeoutS = Integer.parseInt(Converters.getDecimalValue(data[6]));
-
-                Intent intentS = new Intent(this, StationaryScanActivity.class);
-                intentS.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentS.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intentS.putExtra("scanning", true);
-                intentS.putExtra("year", Integer.parseInt(Converters.getDecimalValue(data[16])));
-                intentS.putExtra("month", Integer.parseInt(Converters.getDecimalValue(data[17])));
-                intentS.putExtra("day", Integer.parseInt(Converters.getDecimalValue(data[18])));
-                intentS.putExtra("hour", Integer.parseInt(Converters.getDecimalValue(data[19])));
-                intentS.putExtra("minute", Integer.parseInt(Converters.getDecimalValue(data[20])));
-                intentS.putExtra("seconds", Integer.parseInt(Converters.getDecimalValue(data[21])));
-                startActivity(intentS);
+                intent = new Intent(this, StationaryScanActivity.class);
                 break;
             case "86": // The BLE device is in manual scanning
-                scanning = true;
-                int txTypeM = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                int antennaM = Integer.parseInt(Converters.getDecimalValue(data[4])) / 16;
-                int tableM = Integer.parseInt(Converters.getDecimalValue(data[4])) % 16;
-                int scanTimeM = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int timeoutM = Integer.parseInt(Converters.getDecimalValue(data[6]));
-
-                Intent intentM = new Intent(this, ManualScanActivity.class);
-                intentM.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentM.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intentM.putExtra("scanning", true);
-                intentM.putExtra("year", Integer.parseInt(Converters.getDecimalValue(data[16])));
-                intentM.putExtra("month", Integer.parseInt(Converters.getDecimalValue(data[17])));
-                intentM.putExtra("day", Integer.parseInt(Converters.getDecimalValue(data[18])));
-                intentM.putExtra("hour", Integer.parseInt(Converters.getDecimalValue(data[19])));
-                intentM.putExtra("minute", Integer.parseInt(Converters.getDecimalValue(data[20])));
-                intentM.putExtra("seconds", Integer.parseInt(Converters.getDecimalValue(data[21])));
-                startActivity(intentM);
+                intent = new Intent(this, ManualScanActivity.class);
+                break;
         }
+        intent.putExtra("scanning", true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

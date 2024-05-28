@@ -42,13 +42,13 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/erase_data_button"
+        android:id="@+id/view_data_button"
         style="@style/button_rectangle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="16sp"
-        android:text="@string/lb_erase_data" />
+        android:text="@string/lb_view_data" />
 
     <Button
         android:id="@+id/download_data_button"
@@ -56,6 +56,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="16sp"
         android:text="@string/lb_download_data" />
+
+    <Button
+        android:id="@+id/erase_data_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="16sp"
+        android:text="@string/lb_erase_data" />
 
 </LinearLayout>

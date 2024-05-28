@@ -89,28 +89,28 @@ public class GetDataActivity extends AppCompatActivity {
     LinearLayout download_complete_linearLayout;
     @BindView(R.id.delete_linearLayout)
     LinearLayout delete_linearLayout;
+    @BindView(R.id.deleting_linearLayout)
+    LinearLayout deleting_linearLayout;
     @BindView(R.id.deletion_complete_linearLayout)
     LinearLayout deletion_complete_linearLayout;
-    @BindView(R.id.delete_receiver_button)
-    Button delete_receiver_button;
     @BindView(R.id.downloading_data_imageView)
     ImageView downloading_data_imageView;
     @BindView(R.id.downloading_data_textView)
     TextView downloading_data_textView;
-    @BindView(R.id.downloading_imageView)
-    ImageView downloading_imageView;
+    @BindView(R.id.downloading_progressBar)
+    ProgressBar downloading_progressBar;
     @BindView(R.id.processing_data_imageView)
     ImageView processing_data_imageView;
     @BindView(R.id.processing_data_textView)
     TextView processing_data_textView;
-    @BindView(R.id.processing_imageView)
-    ImageView processing_imageView;
+    @BindView(R.id.processing_progressBar)
+    ProgressBar processing_progressBar;
     @BindView(R.id.preparing_file_imageView)
     ImageView preparing_file_imageView;
     @BindView(R.id.preparing_file_textView)
     TextView preparing_file_textView;
-    @BindView(R.id.preparing_imageView)
-    ImageView preparing_imageView;
+    @BindView(R.id.preparing_progressBar)
+    ProgressBar preparing_progressBar;
 
     private final static String TAG = GetDataActivity.class.getSimpleName();
 
@@ -134,8 +134,6 @@ public class GetDataActivity extends AppCompatActivity {
     private int packetNumber;
     private boolean error;
     private boolean isCanceled;
-
-    private AnimationDrawable animationDrawable;
 
     private Handler processHandler;
     private Handler receiveHandler;
@@ -188,9 +186,6 @@ public class GetDataActivity extends AppCompatActivity {
                         case "test": // Gets memory used and byte stored
                             onClickTest();
                             break;
-                        /*case "readData": // Gets pages total number
-                            onClickReadData();
-                            break;*/
                         case "downloadData": // Downloads raw bytes
                             onClickDownloadData();
                             break;
@@ -281,10 +276,8 @@ public class GetDataActivity extends AppCompatActivity {
     private void onClickReadData() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
-        boolean result = mBluetoothLeService.readCharacteristicDiagnosticResponse(service, characteristic);
-
-        if (result)
-            secondParameter = "";
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+        secondParameter = "";
     }
 
     /**
@@ -337,7 +330,7 @@ public class GetDataActivity extends AppCompatActivity {
 
         if (result) {
             secondParameter = "";
-            delete_receiver_button.setEnabled(false);
+            setVisibility("deleting");
         }
     }
 
@@ -349,8 +342,7 @@ public class GetDataActivity extends AppCompatActivity {
     @OnClick(R.id.erase_data_button)
     public void onClickEraseData(View v) {
         if (!bytes_stored_textView.getText().toString().contains("(0 bytes")) {
-            setVisibility("deleting");
-            title_toolbar.setText(R.string.lb_erase_data);
+            setVisibility("delete");
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Erase Data");
@@ -362,10 +354,6 @@ public class GetDataActivity extends AppCompatActivity {
 
     @OnClick(R.id.begin_download_button)
     public void onClickBeginDownload(View v) {
-        initDownloading();
-        setVisibility("downloading");
-        title_toolbar.setText(R.string.lb_download_data);
-
         parameter = "downloadData";
         mBluetoothLeService.discovering();
     }
@@ -373,12 +361,13 @@ public class GetDataActivity extends AppCompatActivity {
     @OnClick(R.id.cancel_download_button)
     public void onClickCancelDownload(View v) {
         isCanceled = true;
+        setVisibility("begin");
+        parameter = "";
     }
 
     @OnClick(R.id.return_button)
     public void onClickReturn(View v) {
         setVisibility("menu");
-        title_toolbar.setText(R.string.lb_manage_receiver);
     }
 
     @OnClick(R.id.delete_receiver_button)
@@ -390,7 +379,6 @@ public class GetDataActivity extends AppCompatActivity {
     @OnClick(R.id.return_screen_button)
     public void onClickReturnScreen(View v) {
         setVisibility("menu");
-        title_toolbar.setText(R.string.lb_manage_receiver);
     }
 
     @Override
@@ -401,7 +389,6 @@ public class GetDataActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText(R.string.manage_receiver_data);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -467,7 +454,15 @@ public class GetDataActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            finish();
+            if (menu_manage_receiver_linearLayout.getVisibility() == View.VISIBLE) {
+                finish();
+            } else if (begin_download_linearLayout.getVisibility() == View.VISIBLE) {
+                setVisibility("menu");
+            } else if (downloading_file_linearLayout.getVisibility() == View.VISIBLE) {
+                setVisibility("begin");
+            } else if (download_complete_linearLayout.getVisibility() == View.VISIBLE || delete_linearLayout.getVisibility() == View.VISIBLE || deletion_complete_linearLayout.getVisibility() == View.VISIBLE) {
+                setVisibility("menu");
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -504,7 +499,9 @@ public class GetDataActivity extends AppCompatActivity {
                 downloading_file_linearLayout.setVisibility(View.GONE);
                 download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.lb_manage_receiver);
                 break;
             case "begin":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
@@ -512,7 +509,9 @@ public class GetDataActivity extends AppCompatActivity {
                 downloading_file_linearLayout.setVisibility(View.GONE);
                 download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.lb_download_receiver_data);
                 break;
             case "downloading":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
@@ -520,6 +519,7 @@ public class GetDataActivity extends AppCompatActivity {
                 downloading_file_linearLayout.setVisibility(View.VISIBLE);
                 download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
                 break;
             case "downloaded":
@@ -528,14 +528,26 @@ public class GetDataActivity extends AppCompatActivity {
                 downloading_file_linearLayout.setVisibility(View.GONE);
                 download_complete_linearLayout.setVisibility(View.VISIBLE);
                 delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
+                break;
+            case "delete":
+                menu_manage_receiver_linearLayout.setVisibility(View.GONE);
+                begin_download_linearLayout.setVisibility(View.GONE);
+                downloading_file_linearLayout.setVisibility(View.GONE);
+                download_complete_linearLayout.setVisibility(View.GONE);
+                delete_linearLayout.setVisibility(View.VISIBLE);
+                deleting_linearLayout.setVisibility(View.GONE);
+                deletion_complete_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.lb_delete_receiver_data);
                 break;
             case "deleting":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
                 download_complete_linearLayout.setVisibility(View.GONE);
-                delete_linearLayout.setVisibility(View.VISIBLE);
+                delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.VISIBLE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
                 break;
             case "deleted":
@@ -544,6 +556,7 @@ public class GetDataActivity extends AppCompatActivity {
                 downloading_file_linearLayout.setVisibility(View.GONE);
                 download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
+                deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.VISIBLE);
                 break;
         }
@@ -568,7 +581,6 @@ public class GetDataActivity extends AppCompatActivity {
      * @param data This packet indicates the writing status.
      */
     private void downloadResponse(byte[] data) {
-        delete_receiver_button.setEnabled(true);
         if (Converters.getHexValue(data).equals("DD 00 BB EE ")) {
             parameter = "test";
             mBluetoothLeService.discovering();
@@ -581,19 +593,18 @@ public class GetDataActivity extends AppCompatActivity {
             builder.setPositiveButton("OK", null);
             builder.show();
         }
-
     }
 
     private void initDownloading() {
         downloading_data_imageView.setBackgroundResource(R.drawable.ic_circle_light);
         downloading_data_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        downloading_imageView.setVisibility(View.GONE);
+        downloading_progressBar.setVisibility(View.GONE);
         processing_data_imageView.setBackgroundResource(R.drawable.ic_circle_light);
         processing_data_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        processing_imageView.setVisibility(View.GONE);
+        processing_progressBar.setVisibility(View.GONE);
         preparing_file_imageView.setBackgroundResource(R.drawable.ic_circle_light);
         preparing_file_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        preparing_imageView.setVisibility(View.GONE);
+        preparing_progressBar.setVisibility(View.GONE);
     }
 
     /**
@@ -646,6 +657,10 @@ public class GetDataActivity extends AppCompatActivity {
         return (9 * (pageNumber + 1)) + packetNumber;
     }
 
+    private String getFrequency(int frequency) {
+        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
+    }
+
     /**
      * Processes the data when the download is complete.
      *
@@ -655,13 +670,10 @@ public class GetDataActivity extends AppCompatActivity {
      */
     private String readPacket(byte[] packet) {
         downloading_data_imageView.setBackgroundResource(R.drawable.circle_check);
-        downloading_imageView.setVisibility(View.GONE);
+        downloading_progressBar.setVisibility(View.GONE);
         processing_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         processing_data_imageView.setBackgroundResource(R.drawable.ic_circle);
-        processing_imageView.setVisibility(View.VISIBLE);
-        processing_imageView.setBackgroundResource(R.drawable.connecting_animation);
-        animationDrawable = (AnimationDrawable) processing_imageView.getBackground();
-        animationDrawable.start();
+        processing_progressBar.setVisibility(View.VISIBLE);
 
         String data = "";
         int index = 0;
@@ -672,16 +684,20 @@ public class GetDataActivity extends AppCompatActivity {
         int frequencyTableIndex = 0;
         int year;
         Calendar calendar = Calendar.getInstance();
-        String format = Converters.getHexValue(packet[0]);
+
+        String format = Converters.getHexValue(packet[index]);
+        while (!format.equals("83") && !format.equals("82")) {//find a format 82 or 83
+            index += 8;
+            format = Converters.getHexValue(packet[index]);
+        }
 
         if (format.equals("83") || format.equals("82")) {
-
             data += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + CR + LF;
-            year = Integer.parseInt(Converters.getDecimalValue(packet[6]));
+            year = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
             index += 8;
 
             while (index < packet.length) {
-                if (Converters.getHexValue(packet[index]).equals("F0")) {
+                if (Converters.getHexValue(packet[index]).equals("F0")) { //Header
                     frequency = (baseFrequency * 1000) + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
                             Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
                     frequencyTableIndex = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
@@ -697,14 +713,9 @@ public class GetDataActivity extends AppCompatActivity {
                     int hour = date / 100;
                     int minute = date % 100;
                     int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                    calendar.set(year + 2000, month - 1, day);
-                    calendar.set(Calendar.HOUR_OF_DAY, hour);
-                    calendar.set(Calendar.MINUTE, minute);
-                    calendar.set(Calendar.SECOND, seconds);
-                } else {
+                    calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
+                } else { //Body
                     if (Converters.getHexValue(packet[index]).equals("F1")) {
-                        String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-
                         int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
                         int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) > 128 ?
                                 Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) - 128 :
@@ -718,38 +729,34 @@ public class GetDataActivity extends AppCompatActivity {
 
                         data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
                                 ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
+                                ", " + getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
                                 ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
 
                     } else if (Converters.getHexValue(packet[index]).equals("F2")) {
-                        String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-
                         int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) > 128 ?
                                 Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) - 128 :
                                 Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
-                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4])) + 200;
+                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
                         int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        int mort = (Integer.parseInt(Converters.getDecimalValue(packet[6])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[5]));
-                        int numberDetection = (Integer.parseInt(Converters.getDecimalValue(packet[1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[7]));
+                        int mort = (Integer.parseInt(Converters.getDecimalValue(packet[index + 6])) * 256) +
+                                Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
+                        int numberDetection = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
+                                Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
 
                         data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
                                 ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + frequencyText + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
+                                ", " + getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
                                 ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
 
                     } else if (Converters.getHexValue(packet[index]).equals("E1") || Converters.getHexValue(packet[index]).equals("E2")) {
-                        String frequencyText = String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-
                         int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
                         int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) % 10;
-                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4])) + 200;
+                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
                         calendar.add(Calendar.SECOND, secondsOffset);
 
                         data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
                                 ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + frequencyText + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
+                                ", " + getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
                                 "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
                     }
                 }
@@ -796,21 +803,19 @@ public class GetDataActivity extends AppCompatActivity {
 
         if (finalPageNumber == 0) { // No data to download
             setVisibility("menu");
-            title_toolbar.setText(R.string.lb_manage_receiver);
             showPrintDialog("Message", "No data to download.", 1);
             parameter = "";
         } else {
+            initDownloading();
+            setVisibility("downloading");
+
             downloading_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
             downloading_data_imageView.setBackgroundResource(R.drawable.ic_circle);
-            downloading_imageView.setVisibility(View.VISIBLE);
-            downloading_imageView.setBackgroundResource(R.drawable.connecting_animation);
-            animationDrawable = (AnimationDrawable) downloading_imageView.getBackground();
-            animationDrawable.start();
+            downloading_progressBar.setVisibility(View.VISIBLE);
 
             receiveHandler.postDelayed(() -> {
                 if ((packets.size() != totalPackagesNumber || !rawDataCollector.isFilled()) && !error) {
                     Log.i(TAG, "IS FILLED: " + rawDataCollector.isFilled() + " ERROR: " + error + " NUMERO PACKETS: " + packets.size() + " FINAL PAGE NUMBER: " + finalPageNumber);//el error es en este caso, cuando intenta descargar el raw por timeout
-                    //showPrintDialog("Message", "Timeout error.", 1);
                     parameter = "";
                     error = true;
                     printSnapshotFiles();
@@ -820,7 +825,7 @@ public class GetDataActivity extends AppCompatActivity {
     }
 
     private boolean isErrorPacket(byte[] packet) {
-        return (Converters.getHexValue(packet).equals("AA BB CC DD EE "));
+        return Converters.getHexValue(packet).equals("AA BB CC DD EE ");
     }
 
     private boolean isTransmissionDone(byte[] packet) {
@@ -837,35 +842,26 @@ public class GetDataActivity extends AppCompatActivity {
             checkPackets();
         else if (!isCanceled)
             packets.add(packet);
-        Log.i(TAG, packets.size() + ": " + Converters.getHexValue(packet));
     }
 
     private void checkPackets() {
         parameter = "";
         for (byte[] packet : packets) {
             if (packet.length == 5 && isErrorPacket(packet)) { //Shows an error when the packet contains 5 bytes and stops downloading
-                Log.i(TAG, Converters.getHexValue(packet));
-                animationDrawable.stop();
                 setVisibility("menu");
-                title_toolbar.setText(R.string.lb_manage_receiver);
                 showPrintDialog("Error", "Download error (Packet error).", 1);
                 error = true;
                 return;
             } else if ((packetNumber + 1) == findPacketNumber(new byte[] {packet[228], packet[229]})) { // Copy the downloaded package
                 packetNumber++;
-                //percent = (int) ((((float) packetNumber / (float) totalPackagesNumber)) * 100);
                 if (packetNumber % 9 == 0) { //Get current page number when is first package
                     if ((pageNumber + 1) == findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}) && (pageNumber + 1) < finalPageNumber) {
-                        // The current page number must be one more than the previous one and less than the total number of pages
-                        pageNumber++;
+                        pageNumber++; // The current page number must be one more than the previous one and less than the total number of pages
                         byte[] newPacket = new byte[224];
                         System.arraycopy(packet, 0, newPacket, 0, 224);
                         packet = newPacket;
                     } else { // Shows an error and stops downloading
-                        animationDrawable.stop();
                         setVisibility("menu");
-                        title_toolbar.setText(R.string.lb_manage_receiver);
-                        Log.i(TAG, "ERROR PAGE NUMBER DOWNLOAD. CURRENT PAGE: " + pageNumber + " NEW PAGE: " + findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}));
                         showPrintDialog("Error", "Download error (Page Number).", 1);
                         error = true;
                         return;
@@ -876,7 +872,6 @@ public class GetDataActivity extends AppCompatActivity {
                     packet = newPacket;
                 }
                 rawDataCollector.processSnapshotRaw(packet);
-                //Log.i(TAG, "FINAL PAGE: " + finalPageNumber + " PAGE: " + pageNumber + " PACKET: " + packetNumber + " IS FILLED: " + rawDataCollector.isFilled() + " PERCENT: " + percent + " ERROR: " + error);
             }
         }
         if (!error) {
@@ -891,7 +886,7 @@ public class GetDataActivity extends AppCompatActivity {
                     snapshotArray.add(processDataCollector);
                 }
                 printSnapshotFiles();
-            }, 1500);
+            }, 1000);
         }
     }
 
@@ -900,20 +895,16 @@ public class GetDataActivity extends AppCompatActivity {
      */
     private void printSnapshotFiles() {
         processing_data_imageView.setBackgroundResource(R.drawable.circle_check);
-        processing_imageView.setVisibility(View.GONE);
+        processing_progressBar.setVisibility(View.GONE);
         preparing_file_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         preparing_file_imageView.setBackgroundResource(R.drawable.ic_circle);
-        preparing_imageView.setVisibility(View.VISIBLE);
-        preparing_imageView.setBackgroundResource(R.drawable.connecting_animation);
-        animationDrawable = (AnimationDrawable) preparing_imageView.getBackground();
-        animationDrawable.start();
+        preparing_progressBar.setVisibility(View.VISIBLE);
 
         int i = 0;
         boolean outcome;
         String msg;
         try {
-            //set the directory path
-            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
             if (!root.exists()) {
                 outcome = root.mkdirs();
                 if (!outcome)
@@ -922,31 +913,25 @@ public class GetDataActivity extends AppCompatActivity {
                 root.setWritable(true);
             }
             while(i < snapshotArray.size()) {
-                //get the fileName and create the file path
-                fileName = snapshotArray.get(i).getFileName();
+                fileName = snapshotArray.get(i).getFileName(); //get the fileName and create the file path
                 newFile = new File(root.getAbsolutePath(), fileName);
-                //see if there's a possible copy
-                int copy = 1;
+                int copy = 1; //see if there's a possible copy
                 while (!(newFile.createNewFile())) {
                     newFile = new File(root.getAbsolutePath(), fileName.substring(0, fileName.length() - 4) + " (" + copy + ").txt");
                     copy++;
                 }
                 newFile.setReadable(true);
                 newFile.setWritable(true);
-                //write in the file created
-                stream = new FileOutputStream(newFile);
+                stream = new FileOutputStream(newFile); //write in the file created
                 stream.write(snapshotArray.get(i).getSnapshot());
-                //save the file
-                stream.flush();
+                stream.flush(); //save the file
                 stream.close();
-                //go for the next
                 i++;
             }
 
             if (i == snapshotArray.size()) {
                 preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
-                preparing_imageView.setVisibility(View.GONE);
-                animationDrawable.stop();
+                preparing_progressBar.setVisibility(View.GONE);
                 Log.i(TAG, "%s byte(s) downloaded successfully. No fails!");
                 msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded successfully.";
                 if (error) {
@@ -961,8 +946,7 @@ public class GetDataActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.i(TAG, e.toString());
             preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
-            preparing_imageView.setVisibility(View.GONE);
-            animationDrawable.stop();
+            preparing_progressBar.setVisibility(View.GONE);
             Log.i(TAG, "%s fail(s), %ss byte(s) downloaded in total.");
             msg = "Download finished: "+ (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded.";
             if (error) {

@@ -21,9 +21,6 @@
             layout="@layout/no_frequencies"/>
 
         <include
-            layout="@layout/frequency_edit"/>
-
-        <include
             layout="@layout/delete_frequencies"/>
 
         <include

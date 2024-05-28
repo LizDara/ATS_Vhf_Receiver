@@ -36,6 +36,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.UUID;
 
@@ -105,25 +106,8 @@ public class SelectValueActivity extends AppCompatActivity {
     TextView pulse_rate_tolerance_textView;
     @BindView(R.id.pulse_rate_tolerance_editText)
     EditText pulse_rate_tolerance_editText;
-    @BindView(R.id.save_changes_select_value_button)
-    Button save_changes_select_value_button;
 
     private final static String TAG = SelectValueActivity.class.getSimpleName();
-
-    public static final int PULSE_RATE_TYPE = 1001;
-    public static final int MATCHES_FOR_VALID_PATTERN = 1002;
-    public static final int FIXED_PULSE_RATE = 1003;
-    public static final int VARIABLE_PULSE_RATE = 1004;
-    public static final int PULSE_RATE_1 = 1005;
-    public static final int PULSE_RATE_2 = 1006;
-    public static final int PULSE_RATE_3 = 1007;
-    public static final int PULSE_RATE_4 = 1008;
-    public static final int MAX_PULSE_RATE = 1009;
-    public static final int MIN_PULSE_RATE = 1010;
-    public static final int DATA_CALCULATION_TYPES = 1011;
-    public static final int NONE = 1012;
-    public static final int TEMPERATURE = 1013;
-    public static final int PERIOD = 1014;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
@@ -169,30 +153,30 @@ public class SelectValueActivity extends AppCompatActivity {
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     switch (type) {
-                        case PULSE_RATE_TYPE: // Gets the pulse rate type
+                        case ValueCodes.PULSE_RATE_TYPE: // Gets the pulse rate type
                             downloadPulseRateType(packet);
                             break;
-                        case MATCHES_FOR_VALID_PATTERN: // Gets the matches for valid pattern
+                        case ValueCodes.MATCHES_FOR_VALID_PATTERN: // Gets the matches for valid pattern
                             downloadMatchesForValidPattern(packet);
                             break;
-                        case MAX_PULSE_RATE: // Gets the max pulse rate
+                        case ValueCodes.MAX_PULSE_RATE: // Gets the max pulse rate
                             downloadMaxPulseRate(packet);
                             break;
-                        case MIN_PULSE_RATE: // Gets the min pulse rate
+                        case ValueCodes.MIN_PULSE_RATE: // Gets the min pulse rate
                             downloadMinPulseRate(packet);
                             break;
-                        case DATA_CALCULATION_TYPES: // Gets data calculation types
+                        case ValueCodes.DATA_CALCULATION_TYPES: // Gets data calculation types
                             downloadDataCalculation(packet);
-                        case PULSE_RATE_1: // Gets the pulse rate 1
+                        case ValueCodes.PULSE_RATE_1: // Gets the pulse rate 1
                             downloadPulseRate1(packet);
                             break;
-                        case PULSE_RATE_2: // Gets the pulse rate 2
+                        case ValueCodes.PULSE_RATE_2: // Gets the pulse rate 2
                             downloadPulseRate2(packet);
                             break;
-                        case PULSE_RATE_3: // Gets the pulse rate 3
+                        case ValueCodes.PULSE_RATE_3: // Gets the pulse rate 3
                             downloadPulseRate3(packet);
                             break;
-                        case PULSE_RATE_4: // Gets the pulse rate 4
+                        case ValueCodes.PULSE_RATE_4: // Gets the pulse rate 4
                             downloadPulseRate4(packet);
                             break;
                     }
@@ -250,21 +234,20 @@ public class SelectValueActivity extends AppCompatActivity {
     @OnClick(R.id.select_pulse_rate_button)
     public void onClickSelectPulseRate(View v) {
         setVisibility("pulseRateTypes");
-        save_changes_select_value_button.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.fixed_pulse_rate_linearLayout)
     public void onClickFixedPulseRate(View v) {
         fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
-        value = FIXED_PULSE_RATE;
+        value = ValueCodes.FIXED_PULSE_RATE;
     }
 
     @OnClick(R.id.variable_pulse_rate_linearLayout)
     public void onClickVariablePulseRate(View v) {
         variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
-        value = VARIABLE_PULSE_RATE;
+        value = ValueCodes.VARIABLE_PULSE_RATE;
     }
 
     @OnClick(R.id.none_linearLayout)
@@ -272,7 +255,7 @@ public class SelectValueActivity extends AppCompatActivity {
         none_imageView.setVisibility(View.VISIBLE);
         temperature_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = NONE;
+        value = ValueCodes.NONE;
     }
 
     @OnClick(R.id.temperature_linearLayout)
@@ -280,7 +263,7 @@ public class SelectValueActivity extends AppCompatActivity {
         temperature_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = TEMPERATURE;
+        value = ValueCodes.TEMPERATURE;
     }
 
     @OnClick(R.id.period_linearLayout)
@@ -288,7 +271,7 @@ public class SelectValueActivity extends AppCompatActivity {
         period_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         temperature_imageView.setVisibility(View.GONE);
-        value = PERIOD;
+        value = ValueCodes.PERIOD;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -375,30 +358,6 @@ public class SelectValueActivity extends AppCompatActivity {
         value = 8;
     }
 
-    @OnClick(R.id.save_changes_select_value_button)
-    public void onClickSaveChanges(View v) {
-        if (type == PULSE_RATE_1 || type == PULSE_RATE_2 || type == PULSE_RATE_3 || type == PULSE_RATE_4) {
-            int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
-            int tolerance = Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
-            if (pulseRate > 0 && pulseRate <= 150 && tolerance > 0 && tolerance <= 10) {
-                value = (pulseRate * 100) + tolerance;
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Invalid Format or Values");
-                builder.setMessage("Please enter valid pulse rate or tolerance values.");
-                builder.setPositiveButton("Ok", null);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
-                return;
-            }
-        } else if (type == MAX_PULSE_RATE || type == MIN_PULSE_RATE) {
-            value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
-        }
-        setResult(value);
-        finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -423,61 +382,48 @@ public class SelectValueActivity extends AppCompatActivity {
 
         type = getIntent().getIntExtra("type", 0);
         switch (type) {
-            case PULSE_RATE_TYPE:
-                title_toolbar.setText(R.string.pulse_rate_type_options);
-                save_changes_select_value_button.setVisibility(View.GONE);
+            case ValueCodes.PULSE_RATE_TYPE:
+                setVisibility("pulseRateTypes");
                 break;
-            case MATCHES_FOR_VALID_PATTERN:
+            case ValueCodes.MATCHES_FOR_VALID_PATTERN:
                 setVisibility("matches");
-                title_toolbar.setText(R.string.matches_for_valid_pattern);
-                number_of_matches_scrollView.setVisibility(View.VISIBLE);
                 break;
-            case MAX_PULSE_RATE:
+            case ValueCodes.MAX_PULSE_RATE:
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.max_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_max_pulse_rate);
-                max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-                max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
-            case MIN_PULSE_RATE:
+            case ValueCodes.MIN_PULSE_RATE:
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.min_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_min_pulse_rate);
-                max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-                max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
-            case DATA_CALCULATION_TYPES:
+            case ValueCodes.DATA_CALCULATION_TYPES:
                 setVisibility("calculation");
-                title_toolbar.setText(R.string.optional_data_calculations);
-                data_calculation_types_linearLayout.setVisibility(View.VISIBLE);
                 break;
-            case PULSE_RATE_1:
+            case ValueCodes.PULSE_RATE_1:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_1);
                 pulse_rate_textView.setText(R.string.lb_pr1);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
-                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
-            case PULSE_RATE_2:
+            case ValueCodes.PULSE_RATE_2:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_2);
                 pulse_rate_textView.setText(R.string.lb_pr2);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
-                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
-            case PULSE_RATE_3:
+            case ValueCodes.PULSE_RATE_3:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_3);
                 pulse_rate_textView.setText(R.string.lb_pr3);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
-                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
-            case PULSE_RATE_4:
+            case ValueCodes.PULSE_RATE_4:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_4);
                 pulse_rate_textView.setText(R.string.lb_pr4);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
-                pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 break;
         }
 
@@ -488,6 +434,27 @@ public class SelectValueActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            Intent intent = new Intent();
+            if (type == ValueCodes.PULSE_RATE_1 || type == ValueCodes.PULSE_RATE_2 || type == ValueCodes.PULSE_RATE_3 || type == ValueCodes.PULSE_RATE_4) {
+                int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
+                int tolerance = Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
+                if (pulseRate > 0 && pulseRate <= 150 && tolerance > 0 && tolerance <= 10) {
+                    value = (pulseRate * 100) + tolerance;
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Invalid Format or Values");
+                    builder.setMessage("Please enter valid pulse rate or tolerance values.");
+                    builder.setPositiveButton("Ok", null);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
+                    return true;
+                }
+            } else if (type == ValueCodes.MAX_PULSE_RATE || type == ValueCodes.MIN_PULSE_RATE) {
+                value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
+            }
+            intent.putExtra(ValueCodes.VALUE, value);
+            setResult(type, intent);
             finish();
             return true;
         }
@@ -569,6 +536,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_linearLayout.setVisibility(View.GONE);
                 max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
                 data_calculation_types_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.pulse_rate_type_options);
                 break;
             case "matches":
                 non_coded_linearLayout.setVisibility(View.GONE);
@@ -577,6 +545,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_linearLayout.setVisibility(View.GONE);
                 max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
                 data_calculation_types_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.matches_for_valid_pattern);
                 break;
             case "pulseRateValues":
                 non_coded_linearLayout.setVisibility(View.GONE);
@@ -593,6 +562,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_linearLayout.setVisibility(View.GONE);
                 max_min_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 data_calculation_types_linearLayout.setVisibility(View.GONE);
+                max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
             case "calculation":
                 non_coded_linearLayout.setVisibility(View.GONE);
@@ -601,6 +571,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_linearLayout.setVisibility(View.GONE);
                 max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
                 data_calculation_types_linearLayout.setVisibility(View.VISIBLE);
+                title_toolbar.setText(R.string.optional_data_calculations);
                 break;
         }
     }
@@ -622,13 +593,11 @@ public class SelectValueActivity extends AppCompatActivity {
         } else if (Converters.getHexValue(data[1]).equals("21")) {
             setVisibility("pulseRateTypes");
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            save_changes_select_value_button.setVisibility(View.VISIBLE);
-            value = FIXED_PULSE_RATE;
+            value = ValueCodes.FIXED_PULSE_RATE;
         } else if (Converters.getHexValue(data[1]).equals("22")) {
             setVisibility("pulseRateTypes");
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            save_changes_select_value_button.setVisibility(View.VISIBLE);
-            value = FIXED_PULSE_RATE;
+            value = ValueCodes.VARIABLE_PULSE_RATE;
         }
     }
 
@@ -699,15 +668,15 @@ public class SelectValueActivity extends AppCompatActivity {
         switch (Converters.getHexValue(data[11])) {
             case "00":
                 none_imageView.setVisibility(View.VISIBLE);
-                value = NONE;
+                value = ValueCodes.NONE;
                 break;
             case "08":
                 period_imageView.setVisibility(View.VISIBLE);
-                value = PERIOD;
+                value = ValueCodes.PERIOD;
                 break;
             case "04":
                 temperature_imageView.setVisibility(View.VISIBLE);
-                value = TEMPERATURE;
+                value = ValueCodes.TEMPERATURE;
                 break;
         }
     }

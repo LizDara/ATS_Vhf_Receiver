@@ -23,15 +23,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,22 +74,23 @@ public class InputValueActivity extends AppCompatActivity {
     ImageView thirty_minutes_imageView;
     @BindView(R.id.sixty_minutes_imageView)
     ImageView sixty_minutes_imageView;
+    @BindView(R.id.merge_tables_linearLayout)
+    LinearLayout merge_tables_linearLayout;
+    @BindView(R.id.option_tables_textView)
+    TextView option_tables_textView;
+    @BindView(R.id.tables_merge_listView)
+    ListView tables_merge_listView;
+    @BindView(R.id.merge_tables_button)
+    Button merge_tables_button;
 
     private final static String TAG = InputValueActivity.class.getSimpleName();
-
-    public static final int FREQUENCY_TABLE_NUMBER = 1001;
-    public static final int SCAN_RATE_SECONDS = 1002;
-    public static final int NUMBER_OF_ANTENNAS = 1003;
-    public static final int SCAN_TIMEOUT_SECONDS = 1004;
-    public static final int STORE_RATE = 1005;
-    public static final int REFERENCE_FREQUENCY = 1006;
-    public static final int REFERENCE_FREQUENCY_STORE_RATE = 1007;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
-    private int value;
+    private int type;
     private int storeRate = 0;
+    private TableScanListAdapter tableScanListAdapter;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -125,30 +131,37 @@ public class InputValueActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("aerial")) { // Gets aerial defaults data
-                        onClickAerialDefaults();
-                    } else if (parameter.equals("stationary")) { // Gets stationary defaults data
-                        onClickStationaryDefaults();
+                    switch (parameter) {
+                        case "aerial":  // Gets aerial defaults data
+                            onClickAerialDefaults();
+                            break;
+                        case "stationary":  // Gets stationary defaults data
+                            onClickStationaryDefaults();
+                            break;
+                        case "tables":
+                            onClickTables();
+                            break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    switch (value) {
-                        case FREQUENCY_TABLE_NUMBER: // Gets the frequency table number
+                    switch (type) {
+                        case ValueCodes.FREQUENCY_TABLE_NUMBER: // Gets the frequency table number
+                        case ValueCodes.TABLES_NUMBER:
                             downloadTable(packet);
                             break;
-                        case SCAN_RATE_SECONDS: // Gets the scan rate seconds
+                        case ValueCodes.SCAN_RATE_SECONDS: // Gets the scan rate seconds
                             downloadScanRate(packet);
                             break;
-                        case NUMBER_OF_ANTENNAS: // Gets number of antennas
+                        case ValueCodes.NUMBER_OF_ANTENNAS: // Gets number of antennas
                             downloadAntennas(packet);
                             break;
-                        case SCAN_TIMEOUT_SECONDS: // Gets the scan timeout seconds
+                        case ValueCodes.SCAN_TIMEOUT_SECONDS: // Gets the scan timeout seconds
                             downloadTimeout(packet);
                             break;
-                        case STORE_RATE: // Gets the store rate
+                        case ValueCodes.STORE_RATE: // Gets the store rate
                             downloadStoreRate(packet);
                             break;
-                        case REFERENCE_FREQUENCY_STORE_RATE: // Gets the reference frequency store rate
+                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE: // Gets the reference frequency store rate
                             downloadReferenceFrequencyStoreRate(packet);
                             break;
                     }
@@ -188,6 +201,17 @@ public class InputValueActivity extends AppCompatActivity {
     private void onClickStationaryDefaults() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
+        mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
+    }
+
+    /**
+     * Requests a read for get the number of frequencies from each table and display it.
+     * Service name: StoredData.
+     * Characteristic name: FreqTable.
+     */
+    private void onClickTables() {
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
@@ -259,31 +283,35 @@ public class InputValueActivity extends AppCompatActivity {
 
     @OnClick(R.id.save_changes_input_value_button)
     public void onClickSaveChanges(View v) {
-        if (parameter.equals("aerial") && value == SCAN_RATE_SECONDS) { // Sends the scan rate value for aerial
-            float scanRate = Float.parseFloat(value_spinner.getSelectedItem().toString());
-            setResult((int) (scanRate * 10));
-        }
-        if (parameter.equals("stationary") && value == SCAN_RATE_SECONDS) { // Sends the scan rate value for stationary
-            int scanRate = Integer.parseInt(value_spinner.getSelectedItem().toString());
-            setResult(scanRate);
-        }
-        if (value == FREQUENCY_TABLE_NUMBER) { // Sends the frequency table number
-            int frequencyTableNumber = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
+        Intent intent = new Intent();
+        int value = 0;
+        if (parameter.equals("aerial") && type == ValueCodes.SCAN_RATE_SECONDS) { // Sends the scan rate value for aerial
+            value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
+        } else if (parameter.equals("stationary") && type == ValueCodes.SCAN_RATE_SECONDS) { // Sends the scan rate value for stationary
+            value = Integer.parseInt(value_spinner.getSelectedItem().toString());
+        } else if (type == ValueCodes.FREQUENCY_TABLE_NUMBER) { // Sends the frequency table number
+            value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
                     Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
-            setResult(frequencyTableNumber);
+        } else if (type == ValueCodes.NUMBER_OF_ANTENNAS) { // Sends the number of antennas
+            value = value_spinner.getSelectedItemPosition() + 1;
+        } else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS) { // Sends scan timeout value
+            value = Integer.parseInt(value_spinner.getSelectedItem().toString());
+        } else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE) {
+            value = value_spinner.getSelectedItemPosition();
         }
-        if (value == NUMBER_OF_ANTENNAS) { // Sends the number of antennas
-            int numberAntennas = value_spinner.getSelectedItemPosition() + 1;
-            setResult(numberAntennas);
-        }
-        if (value == SCAN_TIMEOUT_SECONDS) { // Sends scan timeout value
-            int timeout = Integer.parseInt(value_spinner.getSelectedItem().toString());
-            setResult(timeout);
-        }
-        if (value == REFERENCE_FREQUENCY_STORE_RATE) {
-            int storeRate = value_spinner.getSelectedItemPosition();
-            setResult(storeRate);
-        }
+        intent.putExtra(ValueCodes.VALUE, value);
+        setResult(type, intent);
+        finish();
+    }
+
+    @OnClick(R.id.merge_tables_button)
+    public void onClickSaveTables(View v) {
+        Intent intent = new Intent();
+        int[] tables = new int[tableScanListAdapter.getCountSelected()];
+        for (int i = 0; i < tableScanListAdapter.getCountSelected(); i++)
+            tables[i] = tableScanListAdapter.getSelected(i);
+        intent.putExtra(ValueCodes.VALUE, tables);
+        setResult(type, intent);
         finish();
     }
 
@@ -295,7 +323,6 @@ public class InputValueActivity extends AppCompatActivity {
 
         // Customize the activity menu
         setSupportActionBar(toolbar);
-        title_toolbar.setText(R.string.edit_receiver_defaults);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
 
@@ -309,15 +336,15 @@ public class InputValueActivity extends AppCompatActivity {
         device_status_textView.setText(receiverInformation.getDeviceStatus());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
-        parameter = getIntent().getStringExtra("type");
-        value = getIntent().getIntExtra("value", 0);
+        parameter = getIntent().getStringExtra("parameter");
+        type = getIntent().getIntExtra("type", 0);
 
-        if (value == STORE_RATE) {
-            store_rate_linearLayout.setVisibility(View.VISIBLE);
-            set_value_linearLayout.setVisibility(View.GONE);
+        if (type == ValueCodes.STORE_RATE) {
+            setVisibility("storeRate");
+        } else if (type == ValueCodes.TABLES_NUMBER) {
+            setVisibility("tables");
         } else {
-            set_value_linearLayout.setVisibility(View.VISIBLE);
-            store_rate_linearLayout.setVisibility(View.GONE);
+            setVisibility("");
         }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -327,8 +354,11 @@ public class InputValueActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (value == STORE_RATE)
+            if (type == ValueCodes.STORE_RATE) {
                 setResult(storeRate);
+            } else {
+                setResult(ValueCodes.CANCELLED);
+            }
             finish();
             return true;
         }
@@ -393,37 +423,65 @@ public class InputValueActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    private void setVisibility(String value) {
+        switch (value) {
+            case "storeRate":
+                store_rate_linearLayout.setVisibility(View.VISIBLE);
+                set_value_linearLayout.setVisibility(View.GONE);
+                merge_tables_linearLayout.setVisibility(View.GONE);
+                title_toolbar.setText(R.string.store_rate);
+                break;
+            case "tables":
+                merge_tables_linearLayout.setVisibility(View.VISIBLE);
+                store_rate_linearLayout.setVisibility(View.GONE);
+                set_value_linearLayout.setVisibility(View.GONE);
+                merge_tables_button.setText(R.string.lb_save_changes);
+                title_toolbar.setText(R.string.tables_scan);
+                break;
+            default:
+                set_value_linearLayout.setVisibility(View.VISIBLE);
+                store_rate_linearLayout.setVisibility(View.GONE);
+                break;
+        }
+    }
+
     /**
      * With the received packet, gets frequency table number and display on the screen.
      *
      * @param data The received packet.
      */
     private void downloadTable(byte[] data) {
-        List<String> tables = new ArrayList<>();
-        int positionFrequencyTableNumber = 0;
-        byte b = (parameter.equals("aerial")) ? data[6] : data[9];
-        for (int i = 1; i <= 8; i++) {
-            if ((b & 1) == 1) {
-                tables.add("Table " + i);
-                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ? tables.size() - 1 : 0;
+        if (type == ValueCodes.TABLES_NUMBER) {
+            ArrayList<Integer> tables = new ArrayList<>();
+            int table = getIntent().getIntExtra("firstTable", 0);
+            if (table != 0)
+                tables.add(table);
+            table = getIntent().getIntExtra("secondTable", 0);
+            if (table != 0)
+                tables.add(table);
+            table = getIntent().getIntExtra("thirdTable", 0);
+            if (table != 0)
+                tables.add(table);
+            option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
+            tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
+            tables_merge_listView.setAdapter(tableScanListAdapter);
+        } else {
+            int table = getIntent().getIntExtra("table", 0);
+            List<String> tables = new ArrayList<>();
+            int position = 0;
+            for (int i = 1; i <= 12; i++) {
+                if (data[i] > 0) {
+                    tables.add("Table " + i);
+                    if (table == i) position = tables.size() - 1;
+                }
             }
-            b = (byte) (b >> 1);
+            if (tables.isEmpty())
+                tables.add("None");
+            ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
+            tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            value_spinner.setAdapter(tablesAdapter);
+            value_spinner.setSelection(position);
         }
-        b = (parameter.equals("aerial")) ? data[7] : data[10];
-        for (int i = 9; i <= 12; i++) {
-            if ((b & 1) == 1) {
-                tables.add("Table " + i);
-                positionFrequencyTableNumber = (i == Integer.parseInt(Converters.getDecimalValue(data[1]))) ? tables.size() - 1 : 0;
-            }
-            b = (byte) (b >> 1);
-        }
-        if (tables.isEmpty()) {
-            tables.add("None");
-        }
-        ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
-        tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        value_spinner.setAdapter(tablesAdapter);
-        value_spinner.setSelection(positionFrequencyTableNumber);
     }
 
     /**

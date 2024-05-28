@@ -16,7 +16,6 @@ import butterknife.OnClick;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -42,7 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeDeviceListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.Adapters.LeDeviceListAdapter;
 
 import java.util.Calendar;
 
@@ -76,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout update_linearLayout;
     @BindView(R.id.devices_linearLayout)
     LinearLayout devices_linearLayout;
-    @BindView(R.id.anim_spinner)
-    ImageView anim_spinner;
     @BindView(R.id.branding_constraintLayout)
     ConstraintLayout branding_constraintLayout;
     @BindView(R.id.searching_receivers_constraintLayout)
@@ -89,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor sharedPreferencesEditor;
 
     private static final int REQUEST_ENABLE_BT = 1;
-    // Stops scanning after 8 seconds.
-    private static final long SCAN_PERIOD = 8000;
+    private static final long SCAN_PERIOD = 8000; // Stops scanning after 8 seconds.
     private static long MESSAGE_PERIOD = 2000;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
@@ -179,8 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
         // Checks if Bluetooth is supported on the device.
@@ -266,18 +261,6 @@ public class MainActivity extends AppCompatActivity {
     private void scanLeDevice(final boolean enable) {
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         if (enable) {
-            // Initializes the spinner to search for available devices
-            anim_spinner.setImageDrawable((AnimatedVectorDrawable) ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
-            Drawable drawable = anim_spinner.getDrawable();
-            Animatable animatable = (Animatable) drawable;
-            AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    new Handler().postDelayed(animatable::start, SCAN_PERIOD);
-                }
-            });
-            animatable.start();
-
             mLeDeviceListAdapter.clear();
 
             refresh_button.setAlpha((float) 0.6);
@@ -293,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
                 mBluetoothLeScanner.stopScan(mLeScanCallback);
 
                 searching_receivers_linearLayout.setVisibility(View.GONE);
-                Log.i("MainActivity", "COUNT: " + mLeDeviceListAdapter.getItemCount());
 
                 if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
                     devices_linearLayout.setVisibility(View.VISIBLE);
@@ -327,8 +309,8 @@ public class MainActivity extends AppCompatActivity {
      * If Location Permissions are needed, it's capable to ask the user for them.
      */
     private void checkPermissions() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Log.i("MainActivity", "SDK S: " + Build.VERSION.SDK_INT);
+        Log.i("MainActivity", "SDK: " + Build.VERSION.SDK_INT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
@@ -338,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
 
             if (permissionCheck != 0) {
-                MESSAGE_PERIOD = 9000;
+                MESSAGE_PERIOD = 8000;
                 this.requestPermissions(
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -350,7 +332,6 @@ public class MainActivity extends AppCompatActivity {
                                 Manifest.permission.BLUETOOTH_SCAN}, 1001); //Any number
             }
         } else {
-            Log.i("MainActivity", "NO SDK S: " + Build.VERSION.SDK_INT);
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
@@ -361,7 +342,8 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.BLUETOOTH}, 1001); //Any number
             }
         }
     }

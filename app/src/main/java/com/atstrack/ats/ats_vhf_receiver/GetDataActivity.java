@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -67,10 +65,10 @@ public class GetDataActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.memory_used_percent_textView)
@@ -399,8 +397,8 @@ public class GetDataActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "test";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         processHandler = new Handler();
@@ -675,47 +673,37 @@ public class GetDataActivity extends AppCompatActivity {
         processing_data_imageView.setBackgroundResource(R.drawable.ic_circle);
         processing_progressBar.setVisibility(View.VISIBLE);
 
-        String data = "";
-        int index = 0;
-
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        int baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
+        int baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
+        String data = "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + CR + LF;
+        int index = 0;
         int frequency = 0;
         int frequencyTableIndex = 0;
         int year;
         Calendar calendar = Calendar.getInstance();
 
-        String format = Converters.getHexValue(packet[index]);
-        while (!format.equals("83") && !format.equals("82")) {//find a format 82 or 83
-            index += 8;
-            format = Converters.getHexValue(packet[index]);
-        }
+        while (index < packet.length) {
+            String format = Converters.getHexValue(packet[index]);
+            if (format.equals("83") || format.equals("82")) {
+                year = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
+                index += 8;
+                while (index < packet.length && !format.equals("83") && !format.equals("82") && !format.equals("86")) {
+                    if (Converters.getHexValue(packet[index]).equals("F0")) { //Header
+                        frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
+                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
+                        frequencyTableIndex = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
 
-        if (format.equals("83") || format.equals("82")) {
-            data += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + CR + LF;
-            year = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-            index += 8;
-
-            while (index < packet.length) {
-                if (Converters.getHexValue(packet[index]).equals("F0")) { //Header
-                    frequency = (baseFrequency * 1000) + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                            Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
-                    frequencyTableIndex = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                    Log.i(TAG, "FREQUENCY: " + frequency + " INDEX: " + frequencyTableIndex);
-
-                    int date = Converters.hexToDecimal(
-                            Converters.getHexValue(packet[index + 4]) + Converters.getHexValue(packet[index + 5]) + Converters.getHexValue(packet[index + 6]));
-
-                    int month = date / 1000000;
-                    date = date % 1000000;
-                    int day = date / 10000;
-                    date = date % 10000;
-                    int hour = date / 100;
-                    int minute = date % 100;
-                    int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                    calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
-                } else { //Body
-                    if (Converters.getHexValue(packet[index]).equals("F1")) {
+                        int date = Converters.hexToDecimal(
+                                Converters.getHexValue(packet[index + 4]) + Converters.getHexValue(packet[index + 5]) + Converters.getHexValue(packet[index + 6]));
+                        int month = date / 1000000;
+                        date = date % 1000000;
+                        int day = date / 10000;
+                        date = date % 10000;
+                        int hour = date / 100;
+                        int minute = date % 100;
+                        int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                        calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
+                    } else if (Converters.getHexValue(packet[index]).equals("F1")) {
                         int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
                         int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) > 128 ?
                                 Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) - 128 :
@@ -725,7 +713,6 @@ public class GetDataActivity extends AppCompatActivity {
                         int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
                         int numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
                         calendar.add(Calendar.SECOND, secondsOffset);
-                        //Log.i(TAG, "Y: " + (calendar.get(Calendar.YEAR) - 2000) + " M: " + (calendar.get(Calendar.MONTH) + 1) + " D: " + calendar.get(Calendar.DAY_OF_MONTH) + " H: " + calendar.get(Calendar.HOUR_OF_DAY) + " M: " + calendar.get(Calendar.MINUTE) + " S: " + calendar.get(Calendar.SECOND) + " J: " + calendar.get(Calendar.DAY_OF_YEAR));
 
                         data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
                                 ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
@@ -759,48 +746,51 @@ public class GetDataActivity extends AppCompatActivity {
                                 ", " + getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
                                 "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
                     }
+                    index += 8;
                 }
+            } else if (format.equals("86")) {
+                year = Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
+                int month = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
+                int day = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
+                int hour = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
+                int minute = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
+                int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
 
+                if (Converters.getHexValue(packet[index + 8]).equals("D0")) {
+                    frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
+                            Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
+                    int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
+                    int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 12]));
+                    int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 13]));
+
+                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
+                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex +
+                            ", " + getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", 0, 0, 0, 0, " +
+                            ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
+                } else if (Converters.getHexValue(packet[index + 8]).equals("E0")) {
+                    frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
+                            Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
+                    int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
+
+                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
+                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex +
+                            ", " + getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
+                            "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + CR + LF;
+                }
+                index += 16;
+            } else {
                 index += 8;
             }
-        } else if (format.equals("86")) {
-
-            data += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + CR + LF;
-            year = Integer.parseInt(Converters.getDecimalValue(packet[2]));
-            int date = Converters.hexToDecimal(
-                    Converters.getHexValue(packet[3]) +
-                            Converters.getHexValue(packet[4]) +
-                            Converters.getHexValue(packet[5]));
-            int month = date / 1000000;
-            date = date % 1000000;
-            int day = date / 10000;
-            date = date % 10000;
-            int hour = date / 100;
-            int minute = date % 100;
-            int seconds = Integer.parseInt(Converters.getDecimalValue(packet[6]));
-
-            index += 8;
-
-            while (index < packet.length) {
-
-                // cuando es 0xD0 agregar a data
-
-                index += 8;
-            }
-        } else {
-            error = true;
         }
-
         return data;
     }
 
-    private void readData(byte[] packet) {
-        // The first package indicates the total number of pages and the current page
+    private void readData(byte[] packet) { // The first package indicates the total number of pages and the current page
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]});
+        Log.i(TAG, "Final: " + finalPageNumber);
         totalPackagesNumber = finalPageNumber * 9;
-
         rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
-
         if (finalPageNumber == 0) { // No data to download
             setVisibility("menu");
             showPrintDialog("Message", "No data to download.", 1);
@@ -808,7 +798,6 @@ public class GetDataActivity extends AppCompatActivity {
         } else {
             initDownloading();
             setVisibility("downloading");
-
             downloading_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
             downloading_data_imageView.setBackgroundResource(R.drawable.ic_circle);
             downloading_progressBar.setVisibility(View.VISIBLE);
@@ -820,7 +809,7 @@ public class GetDataActivity extends AppCompatActivity {
                     error = true;
                     printSnapshotFiles();
                 }
-            }, 5000 * finalPageNumber);
+            }, 4000 * finalPageNumber);
         }
     }
 
@@ -838,6 +827,7 @@ public class GetDataActivity extends AppCompatActivity {
      * @param packet The received packet.
      */
     private void downloadData(byte[] packet) {
+        Log.i(TAG, Converters.getHexValue(packet));
         if (packet.length == 4 && !isCanceled)
             checkPackets();
         else if (!isCanceled)
@@ -854,39 +844,36 @@ public class GetDataActivity extends AppCompatActivity {
                 return;
             } else if ((packetNumber + 1) == findPacketNumber(new byte[] {packet[228], packet[229]})) { // Copy the downloaded package
                 packetNumber++;
+                byte[] newPacket;
                 if (packetNumber % 9 == 0) { //Get current page number when is first package
                     if ((pageNumber + 1) == findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}) && (pageNumber + 1) < finalPageNumber) {
                         pageNumber++; // The current page number must be one more than the previous one and less than the total number of pages
-                        byte[] newPacket = new byte[224];
+                        newPacket = new byte[224];
                         System.arraycopy(packet, 0, newPacket, 0, 224);
-                        packet = newPacket;
                     } else { // Shows an error and stops downloading
                         setVisibility("menu");
-                        showPrintDialog("Error", "Download error (Page Number).", 1);
+                        showPrintDialog("Error", "Download error (Page Number " + pageNumber + ", Next Page " + findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}) + ").", 1);
                         error = true;
                         return;
                     }
                 } else {
-                    byte[] newPacket = new byte[228];
+                    newPacket = new byte[228];
                     System.arraycopy(packet, 0, newPacket, 0, 228);
-                    packet = newPacket;
                 }
-                rawDataCollector.processSnapshotRaw(packet);
+                rawDataCollector.processSnapshotRaw(newPacket);
             }
         }
         if (!error) {
-            processHandler.postDelayed(() -> {
-                snapshotArray.add(rawDataCollector);
-                String processData = readPacket(rawDataCollector.getSnapshot());
+            snapshotArray.add(rawDataCollector);
+            String processData = readPacket(rawDataCollector.getSnapshot());
 
-                if (!error) { // Adds the data to the list if you didn't find any errors during processing
-                    byte[] data = Converters.convertToUTF8(processData);
-                    processDataCollector = new Snapshots(data.length);
-                    processDataCollector.processSnapshot(data);
-                    snapshotArray.add(processDataCollector);
-                }
-                printSnapshotFiles();
-            }, 1000);
+            if (!error) { // Adds the data to the list if you didn't find any errors during processing
+                byte[] data = Converters.convertToUTF8(processData);
+                processDataCollector = new Snapshots(data.length);
+                processDataCollector.processSnapshot(data);
+                snapshotArray.add(processDataCollector);
+            }
+            printSnapshotFiles();
         }
     }
 

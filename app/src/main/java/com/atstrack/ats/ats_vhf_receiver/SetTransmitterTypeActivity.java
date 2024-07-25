@@ -2,7 +2,6 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
@@ -16,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -47,10 +47,10 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.pulse_rate_type_textView)
@@ -161,15 +161,12 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 int value = result.getData().getExtras().getInt(ValueCodes.VALUE);
                 switch (result.getResultCode()) {
                     case ValueCodes.PULSE_RATE_TYPE: // Gets the modified pulse rate type
-                        if (value == ValueCodes.FIXED_PULSE_RATE) {
-                            pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
-                            target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-                            pulse_rates_linearLayout.setVisibility(View.GONE);
-                        } else {
-                            pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
-                            target_pulse_rate_linearLayout.setVisibility(View.GONE);
-                            pulse_rates_linearLayout.setVisibility(View.VISIBLE);
-                        }
+                        if (value == ValueCodes.FIXED_PULSE_RATE)
+                            setVisibility("Fixed");
+                        else if (value == ValueCodes.VARIABLE_PULSE_RATE)
+                            setVisibility("Variable");
+                        else if (value == ValueCodes.CODED)
+                            setVisibility("Coded");
                         break;
                     case ValueCodes.MATCHES_FOR_VALID_PATTERN: // Gets the modified matches for valid pattern
                         matches_for_valid_pattern_textView.setText(String.valueOf(value));
@@ -239,10 +236,10 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      */
     private void onClickSave() {
         byte txType;
-        byte[] b = new byte[]{0};
+        byte[] b = new byte[11];
         switch (pulse_rate_type_textView.getText().toString()) {
-            case "Fixed Pulse Rate":
-                txType = (byte) 0x21;
+            case "Non Coded (Fixed Pulse Rate)":
+                txType = (byte) 0x08;
                 b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
                         (byte) Integer.parseInt(pr1_textView.getText().toString()),
                         (!pr1_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()) : 0,
@@ -253,8 +250,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                         (byte) Integer.parseInt(pr4_textView.getText().toString()),
                         (!pr4_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString()) : 0};
                 break;
-            case "Variable Pulse Rate":
-                txType = (byte) 0x22;
+            case "Non Coded (Variable Pulse Rate)":
+                txType = (byte) 0x07;
                 b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
                         (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) / 256),
                         (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) % 256),
@@ -262,15 +259,25 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                         (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) % 256),
                         (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
                 break;
+            case "Coded":
+                txType = (byte) 0x09;
+                b = new byte[] {(byte) 0x47, txType, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
+                break;
         }
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        Log.i(TAG, "WRITE TX TYPE: " + Converters.getHexValue(b));
 
-        if (result)
+        if (result) {
+            SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+            SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
+            sharedPreferencesEdit.putInt("DetectionType", Integer.parseInt(Converters.getDecimalValue(b[1])));
+            sharedPreferencesEdit.apply();
+            receiverInformation.changeTxType(b[1]);
             showMessage(0);
-        else
+        } else
             showMessage(2);
     }
 
@@ -356,8 +363,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "txType";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         originalData = new HashMap();
@@ -438,12 +445,36 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         }, MESSAGE_PERIOD);
     }
 
+    private void setVisibility(String value) {
+        switch (value) {
+            case "Coded":
+                pulse_rate_type_textView.setText(R.string.lb_coded);
+                matches_for_valid_pattern_linearLayout.setVisibility(View.GONE);
+                target_pulse_rate_linearLayout.setVisibility(View.GONE);
+                pulse_rates_linearLayout.setVisibility(View.GONE);
+                break;
+            case "Fixed":
+                pulse_rate_type_textView.setText(R.string.lb_non_coded_fixed);
+                matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
+                target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
+                pulse_rates_linearLayout.setVisibility(View.GONE);
+                break;
+            case "Variable":
+                pulse_rate_type_textView.setText(R.string.lb_non_coded_variable);
+                matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
+                target_pulse_rate_linearLayout.setVisibility(View.GONE);
+                pulse_rates_linearLayout.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
     /**
      * With the received packet, gets tx type data.
      *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
+        Log.i(TAG, "Read: " + Converters.getHexValue(data));
         if (Converters.getHexValue(data[0]).equals("67")) {
             parameter = "";
 
@@ -460,26 +491,11 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
             int maxPulseRate = 0;
             int minPulseRate = 0;
             switch (Converters.getHexValue(data[1])) {
-                case "11":
-                    pulse_rate_type_textView.setText(R.string.lb_eiler_coded);
-                    pulse_rate_type_imageView.setVisibility(View.GONE);
-                    pulse_rate_type_linearLayout.setEnabled(false);
+                case "09":
+                    setVisibility("Coded");
                     break;
-                case "12":
-                    pulse_rate_type_textView.setText(R.string.lb_eiler_special_coded);
-                    pulse_rate_type_imageView.setVisibility(View.GONE);
-                    pulse_rate_type_linearLayout.setEnabled(false);
-                    break;
-                case "20":
-                    pulse_rate_type_textView.setText(R.string.lb_non_coded);
-                    matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
-
-                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    break;
-                case "21":
-                    pulse_rate_type_textView.setText(R.string.lb_fixed_pulse_rate);
-                    target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
-                    matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
+                case "08":
+                    setVisibility("Fixed");
 
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
                     pr1_textView.setText(Converters.getDecimalValue(data[3]));
@@ -500,11 +516,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     pulseRate4 = Integer.parseInt(Converters.getDecimalValue(data[9]));
                     pulseRateTolerance4 = Integer.parseInt(Converters.getDecimalValue(data[10]));
                     break;
-                case "22":
-                    pulse_rate_type_textView.setText(R.string.lb_variable_pulse_rate);
-                    target_pulse_rate_linearLayout.setVisibility(View.GONE);
-                    matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
-                    pulse_rates_linearLayout.setVisibility(View.VISIBLE);
+                case "07":
+                    setVisibility("Variable");
 
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
                     maxPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
@@ -535,9 +548,9 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
      * @return Returns true, if there are changes.
      */
     private boolean checkChanges() {
-        byte pulseRateType;
+        byte pulseRateType = 0;
         int matches = (matches_for_valid_pattern_textView.getText().equals(""))
-                ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());;
+                ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());
         int pulseRate1 = 0;
         int pulseRate2 = 0;
         int pulseRate3 = 0;
@@ -549,8 +562,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         int maxPulseRate = 0;
         int minPulseRate = 0;
         switch (pulse_rate_type_textView.getText().toString()) {
-            case "Fixed Pulse Rate":
-                pulseRateType = (byte) 0x21;
+            case "Non Coded (Fixed Pulse Rate)":
+                pulseRateType = (byte) 0x08;
                 pulseRate1 = Integer.parseInt(pr1_textView.getText().toString());
                 pulseRate2 = Integer.parseInt(pr2_textView.getText().toString());
                 pulseRate3 = Integer.parseInt(pr3_textView.getText().toString());
@@ -560,13 +573,14 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 pulseRateTolerance3 = Integer.parseInt(pr3_tolerance_textView.getText().toString());
                 pulseRateTolerance4 = Integer.parseInt(pr4_tolerance_textView.getText().toString());
                 break;
-            case "Variable Pulse Rate":
-                pulseRateType = (byte) 0x22;
+            case "Non Coded (Variable Pulse Rate)":
+                pulseRateType = (byte) 0x07;
                 maxPulseRate = Integer.parseInt(max_pulse_rate_textView.getText().toString());
                 minPulseRate = Integer.parseInt(min_pulse_rate_textView.getText().toString());
                 break;
-            default:
-                return false;
+            case "Coded":
+                pulseRateType = (byte) 0x09;
+                break;
         }
         return (int) originalData.get("PulseRateType") != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
                 || (int) originalData.get("Matches") != matches || (int) originalData.get("PulseRate1") != pulseRate1

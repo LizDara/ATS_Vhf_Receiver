@@ -35,10 +35,10 @@ public class ReceiverOptionsActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
 
@@ -135,8 +135,8 @@ public class ReceiverOptionsActivity extends AppCompatActivity {
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -148,6 +148,7 @@ public class ReceiverOptionsActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
+            device_status_textView.setText(receiverInformation.getDeviceStatus());
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
     }

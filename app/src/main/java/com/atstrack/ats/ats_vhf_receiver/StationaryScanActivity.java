@@ -51,10 +51,10 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.ready_stationary_scan_LinearLayout)
@@ -65,8 +65,8 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView scan_rate_stationary_textView;
     @BindView(R.id.selected_frequency_stationary_textView)
     TextView selected_frequency_stationary_textView;
-    @BindView(R.id.store_rateC_stationary_textView)
-    TextView store_rateC_stationary_textView;
+    @BindView(R.id.store_rate_stationary_textView)
+    TextView store_rate_stationary_textView;
     @BindView(R.id.external_data_transfer_stationary_textView)
     TextView external_data_transfer_stationary_textView;
     @BindView(R.id.number_antennas_stationary_textView)
@@ -79,8 +79,10 @@ public class StationaryScanActivity extends AppCompatActivity {
     Button start_stationary_button;
     @BindView(R.id.stationary_result_linearLayout)
     LinearLayout stationary_result_linearLayout;
-    @BindView(R.id.table_stationary_textView)
-    TextView table_stationary_textView;
+    @BindView(R.id.max_index_stationary_textView)
+    TextView max_index_stationary_textView;
+    @BindView(R.id.index_stationary_textView)
+    TextView index_stationary_textView;
     @BindView(R.id.frequency_stationary_textView)
     TextView frequency_stationary_textView;
     @BindView(R.id.current_antenna_stationary_textView)
@@ -89,6 +91,8 @@ public class StationaryScanActivity extends AppCompatActivity {
     LinearLayout scan_details_linearLayout;
     @BindView(R.id.code_textView)
     TextView code_textView;
+    @BindView(R.id.mortality_textView)
+    TextView mortality_textView;
     @BindView(R.id.period_textView)
     TextView period_textView;
     @BindView(R.id.pulse_rate_textView)
@@ -259,7 +263,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         if (isScanning) {
             parameterWrite = "";
             setVisibility("scanning");
-            frequency_stationary_textView.setText("");
         }
     }
 
@@ -345,8 +348,8 @@ public class StationaryScanActivity extends AppCompatActivity {
         isScanning = getIntent().getExtras().getBoolean("scanning");
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
@@ -355,13 +358,16 @@ public class StationaryScanActivity extends AppCompatActivity {
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = "sendLogScanning";
-            setVisibility("scanning");
+            int currentFrequency = getIntent().getExtras().getInt("frequency") + (baseFrequency * 1000);
+            int currentIndex = getIntent().getExtras().getInt("index");
+            int total = getIntent().getExtras().getInt("maxIndex");
+            detectionType = getIntent().getExtras().getByte("detectionType");
+            frequency_stationary_textView.setText(getFrequency(currentFrequency));
+            index_stationary_textView.setText(String.valueOf(currentIndex));
+            max_index_stationary_textView.setText("Table Index (" + total + " Total)");
 
-            detectionType = (byte) sharedPreferences.getInt("DetectionType", 0);
-            int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
-            code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-            period_textView.setVisibility(visibility);
-            pulse_rate_textView.setVisibility(visibility);
+            updateVisibility();
+            setVisibility("scanning");
         } else { // Gets aerial defaults or temporary data
             boolean isTemporary = getIntent().getExtras().getBoolean("temporary");
             if (isTemporary) {
@@ -374,7 +380,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 scan_rate_stationary_textView.setText(scanTime);
                 timeout_stationary_textView.setText(timeout);
                 number_antennas_stationary_textView.setText(antennasNumber);
-                store_rateC_stationary_textView.setText(storeRate);
+                store_rate_stationary_textView.setText(storeRate);
             } else {
                 parameter = "stationary";
             }
@@ -456,6 +462,8 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      */
     private void showDisconnectionMessage() {
+        parameter = "";
+        parameterWrite = "";
         LayoutInflater inflater = LayoutInflater.from(this);
 
         View view = inflater.inflate(R.layout.disconnect_message, null);
@@ -483,7 +491,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.stationary_scanning);
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-                device_name_textView.setText(receiverInformation.getDeviceName());
+                device_status_textView.setText(receiverInformation.getDeviceStatus());
                 break;
             case "scanning":
                 ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
@@ -493,9 +501,18 @@ public class StationaryScanActivity extends AppCompatActivity {
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
-                device_name_textView.setText(receiverInformation.getDeviceName().replace("Not scanning", "Scanning, stationary"));
+                device_status_textView.setText(receiverInformation.getDeviceStatus().replace("Not scanning", "Scanning, stationary"));
                 break;
         }
+    }
+
+    private void updateVisibility() {
+        int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
+        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        mortality_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        //audio_manual_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        period_textView.setVisibility(visibility);
+        pulse_rate_textView.setVisibility(visibility);
     }
 
     /**
@@ -531,9 +548,9 @@ public class StationaryScanActivity extends AppCompatActivity {
             scan_rate_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             timeout_stationary_textView.setText(Converters.getDecimalValue(data[4]));
             if (Converters.getHexValue(data[5]).equals("FF")) {
-                store_rateC_stationary_textView.setText("Continuous Store");
+                store_rate_stationary_textView.setText("Continuous Store");
             } else {
-                store_rateC_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No Store Rate" :
+                store_rate_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No Store Rate" :
                         Converters.getDecimalValue(data[5]));
             }
         }
@@ -551,14 +568,11 @@ public class StationaryScanActivity extends AppCompatActivity {
     private void setCurrentLog(byte[] data) {
         Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
-            case "83":
-                startScanStationaryFirstPart(data);
-                break;
-            case "84":
-                startScanStationarySecondPart(data);
-                break;
-            case "85":
-                startScanStationaryThirdPart(data);
+            case "50":
+                int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+                max_index_stationary_textView.setText("Table Index (" + maxIndex + " Total)");
+                detectionType = data[18];
+                updateVisibility();
                 break;
             case "F0":
                 logScanHeader(data);
@@ -576,48 +590,15 @@ public class StationaryScanActivity extends AppCompatActivity {
     }
 
     /**
-     * Process the stationary data, first part of packet.
-     *
-     * @param data The stationary data packet.
-     */
-    private void startScanStationaryFirstPart(byte[] data) {
-        numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
-
-        detectionType = (byte) (Integer.parseInt(Converters.getDecimalValue(data[4])) % 16);
-        int visibility = (Converters.getHexValue(detectionType).equals("11") || Converters.getHexValue(detectionType).equals("12")) ? View.GONE : View.VISIBLE;
-        code_textView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-        period_textView.setVisibility(visibility);
-        pulse_rate_textView.setVisibility(visibility);
-    }
-
-    /**
-     * Process the stationary data, second part of packet.
-     *
-     * @param data The stationary data packet.
-     */
-    private void startScanStationarySecondPart(byte[] data) {
-
-    }
-
-    /**
-     * Process the stationary data, third part of packet.
-     *
-     * @param data The stationary data packet.
-     */
-    private void startScanStationaryThirdPart(byte[] data) {
-    }
-
-    /**
      * With the received packet, processes the data of scan header to display.
      *
      * @param data The received packet.
      */
     private void logScanHeader(byte[] data) {
+        clear();
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
-        clear();
-
-        table_stationary_textView.setText(Converters.getDecimalValue(data[3]));
+        index_stationary_textView.setText(Converters.getDecimalValue(data[3]));
         frequency_stationary_textView.setText(getFrequency(frequency));
         current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
     }
@@ -953,8 +934,9 @@ public class StationaryScanActivity extends AppCompatActivity {
      * Clears the screen to start displaying the data.
      */
     private void clear() {
+        frequency_stationary_textView.setText("");
+        index_stationary_textView.setText("");
         int count = scan_details_linearLayout.getChildCount();
-
         while (count > 2) {
             scan_details_linearLayout.removeViewAt(2);
             count--;

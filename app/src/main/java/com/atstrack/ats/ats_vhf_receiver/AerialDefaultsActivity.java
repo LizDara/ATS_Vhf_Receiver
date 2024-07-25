@@ -45,10 +45,10 @@ public class AerialDefaultsActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_aerial_textView)
@@ -216,8 +216,8 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "aerial";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         originalData = new HashMap();

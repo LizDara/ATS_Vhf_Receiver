@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -50,10 +49,10 @@ public class InputValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.value_spinner)
@@ -62,18 +61,20 @@ public class InputValueActivity extends AppCompatActivity {
     LinearLayout set_value_linearLayout;
     @BindView(R.id.store_rate_linearLayout)
     LinearLayout store_rate_linearLayout;
-    @BindView(R.id.no_store_rate_imageView)
-    ImageView no_store_rate_imageView;
+    @BindView(R.id.continuous_store_imageView)
+    ImageView continuous_store_imageView;
     @BindView(R.id.five_minutes_imageView)
     ImageView five_minutes_imageView;
     @BindView(R.id.ten_minutes_imageView)
     ImageView ten_minutes_imageView;
-    @BindView(R.id.twenty_minutes_imageView)
-    ImageView twenty_minutes_imageView;
+    @BindView(R.id.fifteen_minutes_imageView)
+    ImageView fifteen_minutes_imageView;
     @BindView(R.id.thirty_minutes_imageView)
     ImageView thirty_minutes_imageView;
     @BindView(R.id.sixty_minutes_imageView)
     ImageView sixty_minutes_imageView;
+    @BindView(R.id.one_hundred_twenty_minutes_imageView)
+    ImageView one_hundred_twenty_minutes_imageView;
     @BindView(R.id.merge_tables_linearLayout)
     LinearLayout merge_tables_linearLayout;
     @BindView(R.id.option_tables_textView)
@@ -215,70 +216,88 @@ public class InputValueActivity extends AppCompatActivity {
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
-    @OnClick(R.id.no_store_rate_linearLayout)
-    public void onClickNoStoreRate(View v) {
-        no_store_rate_imageView.setVisibility(View.VISIBLE);
+    @OnClick(R.id.continuous_store_linearLayout)
+    public void onClickContinuousStore(View v) {
+        continuous_store_imageView.setVisibility(View.VISIBLE);
         five_minutes_imageView.setVisibility(View.GONE);
         ten_minutes_imageView.setVisibility(View.GONE);
-        twenty_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
         thirty_minutes_imageView.setVisibility(View.GONE);
         sixty_minutes_imageView.setVisibility(View.GONE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
         storeRate = 100;
     }
 
     @OnClick(R.id.five_minutes_linearLayout)
     public void onClickFiveMinutes(View v) {
-        no_store_rate_imageView.setVisibility(View.GONE);
+        continuous_store_imageView.setVisibility(View.GONE);
         five_minutes_imageView.setVisibility(View.VISIBLE);
         ten_minutes_imageView.setVisibility(View.GONE);
-        twenty_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
         thirty_minutes_imageView.setVisibility(View.GONE);
         sixty_minutes_imageView.setVisibility(View.GONE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
         storeRate = 5;
     }
 
     @OnClick(R.id.ten_minutes_linearLayout)
     public void onClickTenMinutes(View v) {
-        no_store_rate_imageView.setVisibility(View.GONE);
+        continuous_store_imageView.setVisibility(View.GONE);
         five_minutes_imageView.setVisibility(View.GONE);
         ten_minutes_imageView.setVisibility(View.VISIBLE);
-        twenty_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
         thirty_minutes_imageView.setVisibility(View.GONE);
         sixty_minutes_imageView.setVisibility(View.GONE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
         storeRate = 10;
     }
 
-    @OnClick(R.id.twenty_minutes_linearLayout)
-    public void onClickTwentyMinutes(View v) {
-        no_store_rate_imageView.setVisibility(View.GONE);
+    @OnClick(R.id.fifteen_minutes_linearLayout)
+    public void onClickFifteenMinutes(View v) {
+        continuous_store_imageView.setVisibility(View.GONE);
         five_minutes_imageView.setVisibility(View.GONE);
         ten_minutes_imageView.setVisibility(View.GONE);
-        twenty_minutes_imageView.setVisibility(View.VISIBLE);
+        fifteen_minutes_imageView.setVisibility(View.VISIBLE);
         thirty_minutes_imageView.setVisibility(View.GONE);
         sixty_minutes_imageView.setVisibility(View.GONE);
-        storeRate = 20;
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
+        storeRate = 15;
     }
 
     @OnClick(R.id.thirty_minutes_linearLayout)
     public void onClickThirtyMinutes(View v) {
-        no_store_rate_imageView.setVisibility(View.GONE);
+        continuous_store_imageView.setVisibility(View.GONE);
         five_minutes_imageView.setVisibility(View.GONE);
         ten_minutes_imageView.setVisibility(View.GONE);
-        twenty_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
         thirty_minutes_imageView.setVisibility(View.VISIBLE);
         sixty_minutes_imageView.setVisibility(View.GONE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
         storeRate = 30;
     }
 
     @OnClick(R.id.sixty_minutes_linearLayout)
     public void onClickSixtyMinutes(View v) {
-        no_store_rate_imageView.setVisibility(View.GONE);
+        continuous_store_imageView.setVisibility(View.GONE);
         five_minutes_imageView.setVisibility(View.GONE);
         ten_minutes_imageView.setVisibility(View.GONE);
-        twenty_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
         thirty_minutes_imageView.setVisibility(View.GONE);
         sixty_minutes_imageView.setVisibility(View.VISIBLE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.GONE);
         storeRate = 60;
+    }
+
+    @OnClick(R.id.one_hundred_twenty_minutes_linearLayout)
+    public void onClickOneHundredTwentyMinutes(View v) {
+        continuous_store_imageView.setVisibility(View.GONE);
+        five_minutes_imageView.setVisibility(View.GONE);
+        ten_minutes_imageView.setVisibility(View.GONE);
+        fifteen_minutes_imageView.setVisibility(View.GONE);
+        thirty_minutes_imageView.setVisibility(View.GONE);
+        sixty_minutes_imageView.setVisibility(View.GONE);
+        one_hundred_twenty_minutes_imageView.setVisibility(View.VISIBLE);
+        storeRate = 120;
     }
 
     @OnClick(R.id.save_changes_input_value_button)
@@ -332,8 +351,8 @@ public class InputValueActivity extends AppCompatActivity {
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         parameter = getIntent().getStringExtra("parameter");
@@ -355,7 +374,9 @@ public class InputValueActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (type == ValueCodes.STORE_RATE) {
-                setResult(storeRate);
+                Intent intent = new Intent();
+                intent.putExtra(ValueCodes.VALUE, storeRate);
+                setResult(type, intent);
             } else {
                 setResult(ValueCodes.CANCELLED);
             }
@@ -454,13 +475,13 @@ public class InputValueActivity extends AppCompatActivity {
         if (type == ValueCodes.TABLES_NUMBER) {
             ArrayList<Integer> tables = new ArrayList<>();
             int table = getIntent().getIntExtra("firstTable", 0);
-            if (table != 0)
+            if (table != 0 && table <= 12)
                 tables.add(table);
             table = getIntent().getIntExtra("secondTable", 0);
-            if (table != 0)
+            if (table != 0 && table <= 12)
                 tables.add(table);
             table = getIntent().getIntExtra("thirdTable", 0);
-            if (table != 0)
+            if (table != 0 && table <= 12)
                 tables.add(table);
             option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
             tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
@@ -562,7 +583,7 @@ public class InputValueActivity extends AppCompatActivity {
     private void downloadStoreRate(byte[] data) {
         switch (Converters.getDecimalValue(data[5])) {
             case "0":
-                no_store_rate_imageView.setVisibility(View.VISIBLE);
+                continuous_store_imageView.setVisibility(View.VISIBLE);
                 break;
             case "5":
                 five_minutes_imageView.setVisibility(View.VISIBLE);
@@ -571,7 +592,7 @@ public class InputValueActivity extends AppCompatActivity {
                 ten_minutes_imageView.setVisibility(View.VISIBLE);
                 break;
             case "20":
-                twenty_minutes_imageView.setVisibility(View.VISIBLE);
+                fifteen_minutes_imageView.setVisibility(View.VISIBLE);
                 break;
             case "30":
                 thirty_minutes_imageView.setVisibility(View.VISIBLE);

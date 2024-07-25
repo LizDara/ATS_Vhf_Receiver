@@ -2,9 +2,6 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -16,9 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,6 +24,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -48,10 +43,10 @@ public class TestReceiverActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.loading_linearLayout)
@@ -231,8 +226,8 @@ public class TestReceiverActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "test";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         mHandlerTest = new Handler();
@@ -392,7 +387,7 @@ public class TestReceiverActivity extends AppCompatActivity {
 
         Log.i(TAG, "TX TYPE: " + Converters.getHexValue(data[25]));
         tx_type_textView.setText(
-                Converters.getHexValue(data[25]).equals("11") || Converters.getHexValue(data[25]).equals("12") ? "Coded" : "Non coded");
+                Converters.getHexValue(data[25]).equals("09")  ? "Coded" : "Non coded");
         software_version_textView.setText(Converters.getDecimalValue(data[26]));
         hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
     }
@@ -405,35 +400,16 @@ public class TestReceiverActivity extends AppCompatActivity {
 
         View view = inflater.inflate(R.layout.connecting_test, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        ImageView spinner_testing = view.findViewById(R.id.spinner_testing);
+        ProgressBar testing_progressBar = view.findViewById(R.id.testing_progressBar);
+        ImageView complete_test_imageView = view.findViewById(R.id.complete_test_imageView);
         TextView state_test_textView = view.findViewById(R.id.state_test_textView);
-
-        spinner_testing.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
-        Drawable drawable1 = spinner_testing.getDrawable();
-        Animatable animatable1 = (Animatable) drawable1;
-        AnimatedVectorDrawableCompat.registerAnimationCallback(drawable1, new Animatable2Compat.AnimationCallback() {
-            @Override
-            public void onAnimationEnd(Drawable drawable) {
-                new Handler().postDelayed(animatable1::start, MESSAGE_PERIOD);
-            }
-        });
-        animatable1.start();
-
         dialog.setView(view);
         dialog.show();
 
         mHandlerTest.postDelayed(() -> {
             state_test_textView.setText(R.string.lb_diagnostics_complete);
-            spinner_testing.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.check_avd_anim));
-            Drawable drawable2 = spinner_testing.getDrawable();
-            Animatable animatable2 = (Animatable) drawable2;
-            AnimatedVectorDrawableCompat.registerAnimationCallback(drawable2, new Animatable2Compat.AnimationCallback() {
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    new Handler().postDelayed(animatable2::start, TEST_PERIOD);
-                }
-            });
-            animatable2.start();
+            testing_progressBar.setVisibility(View.GONE);
+            complete_test_imageView.setVisibility(View.VISIBLE);
 
             new Handler().postDelayed(() -> {
                 dialog.dismiss();

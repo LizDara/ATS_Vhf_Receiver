@@ -50,7 +50,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
                 }
-                Log.i("Devices", deviceName);
+                Log.i("Devices", deviceName + " : " + deviceName.length());
             }
         }
     }
@@ -79,20 +79,21 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         String status = Converters.getHexValue(scanRecord[firstElement + 6]);
         switch (status) {
             case "00":
-                status = "Not scanning";
+                status = " Not scanning";
                 break;
             case "82":
             case "81":
-                status = "Scanning, mobile";
+            case "80":
+                status = " Scanning, mobile";
                 break;
             case "83":
-                status = "Scanning, stationary";
+                status = " Scanning, stationary";
                 break;
             case "86":
-                status = "Scanning, manual";
+                status = " Scanning, manual";
                 break;
             default:
-                status = "None";
+                status = " None";
                 break;
         }
         return status;
@@ -115,8 +116,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        // Set all remote device information
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) { // Set all remote device information
         BluetoothDevice device = mLeDevices.get(position);
         String percent = getPercentBattery(mScanRecords.get(position));
 
@@ -127,17 +127,27 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             final String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-" +
                     String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
 
-            final String type = device.getName().substring(15, 16);
+            String type = device.getName().substring(15, 16);
             final String status = getStatus(mScanRecords.get(position));
+            switch (type) {
+                case "C":
+                    type = " Coded,";
+                    break;
+                case "F":
+                    type = " Fixed PR,";
+                    break;
+                case "V":
+                    type = " Variable PR,";
+                    break;
+            }
+            holder.deviceName.setText(deviceName + type + status);
 
-            holder.deviceName.setText(deviceName + ((type.equals("C")) ? " Coded, " : " Non coded, ") + status);
-
-            holder.deviceStatus.setText(range + " MHz");
+            holder.deviceRange.setText(range + " MHz");
 
             holder.percentBattery.setText(percent + "%");
         } else {
             holder.deviceName.setText(deviceName);
-            holder.deviceStatus.setText("None");
+            holder.deviceRange.setText("None");
             holder.percentBattery.setText("0%");
         }
         holder.device = mLeDevices.get(position);
@@ -155,7 +165,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         LinearLayout receiver_status;
         LinearLayout device_linearLayout;
         TextView deviceName;
-        TextView deviceStatus;
+        TextView deviceRange;
         TextView percentBattery;
         BluetoothDevice device;
 
@@ -163,8 +173,8 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             super(itemView);
             receiver_status = itemView.findViewById(R.id.receiver_status);
             device_linearLayout = itemView.findViewById(R.id.device_linearLayout);
-            deviceStatus = itemView.findViewById(R.id.device_status_textView);
-            deviceName = itemView.findViewById(R.id.device_name_textView);
+            deviceRange = itemView.findViewById(R.id.device_range_textView);
+            deviceName = itemView.findViewById(R.id.device_status_textView);
             percentBattery = itemView.findViewById(R.id.percent_battery_textView);
 
             device_linearLayout.setOnClickListener(view -> {
@@ -182,9 +192,10 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     sharedPreferencesEdit.putInt("Range", Integer.parseInt(device.getName().substring(17)));
 
                     Intent intent = new Intent(context, MainMenuActivity.class);
-                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, deviceName.getText().toString());
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_STATUS, deviceName.getText().toString());
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_NAME, device.getName().substring(0, 7));
                     intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_STATUS, deviceStatus.getText().toString());
+                    intent.putExtra(MainMenuActivity.EXTRAS_DEVICE_RANGE, deviceRange.getText().toString());
                     intent.putExtra(MainMenuActivity.EXTRAS_BATTERY, percentBattery.getText().toString());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.putExtra("menu", false);

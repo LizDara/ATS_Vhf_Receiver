@@ -50,10 +50,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_stationary_textView)
@@ -64,8 +64,8 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     TextView scan_timeout_seconds_stationary_textView;
     @BindView(R.id.number_of_antennas_stationary_textView)
     TextView number_of_antennas_stationary_textView;
-    @BindView(R.id.store_rate_stationary_textView)
-    TextView store_rate_stationary_textView;
+    @BindView(R.id.store_rate_minutes_stationary_textView)
+    TextView store_rate_minutes_stationary_textView;
     @BindView(R.id.frequency_reference_stationary_textView)
     TextView frequency_reference_stationary_textView;
     @BindView(R.id.store_rate_stationary_imageView)
@@ -150,7 +150,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
-                Log.i(TAG, "Type: " + result.getResultCode());
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
                 else if (ValueCodes.TABLES_NUMBER == result.getResultCode()) { // Gets the modified frequency table number
@@ -172,7 +171,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                             number_of_antennas_stationary_textView.setText(String.valueOf(value));
                             break;
                         case ValueCodes.STORE_RATE:
-                            store_rate_stationary_textView.setText((value == 100) ? "No Store Rate" : String.valueOf(value));
+                            store_rate_minutes_stationary_textView.setText((value == 100) ? "Continuous Store" : String.valueOf(value));
                             break;
                         case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE:
                             reference_frequency_store_rate_stationary_textView.setText(String.valueOf(value));
@@ -220,16 +219,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         int scanTimeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int externalDataPush = stationary_external_data_transfer_switch.isChecked() ? 1 : 0;
         int storeRate;
-        switch (store_rate_stationary_textView.getText().toString()) {
-            case "No Store Rate":
-                storeRate = 0;
-                break;
-            case "Continuous Store":
-                storeRate = 255;
-                break;
-            default:
-                storeRate = Integer.parseInt(store_rate_stationary_textView.getText().toString());
-                break;
+        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString())) {
+            storeRate = 0;
+        } else {
+            storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         }
         int frequency = (stationary_reference_frequency_switch.isChecked()) ?
                 (getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) - baseFrequency) : 0;
@@ -241,6 +234,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        Log.i(TAG, "Saved: " + Converters.getHexValue(b));
 
         if (result)
             showMessage(0);
@@ -293,12 +287,14 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     @OnCheckedChanged(R.id.stationary_reference_frequency_switch)
     public void onCheckedChangedReferenceFrequency(CompoundButton button, boolean isChecked) {
+        Log.i(TAG, "Change State Reference");
         if (isChecked) {
             reference_frequency_stationary_linearLayout.setEnabled(true);
             int frequency = (int) originalData.get("ReferenceFrequency");
             frequency_reference_stationary_textView.setText(frequency != 0 ? getFrequency(frequency) : "0");
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(true);
         } else {
+            Log.i(TAG, "No Reference");
             reference_frequency_stationary_linearLayout.setEnabled(false);
             frequency_reference_stationary_textView.setText("No Reference Frequency");
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(false);
@@ -342,8 +338,8 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "stationary";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
@@ -452,15 +448,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             stationary_external_data_transfer_switch.setChecked(data[2] != 0);
             scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            if (Converters.getHexValue(data[5]).equals("FF")) {
-                store_rate_stationary_textView.setText("Continuous Store");
-                store_rate_stationary_imageView.setVisibility(View.GONE);
-                store_rate_stationary_linearLayout.setEnabled(false);
+            if (Converters.getHexValue(data[5]).equals("00")) {
+                store_rate_minutes_stationary_textView.setText("Continuous Store");
             } else {
-                store_rate_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No Store Rate" :
-                        Converters.getDecimalValue(data[5]));
-                store_rate_stationary_imageView.setVisibility(View.VISIBLE);
-                store_rate_stationary_linearLayout.setEnabled(true);
+                store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
             }
             int frequency = 0;
             if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0")) {
@@ -535,16 +526,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         int timeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int externalData = stationary_external_data_transfer_switch.isChecked() ? 1 : 0;
         int storeRate;
-        switch (store_rate_stationary_textView.getText().toString()) {
-            case "No Store Rate":
-                storeRate = 0;
-                break;
-            case "Continuous Store":
-                storeRate = 255;
-                break;
-            default:
-                storeRate = Integer.parseInt(store_rate_stationary_textView.getText().toString());
-                break;
+        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString())) {
+            storeRate = 0;
+        } else {
+            storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         }
         int referenceFrequency = stationary_reference_frequency_switch.isChecked() ?
                 getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;

@@ -51,10 +51,10 @@ public class EditTablesActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequencies_overview_linearLayout)
@@ -278,7 +278,7 @@ public class EditTablesActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic;
-        switch (number) {
+        switch (number)     {
             case 1:
                 characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TABLE_1;
                 break;
@@ -385,8 +385,8 @@ public class EditTablesActivity extends AppCompatActivity {
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         baseFrequency = getIntent().getExtras().getInt("baseFrequency") * 1000;
@@ -620,7 +620,8 @@ public class EditTablesActivity extends AppCompatActivity {
     }
 
     private boolean existChanges() {
-        if (originalTable.length != frequencyListAdapter.getCount())
+        int count = frequencyListAdapter == null ? 0 : frequencyListAdapter.getCount();
+        if (originalTable.length != count)
             return true;
         for (int i = 0; i < originalTable.length; i++) {
             if (originalTable[i] != frequencyListAdapter.getFrequency(i))

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16sp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16sp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/one_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginEnd="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="1"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:id="@+id/two_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="2"
+            android:textColor="@color/limed_spruce" />
+
+        <Button
+            android:id="@+id/three_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="3"
+            android:textColor="@color/limed_spruce" />
+
+        <Button
+            android:id="@+id/four_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginStart="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="4"
+            android:textColor="@color/limed_spruce" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16sp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/five_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginEnd="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="5"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:id="@+id/six_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="6"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:id="@+id/seven_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="7"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:id="@+id/eight_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginStart="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="8"
+            android:textColor="@color/ebony_clay" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/nine_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginEnd="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="9"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:id="@+id/zero_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:text="0"
+            android:textColor="@color/ebony_clay" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/delete_imageView"
+            style="@style/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginStart="8sp"
+            android:layout_weight="1"
+            android:paddingVertical="8sp"
+            android:src="@drawable/ic_delete" />
+
+    </LinearLayout>
+
+</LinearLayout>

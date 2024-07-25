@@ -26,7 +26,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/no_store_rate_linearLayout"
+            android:id="@+id/continuous_store_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -37,7 +37,7 @@
                 style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_no_store_rate"
+                android:text="@string/lb_continuous_store"
                 android:textColor="@color/ebony_clay" />
 
             <Space
@@ -46,7 +46,7 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/no_store_rate_imageView"
+                android:id="@+id/continuous_store_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_check"
@@ -131,7 +131,7 @@
             tools:ignore="SmallSp" />
 
         <LinearLayout
-            android:id="@+id/twenty_minutes_linearLayout"
+            android:id="@+id/fifteen_minutes_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -142,7 +142,7 @@
                 style="@style/body_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_20_minutes"
+                android:text="@string/lb_15_minutes"
                 android:textColor="@color/ebony_clay" />
 
             <Space
@@ -151,7 +151,7 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/twenty_minutes_imageView"
+                android:id="@+id/fifteen_minutes_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_check"
@@ -222,6 +222,39 @@
 
             <ImageView
                 android:id="@+id/sixty_minutes_imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_check"
+                android:visibility="gone" />
+
+        </LinearLayout><View
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:background="@color/light_gray"
+        tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:id="@+id/one_hundred_twenty_minutes_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16sp">
+
+            <TextView
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_120_minutes"
+                android:textColor="@color/ebony_clay" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/one_hundred_twenty_minutes_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_check"

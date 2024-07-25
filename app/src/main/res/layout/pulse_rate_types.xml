@@ -3,6 +3,7 @@
     android:id="@+id/select_pulse_rate_linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_weight="1"
     android:orientation="vertical">
 
     <TextView
@@ -25,6 +26,36 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/coded_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16sp">
+
+            <TextView
+                style="@style/body_regular"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/lb_coded"
+                android:textColor="@color/ebony_clay" />
+
+            <ImageView
+                android:id="@+id/coded_imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_check"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray" />
+
+        <LinearLayout
             android:id="@+id/fixed_pulse_rate_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +68,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/lb_fixed_pulse_rate"
+                android:text="@string/lb_non_coded_fixed"
                 android:textColor="@color/ebony_clay" />
 
             <ImageView
@@ -67,7 +98,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/lb_variable_pulse_rate"
+                android:text="@string/lb_non_coded_variable"
                 android:textColor="@color/ebony_clay" />
 
             <ImageView

@@ -1,22 +1,5 @@
-/*
- * Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules
- * Contact: support@bluegiga.com.
- *
- * This is free software distributed under the terms of the MIT license reproduced below.
- *
- * Copyright (c) 2013, Bluegiga Technologies
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software")
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF
- * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
- * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
- */
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
-import android.text.TextUtils;
 import java.io.UnsupportedEncodingException;
 
 // Converters - converts value between different numeral system
@@ -26,9 +9,8 @@ public class Converters {
 
     // Gets value in hexadecimal system
     public static String getHexValue(byte value[]) {
-        if (value == null) {
+        if (value == null)
             return "";
-        }
 
         char[] hexChars = new char[value.length * 3];
         int v;
@@ -53,14 +35,12 @@ public class Converters {
 
     // Gets value in decimal system
     public static String getDecimalValue(byte value[]) {
-        if (value == null) {
+        if (value == null)
             return "";
-        }
 
         String result = "";
-        for (byte b : value) {
+        for (byte b : value)
             result += ((int) b & 0xff) + " ";
-        }
         return result;
     }
 
@@ -72,319 +52,10 @@ public class Converters {
         return result;
     }
 
-    public static byte[] convertStringTo(String input, String format) {
-        if (TextUtils.isEmpty(input)) {
-            return input.getBytes();
-        }
-
-        byte[] returnVal;
-
-        // note that java uses big endian
-        switch (format) {
-            case "utf8s":
-                returnVal = convertToUTF8(input);
-                break;
-            case "utf16s":
-                returnVal = convertToUTF16(input);
-                break;
-            case "uint8":
-                returnVal = convertToUint8(input);
-                break;
-            case "uint16":
-                returnVal = convertToUint16(input);
-                break;
-            case "uint24":
-                returnVal = convertToUint24(input);
-                break;
-            case "uint32":
-                returnVal = convertToUint32(input);
-                break;
-            case "uint40":
-                returnVal = convertToUint40(input);
-                break;
-            case "uint48":
-                returnVal = convertToUint48(input);
-                break;
-            case "sint8":
-                returnVal = convertToSint8(input);
-                break;
-            case "sint16":
-                returnVal = convertToSint16(input);
-                break;
-            case "sint24":
-                returnVal = convertToSint24(input);
-                break;
-            case "sint32":
-                returnVal = convertToSint32(input);
-                break;
-            case "sint40":
-                returnVal = convertToSint40(input);
-                break;
-            case "sint48":
-                returnVal = convertToSint48(input);
-                break;
-            case "float32":
-                returnVal = convertToFloat32(input);
-                break;
-            case "float64":
-                returnVal = convertToFloat64(input);
-                break;
-            default:
-                returnVal = input.getBytes();
-        }
-
-        return returnVal;
-    }
-
-    public static byte[] convertToFloat32(String input) {
-        try {
-            float floatVal = Float.parseFloat(input);
-            int intBits = Float.floatToIntBits(floatVal);
-            byte[] returnVal = new byte[4];
-            returnVal[0] = (byte) (intBits & 0xff);
-            returnVal[1] = (byte) ((intBits >>> 8) & 0xff);
-            returnVal[2] = (byte) ((intBits >>> 16) & 0xff);
-            returnVal[3] = (byte) ((intBits >>> 24) & 0xff);
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToFloat64(String input) {
-        try {
-            double floatVal = Double.parseDouble(input);
-            long longBits = Double.doubleToLongBits(floatVal);
-            byte[] returnVal = new byte[8];
-            returnVal[0] = (byte) (longBits & 0xff);
-            returnVal[1] = (byte) ((longBits >>> 8) & 0xff);
-            returnVal[2] = (byte) ((longBits >>> 16) & 0xff);
-            returnVal[3] = (byte) ((longBits >>> 24) & 0xff);
-            returnVal[4] = (byte) ((longBits >>> 32) & 0xff);
-            returnVal[5] = (byte) ((longBits >>> 40) & 0xff);
-            returnVal[6] = (byte) ((longBits >>> 48) & 0xff);
-            returnVal[7] = (byte) ((longBits >>> 56) & 0xff);
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint8(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[1];
-            returnVal[0] = (byte) (val & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint16(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[2];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint24(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[3];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint32(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[4];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint40(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[5];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-            returnVal[4] = (byte) ((val >>> 32) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToSint48(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[6];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-            returnVal[4] = (byte) ((val >>> 32) & 0xFF);
-            returnVal[5] = (byte) ((val >>> 40) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint8(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[1];
-            returnVal[0] = (byte) (val & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint16(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[2];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint24(String input) {
-        try {
-            int val = Integer.parseInt(input);
-
-            byte[] returnVal = new byte[3];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint32(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[4];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint40(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[5];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-            returnVal[4] = (byte) ((val >>> 32) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
-    public static byte[] convertToUint48(String input) {
-        try {
-            long val = Long.parseLong(input);
-
-            byte[] returnVal = new byte[6];
-            returnVal[0] = (byte) (val & 0xFF);
-            returnVal[1] = (byte) ((val >>> 8) & 0xFF);
-            returnVal[2] = (byte) ((val >>> 16) & 0xFF);
-            returnVal[3] = (byte) ((val >>> 24) & 0xFF);
-            returnVal[4] = (byte) ((val >>> 32) & 0xFF);
-            returnVal[5] = (byte) ((val >>> 40) & 0xFF);
-
-            return returnVal;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return input.getBytes();
-        }
-    }
-
     public static byte[] convertToUTF8(String input) {
         byte[] returnVal;
         try {
             returnVal = input.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            returnVal = input.getBytes();
-            e.printStackTrace();
-        }
-        return returnVal;
-    }
-
-    public static byte[] convertToUTF16(String input) {
-        byte[] returnVal;
-        try {
-            returnVal = input.getBytes("UTF-16");
         } catch (UnsupportedEncodingException e) {
             returnVal = input.getBytes();
             e.printStackTrace();
@@ -401,7 +72,6 @@ public class Converters {
         String[] hexadecimal = input.split("");
 
         for (int x = hexadecimal.length - 1; x >= 0; x--) {
-
             z = (hexadecimal.length - x - 1);
             pot = 1;
             for (int y = 0; y < z; y++) {

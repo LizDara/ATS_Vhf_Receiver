@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Animatable;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,16 +43,14 @@ public class ReceiverUpdateActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.updating_receiver_linearLayout)
     LinearLayout updating_receiver_linearLayout;
-    @BindView(R.id.updating_receiver_imageView)
-    ImageView updating_receiver_imageView;
     @BindView(R.id.updating_receiver_progressBar)
     ProgressBar updating_receiver_progressBar;
     @BindView(R.id.update_receiver_linearLayout)
@@ -153,20 +150,9 @@ public class ReceiverUpdateActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "update";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
-        updating_receiver_imageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.avd_anim_spinner_48));
-        Drawable drawable = updating_receiver_imageView.getDrawable();
-        Animatable animatable = (Animatable) drawable;
-        AnimatedVectorDrawableCompat.registerAnimationCallback(drawable, new Animatable2Compat.AnimationCallback() {
-            @Override
-            public void onAnimationEnd(Drawable drawable) {
-                new Handler().postDelayed(animatable::start, MESSAGE_PERIOD);
-            }
-        });
-        animatable.start();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);

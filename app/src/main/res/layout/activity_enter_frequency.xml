@@ -41,8 +41,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16sp"
+                    android:layout_marginTop="16sp"
+                    android:layout_marginBottom="8sp"
                     android:gravity="center"
-                    android:padding="16sp"
                     android:text="@string/lb_enter_frequency_digits"
                     android:textColor="@color/slate_gray" />
 
@@ -69,12 +70,29 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:id="@+id/number_buttons_linearLayout"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="8sp"
                         android:layout_marginBottom="32sp"
-                        android:orientation="vertical" />
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/number_buttons_linearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="8sp">
+
+                            <include
+                                layout="@layout/numbers"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </ScrollView>
 

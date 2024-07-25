@@ -66,8 +66,14 @@
     <string name="lb_pulse_rate">Pulse Rate</string>
     <string name="lb_record_data">Record Data</string>
     <string name="lb_id_audio">ID Audio</string>
-    <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
     <string name="lb_auto_recording">Auto-recording</string>
+    <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
+    <string name="lb_select_ids_audio">Select IDs for Audio</string>
+    <string name="lb_single">Single</string>
+    <string name="lb_all">All</string>
+    <string name="lb_none">None</string>
+    <string name="lb_enter_digit_id">Enter a two digit ID</string>
+    <string name="lb_play_background_signals">Play Background Signals</string>
 
     <!--AERIAL SCAN-->
     <string name="aerial_scanning">Mobile Scanning</string>
@@ -83,7 +89,9 @@
     <string name="lb_edit_settings">Edit Settings</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
-    <string name="lb_scan_details">Scan Details</string>
+    <string name="lb_searching_gps">Searching ...</string>
+    <string name="lb_valid_gps">Valid</string>
+    <string name="lb_failed_gps">Failed</string>
     <string name="lb_frequency">Frequency</string>
     <string name="lb_table_total">Table Total</string>
     <string name="lb_table_index">Table Index</string>
@@ -95,7 +103,6 @@
     <string name="lb_scan_feed">Scan Feed</string>
     <string name="lb_hold">Hold Frequency</string>
     <string name="lb_release">Release Frequency</string>
-    <string name="lb_none">None</string>
     <string name="lb_on">ON</string>
     <string name="lb_off">OFF</string>
     <string name="lb_stop_scanning">Stop Scanning</string>
@@ -123,6 +130,7 @@
     <string name="lb_start_stationary_scan">Start Stationary Scan</string>
     <string name="lb_stationary_scanning">Stationary Scanning ...</string>
     <string name="lb_current_antenna">Antenna #</string>
+    <string name="lb_scan_details">Scan Details</string>
 
     <!--TEMPORARY STATIONARY-->
     <string name="temporary_stationary">Temporary Stationary Settings</string>
@@ -184,12 +192,13 @@
     <string name="lb_scan_tables">Scan Tables</string>
     <string name="lb_scan_timeout">Timeout (Seconds)</string>
     <string name="lb_select_store_rate">Select Store Rate</string>
-    <string name="lb_no_store_rate">No Store Rate</string>
+    <string name="lb_continuous_store">Continuous Store</string>
     <string name="lb_5_minutes">5 minutes</string>
     <string name="lb_10_minutes">10 minutes</string>
-    <string name="lb_20_minutes">20 minutes</string>
+    <string name="lb_15_minutes">15 minutes</string>
     <string name="lb_30_minutes">30 minutes</string>
     <string name="lb_60_minutes">60 minutes</string>
+    <string name="lb_120_minutes">120 minutes</string>
     <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate (Minutes)</string>
 
     <!--SET TRANSMITTER TYPE-->
@@ -203,6 +212,11 @@
     <string name="target_pulse_rate_2">Target Pulse Rate 2</string>
     <string name="target_pulse_rate_3">Target Pulse Rate 3</string>
     <string name="target_pulse_rate_4">Target Pulse Rate 4</string>
+    <string name="lb_select_detection_message">Please select a transmitter detection filter to continue. You can change this later in receiver options.</string>
+    <string name="lb_coded">Coded</string>
+    <string name="lb_non_coded_fixed">Non Coded (Fixed Pulse Rate)</string>
+    <string name="lb_non_coded_variable">Non Coded (Variable Pulse Rate)</string>
+    <string name="lb_continue">Continue</string>
     <string name="lb_transmitter_detection">Transmitter Detection Filter Options</string>
     <string name="lb_pulse_rate_type">Pulse Rate Type</string>
     <string name="lb_choose_one">Choose one now to setup the detection filters.</string>
@@ -220,8 +234,6 @@
     <string name="lb_pr4">PR4 (ppm)</string>
     <string name="lb_pr4_tolerance">PR4 Tolerance (ppm)</string>
     <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
-    <string name="lb_fixed_pulse_rate">Fixed Pulse Rate</string>
-    <string name="lb_variable_pulse_rate">Variable Pulse Rate</string>
     <string name="lb_temperature">Temperature</string>
     <string name="lb_select_type">Select Type:</string>
     <string name="lb_number_matches">Number of Matches</string>

@@ -14,18 +14,19 @@ public class ValueCodes {
 
     public static final int PULSE_RATE_TYPE = 1008;
     public static final int MATCHES_FOR_VALID_PATTERN = 1009;
-    public static final int FIXED_PULSE_RATE = 1010;
-    public static final int VARIABLE_PULSE_RATE = 1011;
-    public static final int PULSE_RATE_1 = 1012;
-    public static final int PULSE_RATE_2 = 1013;
-    public static final int PULSE_RATE_3 = 1014;
-    public static final int PULSE_RATE_4 = 1015;
-    public static final int MAX_PULSE_RATE = 1016;
-    public static final int MIN_PULSE_RATE = 1017;
-    public static final int DATA_CALCULATION_TYPES = 1018;
-    public static final int NONE = 1019;
-    public static final int TEMPERATURE = 1020;
-    public static final int PERIOD = 1021;
+    public static final int CODED = 1010;
+    public static final int FIXED_PULSE_RATE = 1011;
+    public static final int VARIABLE_PULSE_RATE = 1012;
+    public static final int PULSE_RATE_1 = 1013;
+    public static final int PULSE_RATE_2 = 1014;
+    public static final int PULSE_RATE_3 = 1015;
+    public static final int PULSE_RATE_4 = 1016;
+    public static final int MAX_PULSE_RATE = 1017;
+    public static final int MIN_PULSE_RATE = 1018;
+    public static final int DATA_CALCULATION_TYPES = 1019;
+    public static final int NONE = 1020;
+    public static final int TEMPERATURE = 1021;
+    public static final int PERIOD = 1022;
 
     public static final String VALUE = "value";
 }

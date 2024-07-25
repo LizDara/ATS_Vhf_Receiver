@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.R;
@@ -35,8 +34,10 @@ public class TableScanListAdapter extends BaseAdapter {
         selected = new ArrayList<>();
         for (int i = 0; i < frequencies.length; i++)
             selected.add(false);
-        for (int number : tables)
-            selected.set(number, true);
+        for (int number : tables) {
+            if (number <= 12)
+                selected.set(number - 1, true);
+        }
     }
 
     @Override

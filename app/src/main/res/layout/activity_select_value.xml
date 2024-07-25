@@ -15,9 +15,6 @@
             layout="@layout/toolbar"/>
 
         <include
-            layout="@layout/non_coded"/>
-
-        <include
             layout="@layout/pulse_rate_types"/>
 
         <include

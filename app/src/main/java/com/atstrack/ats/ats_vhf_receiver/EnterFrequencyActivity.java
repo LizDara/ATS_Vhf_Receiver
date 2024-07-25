@@ -11,16 +11,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -32,8 +28,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_delete;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_delete;
 
 public class EnterFrequencyActivity extends AppCompatActivity {
 
@@ -43,10 +37,10 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequency_textView)
@@ -60,7 +54,7 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     @BindView(R.id.save_changes_button)
     Button save_changes_button;
 
-    private final static String TAG = InputValueActivity.class.getSimpleName();
+    private final static String TAG = EnterFrequencyActivity.class.getSimpleName();
 
     private int position;
     private int baseFrequency;
@@ -104,6 +98,22 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         }
     };
 
+    @OnClick({R.id.one_button, R.id.two_button, R.id.three_button, R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button, R.id.eight_button, R.id.nine_button})
+    public void onClickNumber(View v) {
+        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
+            Button button = (Button) v;
+            String number = frequency_textView.getText().toString();
+            frequency_textView.setText(number + button.getText());
+        }
+    }
+
+    @OnClick(R.id.delete_imageView)
+    public void onClickDelete(View v) {
+        String number = frequency_textView.getText().toString();
+        if (!number.isEmpty())
+            frequency_textView.setText(number.substring(0, number.length() - 1));
+    }
+
     @OnClick(R.id.save_changes_button)
     public void onClickSaveChanges(View v) {
         int newFrequency = Integer.parseInt(frequency_textView.getText().toString());
@@ -132,8 +142,8 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         // Gets the number of frequencies from that table
@@ -179,49 +189,6 @@ public class EnterFrequencyActivity extends AppCompatActivity {
             }
             number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
         }
-
-        Space space = new Space(this);
-        space.setLayoutParams(newLinearLayoutParams());
-        number_buttons_linearLayout.addView(space);
-
-        int number = 1;
-        for (int i = 0; i < 3; i++) {
-            newBaseLinearLayout();
-            for (int j = 0; j < 4; j++) {
-                if (number == 10) {
-                    Space spaceBaseFrequency = new Space(this);
-                    spaceBaseFrequency.setLayoutParams(newButtonParams());
-                    linearLayoutBaseFrequency.addView(spaceBaseFrequency);
-                } else if (number == 11) {
-                    ImageView imageViewBaseFrequency = new ImageView(this);
-                    imageViewBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_delete));
-                    imageViewBaseFrequency.setImageDrawable(ContextCompat.getDrawable(this, ic_delete));
-                    imageViewBaseFrequency.setLayoutParams(newButtonDeleteParams());
-                    imageViewBaseFrequency.setPadding(50, 0, 50, 0);
-                    imageViewBaseFrequency.setOnClickListener(view -> {
-                        if (!frequency_textView.getText().toString().isEmpty()) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous.substring(0, previous.length() - 1));
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(imageViewBaseFrequency);
-                } else {
-                    newBaseButton(number);
-                    int finalNumber = number;
-                    buttonBaseFrequency.setOnClickListener(view -> {
-                        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
-                            String previous = frequency_textView.getText().toString();
-                            frequency_textView.setText(previous + finalNumber);
-                        }
-                    });
-                    linearLayoutBaseFrequency.addView(buttonBaseFrequency);
-                }
-                if (number == 9) number = 0;
-                else if (number == 0) number = 10;
-                else number++;
-            }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
-        }
     }
 
     private void newBaseLinearLayout() {
@@ -232,11 +199,11 @@ public class EnterFrequencyActivity extends AppCompatActivity {
 
     private void newBaseButton(int baseNumber) {
         buttonBaseFrequency = new Button(this);
+        buttonBaseFrequency.setLayoutParams(newButtonParams());
         buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, border));
         buttonBaseFrequency.setTextSize(16);
         buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
         buttonBaseFrequency.setText(String.valueOf(baseNumber));
-        buttonBaseFrequency.setLayoutParams(newButtonParams());
     }
 
     /**
@@ -254,15 +221,9 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     private LinearLayout.LayoutParams newButtonParams() {
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(16, 0, 16, 0);
+        params.height = 64;
         params.weight = 1;
-        return params;
-    }
-
-    private LinearLayout.LayoutParams newButtonDeleteParams() {
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.height = GridLayout.LayoutParams.MATCH_PARENT;
-        params.weight = 1;
+        params.gravity = Gravity.CENTER_VERTICAL;
         return params;
     }
 }

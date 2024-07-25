@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 
 import java.util.UUID;
@@ -40,10 +39,10 @@ public class StartScanningActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.menu_scan_linearLayout)
@@ -191,8 +190,8 @@ public class StartScanningActivity extends AppCompatActivity {
         menu_scan_linearLayout.setVisibility(View.VISIBLE);
         warning_no_tables_linearLayout.setVisibility(View.GONE);
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);

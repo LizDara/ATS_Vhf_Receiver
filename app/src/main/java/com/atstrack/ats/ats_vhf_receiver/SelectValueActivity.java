@@ -25,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,18 +49,18 @@ public class SelectValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
-    @BindView(R.id.non_coded_linearLayout)
-    LinearLayout non_coded_linearLayout;
     @BindView(R.id.select_pulse_rate_linearLayout)
     LinearLayout select_pulse_rate_linearLayout;
     @BindView(R.id.number_of_matches_scrollView)
     ScrollView number_of_matches_scrollView;
+    @BindView(R.id.coded_imageView)
+    ImageView coded_imageView;
     @BindView(R.id.fixed_pulse_rate_imageView)
     ImageView fixed_pulse_rate_imageView;
     @BindView(R.id.variable_pulse_rate_imageView)
@@ -231,13 +230,17 @@ public class SelectValueActivity extends AppCompatActivity {
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
     }
 
-    @OnClick(R.id.select_pulse_rate_button)
-    public void onClickSelectPulseRate(View v) {
-        setVisibility("pulseRateTypes");
+    @OnClick(R.id.coded_linearLayout)
+    public void onClickCoded(View v) {
+        coded_imageView.setVisibility(View.VISIBLE);
+        fixed_pulse_rate_imageView.setVisibility(View.GONE);
+        variable_pulse_rate_imageView.setVisibility(View.GONE);
+        value = ValueCodes.CODED;
     }
 
     @OnClick(R.id.fixed_pulse_rate_linearLayout)
     public void onClickFixedPulseRate(View v) {
+        coded_imageView.setVisibility(View.GONE);
         fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
         value = ValueCodes.FIXED_PULSE_RATE;
@@ -245,6 +248,7 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @OnClick(R.id.variable_pulse_rate_linearLayout)
     public void onClickVariablePulseRate(View v) {
+        coded_imageView.setVisibility(View.GONE);
         variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
         value = ValueCodes.VARIABLE_PULSE_RATE;
@@ -376,8 +380,8 @@ public class SelectValueActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "txType";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         type = getIntent().getIntExtra("type", 0);
@@ -521,16 +525,7 @@ public class SelectValueActivity extends AppCompatActivity {
 
     private void setVisibility(String value) {
         switch (value) {
-            case "nonCoded":
-                non_coded_linearLayout.setVisibility(View.VISIBLE);
-                select_pulse_rate_linearLayout.setVisibility(View.GONE);
-                number_of_matches_scrollView.setVisibility(View.GONE);
-                pulse_rate_linearLayout.setVisibility(View.GONE);
-                max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
-                data_calculation_types_linearLayout.setVisibility(View.GONE);
-                break;
             case "pulseRateTypes":
-                non_coded_linearLayout.setVisibility(View.GONE);
                 select_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 number_of_matches_scrollView.setVisibility(View.GONE);
                 pulse_rate_linearLayout.setVisibility(View.GONE);
@@ -539,7 +534,6 @@ public class SelectValueActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.pulse_rate_type_options);
                 break;
             case "matches":
-                non_coded_linearLayout.setVisibility(View.GONE);
                 select_pulse_rate_linearLayout.setVisibility(View.GONE);
                 number_of_matches_scrollView.setVisibility(View.VISIBLE);
                 pulse_rate_linearLayout.setVisibility(View.GONE);
@@ -548,7 +542,6 @@ public class SelectValueActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.matches_for_valid_pattern);
                 break;
             case "pulseRateValues":
-                non_coded_linearLayout.setVisibility(View.GONE);
                 select_pulse_rate_linearLayout.setVisibility(View.GONE);
                 number_of_matches_scrollView.setVisibility(View.GONE);
                 pulse_rate_linearLayout.setVisibility(View.VISIBLE);
@@ -556,7 +549,6 @@ public class SelectValueActivity extends AppCompatActivity {
                 data_calculation_types_linearLayout.setVisibility(View.GONE);
                 break;
             case "maxMin":
-                non_coded_linearLayout.setVisibility(View.GONE);
                 select_pulse_rate_linearLayout.setVisibility(View.GONE);
                 number_of_matches_scrollView.setVisibility(View.GONE);
                 pulse_rate_linearLayout.setVisibility(View.GONE);
@@ -565,7 +557,6 @@ public class SelectValueActivity extends AppCompatActivity {
                 max_min_pulse_rate_editText.addTextChangedListener(textChangedListener);
                 break;
             case "calculation":
-                non_coded_linearLayout.setVisibility(View.GONE);
                 select_pulse_rate_linearLayout.setVisibility(View.GONE);
                 number_of_matches_scrollView.setVisibility(View.GONE);
                 pulse_rate_linearLayout.setVisibility(View.GONE);
@@ -583,19 +574,14 @@ public class SelectValueActivity extends AppCompatActivity {
      */
     private void downloadPulseRateType(byte[] data) {
         Log.i(TAG, "Type: " + Converters.getHexValue(data));
-        if (Converters.getHexValue(data[1]).equals("20") || // this is the correct
-                Converters.getHexValue(data[1]).equals("04") ||
-                Converters.getHexValue(data[1]).equals("00") ||
-                Converters.getHexValue(data[1]).equals("E2") ||
-                Converters.getHexValue(data[1]).equals("64")) {
-            setVisibility("nonCoded");
-            value = 0;
-        } else if (Converters.getHexValue(data[1]).equals("21")) {
-            setVisibility("pulseRateTypes");
+        setVisibility("pulseRateTypes");
+        if (Converters.getHexValue(data[1]).equals("09")) {
+            coded_imageView.setVisibility(View.VISIBLE);
+            value = ValueCodes.CODED;
+        } else if (Converters.getHexValue(data[1]).equals("08")) {
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
             value = ValueCodes.FIXED_PULSE_RATE;
-        } else if (Converters.getHexValue(data[1]).equals("22")) {
-            setVisibility("pulseRateTypes");
+        } else if (Converters.getHexValue(data[1]).equals("07")) {
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
             value = ValueCodes.VARIABLE_PULSE_RATE;
         }

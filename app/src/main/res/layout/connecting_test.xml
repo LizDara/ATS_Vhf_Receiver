@@ -8,13 +8,22 @@
     android:orientation="vertical"
     android:visibility="visible">
 
-    <ImageView
-        android:id="@+id/spinner_testing"
+    <ProgressBar
+        android:id="@+id/testing_progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="48sp"
         android:layout_marginBottom="24sp" />
+
+    <ImageView
+        android:id="@+id/complete_test_imageView"
+        android:layout_width="@dimen/button_height"
+        android:layout_height="@dimen/button_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="48sp"
+        android:layout_marginBottom="24sp"
+        android:background="@drawable/circle_check" />
 
     <TextView
         android:id="@+id/state_test_textView"

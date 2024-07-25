@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EnterFrequencyActivity"></activity>
+        <activity
+            android:name=".EnterFrequencyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ReceiverUpdateActivity"
             android:exported="true"

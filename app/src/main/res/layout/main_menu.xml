@@ -52,7 +52,7 @@
             android:layout_height="@dimen/connect_image"
             android:layout_marginTop="35sp"
             android:layout_marginBottom="24sp"
-            android:background="@drawable/connected"
+            android:background="@drawable/receiver_branding"
             android:elevation="4sp"
             android:gravity="center">
 

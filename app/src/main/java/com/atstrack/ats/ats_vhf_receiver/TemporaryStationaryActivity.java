@@ -51,10 +51,10 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_name_textView)
-    TextView device_name_textView;
     @BindView(R.id.device_status_textView)
     TextView device_status_textView;
+    @BindView(R.id.device_range_textView)
+    TextView device_range_textView;
     @BindView(R.id.percent_battery_textView)
     TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_stationary_textView)
@@ -65,7 +65,7 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     TextView scan_timeout_seconds_stationary_textView;
     @BindView(R.id.number_of_antennas_stationary_textView)
     TextView number_of_antennas_stationary_textView;
-    @BindView(R.id.store_rate_stationary_textView)
+    @BindView(R.id.store_rate_minutes_stationary_textView)
     TextView store_rate_stationary_textView;
     @BindView(R.id.frequency_reference_stationary_textView)
     TextView frequency_reference_stationary_textView;
@@ -152,7 +152,7 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
-                else if (ValueCodes.FREQUENCY_TABLE_NUMBER == result.getResultCode()) { // Gets the modified frequency table number
+                else if (ValueCodes.TABLES_NUMBER == result.getResultCode()) { // Gets the modified frequency table number
                     int[] value = result.getData().getExtras().getIntArray(ValueCodes.VALUE);
                     String numbers = "";
                     for (int number : value)
@@ -354,8 +354,8 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         parameter = "stationary";
 
-        device_name_textView.setText(receiverInformation.getDeviceName());
         device_status_textView.setText(receiverInformation.getDeviceStatus());
+        device_range_textView.setText(receiverInformation.getDeviceRange());
         percent_battery_textView.setText(receiverInformation.getPercentBattery());
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
@@ -474,7 +474,7 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
                 if (data[i] != 0)
                     tables += Converters.getDecimalValue(data[i]) + ", ";
             }
-            frequency_table_number_stationary_textView.setText(tables.equals("") ? "None" : tables);
+            frequency_table_number_stationary_textView.setText(tables.equals("") ? "None" : tables.substring(0, tables.length() - 2));
             int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
             number_of_antennas_stationary_textView.setText((antennaNumber == 0) ? "None" : String.valueOf(antennaNumber));
             scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));

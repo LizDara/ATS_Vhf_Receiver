@@ -6,17 +6,18 @@ public class ReceiverInformation {
     private String mDeviceStatus;
     private String mDeviceAddress;
     private String mDeviceRange;
-    private String mDeviceBattery;
+    private int mDeviceBattery;
     private String deviceName;
     private byte txType;
     private byte scanState;
+    private String mSDCard;
 
     private ReceiverInformation() {
         deviceName = "Unknown";
         mDeviceStatus = deviceName;
         mDeviceAddress = "Unknown";
         mDeviceRange = "None";
-        mDeviceBattery = "%";
+        mDeviceBattery = 0;
     }
 
     public static ReceiverInformation getReceiverInformation() {
@@ -29,7 +30,7 @@ public class ReceiverInformation {
     public void changeInformation(byte txType, byte scanState, String deviceName, String deviceAddress, String deviceRange, String deviceBattery) {
         mDeviceAddress = deviceAddress;
         mDeviceRange = deviceRange;
-        mDeviceBattery = deviceBattery;
+        mDeviceBattery = Integer.parseInt(deviceBattery.replace("%", ""));
         this.deviceName = deviceName;
         this.txType = txType;
         this.scanState = scanState;
@@ -52,7 +53,11 @@ public class ReceiverInformation {
         setScanState();
     }
 
-    public void changeDeviceBattery(String deviceBattery) {
+    public void changeSDCard(byte state) {
+        mSDCard = Converters.getHexValue(state).equals("80") ? "Inserted" : "None";
+    }
+
+    public void changeDeviceBattery(int deviceBattery) {
         mDeviceBattery = deviceBattery;
     }
 
@@ -68,8 +73,16 @@ public class ReceiverInformation {
         return mDeviceRange;
     }
 
-    public String getPercentBattery() {
+    public int getPercentBattery() {
         return mDeviceBattery;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public String getSDCard() {
+        return mSDCard;
     }
 
     private void setTxType() {

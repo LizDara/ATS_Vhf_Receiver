@@ -29,7 +29,9 @@
     <string name="lb_start_scanning">Start Scanning</string>
     <string name="lb_connecting_device">Connecting ...</string>
     <string name="lb_connected">Connected</string>
-    <string name="lb_receiver_connected">ATS Receiver connected</string>
+    <string name="lb_battery">Battery</string>
+    <string name="lb_sd_card">SD Card</string>
+    <string name="lb_inserted">Inserted</string>
     <string name="lb_disconnect">Disconnect</string>
 
     <!--RECEIVER OPTIONS-->
@@ -89,9 +91,10 @@
     <string name="lb_edit_settings">Edit Settings</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
-    <string name="lb_searching_gps">Searching ...</string>
-    <string name="lb_valid_gps">Valid</string>
-    <string name="lb_failed_gps">Failed</string>
+    <string name="lb_searching_gps">GPS: Searching</string>
+    <string name="lb_off_gps">GPS: Off</string>
+    <string name="lb_valid_gps">GPS: Valid</string>
+    <string name="lb_failed_gps">GPS: Failed</string>
     <string name="lb_frequency">Frequency</string>
     <string name="lb_table_total">Table Total</string>
     <string name="lb_table_index">Table Index</string>
@@ -277,7 +280,7 @@
     <string name="lb_running_diagnostics">Running Diagnostics ...</string>
     <string name="lb_diagnostics_complete">Diagnostics Complete</string>
     <string name="lb_frequency_range">Frequency Range:</string>
-    <string name="lb_battery">Battery (%):</string>
+    <string name="lb_battery_percent">Battery (%):</string>
     <string name="lb_bytes_stored">Bytes Stored:</string>
     <string name="lb_memory_used_percent">Memory Used (%):</string>
     <string name="lb_frequency_tables">Frequency Tables:</string>

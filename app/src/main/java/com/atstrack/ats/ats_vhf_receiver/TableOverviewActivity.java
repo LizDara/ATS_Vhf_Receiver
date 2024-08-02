@@ -34,6 +34,8 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,35 +54,24 @@ public class TableOverviewActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.tables_listView)
     ListView tables_listView;
 
     final private String TAG = TableOverviewActivity.class.getSimpleName();
 
-    private static final int REQUEST_CODE_OPEN_STORAGE = 3;
-
-    private int[][] tables;
-    private TableListAdapter tableListAdapter;
-
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
-    // Code to manage Service lifecycle.
+    private TableListAdapter tableListAdapter;
+    private int[][] tables;
+
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -93,11 +84,6 @@ public class TableOverviewActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -134,8 +120,6 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get the number of frequencies from each table and display it.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onClickTables() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -146,9 +130,8 @@ public class TableOverviewActivity extends AppCompatActivity {
     @OnClick(R.id.load_from_file_button)
     public void onClickLoadTablesFromFile(View v) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-
         intent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory().getPath()), "*/*");
-        startActivityForResult(intent, REQUEST_CODE_OPEN_STORAGE);
+        startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
     }
 
     @Override
@@ -157,23 +140,15 @@ public class TableOverviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_table_overview);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.edit_frequency_tables);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
 
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
-        // Gets the number of frequencies from each table
         parameter = "tables";
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -182,7 +157,7 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_OPEN_STORAGE) {
+        if (requestCode == ValueCodes.REQUEST_CODE_OPEN_STORAGE) {
             if (resultCode == RESULT_OK) { // Gets the Uri of the selected file
                 Uri uri = data.getData();
                 String uriString = uri.toString();
@@ -219,9 +194,8 @@ public class TableOverviewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -244,39 +218,30 @@ public class TableOverviewActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
      * Reads a file from the local storage and get the frequencies from each table.
-     *
      * @param path The directory path where is the file.
      */
     private void readFile(String path) {
         if (isExternalStorageReadable()) {
             try {
-                // Gets the selected file
-                String newPath = findPath(path);
+                String newPath = findPath(path); // Gets the selected file
                 File file = new File(Environment.getExternalStorageDirectory(), newPath);
                 FileInputStream fileInputStream = new FileInputStream(file);
 
@@ -322,23 +287,19 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     /**
      * Finds the directory path of the selected file.
-     *
      * @param path The directory path where is the file.
-     *
      * @return Returns the directory path separated by /.
      */
     private String findPath(String path) {
         String[] splitPath = path.split("%");
         String newPath = "";
-        for (int i = 1; i < splitPath.length; i++) {
+        for (int i = 1; i < splitPath.length; i++)
             newPath += "/" + splitPath[i].substring(2);
-        }
         return newPath;
     }
 
     /**
      * Checks if external storage is readable.
-     *
      * @return Returns true, if external storage is readable.
      */
     private boolean isExternalStorageReadable() {
@@ -348,7 +309,6 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets the number of frequencies from each table and display on the screen.
-     *
      * @param packet The received packet.
      */
     private void downloadData(byte[] packet) {

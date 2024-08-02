@@ -31,6 +31,11 @@
         <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
 
+    <style name="body_x_small" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/body_x_small</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
     <style name="button" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/button</item>
         <item name="android:textStyle">bold</item>

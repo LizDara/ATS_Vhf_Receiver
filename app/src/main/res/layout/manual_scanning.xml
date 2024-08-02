@@ -23,7 +23,7 @@
             android:background="@drawable/ic_gps_off"/>
 
         <TextView
-            android:id="@+id/state_manual_textView"
+            android:id="@+id/gps_state_manual_textView"
             style="@style/body_regular"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

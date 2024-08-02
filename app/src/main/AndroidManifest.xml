@@ -39,10 +39,6 @@
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ReceiverOptionsActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".SelectValueActivity"
             android:exported="true"
             android:screenOrientation="portrait" />

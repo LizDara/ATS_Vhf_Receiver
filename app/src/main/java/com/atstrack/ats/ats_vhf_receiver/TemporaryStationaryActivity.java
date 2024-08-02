@@ -37,6 +37,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
@@ -51,12 +52,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_stationary_textView)
     TextView frequency_table_number_stationary_textView;
     @BindView(R.id.scan_rate_seconds_stationary_textView)
@@ -93,16 +88,13 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     private int baseFrequency;
     private int range;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -115,11 +107,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -194,8 +181,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get stationary defaults data.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStationaryDefaults() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -205,8 +190,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
 
     /**
      * Writes the modified stationary defaults data by the user.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickSave() {
         String[] tables = frequency_table_number_stationary_textView.getText().toString().split(", ");
@@ -341,27 +324,20 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_temporary_stationary);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.temporary_stationary);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
-        parameter = "stationary";
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
+        ReceiverStatus.setReceiverStatus(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
         range = sharedPreferences.getInt("Range", 0);
 
+        parameter = "stationary";
         originalData = new HashMap();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -408,9 +384,8 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -438,32 +413,24 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
      * With the received packet, gets stationary defaults data.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
@@ -490,10 +457,9 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
                 store_rate_stationary_linearLayout.setEnabled(true);
             }
             int frequency = 0;
-            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0")) {
+            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
                 frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                         Integer.parseInt(Converters.getDecimalValue(data[7])) + 150000;
-            }
             frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : String.valueOf(frequency));
             reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
 
@@ -511,7 +477,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
 
     /**
      * Displays a message indicating whether the writing was successful.
-     *
      * @param status This number indicates the writing status.
      */
     private void showMessage(int status) {
@@ -546,7 +511,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
 
     /**
      * Checks for changes to the default data.
-     *
      * @return Returns true, if there are changes.
      */
     private boolean checkChanges() {
@@ -583,7 +547,6 @@ public class TemporaryStationaryActivity extends AppCompatActivity {
 
     /**
      * Checks that the data is a valid and correct format.
-     *
      * @return Returns true, if the data is correct.
      */
     private boolean isDataCorrect() {

@@ -39,6 +39,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
@@ -65,12 +66,6 @@ public class ManualScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.ready_manual_scan_linearLayout)
     LinearLayout ready_manual_scan_LinearLayout;
     @BindView(R.id.frequency_manual_textView)
@@ -103,18 +98,17 @@ public class ManualScanActivity extends AppCompatActivity {
     ImageView plus_imageView;
     @BindView(R.id.gps_manual_imageView)
     ImageView gps_manual_imageView;
-    @BindView(R.id.state_manual_textView)
-    TextView state_manual_textView;
+    @BindView(R.id.gps_state_manual_textView)
+    TextView gps_state_manual_textView;
 
     private final static String TAG = ManualScanActivity.class.getSimpleName();
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private static final int WAITING_PERIOD = 1000;
 
+    private AnimationDrawable animationDrawable;
     private boolean isScanning;
     private boolean isEditFrequency;
-
     private int baseFrequency;
     private int frequencyRange;
     private int range;
@@ -125,18 +119,13 @@ public class ManualScanActivity extends AppCompatActivity {
     private int mort;
     private byte[] audioOption = {(byte) 0x5A, 0, 0};
 
-    private AnimationDrawable animationDrawable;
-
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -150,11 +139,6 @@ public class ManualScanActivity extends AppCompatActivity {
     private String parameter = "";
     private String parameterWrite = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -167,11 +151,10 @@ public class ManualScanActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if ("sendLog".equals(parameter)) { // Receives the data
+                    if ("sendLog".equals(parameter)) // Receives the data
                         onClickLog();
-                    } else if ("sendLogScanning".equals(parameter)) {
+                    else if ("sendLogScanning".equals(parameter))
                         onClickLogScanning();
-                    }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (parameter.equals("sendLog")) // Receives the data
@@ -189,7 +172,6 @@ public class ManualScanActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                Log.i(TAG, "BROADCAST RECEIVER 1: " + action);
                 if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
                     switch (parameterWrite) {
                         case "startManual": // Starts to scan
@@ -221,12 +203,11 @@ public class ManualScanActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (ValueCodes.CANCELLED == result.getResultCode()) {
+                if (ValueCodes.CANCELLED == result.getResultCode())
                     setVisibility("overview");
-                }
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
                     newFrequency = result.getData().getExtras().getInt("frequency");
-                    frequency_manual_textView.setText(getFrequency(newFrequency));
+                    frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
                     parameter = "sendLog";
                     mBluetoothLeService.discovering();
                 }
@@ -249,8 +230,6 @@ public class ManualScanActivity extends AppCompatActivity {
 
     /**
      * Writes the aerial scan data for start to scan.
-     * Service name: Scan.
-     * Characteristic name: Manual.
      */
     private void onClickStart() {
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -273,16 +252,13 @@ public class ManualScanActivity extends AppCompatActivity {
         if (isScanning) {
             parameterWrite = "";
             setVisibility("scanning");
-            frequency_scan_manual_textView.setText(getFrequency(newFrequency));
-            setGpsOff(R.string.lb_searching_gps);
-            state_manual_textView.setVisibility(manual_gps_switch.isChecked() ? View.VISIBLE : View.GONE);
+            frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
+            if (manual_gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
         }
     }
 
     /**
      * Enables notification for receive the data.
-     * Service name: Screen.
-     * Characteristic name: SendLog.
      */
     private void onClickLog() {
         parameterWrite = "startManual";
@@ -293,13 +269,11 @@ public class ManualScanActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
-        }, WAITING_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     /**
      * Writes a value for stop scan.
-     * Service name: Scan.
-     * Characteristic name: Manual.
      */
     private void onClickStop() {
         byte[] b = new byte[] {(byte) 0x87};
@@ -311,7 +285,6 @@ public class ManualScanActivity extends AppCompatActivity {
         if (result) {
             clear();
             isScanning = false;
-
             if (isEditFrequency) {
                 isEditFrequency = false;
                 Intent intent = new Intent(this, EnterFrequencyActivity.class);
@@ -338,7 +311,7 @@ public class ManualScanActivity extends AppCompatActivity {
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
         if (result) {
-            state_manual_textView.setVisibility(View.GONE);
+            record_data_manual_button.setText(R.string.lb_record_data);
             record_data_manual_button.setAlpha(1);
             record_data_manual_button.setEnabled(true);
             clear();
@@ -398,7 +371,7 @@ public class ManualScanActivity extends AppCompatActivity {
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
-        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b);
     }
 
     @OnClick(R.id.enter_new_frequency_button)
@@ -428,22 +401,21 @@ public class ManualScanActivity extends AppCompatActivity {
         parameterWrite = "recordData";
         mBluetoothLeService.discoveringSecond();
 
-        state_manual_textView.setVisibility(View.VISIBLE);
-        state_manual_textView.setText(R.string.lb_saving_targets);
+        record_data_manual_button.setText(R.string.lb_saving_targets);
         record_data_manual_button.setAlpha((float) 0.6);
         record_data_manual_button.setEnabled(false);
     }
 
     @OnClick(R.id.minus_imageView)
     public void onClickMinus(View v) {
-        newFrequency = getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) - 1;
+        newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) - 1;
         parameterWrite = "decrease";
         mBluetoothLeService.discoveringSecond();
     }
 
     @OnClick(R.id.plus_imageView)
     public void onClickPlus(View v) {
-        newFrequency = getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) + 1;
+        newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) + 1;
         parameterWrite = "increase";
         mBluetoothLeService.discoveringSecond();
     }
@@ -451,7 +423,6 @@ public class ManualScanActivity extends AppCompatActivity {
     @OnClick(R.id.edit_audio_manual_textView)
     public void onClickEditAudio(View v) {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.audio_options, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
@@ -545,35 +516,28 @@ public class ManualScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manual_scan);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.manual_scanning);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
-        isScanning = getIntent().getExtras().getBoolean("scanning");
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
 
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
+        isScanning = getIntent().getExtras().getBoolean("scanning");
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
         range = sharedPreferences.getInt("Range", 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         isEditFrequency = false;
 
-        frequency_manual_textView.setText(getFrequency(baseFrequency));
+        frequency_manual_textView.setText(Converters.getFrequency(baseFrequency));
         newFrequency = baseFrequency;
         if (isScanning) { // The device is already scanning
             parameter = "sendLogScanning";
             detectionType = getIntent().getExtras().getByte("detectionType");
-            frequency_scan_manual_textView.setText(getFrequency(newFrequency));
+            frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
 
             updateVisibility();
             setVisibility("scanning");
@@ -590,9 +554,8 @@ public class ManualScanActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         registerReceiver(mGattUpdateReceiverWrite, makeGattUpdateIntentFilterWrite());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -633,27 +596,20 @@ public class ManualScanActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     private void setVisibility(String value) {
@@ -664,7 +620,6 @@ public class ManualScanActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.manual_scanning);
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-                device_status_textView.setText(receiverInformation.getDeviceStatus());
                 break;
             case "scanning":
                 ready_manual_scan_LinearLayout.setVisibility(View.GONE);
@@ -674,7 +629,6 @@ public class ManualScanActivity extends AppCompatActivity {
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
-                device_status_textView.setText(receiverInformation.getDeviceStatus().replace("Not scanning", "Scanning, manual"));
                 break;
         }
     }
@@ -688,27 +642,28 @@ public class ManualScanActivity extends AppCompatActivity {
         pulse_rate_textView.setVisibility(visibility);
     }
 
-    private String getFrequency(int frequency) {
-        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-    }
-
-    private int getFrequencyNumber(String frequency) {
-        return Integer.parseInt(frequency.replace(".", ""));
-    }
-
-    private void setGpsOff(int idString) {
+    private void setGpsOff() {
         gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
-        state_manual_textView.setText(idString);
+        gps_state_manual_textView.setText(R.string.lb_off_gps);
     }
 
-    private void setGpsOn() {
-        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_on));
-        state_manual_textView.setText(R.string.lb_valid_gps);
+    private void setGpsSearching() {
+        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_manual_textView.setText(R.string.lb_searching_gps);
+    }
+
+    private void setGpsFailed() {
+        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_manual_textView.setText(R.string.lb_failed_gps);
+    }
+
+    private void setGpsValid() {
+        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
+        gps_state_manual_textView.setText(R.string.lb_valid_gps);
     }
 
     /**
      * With the received packet, gets the data of scanning.
-     *
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
@@ -721,8 +676,8 @@ public class ManualScanActivity extends AppCompatActivity {
             clear();
             int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                     (Integer.parseInt(Converters.getDecimalValue(data[2]))));
-            frequency_scan_manual_textView.setText(getFrequency(frequency));
-            frequency_manual_textView.setText(getFrequency(frequency));
+            frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
+            frequency_manual_textView.setText(Converters.getFrequency(frequency));
         } else if (Converters.getHexValue(data[0]).equals("D0") || Converters.getHexValue(data[0]).equals("E0")) {
             int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
 
@@ -769,26 +724,24 @@ public class ManualScanActivity extends AppCompatActivity {
         detectionType = data[18];
         int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[10])) * 256) +
                 (Integer.parseInt(Converters.getDecimalValue(data[11]))));
-        frequency_scan_manual_textView.setText(getFrequency(frequency));
-        frequency_manual_textView.setText(getFrequency(frequency));
+        frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
+        frequency_manual_textView.setText(Converters.getFrequency(frequency));
         updateVisibility();
     }
 
     private void gpsState(byte[] data) {
         int state = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        if (state == 3)
-            setGpsOn();
-        else if (state == 2)
-            setGpsOff(R.string.lb_failed_gps);
-        else if (state == 1)
-            setGpsOff(R.string.lb_searching_gps);
+        if (state == 3) // Valid
+            setGpsValid();
+        else if (state == 2) // Failed
+            setGpsFailed();
+        else if (state == 1) // Searching
+            setGpsSearching();
     }
 
     /**
      * Looks for the position in the table of code received.
-     *
      * @param number Number of code or period to look.
-     *
      * @return Returns the position of code in the table.
      */
     private int getPositionNumber(int number, int position) {
@@ -933,13 +886,6 @@ public class ManualScanActivity extends AppCompatActivity {
         addNewNonCodedFixedDetail(position, pulseRate, signalStrength, detections, period, type);
     }
 
-    /**
-     * Creates a row of non code data and display it.
-     *
-     * @param period Number of period received.
-     * @param pulseRate Number of pulse rate received.
-     * @param signalStrength Number of signal strength received.
-     */
     private void refreshNonCodedVariable(int period, int pulseRate, int signalStrength) {
         createDetail();
         for (int i = scan_details_linearLayout.getChildCount() - 2; i > 3 ; i -= 2) {

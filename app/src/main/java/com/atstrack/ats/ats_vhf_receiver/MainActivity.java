@@ -25,7 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -35,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.LeDeviceListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
 
@@ -75,16 +75,12 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.refresh_button)
     ImageButton refresh_button;
 
-    private boolean isNightModeOn;
     private SharedPreferences.Editor sharedPreferencesEditor;
-
-    private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 8000; // Stops scanning after 8 seconds.
-    private static long MESSAGE_PERIOD = 2000;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private Handler mHandler;
+    private boolean isNightModeOn;
 
     // Device scan callback.
     private final ScanCallback mLeScanCallback =
@@ -149,14 +145,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         String version = "version: " + BuildConfig.VERSION_NAME;
         version_textView.setText(version);
-
         init();
-
         mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -183,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void init() {
         searching_receivers_constraintLayout.setVisibility(View.GONE);
-
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         SharedPreferences appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0);
         sharedPreferencesEditor = appSettingPrefs.edit();
@@ -201,12 +193,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         checkPermissions();
-        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+        if (!BluetoothAdapter.getDefaultAdapter().isEnabled())
             bluetooth_enable_linearLayout.setVisibility(View.VISIBLE);
-        }
-        if (!isLocationEnable()) {
+        if (!isLocationEnable())
             location_enable_linearLayout.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
@@ -217,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                startActivityForResult(enableBtIntent, ValueCodes.REQUEST_ENABLE_BT);
             }
         }
         // Initializes list view adapter.
@@ -226,13 +216,12 @@ public class MainActivity extends AppCompatActivity {
             branding_constraintLayout.setVisibility(View.GONE);
             searching_receivers_constraintLayout.setVisibility(View.VISIBLE);
             scanLeDevice(true);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.BRANDING_PERIOD);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // User chose not to enable Bluetooth.
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
+        if (requestCode == ValueCodes.REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) { // User chose not to enable Bluetooth.
             finish();
             return;
         }
@@ -248,26 +237,22 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Method for scanning and displaying available BLE devices.
-     *
      * @param enable If true, enable to scan available devices.
      */
     private void scanLeDevice(final boolean enable) {
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         if (enable) {
             mLeDeviceListAdapter.clear();
-
             refresh_button.setAlpha((float) 0.6);
             refresh_button.setEnabled(false);
             retry_linearLayout.setVisibility(View.GONE);
             retry_button.setVisibility(View.GONE);
             devices_linearLayout.setVisibility(View.GONE);
             searching_receivers_linearLayout.setVisibility(View.VISIBLE);
-
             mBluetoothLeScanner.startScan(mLeScanCallback);
 
             mHandler.postDelayed(() -> {
                 mBluetoothLeScanner.stopScan(mLeScanCallback);
-
                 searching_receivers_linearLayout.setVisibility(View.GONE);
 
                 if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
@@ -285,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 invalidateOptionsMenu();
-            }, SCAN_PERIOD);
+            }, ValueCodes.SCAN_PERIOD);
         } else {
             mBluetoothLeScanner.stopScan(mLeScanCallback);
         }
@@ -302,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
      * If Location Permissions are needed, it's capable to ask the user for them.
      */
     private void checkPermissions() {
-        Log.i("MainActivity", "SDK: " + Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
@@ -313,7 +297,6 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
 
             if (permissionCheck != 0) {
-                MESSAGE_PERIOD = 8000;
                 this.requestPermissions(
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -330,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
             if (permissionCheck != 0) {
-                MESSAGE_PERIOD = 5000;
                 this.requestPermissions(
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -343,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Checks if location mode is enabled to use.
-     *
      * @return Returns true, if the location mode is not off.
      */
     private boolean isLocationEnable() {

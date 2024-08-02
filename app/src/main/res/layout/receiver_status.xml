@@ -1,57 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/receiver_status"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/catskill_white"
     android:orientation="horizontal"
-    android:padding="16sp">
+    android:gravity="center_vertical">
 
     <LinearLayout
-        android:id="@+id/device_linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="6"
-        android:orientation="vertical">
+        android:layout_width="@dimen/receiver_status"
+        android:layout_height="@dimen/receiver_status"
+        android:background="@drawable/receiver_branding"
+        android:elevation="4sp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginVertical="8sp"
+        android:gravity="center">
 
-        <TextView
-            android:id="@+id/device_status_textView"
-            style="@style/body_large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8sp"
-            android:textColor="@color/ebony_clay" />
-
-        <TextView
-            android:id="@+id/device_range_textView"
-            style="@style/body_small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/ebony_clay" />
+        <ImageView
+            android:layout_width="@dimen/receiver_image_status"
+            android:layout_height="@dimen/receiver_image_status"
+            android:src="@drawable/receiver" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <ImageView
+            android:id="@+id/percent_battery_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:src="@drawable/ic_battery_full" />
+            android:layout_marginEnd="8sp"
+            android:layout_marginStart="8sp" />
 
-        <TextView
-            android:id="@+id/percent_battery_textView"
-            style="@style/body_small"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|bottom"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:textColor="@color/ebony_clay" />
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_x_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_battery"
+                android:textColor="@color/slate_gray"/>
+
+            <TextView
+                android:id="@+id/percent_battery_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/sd_card_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8sp"
+            android:layout_marginStart="20sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_x_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_sd_card"
+                android:textColor="@color/slate_gray"/>
+
+            <TextView
+                android:id="@+id/sd_card_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

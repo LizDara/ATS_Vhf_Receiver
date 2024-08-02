@@ -133,4 +133,12 @@ public class Converters {
         }
         return total;
     }
+
+    public static String getFrequency(int frequency) {
+        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
+    }
+
+    public static int getFrequencyNumber(String frequency) {
+        return Integer.parseInt(frequency.replace(".", ""));
+    }
 }

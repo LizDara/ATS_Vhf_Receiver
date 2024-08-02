@@ -2,6 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -101,7 +102,19 @@ public class Snapshots implements Parcelable {
             if (byteIndex == size) filled = true;
         }
         catch (Exception e) {
-            setFileName(getFileName() + " || error: " + e.getMessage());
+            Log.i("Snapshot", "Error Process Snapshot Raw");
+            //setFileName(getFileName() + "||repeated_pages");
+            error = true;
+        }
+    }
+
+    public void replaceSnapshotRaw(byte[] packRead) {
+        try {
+            System.arraycopy(packRead, 0, snapshot, byteIndex - packRead.length, packRead.length);
+        }
+        catch (Exception e) {
+            Log.i("Snapshot", "Error Replace Snapshot Raw");
+            //setFileName(getFileName() + "||repeated_pages");
             error = true;
         }
     }
@@ -119,7 +132,8 @@ public class Snapshots implements Parcelable {
                 byteIndex += packRead.length;
             }
         } catch (Exception e) {
-            setFileName(getFileName() + " || error: " + e.getMessage());
+            Log.i("Snapshot", "Error Process Snapshot");
+            //setFileName(getFileName() + "||repeated_pages");
             error = true;
         }
     }

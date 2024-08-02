@@ -35,6 +35,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
@@ -49,12 +50,6 @@ public class InputValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.value_spinner)
     Spinner value_spinner;
     @BindView(R.id.set_value_linearLayout)
@@ -89,20 +84,17 @@ public class InputValueActivity extends AppCompatActivity {
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
+    private TableScanListAdapter tableScanListAdapter;
     private int type;
     private int storeRate = 0;
-    private TableScanListAdapter tableScanListAdapter;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -115,11 +107,6 @@ public class InputValueActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -185,8 +172,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get aerial defaults data.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickAerialDefaults() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -196,8 +181,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get stationary defaults data.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStationaryDefaults() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -207,8 +190,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get the number of frequencies from each table and display it.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onClickTables() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -304,20 +285,19 @@ public class InputValueActivity extends AppCompatActivity {
     public void onClickSaveChanges(View v) {
         Intent intent = new Intent();
         int value = 0;
-        if (parameter.equals("aerial") && type == ValueCodes.SCAN_RATE_SECONDS) { // Sends the scan rate value for aerial
+        if (parameter.equals("aerial") && type == ValueCodes.SCAN_RATE_SECONDS) // Sends the scan rate value for aerial
             value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
-        } else if (parameter.equals("stationary") && type == ValueCodes.SCAN_RATE_SECONDS) { // Sends the scan rate value for stationary
+        else if (parameter.equals("stationary") && type == ValueCodes.SCAN_RATE_SECONDS) // Sends the scan rate value for stationary
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        } else if (type == ValueCodes.FREQUENCY_TABLE_NUMBER) { // Sends the frequency table number
+        else if (type == ValueCodes.FREQUENCY_TABLE_NUMBER) // Sends the frequency table number
             value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
                     Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
-        } else if (type == ValueCodes.NUMBER_OF_ANTENNAS) { // Sends the number of antennas
+        else if (type == ValueCodes.NUMBER_OF_ANTENNAS) // Sends the number of antennas
             value = value_spinner.getSelectedItemPosition() + 1;
-        } else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS) { // Sends scan timeout value
+        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS) // Sends scan timeout value
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        } else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE) {
+        else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE)
             value = value_spinner.getSelectedItemPosition();
-        }
         intent.putExtra(ValueCodes.VALUE, value);
         setResult(type, intent);
         finish();
@@ -340,31 +320,22 @@ public class InputValueActivity extends AppCompatActivity {
         setContentView(R.layout.activity_input_value);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
+        ReceiverStatus.setReceiverStatus(this);
 
         parameter = getIntent().getStringExtra("parameter");
         type = getIntent().getIntExtra("type", 0);
-
-        if (type == ValueCodes.STORE_RATE) {
+        if (type == ValueCodes.STORE_RATE)
             setVisibility("storeRate");
-        } else if (type == ValueCodes.TABLES_NUMBER) {
+        else if (type == ValueCodes.TABLES_NUMBER)
             setVisibility("tables");
-        } else {
+        else
             setVisibility("");
-        }
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -390,9 +361,8 @@ public class InputValueActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -410,9 +380,8 @@ public class InputValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected) {
+        if (!mConnected)
             showDisconnectionMessage();
-        }
         return true;
     }
 
@@ -421,27 +390,20 @@ public class InputValueActivity extends AppCompatActivity {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     private void setVisibility(String value) {
@@ -468,7 +430,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets frequency table number and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadTable(byte[] data) {
@@ -507,7 +468,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets scan rate value and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadScanRate(byte[] data) {
@@ -531,17 +491,15 @@ public class InputValueActivity extends AppCompatActivity {
             value_spinner.setAdapter(scanRateAdapter);
 
             int scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
-            if (scanRate <= 255) {
+            if (scanRate <= 255)
                 value_spinner.setSelection(scanRate - 3);
-            } else {
+            else
                 value_spinner.setSelection(0);
-            }
         }
     }
 
     /**
      * With the received packet, gets number of antennas and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadAntennas(byte[] data) {
@@ -550,16 +508,14 @@ public class InputValueActivity extends AppCompatActivity {
         value_spinner.setAdapter(antennasAdapter);
 
         int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[2])) & 15;
-        if (antennaNumber <= 4 && antennaNumber > 0) {
+        if (antennaNumber <= 4 && antennaNumber > 0)
             value_spinner.setSelection(antennaNumber - 1);
-        } else {
+        else
             value_spinner.setSelection(0);
-        }
     }
 
     /**
      * With the received packet, gets scan timeout value and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadTimeout(byte[] data) {
@@ -568,16 +524,14 @@ public class InputValueActivity extends AppCompatActivity {
         value_spinner.setAdapter(timeoutAdapter);
 
         int timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        if (timeout <= 200) {
+        if (timeout <= 200)
             value_spinner.setSelection(timeout - 2);
-        } else {
+        else
             value_spinner.setSelection(0);
-        }
     }
 
     /**
      * With the received packet, gets store rate value and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadStoreRate(byte[] data) {
@@ -605,7 +559,6 @@ public class InputValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets reference frequency store rate value and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadReferenceFrequencyStoreRate(byte[] data) {
@@ -614,10 +567,9 @@ public class InputValueActivity extends AppCompatActivity {
         value_spinner.setAdapter(storeRateAdapter);
 
         int referenceFrequencyStoreRate = Integer.parseInt(Converters.getDecimalValue(data[8]));
-        if (referenceFrequencyStoreRate <= 24) {
+        if (referenceFrequencyStoreRate <= 24)
             value_spinner.setSelection(referenceFrequencyStoreRate);
-        } else {
+        else
             value_spinner.setSelection(0);
-        }
     }
 }

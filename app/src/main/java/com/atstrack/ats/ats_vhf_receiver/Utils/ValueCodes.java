@@ -29,4 +29,16 @@ public class ValueCodes {
     public static final int PERIOD = 1022;
 
     public static final String VALUE = "value";
+
+    public static final int DISCONNECTION_MESSAGE_PERIOD = 3000;
+    public static final int WAITING_PERIOD = 1000;
+    public static final int MESSAGE_PERIOD = 1000;
+    public static final int REQUEST_CODE_SIGN_IN = 1;
+    public static final int SCAN_PERIOD = 8000;
+    public static final int BRANDING_PERIOD = 4000;
+    public static final int CONNECT_PERIOD = 1500;
+    public final static char CR = (char) 0x0D;
+    public final static char LF = (char) 0x0A;
+    public static final int REQUEST_ENABLE_BT = 1;
+    public static final int REQUEST_CODE_OPEN_STORAGE = 3;
 }

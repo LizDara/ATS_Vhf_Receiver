@@ -34,6 +34,8 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -51,12 +53,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.ready_stationary_scan_LinearLayout)
     LinearLayout ready_stationary_scan_LinearLayout;
     @BindView(R.id.ready_stationary_textView)
@@ -104,13 +100,10 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private static final int WAITING_PERIOD = 1000;
-
-    private boolean isScanning;
-    private boolean previousScanning;
 
     private AnimationDrawable animationDrawable;
-
+    private boolean isScanning;
+    private boolean previousScanning;
     private int baseFrequency;
     private byte detectionType;
     private int firstTable;
@@ -121,16 +114,13 @@ public class StationaryScanActivity extends AppCompatActivity {
     private int detections;
     private int mort;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -144,11 +134,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     private String parameter = "";
     private String parameterWrite = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -195,7 +180,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                Log.i(TAG, "BROADCAST RECEIVER 1: " + action);
                 if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
                     switch (parameterWrite) {
                         case "startStationary": // Starts to scan
@@ -230,8 +214,6 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get stationary defaults data.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStationary() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -241,8 +223,6 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     /**
      * Writes the stationary scan data for start to scan.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStart() {
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -268,8 +248,6 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     /**
      * Enables notification for receive the data.
-     * Service name: Screen.
-     * Characteristic name: SendLog.
      */
     private void onClickLog() {
         parameterWrite = "startStationary";
@@ -280,13 +258,11 @@ public class StationaryScanActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
-        }, WAITING_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     /**
      * Writes a value for stop scan.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStop() {
         byte[] b = new byte[] {(byte) 0x87};
@@ -303,7 +279,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 parameter = "stationary";
                 new Handler().postDelayed(() -> {
                     mBluetoothLeService.discovering();
-                }, WAITING_PERIOD);
+                }, ValueCodes.WAITING_PERIOD);
             } else {
                 parameter = "";
             }
@@ -337,24 +313,16 @@ public class StationaryScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stationary_scan);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
-        isScanning = getIntent().getExtras().getBoolean("scanning");
         receiverInformation = ReceiverInformation.getReceiverInformation();
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
+        ReceiverStatus.setReceiverStatus(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0);
-
+        isScanning = getIntent().getExtras().getBoolean("scanning");
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = "sendLogScanning";
@@ -362,7 +330,7 @@ public class StationaryScanActivity extends AppCompatActivity {
             int currentIndex = getIntent().getExtras().getInt("index");
             int total = getIntent().getExtras().getInt("maxIndex");
             detectionType = getIntent().getExtras().getByte("detectionType");
-            frequency_stationary_textView.setText(getFrequency(currentFrequency));
+            frequency_stationary_textView.setText(Converters.getFrequency(currentFrequency));
             index_stationary_textView.setText(String.valueOf(currentIndex));
             max_index_stationary_textView.setText("Table Index (" + total + " Total)");
 
@@ -432,9 +400,8 @@ public class StationaryScanActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         registerReceiver(mGattUpdateReceiverWrite, makeGattUpdateIntentFilterWrite());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -458,29 +425,22 @@ public class StationaryScanActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         parameter = "";
         parameterWrite = "";
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     private void setVisibility(String value) {
@@ -491,7 +451,6 @@ public class StationaryScanActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.stationary_scanning);
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-                device_status_textView.setText(receiverInformation.getDeviceStatus());
                 break;
             case "scanning":
                 ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
@@ -501,7 +460,6 @@ public class StationaryScanActivity extends AppCompatActivity {
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
-                device_status_textView.setText(receiverInformation.getDeviceStatus().replace("Not scanning", "Scanning, stationary"));
                 break;
         }
     }
@@ -517,7 +475,6 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets stationary defaults data.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
@@ -547,22 +504,16 @@ public class StationaryScanActivity extends AppCompatActivity {
             number_antennas_stationary_textView.setText((numberAntennas == 0) ? "None" : String.valueOf(numberAntennas));
             scan_rate_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             timeout_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            if (Converters.getHexValue(data[5]).equals("FF")) {
+            if (Converters.getHexValue(data[5]).equals("FF"))
                 store_rate_stationary_textView.setText("Continuous Store");
-            } else {
+            else
                 store_rate_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No Store Rate" :
                         Converters.getDecimalValue(data[5]));
-            }
         }
-    }
-
-    private String getFrequency(int frequency) {
-        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
     }
 
     /**
      * With the received packet, gets the data of scanning.
-     *
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
@@ -591,7 +542,6 @@ public class StationaryScanActivity extends AppCompatActivity {
 
     /**
      * With the received packet, processes the data of scan header to display.
-     *
      * @param data The received packet.
      */
     private void logScanHeader(byte[] data) {
@@ -599,13 +549,12 @@ public class StationaryScanActivity extends AppCompatActivity {
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
         index_stationary_textView.setText(Converters.getDecimalValue(data[3]));
-        frequency_stationary_textView.setText(getFrequency(frequency));
+        frequency_stationary_textView.setText(Converters.getFrequency(frequency));
         current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is code.
-     *
      * @param data The received packet.
      */
     private void logScanFix(byte[] data) {
@@ -615,18 +564,16 @@ public class StationaryScanActivity extends AppCompatActivity {
         int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
         int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
             refreshFirstCode(signalStrength, mort > 0);
-        } else if ((position = positionCode(code)) != 0) {
+        else if ((position = positionCode(code)) != 0)
             refreshPosition(position, signalStrength, mort > 0);
-        } else {
+        else
             createCodeDetail(code, signalStrength, detections + 1, mort > 0);
-        }
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is code.
-     *
      * @param data The received packet.
      */
     private void logScanFixConsolidated(byte[] data) {
@@ -638,18 +585,16 @@ public class StationaryScanActivity extends AppCompatActivity {
         int mort = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
             refreshFirstCode(signalStrength, mort > 0);
-        } else if ((position = positionCode(code)) != 0) {
+        else if ((position = positionCode(code)) != 0)
             refreshPosition(position, signalStrength, mort > 0);
-        } else {
+        else
             createCodeDetail(code, signalStrength, detections + 1, mort > 0);
-        }
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is non code.
-     *
      * @param data The received packet.
      */
     private void logScanData(byte[] data) {
@@ -661,14 +606,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         refreshNonCoded(period, pulseRate, signalStrength, detections);
     }
 
-    /**
-     * Creates a row of code data and display it.
-     *
-     * @param code Number of code.
-     * @param signalStrength Number of signal strength.
-     * @param detections Number of detections.
-     * @param isMort True, if the code is mort.
-     */
     private void createCodeDetail(int code, int signalStrength, int detections, boolean isMort) {
         LinearLayout newCode = new LinearLayout(this);
         newCode.setOrientation(LinearLayout.HORIZONTAL);
@@ -720,13 +657,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, isMort, 0);
     }
 
-    /**
-     * Checks that the first code in the table is equal to code received.
-     *
-     * @param code Number of code received.
-     *
-     * @return Returns true, if the first code is equal to code received.
-     */
     private boolean isEqualFirstCode(int code) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
@@ -734,11 +664,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         return Integer.parseInt(codeTextView.getText().toString()) == code;
     }
 
-    /**
-     * Updates data in the first row in the table.
-     *
-     * @param signalStrength Number of signal strength to update.
-     */
     private void refreshFirstCode(int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
@@ -754,31 +679,17 @@ public class StationaryScanActivity extends AppCompatActivity {
         mort = Integer.parseInt(mortTextView.getText().toString());
     }
 
-    /**
-     * Looks for the position in the table of code received.
-     *
-     * @param code Number of code to look.
-     *
-     * @return Returns the position of code in the table.
-     */
     private int positionCode(int code) {
         int position = 0;
         for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-
             if (Integer.parseInt(codeTextView.getText().toString()) == code)
                 position = i;
         }
         return position;
     }
 
-    /**
-     * Updates data at a specific position in the table.
-     *
-     * @param position Number of position in the table to update.
-     * @param signalStrength Number of signal strength.
-     */
     private void refreshPosition(int position, int signalStrength, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
@@ -792,15 +703,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         refreshCode(position, code, signalStrength, detections + 1, isMort, mort);
     }
 
-    /**
-     * Updates data from a specific position to the first position in the table.
-     *
-     * @param finalPosition Number of rows to update in the table.
-     * @param code Number of code received.
-     * @param signalStrength Number of signal strength received.
-     * @param detections Number of signal strength calculated.
-     * @param isMort True, if the code is mort.
-     */
     private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort, int mort) {
         for (int i = finalPosition; i > 3 ; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
@@ -845,14 +747,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
 
-    /**
-     * Creates a row of non code data and display it.
-     *
-     * @param period Number of period received.
-     * @param pulseRate Number of pulse rate received.
-     * @param signalStrength Number of signal strength received.
-     * @param detections Number of detections received.
-     */
     private void refreshNonCoded(int period, float pulseRate, int signalStrength, int detections) {
         LinearLayout newNonCoded = new LinearLayout(this);
         newNonCoded.setOrientation(LinearLayout.HORIZONTAL);

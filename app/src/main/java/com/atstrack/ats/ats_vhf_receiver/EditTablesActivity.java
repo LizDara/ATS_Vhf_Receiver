@@ -36,6 +36,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
@@ -51,12 +52,6 @@ public class EditTablesActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.frequencies_overview_linearLayout)
     LinearLayout frequencies_overview_linearLayout;
     @BindView(R.id.edit_options_linearLayout)
@@ -76,30 +71,26 @@ public class EditTablesActivity extends AppCompatActivity {
 
     final private String TAG = EditTablesActivity.class.getSimpleName();
 
-    private int[] originalTable;
+    private ReceiverInformation receiverInformation;
+    private BluetoothLeService mBluetoothLeService;
+
+    private Handler handlerMessage;
     private FrequencyListAdapter frequencyListAdapter;
     private FrequencyDeleteListAdapter frequencyDeleteListAdapter;
+    private int[] originalTable;
     private int number;
     private int originalTotalFrequencies;
     private int baseFrequency;
     private int range;
     private boolean isFile;
 
-    private Handler handlerMessage;
-
-    private ReceiverInformation receiverInformation;
-    private BluetoothLeService mBluetoothLeService;
-
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -112,11 +103,6 @@ public class EditTablesActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -142,7 +128,6 @@ public class EditTablesActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    Log.i(TAG, Converters.getHexValue(packet));
                     if (parameter.equals("table")) // Gets the frequencies from a table
                         downloadData(packet);
                 }
@@ -180,8 +165,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     /**
      * Writes the table number to get its frequencies.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onClickTable() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -231,8 +214,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     /**
      * Enables notification for receive the frequencies from that table.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onReceiveTable() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -242,8 +223,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     /**
      * Writes the modified frequencies by the user.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onClickSendTable() {
         parameter = "";
@@ -266,7 +245,6 @@ public class EditTablesActivity extends AppCompatActivity {
         b[7] = (byte) number;//frequency number table
         b[8] = (byte) frequencyListAdapter.getCount();//Number of frequencies in the table
         b[9] = (byte) (baseFrequency / 1000);//base frequency
-
         int index = 10;
         int i = 0;
         while (i < frequencyListAdapter.getCount()) {
@@ -367,31 +345,20 @@ public class EditTablesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_tables);
         ButterKnife.bind(this);
 
-        // Gets the table number to ask its frequencies
         number = getIntent().getExtras().getInt("number");
         originalTotalFrequencies = getIntent().getExtras().getInt("total");
-
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText("Table " + number + " (" + originalTotalFrequencies + " Frequencies)");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        handlerMessage = new Handler();
-
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
 
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
+        handlerMessage = new Handler();
         baseFrequency = getIntent().getExtras().getInt("baseFrequency") * 1000;
         range = getIntent().getExtras().getInt("range");
-
         isFile = getIntent().getExtras().getBoolean("isFile");
         if (isFile) { // Asks for the frequencies obtained from a file
             setVisibility("overview");
@@ -442,9 +409,8 @@ public class EditTablesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -474,32 +440,24 @@ public class EditTablesActivity extends AppCompatActivity {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
      * Checks that the number of frequencies is not greater than 100.
-     *
      * @return Returns true, if the number of frequencies is less than or equal to 100.
      */
     private boolean isWithinLimit() {
@@ -529,7 +487,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets the frequencies from the table and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
@@ -585,11 +542,10 @@ public class EditTablesActivity extends AppCompatActivity {
     private void deleteFrequencies() {
         int index = 0;
         while (index < frequencyDeleteListAdapter.getCount()) {
-            if (frequencyDeleteListAdapter.isSelected(index)) {
+            if (frequencyDeleteListAdapter.isSelected(index))
                 frequencyDeleteListAdapter.removeFrequency(index);
-            } else {
+            else
                 index++;
-            }
         }
         frequencyListAdapter.notifyDataSetChanged();
         frequencyDeleteListAdapter.notifyDataSetChanged();
@@ -599,16 +555,13 @@ public class EditTablesActivity extends AppCompatActivity {
 
     private void manageMessage(int idStringMessage, boolean isEmpty) {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.frequency_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         TextView state_message_textView = view.findViewById(R.id.state_message_textView);
         state_message_textView.setText(idStringMessage);
-
         dialog.setView(view);
         dialog.show();
 
-        int MESSAGE_PERIOD = 1000;
         handlerMessage.postDelayed(() -> {
             dialog.dismiss();
             if (isEmpty)
@@ -616,7 +569,7 @@ public class EditTablesActivity extends AppCompatActivity {
             else
                 setVisibility("overview");
             title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getCount() + " Frequencies)");
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     private boolean existChanges() {
@@ -632,7 +585,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
     /**
      * Displays a message indicating whether the writing was successful.
-     *
      * @param status This number indicates the writing status.
      */
     private void showMessage(int status) {

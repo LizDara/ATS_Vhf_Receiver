@@ -71,10 +71,7 @@ public class BluetoothLeService extends Service {
         }
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            // Sends a response from the device indicating status of the write.
-            Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS)
-                    + " " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":"
-                    + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND));
+            Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS));
         }
 
         @Override
@@ -87,6 +84,12 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+        }
+
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+            Log.i(TAG, "Rssi: " + rssi + " Status: " + status);
+            super.onReadRemoteRssi(gatt, rssi, status);
         }
     };
 
@@ -130,7 +133,6 @@ public class BluetoothLeService extends Service {
 
     /**
      * Initializes a reference to the local Bluetooth adapter.
-     *
      * @return Return true if the initialization is successful.
      */
     public boolean initialize() {
@@ -146,9 +148,7 @@ public class BluetoothLeService extends Service {
 
     /**
      * Connects to the GATT server hosted on the Bluetooth LE device.
-     *
      * @param address The device address of the destination device.
-     *
      * @return Return true if the connection is initiated successfully. The connection result
      *         is reported asynchronously through the
      *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
@@ -224,7 +224,6 @@ public class BluetoothLeService extends Service {
      * Request a read on a given {@code BluetoothGattCharacteristic}. The read result is reported
      * asynchronously through the {@code BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
      * callback.
-     *
      * @param service UUID to act on.
      * @param Characteristics  UUID to act on.
      */
@@ -256,7 +255,6 @@ public class BluetoothLeService extends Service {
 
     /**
      * To write to the value of a characteristic value or a descriptor.
-     *
      * @param service UUID to act on.
      * @param Characteristics UUID to act on.
      * @param data value to write.
@@ -283,7 +281,6 @@ public class BluetoothLeService extends Service {
 
     /**
      * Enables or disables notification on a give characteristic.
-     *
      * @param service UUID to act on.
      * @param Characteristics  UUID to act on.
      * @param enabled If true, enable notification.  False otherwise.
@@ -298,17 +295,19 @@ public class BluetoothLeService extends Service {
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(Characteristics);
 
         BluetoothGattDescriptor desc = myGatChar.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
-        //desc.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
         desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(desc);
 
         mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
     }
 
+    public void readRssi() {
+        mBluetoothGatt.readRemoteRssi();
+    }
+
     /**
      * Retrieves a list of supported GATT services on the connected device. This should be
      * invoked only after {@code BluetoothGatt#discoverServices()} completes successfully.
-     *
      * @return A {@code List} of supported services.
      */
     public List<BluetoothGattService> getSupportedGattServices() {

@@ -41,6 +41,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
@@ -72,12 +73,6 @@ public class AerialScanActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.ready_aerial_scan_LinearLayout)
     LinearLayout ready_aerial_scan_LinearLayout;
     @BindView(R.id.ready_aerial_textView)
@@ -151,17 +146,14 @@ public class AerialScanActivity extends AppCompatActivity {
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
-    private static final int WAITING_PERIOD = 1000;
 
+    private Handler handlerMessage;
+    private TableMergeListAdapter tableMergeListAdapter;
+    private AnimationDrawable animationDrawable;
     private boolean isScanning;
     private boolean previousScanning;
     private boolean isHold;
     private boolean isRecord; //This can change during scanning
-    private Handler handlerMessage;
-    private TableMergeListAdapter tableMergeListAdapter;
-
-    private AnimationDrawable animationDrawable;
-
     private int baseFrequency;
     private int frequencyRange;
     private int range;
@@ -174,16 +166,13 @@ public class AerialScanActivity extends AppCompatActivity {
     private int detections;
     private int mort;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -197,11 +186,6 @@ public class AerialScanActivity extends AppCompatActivity {
     private String parameter = "";
     private String parameterWrite = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -295,9 +279,8 @@ public class AerialScanActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameterWrite.equals("tables")) {
+                    if (parameterWrite.equals("tables"))
                         downloadTables(packet);
-                    }
                 }
             }
             catch (Exception e) {
@@ -308,14 +291,12 @@ public class AerialScanActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (ValueCodes.CANCELLED == result.getResultCode()) {
+                if (ValueCodes.CANCELLED == result.getResultCode())
                     setVisibility("overview");
-                }
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
                     newFrequency = result.getData().getExtras().getInt("frequency");
                     parameter = "sendLogScanning";
                     parameterWrite = "addFrequency";
-                    Log.i(TAG, "ADDING FREQUENCY");
                 }
             });
 
@@ -337,8 +318,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get aerial defaults data.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickAerial() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -348,8 +327,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Writes the aerial scan data for start to scan.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickStart() {
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -374,15 +351,12 @@ public class AerialScanActivity extends AppCompatActivity {
             removeHold();
             isRecord = autoRecord == 1;
             if (isRecord) setRecord(); else removeRecord();
-            setGpsOff(R.string.lb_searching_gps);
-            gps_state_aerial_textView.setVisibility(gps == 1 ? View.VISIBLE : View.GONE);
+            if (gps == 1) setGpsSearching(); else setGpsOff();
         }
     }
 
     /**
      * Enables notification for receive the data.
-     * Service name: Screen.
-     * Characteristic name: SendLog.
      */
     private void onClickLog() {
         parameterWrite = "startAerial";
@@ -393,13 +367,11 @@ public class AerialScanActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
-        }, WAITING_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     /**
      * Writes a value for stop scan.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickStop() {
         byte[] b = new byte[] {(byte) 0x87};
@@ -411,12 +383,11 @@ public class AerialScanActivity extends AppCompatActivity {
         if (result) {
             clear();
             isScanning = false;
-
             if (previousScanning) {
                 parameter = "aerial";
                 new Handler().postDelayed(() -> {
                     mBluetoothLeService.discovering();
-                }, WAITING_PERIOD);
+                }, ValueCodes.WAITING_PERIOD);
             } else {
                 parameter = "";
             }
@@ -427,8 +398,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Writes a value for hold scan.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickHold() {
         byte[] b = new byte[] {(byte) 0x81};
@@ -446,8 +415,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Writes a value for remove hold scan.
-     * Service name: Scan.
-     * Characteristic name: Aerial.
      */
     private void onClickRemoveHold() {
         byte[] b = new byte[] {(byte) 0x80};
@@ -463,6 +430,9 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Enables notification for receive the data.
+     */
     private void onClickLogScanning() {
         parameter = "sendLog";
 
@@ -473,13 +443,11 @@ public class AerialScanActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             if (newFrequency != 0)
                 mBluetoothLeService.discoveringSecond();
-        }, WAITING_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     /**
      * Requests a read for get the number of frequencies from each table and display it.
-     * Service name: StoredData.
-     * Characteristic name: FreqTable.
      */
     private void onClickTables() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -487,6 +455,9 @@ public class AerialScanActivity extends AppCompatActivity {
         mBluetoothLeService.readCharacteristicDiagnosticSecond(service, characteristic);
     }
 
+    /**
+     * Writes a value for add a frequency in the table.
+     */
     private void onClickAddFrequency() {
         Log.i(TAG, "ADD FREQUENCY AERIAL");
         byte[] b = new byte[] {(byte) 0x5D, (byte) ((newFrequency - baseFrequency) / 256),
@@ -503,6 +474,9 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Writes a value for delete a frequency of the table.
+     */
     private void onClickDeleteFrequency() {
         int index = Integer.parseInt(table_index_aerial_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x5C, (byte) (index / 256), (byte) (index % 256)};
@@ -512,11 +486,13 @@ public class AerialScanActivity extends AppCompatActivity {
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-        if (result) {
+        if (result)
             manageMessage(R.string.lb_frequency_deleted);
-        }
     }
 
+    /**
+     * Writes a value for merge other tables to the selected table.
+     */
     private void onClickMerge() {
         for (int i = 0; i < tableMergeListAdapter.getCount();  i++) {
             if (tableMergeListAdapter.isSelected(i)) {
@@ -527,18 +503,20 @@ public class AerialScanActivity extends AppCompatActivity {
                 UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
                 boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
-                if (result) {
+                if (result)
                     tableMergeListAdapter.setNotSelected(i);
-                }
                 new Handler().postDelayed(() -> {
                     mBluetoothLeService.discoveringSecond();
-                }, WAITING_PERIOD);
+                }, ValueCodes.WAITING_PERIOD);
                 return;
             }
         }
         manageMessage(R.string.lb_tables_merged);
     }
 
+    /**
+     * Writes a value for add one to the current frequency.
+     */
     private void onClickDecrease() {
         byte[] b = new byte[] {(byte) 0x5E};
         Log.i(TAG, "DECREASE FREQUENCY AERIAL " + Converters.getDecimalValue(b));
@@ -558,6 +536,9 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Writes a value for subtract one to the current frequency.
+     */
     private void onClickIncrease() {
         byte[] b = new byte[] {(byte) 0x5F};
         Log.i(TAG, "INCREASE FREQUENCY AERIAL " + Converters.getDecimalValue(b) + " : " + newFrequency);
@@ -578,7 +559,7 @@ public class AerialScanActivity extends AppCompatActivity {
     }
 
     /**
-     * Records the specific code information, the code received.
+     * Record the data displayed on the screen.
      */
     private void onClickRecord() {
         byte[] b = new byte[] {(byte) 0x8C};
@@ -594,6 +575,9 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Stop to record the data displayed on the screen.
+     */
     private void onClickStopRecord() {
         byte[] b = new byte[] {(byte) 0x8E};
 
@@ -608,22 +592,28 @@ public class AerialScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Writes a value to go to the next index.
+     */
     private void onClickLeft() {
         byte[] b = new byte[] {(byte) 0x57};
         Log.i(TAG, "LEFT AERIAL");
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
-        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b);
     }
 
+    /**
+     * Writes a value to go to the previous index.
+     */
     private void onClickRight() {
         byte[] b = new byte[] {(byte) 0x58};
         Log.i(TAG, "RIGHT AERIAL");
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
-        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        mBluetoothLeService.writeCharacteristic(service, characteristic, b);
     }
 
     @OnClick(R.id.edit_aerial_settings_button)
@@ -647,14 +637,14 @@ public class AerialScanActivity extends AppCompatActivity {
 
     @OnClick(R.id.decrease_imageView)
     public void onClickDecrease(View v) {
-        newFrequency = getFrequencyNumber(frequency_aerial_textView.getText().toString()) - 1;
+        newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) - 1;
         parameterWrite = "decrease";
         mBluetoothLeService.discoveringSecond();
     }
 
     @OnClick(R.id.increase_imageView)
     public void onClickIncrease(View v) {
-        newFrequency = getFrequencyNumber(frequency_aerial_textView.getText().toString()) + 1;
+        newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) + 1;
         parameterWrite = "increase";
         mBluetoothLeService.discoveringSecond();
     }
@@ -718,7 +708,6 @@ public class AerialScanActivity extends AppCompatActivity {
     @OnClick(R.id.edit_audio_aerial_textView)
     public void onClickEditAudio(View v) {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.audio_options, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
@@ -802,21 +791,14 @@ public class AerialScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_aerial_scan);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
-        isScanning = getIntent().getExtras().getBoolean("scanning");
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
 
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
+        isScanning = getIntent().getExtras().getBoolean("scanning");
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
         range = sharedPreferences.getInt("Range", 0);
@@ -825,7 +807,6 @@ public class AerialScanActivity extends AppCompatActivity {
         isHold = false;
         newFrequency = 0;
         handlerMessage = new Handler();
-
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = "sendLogScanning";
@@ -836,7 +817,7 @@ public class AerialScanActivity extends AppCompatActivity {
             int currentIndex = getIntent().getExtras().getInt("index");
             int total = getIntent().getExtras().getInt("maxIndex");
             detectionType = getIntent().getExtras().getByte("detectionType");
-            frequency_aerial_textView.setText(getFrequency(currentFrequency));
+            frequency_aerial_textView.setText(Converters.getFrequency(currentFrequency));
             table_index_aerial_textView.setText(String.valueOf(currentIndex));
             max_index_aerial_textView.setText("Table Index (" + total + " Total)");
             table_total_aerial_textView.setText(String.valueOf(total));
@@ -952,22 +933,18 @@ public class AerialScanActivity extends AppCompatActivity {
         parameter = "";
         parameterWrite = "";
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     private void setVisibility(String value) {
@@ -980,7 +957,6 @@ public class AerialScanActivity extends AppCompatActivity {
                 title_toolbar.setText(R.string.aerial_scanning);
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
-                device_status_textView.setText(receiverInformation.getDeviceStatus());
                 break;
             case "scanning":
                 ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
@@ -992,7 +968,6 @@ public class AerialScanActivity extends AppCompatActivity {
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
-                device_status_textView.setText(receiverInformation.getDeviceStatus().replace("Not scanning", "Scanning, mobile"));
                 break;
             case "editTable":
                 ready_aerial_scan_LinearLayout.setVisibility(View.GONE);
@@ -1022,21 +997,18 @@ public class AerialScanActivity extends AppCompatActivity {
 
     private void manageMessage(int idStringMessage) {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.frequency_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         TextView state_message_textView = view.findViewById(R.id.state_message_textView);
         state_message_textView.setText(idStringMessage);
-
         dialog.setView(view);
         dialog.show();
 
-        int MESSAGE_PERIOD = 1000;
         handlerMessage.postDelayed(() -> {
             dialog.dismiss();
             title_toolbar.setText(R.string.aerial_scanning);
             setVisibility("scanning");
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.MESSAGE_PERIOD);
     }
 
     /**
@@ -1071,7 +1043,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets aerial defaults data.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
@@ -1097,14 +1068,6 @@ public class AerialScanActivity extends AppCompatActivity {
             autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
             auto_record_aerial_textView.setText((autoRecord == 1) ? R.string.lb_on : R.string.lb_off);
         }
-    }
-
-    private String getFrequency(int frequency) {
-        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-    }
-
-    private int getFrequencyNumber(String frequency) {
-        return Integer.parseInt(frequency.replace(".", ""));
     }
 
     private void setHold() {
@@ -1133,19 +1096,28 @@ public class AerialScanActivity extends AppCompatActivity {
         record_data_aerial_button.setBackground(ContextCompat.getDrawable(this, button_primary));
     }
 
-    private void setGpsOff(int idString) {
+    private void setGpsOff() {
         gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
-        gps_state_aerial_textView.setText(idString);
+        gps_state_aerial_textView.setText(R.string.lb_off_gps);
     }
 
-    private void setGpsOn() {
-        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_on));
+    private void setGpsSearching() {
+        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_aerial_textView.setText(R.string.lb_searching_gps);
+    }
+
+    private void setGpsFailed() {
+        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_aerial_textView.setText(R.string.lb_failed_gps);
+    }
+
+    private void setGpsValid() {
+        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
         gps_state_aerial_textView.setText(R.string.lb_valid_gps);
     }
 
     /**
      * With the received packet, gets the data of scanning.
-     *
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
@@ -1181,17 +1153,16 @@ public class AerialScanActivity extends AppCompatActivity {
 
     private void gpsState(byte[] data) {
         int state = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        if (state == 3)
-            setGpsOn();
-        else if (state == 2)
-            setGpsOff(R.string.lb_failed_gps);
-        else if (state == 1)
-            setGpsOff(R.string.lb_searching_gps);
+        if (state == 3) // Valid
+            setGpsValid();
+        else if (state == 2) // Failed
+            setGpsFailed();
+        else if (state == 1) // Searching
+            setGpsSearching();
     }
 
     /**
      * With the received packet, processes the data of scan header to display.
-     *
      * @param data The received packet.
      */
     private void logScanHeader(byte[] data) {
@@ -1199,12 +1170,11 @@ public class AerialScanActivity extends AppCompatActivity {
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + baseFrequency;
         table_index_aerial_textView.setText(Converters.getDecimalValue(data[3]));
-        frequency_aerial_textView.setText(getFrequency(frequency));
+        frequency_aerial_textView.setText(Converters.getFrequency(frequency));
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is code.
-     *
      * @param data The received packet.
      */
     private void logScanFix(byte[] data) {
@@ -1214,18 +1184,16 @@ public class AerialScanActivity extends AppCompatActivity {
         int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
         int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
             refreshFirstCode(signalStrength, mort > 0);
-        } else if ((position = positionCode(code)) != 0) {
+        else if ((position = positionCode(code)) != 0)
             refreshPosition(position, signalStrength, mort > 0);
-        } else {
+        else
             createCodeDetail(code, signalStrength, detections, mort > 0);
-        }
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is code.
-     *
      * @param data The received packet.
      */
     private void logScanFixConsolidated(byte[] data) {
@@ -1235,18 +1203,16 @@ public class AerialScanActivity extends AppCompatActivity {
         int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
         int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
 
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code)) {
+        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
             refreshFirstCode(signalStrength, mort > 1);
-        } else if ((position = positionCode(code)) != 0) {
+        else if ((position = positionCode(code)) != 0)
             refreshPosition(position, signalStrength, mort > 0);
-        } else {
+        else
             createCodeDetail(code, signalStrength, detections, mort > 0);
-        }
     }
 
     /**
      * With the received packet, processes the data to display. The pulse rate type is non code.
-     *
      * @param data The received packet.
      */
     private void logScanData(byte[] data) {
@@ -1260,7 +1226,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Creates a row of code data and display it.
-     *
      * @param code Number of code.
      * @param signalStrength Number of signal strength.
      * @param detections Number of detections.
@@ -1319,9 +1284,7 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Checks that the first code in the table is equal to code received.
-     *
      * @param code Number of code received.
-     *
      * @return Returns true, if the first code is equal to code received.
      */
     private boolean isEqualFirstCode(int code) {
@@ -1333,7 +1296,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Updates data in the first row in the table.
-     *
      * @param signalStrength Number of signal strength to update.
      */
     private void refreshFirstCode(int signalStrength, boolean isMort) {
@@ -1353,9 +1315,7 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Looks for the position in the table of code received.
-     *
      * @param code Number of code to look.
-     *
      * @return Returns the position of code in the table.
      */
     private int positionCode(int code) {
@@ -1363,7 +1323,6 @@ public class AerialScanActivity extends AppCompatActivity {
         for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
             LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-
             if (Integer.parseInt(codeTextView.getText().toString()) == code)
                 position = i;
         }
@@ -1372,7 +1331,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Updates data at a specific position in the table.
-     *
      * @param position Number of position in the table to update.
      * @param signalStrength Number of signal strength.
      */
@@ -1391,7 +1349,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Updates data from a specific position to the first position in the table.
-     *
      * @param finalPosition Number of rows to update in the table.
      * @param code Number of code received.
      * @param signalStrength Number of signal strength received.
@@ -1444,7 +1401,6 @@ public class AerialScanActivity extends AppCompatActivity {
 
     /**
      * Creates a row of non code data and display it.
-     *
      * @param period Number of period received.
      * @param pulseRate Number of pulse rate received.
      * @param signalStrength Number of signal strength received.

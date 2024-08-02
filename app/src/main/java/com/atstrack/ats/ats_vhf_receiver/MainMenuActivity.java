@@ -1,8 +1,8 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -21,7 +21,6 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -36,6 +35,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.UUID;
 
@@ -54,11 +54,17 @@ public class MainMenuActivity extends AppCompatActivity {
     @BindView(R.id.connecting_device_linearLayout)
     LinearLayout connecting_device_linearLayout;
     @BindView(R.id.percent_battery_menu_textView)
-    TextView percent_battery_menu;
+    TextView percent_battery_menu_textView;
     @BindView(R.id.connecting_progressBar)
     ProgressBar connecting_progressBar;
     @BindView(R.id.connected_imageView)
     ImageView connected_imageView;
+    @BindView(R.id.sd_card_menu_textView)
+    TextView sd_card_menu_textView;
+    @BindView(R.id.battery_menu_imageView)
+    ImageView battery_menu_imageView;
+    @BindView(R.id.sd_card_menu_imageView)
+    ImageView sd_card_menu_imageView;
 
     private final static String TAG = MainMenuActivity.class.getSimpleName();
 
@@ -67,13 +73,12 @@ public class MainMenuActivity extends AppCompatActivity {
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
     public static final String EXTRAS_DEVICE_RANGE = "DEVICE_RANGE";
     public static final String EXTRAS_BATTERY = "DEVICE_BATTERY";
-    private static final long MESSAGE_PERIOD = 1000;
-    private static final long CONNECT_PERIOD = 1500;
 
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
     private Handler mHandler;
     private Handler mHandlerMenu;
+    private byte detectionType;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -144,9 +149,8 @@ public class MainMenuActivity extends AppCompatActivity {
             try {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
-                    if (secondParameter.equals("boardState")) { // Checks if the BLE device is scanning
+                    if (secondParameter.equals("boardState")) // Checks if the BLE device is scanning
                         onClickBoardState();
-                    }
                 }
             }
             catch (Exception e) {
@@ -171,9 +175,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     /**
-     * Requests a read for check if the BLE device is scanning.
-     * Service name: Diagnostic.
-     * Characteristic name: BoardState.
+     * Requests a read for board state.
      */
     private void onClickBoardState() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;
@@ -183,6 +185,9 @@ public class MainMenuActivity extends AppCompatActivity {
         parameter = "";
     }
 
+    /**
+     * Requests a read for scan state.
+     */
     private void onClickScanning() {
         secondParameter = "boardState";
 
@@ -192,7 +197,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.MESSAGE_PERIOD);
     }
 
     @OnClick(R.id.disconnect_button)
@@ -203,15 +208,27 @@ public class MainMenuActivity extends AppCompatActivity {
         mBluetoothLeService.disconnect();
     }
 
-    @OnClick(R.id.view_receiver_options_button)
-    public void onClickViewReceiverOptions(View v) {
-        Intent intent = new Intent(this, ReceiverOptionsActivity.class);
-        startActivity(intent);
-    }
-
     @OnClick(R.id.start_scanning_button)
     public void onClickStartScanning(View v) {
         Intent intent = new Intent(this, StartScanningActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.receiver_configuration_button)
+    public void onClickReceiverConfiguration(View v) {
+        Intent intent = new Intent(this, ReceiverConfigurationActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.manage_receiver_data_button)
+    public void onClickManageReceiverData(View v) {
+        Intent intent = new Intent(this, GetDataActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.diagnostics_button)
+    public void onClickDiagnostics(View v) {
+        Intent intent = new Intent(this, TestReceiverActivity.class);
         startActivity(intent);
     }
 
@@ -223,34 +240,39 @@ public class MainMenuActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // Keep screen on
 
-        // Get device data from previous activity
-        receiverInformation = ReceiverInformation.getReceiverInformation();
+        receiverInformation = ReceiverInformation.getReceiverInformation(); // Get device data from previous activity
 
         boolean isMenu = getIntent().getBooleanExtra("menu", false);
-
         if (!isMenu) { // Connecting to the selected BLE device
-            Log.i(TAG, "SCANNING");
+            Log.i(TAG, "ASK SCANNING AND BOARD STATUS");
             parameter = "scanning"; // Checks if the BLE device is scanning
             receiverInformation.changeInformation((byte) 0, (byte) 0,
                     getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
                     getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS),
                     getIntent().getStringExtra(EXTRAS_DEVICE_RANGE),
                     getIntent().getStringExtra(EXTRAS_BATTERY));
-            status_textView.setText(getIntent().getStringExtra(EXTRAS_DEVICE_STATUS));
+
+            String status = getIntent().getStringExtra(EXTRAS_DEVICE_STATUS);
+            if (status.contains("Fixed"))
+                detectionType = 0x08;
+            else if (status.contains("Variable"))
+                detectionType = 0x07;
+            else if (status.contains("Coded"))
+                detectionType = 0x09;
 
             mHandlerMenu = new Handler();
             mHandler = new Handler();
             menu_linearLayout.setVisibility(View.GONE);
             connectingToDevice();
         } else { // Only displays the main menu
-            Log.i(TAG, "NOT SCANNING");
+            Log.i(TAG, "SHOW ONLY MENU");
             vhf_constraintLayout.setVisibility(View.GONE);
             menu_linearLayout.setVisibility(View.VISIBLE);
             connecting_device_linearLayout.setVisibility(View.GONE);
-            status_textView.setText(receiverInformation.getDeviceStatus());
         }
-
-        percent_battery_menu.setText(receiverInformation.getPercentBattery());
+        status_textView.setText("Receiver " + receiverInformation.getDeviceName());
+        percent_battery_menu_textView.setText(receiverInformation.getPercentBattery() + "%");
+        battery_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -272,7 +294,6 @@ public class MainMenuActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         registerReceiver(mSecondGattUpdateReceiver, makeSecondGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
-            status_textView.setText(receiverInformation.getDeviceStatus());
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG, "Connect request result=" + result);
         }
@@ -293,37 +314,24 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { // Go back to the previous activity
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mConnected) {
+        if (mConnected)
             connecting_device_linearLayout.setVisibility(View.VISIBLE);
-        } else if (menu_linearLayout.getVisibility() == View.VISIBLE) {
+        else if (menu_linearLayout.getVisibility() == View.VISIBLE)
             showDisconnectionMessage("Receiver Disconnected");
-        }
         return true;
     }
 
     /**
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     *
      * @param message The message that will be displayed on the screen.
      */
     private void showDisconnectionMessage(String message) {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         TextView disconnect_message = view.findViewById(R.id.disconnect_message);
         disconnect_message.setText(message);
-
         dialog.setView(view);
         dialog.show();
 
@@ -334,7 +342,7 @@ public class MainMenuActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, CONNECT_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
@@ -351,19 +359,19 @@ public class MainMenuActivity extends AppCompatActivity {
                     menu_linearLayout.setVisibility(View.VISIBLE);
                     vhf_constraintLayout.setVisibility(View.GONE);
                     connecting_device_linearLayout.setVisibility(View.GONE);
-                }, MESSAGE_PERIOD);
+                }, ValueCodes.MESSAGE_PERIOD);
             } else {
                 showDisconnectionMessage("Failed to connect to receiver");
             }
-        }, CONNECT_PERIOD);
+        }, ValueCodes.CONNECT_PERIOD);
     }
 
     /**
-     * With the received packet, check if the BLE device is in scanning.
-     *
+     * With the received packet, get state of board.
      * @param data The received packet.
      */
     private void downloadBoardState(byte[] data) {
+        checkSDCard(data[7]);
         int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[1]));
         int range = Integer.parseInt(Converters.getDecimalValue(data[2]));
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
@@ -372,17 +380,8 @@ public class MainMenuActivity extends AppCompatActivity {
         sharedPreferencesEdit.putInt("Range", range);
         sharedPreferencesEdit.apply();
 
-        byte detectionType = 0;
-        if (status_textView.getText().toString().contains("Fixed"))
-            detectionType = 0x08;
-        else if (status_textView.getText().toString().contains("Variable"))
-            detectionType = 0x07;
-        else if (status_textView.getText().toString().contains("Coded"))
-            detectionType = 0x09;
-
         if (detectionType == 0) {
             LayoutInflater inflater = LayoutInflater.from(this);
-
             View view = inflater.inflate(R.layout.select_detection_filter, null);
             final AlertDialog dialog = new AlertDialog.Builder(this).create();
 
@@ -401,11 +400,10 @@ public class MainMenuActivity extends AppCompatActivity {
                     b[1] = (byte) 0x09;
                 UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
                 UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
-                Log.i(TAG, "Detection type: " + Converters.getHexValue(b));
                 boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
                 if (result) {
+                    Log.i(TAG, "Detection type: " + Converters.getHexValue(b));
                     receiverInformation.changeTxType(b[1]);
-                    status_textView.setText(receiverInformation.getDeviceStatus());
                     dialog.dismiss();
                 }
             });
@@ -417,6 +415,10 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * With the received packet, get state of scan.
+     * @param data The received packet.
+     */
     private void downloadScanning(byte[] data) {
         receiverInformation.changeScanState(data[1]);
         if (data[1] == 0)
@@ -465,5 +467,11 @@ public class MainMenuActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    private void checkSDCard(byte state) {
+        receiverInformation.changeSDCard(state);
+        sd_card_menu_textView.setText(receiverInformation.getSDCard());
+        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, Converters.getHexValue(state).equals("80") ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

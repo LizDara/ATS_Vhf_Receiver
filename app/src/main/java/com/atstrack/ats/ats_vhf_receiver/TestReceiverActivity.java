@@ -32,6 +32,8 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.UUID;
 
@@ -43,12 +45,6 @@ public class TestReceiverActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.loading_linearLayout)
     LinearLayout loading_linearLayout;
     @BindView(R.id.test_complete_scrollView)
@@ -120,24 +116,18 @@ public class TestReceiverActivity extends AppCompatActivity {
 
     private final static String TAG = TestReceiverActivity.class.getSimpleName();
 
-    private final int MESSAGE_PERIOD = 3000;
-    private final int TEST_PERIOD = 1000;
-
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
     private Handler mHandlerTest;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -150,11 +140,6 @@ public class TestReceiverActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -192,8 +177,6 @@ public class TestReceiverActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get BLE device data.
-     * Service name: Diagnostic.
-     * Characteristic name: DiagInfo.
      */
     private void onClickTest() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;
@@ -213,23 +196,16 @@ public class TestReceiverActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test_receiver);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.receiver_diagnostics);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
+
         parameter = "test";
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
         mHandlerTest = new Handler();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -251,9 +227,8 @@ public class TestReceiverActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -276,33 +251,25 @@ public class TestReceiverActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
      * Finds the page number of a 4-byte packet.
-     *
      * @param packet The received packet.
-     *
      * @return Returns the page number.
      */
     private int findPageNumber(byte[] packet) {
@@ -315,7 +282,6 @@ public class TestReceiverActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets BLE device data.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
@@ -335,8 +301,7 @@ public class TestReceiverActivity extends AppCompatActivity {
 
         frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
 
-        // Only shows tables that have frequencies
-        if (Integer.parseInt(Converters.getDecimalValue(data[3])) > 0) {
+        if (Integer.parseInt(Converters.getDecimalValue(data[3])) > 0) { // Only shows tables that have frequencies
             first_table_textView.setText(Converters.getDecimalValue(data[3]));
             table1_linearLayout.setVisibility(View.VISIBLE);
         }
@@ -397,7 +362,6 @@ public class TestReceiverActivity extends AppCompatActivity {
      */
     private void runningTest() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.connecting_test, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         ProgressBar testing_progressBar = view.findViewById(R.id.testing_progressBar);
@@ -415,7 +379,7 @@ public class TestReceiverActivity extends AppCompatActivity {
                 dialog.dismiss();
                 loading_linearLayout.setVisibility(View.GONE);
                 test_complete_scrollView.setVisibility(View.VISIBLE);
-            }, TEST_PERIOD);
-        }, MESSAGE_PERIOD);
+            }, ValueCodes.MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 }

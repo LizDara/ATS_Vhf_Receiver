@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="16sp"
         android:layout_marginHorizontal="32sp"
-        android:gravity="bottom"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <ImageView
@@ -24,13 +24,12 @@
 
         <TextView
             android:id="@+id/gps_state_aerial_textView"
-            style="@style/body_regular"
+            style="@style/body_small"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="8sp"
-            android:gravity="bottom"
-            android:textColor="@color/ebony_clay"
-            android:visibility="gone"/>
+            android:text="@string/lb_off_gps"
+            android:textColor="@color/ebony_clay"/>
 
         <Space
             android:layout_width="0dp"

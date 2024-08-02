@@ -10,82 +10,131 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@color/mountain_meadow"
-        android:gravity="center"
         android:orientation="vertical"
         android:padding="16sp">
+
+        <Button
+            android:id="@+id/disconnect_button"
+            style="@style/button_secondary_light"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_small_height"
+            android:paddingHorizontal="20sp"
+            android:text="@string/lb_disconnect" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8sp"
-                android:src="@drawable/ic_battery_full_light" />
-
-            <TextView
-                android:id="@+id/percent_battery_menu_textView"
-                style="@style/body_small"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:textColor="@color/catskill_white" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <Button
-                android:id="@+id/disconnect_button"
-                style="@style/button_secondary_light"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_small_height"
-                android:paddingHorizontal="20sp"
-                android:text="@string/lb_disconnect" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="@dimen/connect_image"
-            android:layout_height="@dimen/connect_image"
-            android:layout_marginTop="35sp"
-            android:layout_marginBottom="24sp"
-            android:background="@drawable/receiver_branding"
-            android:elevation="4sp"
+            android:orientation="horizontal"
             android:gravity="center">
 
-            <ImageView
-                android:layout_width="@dimen/receiver_connect"
-                android:layout_height="@dimen/receiver_connect"
-                android:src="@drawable/receiver" />
+            <LinearLayout
+                android:layout_width="@dimen/connect_image"
+                android:layout_height="@dimen/connect_image"
+                android:layout_marginTop="35sp"
+                android:layout_marginBottom="24sp"
+                android:background="@drawable/receiver_branding"
+                android:elevation="4sp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="@dimen/receiver_connect"
+                    android:layout_height="@dimen/receiver_connect"
+                    android:src="@drawable/receiver" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="12sp">
+
+                <TextView
+                    android:id="@+id/status_device_menu_textView"
+                    style="@style/h2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12sp"
+                    android:layout_marginBottom="8sp"
+                    android:textColor="@color/catskill_white" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/battery_menu_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+
+                        <TextView
+                            style="@style/body_x_small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lb_battery"
+                            android:textColor="@color/humming_bird"/>
+
+                        <TextView
+                            android:id="@+id/percent_battery_menu_textView"
+                            style="@style/body_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/catskill_white" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/sd_card_menu_imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+
+                        <TextView
+                            style="@style/body_x_small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lb_sd_card"
+                            android:textColor="@color/humming_bird"/>
+
+                        <TextView
+                            android:id="@+id/sd_card_menu_textView"
+                            style="@style/body_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/catskill_white" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <TextView
-            style="@style/h1"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/start_scanning_button"
+            style="@style/button_secondary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/lb_receiver_connected"
-            android:textColor="@color/catskill_white" />
-
-        <TextView
-            android:id="@+id/status_device_menu_textView"
-            style="@style/subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12sp"
-            android:layout_marginBottom="8sp"
-            android:textColor="@color/catskill_white" />
+            android:layout_marginBottom="4sp"
+            android:text="@string/lb_start_scanning" />
 
     </LinearLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,25 +143,30 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/view_receiver_options_button"
-            style="@style/button_secondary"
+            android:id="@+id/receiver_configuration_button"
+            style="@style/button_rectangle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16sp"
-            android:layout_marginTop="8sp"
-            android:layout_marginEnd="16sp"
-            android:layout_marginBottom="16sp"
-            android:text="@string/lb_view_receiver_options" />
+            android:layout_marginHorizontal="16sp"
+            android:layout_marginTop="24sp"
+            android:text="@string/lb_receiver_configuration" />
 
         <Button
-            android:id="@+id/start_scanning_button"
-            style="@style/button_primary"
+            android:id="@+id/manage_receiver_data_button"
+            style="@style/button_rectangle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16sp"
-            android:layout_marginEnd="16sp"
-            android:layout_marginBottom="24sp"
-            android:text="@string/lb_start_scanning" />
+            android:layout_margin="16sp"
+            android:text="@string/lb_manage_receiver" />
+
+        <Button
+            android:id="@+id/diagnostics_button"
+            style="@style/button_rectangle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:layout_marginBottom="16sp"
+            android:text="@string/lb_diagnostics" />
 
     </LinearLayout>
 

@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
@@ -37,12 +37,6 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.frequency_textView)
     TextView frequency_textView;
     @BindView(R.id.line_frequency_view)
@@ -54,8 +48,6 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     @BindView(R.id.save_changes_button)
     Button save_changes_button;
 
-    private final static String TAG = EnterFrequencyActivity.class.getSimpleName();
-
     private int position;
     private int baseFrequency;
     private int frequencyRange;
@@ -63,21 +55,15 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     private LinearLayout linearLayoutBaseFrequency;
     private Button buttonBaseFrequency;
 
-    private ReceiverInformation receiverInformation;
-
     /**
      * Change the period while editing the pulse rate.
      */
     private TextWatcher textChangedListener = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
         @Override
         public void afterTextChanged(Editable editable) {
@@ -130,35 +116,24 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_enter_frequency);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(getIntent().getExtras().getString("title"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
-        receiverInformation = ReceiverInformation.getReceiverInformation();
+        ReceiverStatus.setReceiverStatus(this);
 
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
-
-        // Gets the number of frequencies from that table
         baseFrequency = getIntent().getExtras().getInt("baseFrequency");
         int range = getIntent().getExtras().getInt("range");
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
+        position = getIntent().getExtras().getInt("position");
 
         frequency_textView.addTextChangedListener(textChangedListener);
         String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
         edit_frequency_message_textView.setText(message);
-
-        position = getIntent().getExtras().getInt("position");
         if (position == -1)
             save_changes_button.setText(R.string.lb_add_frequency);
-
         createNumberButtons(range);
     }
 
@@ -206,11 +181,6 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         buttonBaseFrequency.setText(String.valueOf(baseNumber));
     }
 
-    /**
-     * Sets the margins for the LinearLayout.
-     *
-     * @return Returns a LayoutParams with the customize margins.
-     */
     private LinearLayout.LayoutParams newLinearLayoutParams() {
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(0, 0, 0, 32);

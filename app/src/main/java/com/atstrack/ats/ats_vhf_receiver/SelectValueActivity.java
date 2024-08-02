@@ -35,6 +35,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.UUID;
@@ -49,12 +50,6 @@ public class SelectValueActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.select_pulse_rate_linearLayout)
     LinearLayout select_pulse_rate_linearLayout;
     @BindView(R.id.number_of_matches_scrollView)
@@ -119,10 +114,8 @@ public class SelectValueActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -187,19 +180,12 @@ public class SelectValueActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * Change the period while editing the pulse rate.
-     */
     private TextWatcher textChangedListener = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
         @Override
         public void afterTextChanged(Editable editable) {
@@ -221,8 +207,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * Requests a read for tx type data.
-     * Service name: Scan.
-     * Characteristic name: Tx type.
      */
     private void onClickTxType() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -368,21 +352,13 @@ public class SelectValueActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_value);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
-        parameter = "txType";
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
+        ReceiverStatus.setReceiverStatus(this);
 
         type = getIntent().getIntExtra("type", 0);
         switch (type) {
@@ -430,6 +406,7 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
                 break;
         }
+        parameter = "txType";
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -469,9 +446,8 @@ public class SelectValueActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -489,9 +465,8 @@ public class SelectValueActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected) {
+        if (!mConnected)
             showDisconnectionMessage();
-        }
         return true;
     }
 
@@ -500,27 +475,20 @@ public class SelectValueActivity extends AppCompatActivity {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     private void setVisibility(String value) {
@@ -569,11 +537,9 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets pulse rate type and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadPulseRateType(byte[] data) {
-        Log.i(TAG, "Type: " + Converters.getHexValue(data));
         setVisibility("pulseRateTypes");
         if (Converters.getHexValue(data[1]).equals("09")) {
             coded_imageView.setVisibility(View.VISIBLE);
@@ -589,7 +555,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets matches for valid pattern and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadMatchesForValidPattern(byte[] data) {
@@ -621,7 +586,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets max pulse rate and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadMaxPulseRate(byte[] data) {
@@ -634,7 +598,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets min pulse rate and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadMinPulseRate(byte[] data) {
@@ -647,7 +610,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets data calculation types and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadDataCalculation(byte[] data) {
@@ -669,7 +631,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets pulse rate 1 and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadPulseRate1(byte[] data) {
@@ -680,7 +641,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets pulse rate 2 and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadPulseRate2(byte[] data) {
@@ -691,7 +651,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets pulse rate 3 and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadPulseRate3(byte[] data) {
@@ -702,7 +661,6 @@ public class SelectValueActivity extends AppCompatActivity {
 
     /**
      * With the received packet, gets pulse rate 4 and display on the screen.
-     *
      * @param data The received packet.
      */
     private void downloadPulseRate4(byte[] data) {

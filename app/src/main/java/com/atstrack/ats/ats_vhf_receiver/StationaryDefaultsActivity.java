@@ -36,6 +36,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
@@ -50,12 +51,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     TextView title_toolbar;
     @BindView(R.id.state_view)
     View state_view;
-    @BindView(R.id.device_status_textView)
-    TextView device_status_textView;
-    @BindView(R.id.device_range_textView)
-    TextView device_range_textView;
-    @BindView(R.id.percent_battery_textView)
-    TextView percent_battery_textView;
     @BindView(R.id.frequency_table_number_stationary_textView)
     TextView frequency_table_number_stationary_textView;
     @BindView(R.id.scan_rate_seconds_stationary_textView)
@@ -92,16 +87,13 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     private int baseFrequency;
     private int range;
 
-    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (!mBluetoothLeService.initialize())
                 finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
             mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
         }
 
@@ -114,11 +106,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     private boolean mConnected = true;
     private String parameter = "";
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -131,11 +118,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                     mConnected = false;
                     invalidateOptionsMenu();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("save")) { // Save stationary defaults data
+                    if (parameter.equals("save")) // Save stationary defaults data
                         onClickSave();
-                    } else if (parameter.equals("stationary")) { // Gets stationary defaults data
+                    else if (parameter.equals("stationary")) // Gets stationary defaults data
                         onClickStationaryDefaults();
-                    }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (parameter.equals("stationary")) // Gets stationary defaults data
@@ -177,7 +163,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                             reference_frequency_store_rate_stationary_textView.setText(String.valueOf(value));
                             break;
                         case ValueCodes.RESULT_OK:
-                            frequency_reference_stationary_textView.setText(getFrequency(value));
+                            frequency_reference_stationary_textView.setText(Converters.getFrequency(value));
                             break;
                     }
                 }
@@ -194,8 +180,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     /**
      * Requests a read for get stationary defaults data.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickStationaryDefaults() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -205,8 +189,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     /**
      * Writes the modified stationary defaults data by the user.
-     * Service name: Scan.
-     * Characteristic name: Stationary.
      */
     private void onClickSave() {
         String[] tables = frequency_table_number_stationary_textView.getText().toString().split(", ");
@@ -219,13 +201,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         int scanTimeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int externalDataPush = stationary_external_data_transfer_switch.isChecked() ? 1 : 0;
         int storeRate;
-        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString())) {
+        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString()))
             storeRate = 0;
-        } else {
+        else
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
-        }
         int frequency = (stationary_reference_frequency_switch.isChecked()) ?
-                (getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) - baseFrequency) : 0;
+                (Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) - baseFrequency) : 0;
         int referenceFrequencyStoreRate = Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x4C, (byte) antennasNumber, (byte) externalDataPush, (byte) scanRate, (byte) scanTimeout,
                 (byte) storeRate, (byte) (frequency / 256), (byte) (frequency % 256), (byte) referenceFrequencyStoreRate,
@@ -234,7 +215,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
-        Log.i(TAG, "Saved: " + Converters.getHexValue(b));
 
         if (result)
             showMessage(0);
@@ -287,11 +267,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     @OnCheckedChanged(R.id.stationary_reference_frequency_switch)
     public void onCheckedChangedReferenceFrequency(CompoundButton button, boolean isChecked) {
-        Log.i(TAG, "Change State Reference");
         if (isChecked) {
             reference_frequency_stationary_linearLayout.setEnabled(true);
             int frequency = (int) originalData.get("ReferenceFrequency");
-            frequency_reference_stationary_textView.setText(frequency != 0 ? getFrequency(frequency) : "0");
+            frequency_reference_stationary_textView.setText(frequency != 0 ? Converters.getFrequency(frequency) : "0");
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(true);
         } else {
             Log.i(TAG, "No Reference");
@@ -325,27 +304,19 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stationary_defaults);
         ButterKnife.bind(this);
 
-        // Customize the activity menu
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.stationary_defaults);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-
-        // Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Get device data from previous activity
         receiverInformation = ReceiverInformation.getReceiverInformation();
-        parameter = "stationary";
-
-        device_status_textView.setText(receiverInformation.getDeviceStatus());
-        device_range_textView.setText(receiverInformation.getDeviceRange());
-        percent_battery_textView.setText(receiverInformation.getPercentBattery());
+        ReceiverStatus.setReceiverStatus(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
         range = sharedPreferences.getInt("Range", 0);
-
+        parameter = "stationary";
         originalData = new HashMap();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -374,10 +345,8 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
-            Log.i(TAG,"Connect request result= " + result);
-        }
+        if (mBluetoothLeService != null)
+            mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
     }
 
     @Override
@@ -405,37 +374,28 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    /**
-     * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
-     */
     private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
-
         dialog.setView(view);
         dialog.show();
 
-        // The message disappears after a pre-defined period and will search for other available BLE devices again
-        int MESSAGE_PERIOD = 3000;
         new Handler().postDelayed(() -> {
             dialog.dismiss();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }, MESSAGE_PERIOD);
+        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
     /**
      * With the received packet, gets stationary defaults data.
-     *
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("6C")) {
-            Log.i(TAG, Converters.getHexValue(data));
             parameter = "";
             String tables = "";
             for (int i = 9; i < data.length; i++) {
@@ -448,18 +408,16 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             stationary_external_data_transfer_switch.setChecked(data[2] != 0);
             scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            if (Converters.getHexValue(data[5]).equals("00")) {
+            if (Converters.getHexValue(data[5]).equals("00"))
                 store_rate_minutes_stationary_textView.setText("Continuous Store");
-            } else {
+            else
                 store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
-            }
             int frequency = 0;
-            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0")) {
+            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
                 frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                         Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-            }
             stationary_reference_frequency_switch.setChecked(frequency != 0);
-            frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : getFrequency(frequency));
+            frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
             reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
 
             originalData.put("FirstTableNumber", Integer.parseInt(Converters.getDecimalValue(data[9])));
@@ -475,17 +433,8 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         }
     }
 
-    private String getFrequency(int frequency) {
-        return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
-    }
-
-    private int getFrequencyNumber(String frequency) {
-        return Integer.parseInt(frequency.replace(".", ""));
-    }
-
     /**
      * Displays a message indicating whether the writing was successful.
-     *
      * @param status This number indicates the writing status.
      */
     private void showMessage(int status) {
@@ -512,7 +461,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     /**
      * Checks for changes to the default data.
-     *
      * @return Returns true, if there are changes.
      */
     private boolean checkChanges() {
@@ -526,13 +474,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         int timeout = Integer.parseInt(scan_timeout_seconds_stationary_textView.getText().toString());
         int externalData = stationary_external_data_transfer_switch.isChecked() ? 1 : 0;
         int storeRate;
-        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString())) {
+        if ("Continuous Store".equals(store_rate_minutes_stationary_textView.getText().toString()))
             storeRate = 0;
-        } else {
+        else
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
-        }
         int referenceFrequency = stationary_reference_frequency_switch.isChecked() ?
-                getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;
+                Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;
         int referenceFrequencyStoreRate = Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
 
         return (int) originalData.get("FirstTableNumber") != firstTableNumber || (int) originalData.get("SecondTableNumber") != secondTableNumber
@@ -545,7 +492,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
     /**
      * Checks that the data is a valid and correct format.
-     *
      * @return Returns true, if the data is correct.
      */
     private boolean isDataCorrect() {

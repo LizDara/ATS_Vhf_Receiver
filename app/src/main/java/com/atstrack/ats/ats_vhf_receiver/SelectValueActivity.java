@@ -38,6 +38,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
@@ -144,6 +145,7 @@ public class SelectValueActivity extends AppCompatActivity {
                         onClickTxType();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     switch (type) {
                         case ValueCodes.PULSE_RATE_TYPE: // Gets the pulse rate type
                             downloadPulseRateType(packet);
@@ -180,7 +182,7 @@ public class SelectValueActivity extends AppCompatActivity {
         }
     };
 
-    private TextWatcher textChangedListener = new TextWatcher() {
+    private final TextWatcher textChangedListener = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
@@ -353,7 +355,7 @@ public class SelectValueActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -428,7 +430,7 @@ public class SelectValueActivity extends AppCompatActivity {
                     builder.setPositiveButton("Ok", null);
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
+                    Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
                     return true;
                 }
             } else if (type == ValueCodes.MAX_PULSE_RATE || type == ValueCodes.MIN_PULSE_RATE) {

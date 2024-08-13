@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +28,9 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.border;
+import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_number;
+
+import java.util.Objects;
 
 public class EnterFrequencyActivity extends AppCompatActivity {
 
@@ -47,6 +50,8 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     LinearLayout number_buttons_linearLayout;
     @BindView(R.id.save_changes_button)
     Button save_changes_button;
+    @BindView(R.id.one_button)
+    Button one_button;
 
     private int position;
     private int baseFrequency;
@@ -58,7 +63,7 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     /**
      * Change the period while editing the pulse rate.
      */
-    private TextWatcher textChangedListener = new TextWatcher() {
+    private final TextWatcher textChangedListener = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
@@ -84,7 +89,7 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         }
     };
 
-    @OnClick({R.id.one_button, R.id.two_button, R.id.three_button, R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button, R.id.eight_button, R.id.nine_button})
+    @OnClick({R.id.one_button, R.id.two_button, R.id.three_button, R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button, R.id.eight_button, R.id.nine_button, R.id.zero_button})
     public void onClickNumber(View v) {
         if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
             Button button = (Button) v;
@@ -118,7 +123,7 @@ public class EnterFrequencyActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(getIntent().getExtras().getString("title"));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -173,9 +178,10 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     }
 
     private void newBaseButton(int baseNumber) {
-        buttonBaseFrequency = new Button(this);
+        buttonBaseFrequency = new Button(new ContextThemeWrapper(this, R.style.button_number_small), null, R.style.button_number_small);
         buttonBaseFrequency.setLayoutParams(newButtonParams());
-        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, border));
+        buttonBaseFrequency.setGravity(Gravity.CENTER);
+        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_number));
         buttonBaseFrequency.setTextSize(16);
         buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
         buttonBaseFrequency.setText(String.valueOf(baseNumber));
@@ -190,10 +196,8 @@ public class EnterFrequencyActivity extends AppCompatActivity {
 
     private LinearLayout.LayoutParams newButtonParams() {
         TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.setMargins(16, 0, 16, 0);
-        params.height = 64;
+        params.setMargins(8, 0, 8, 0);
         params.weight = 1;
-        params.gravity = Gravity.CENTER_VERTICAL;
         return params;
     }
 }

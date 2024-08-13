@@ -46,6 +46,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -162,9 +163,6 @@ public class AerialScanActivity extends AppCompatActivity {
     private int selectedTable;
     private int autoRecord; //This is the default record
     private int gps;
-    private int code;
-    private int detections;
-    private int mort;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -211,6 +209,8 @@ public class AerialScanActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    Log.i(TAG, Converters.getHexValue(packet));
+                    if (packet == null) return;
                     switch (parameter) {
                         case "aerial": // Gets aerial defaults data
                             downloadData(packet);
@@ -792,7 +792,7 @@ public class AerialScanActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         receiverInformation = ReceiverInformation.getReceiverInformation();
@@ -864,7 +864,7 @@ public class AerialScanActivity extends AppCompatActivity {
                     setVisibility("scanning");
                 } else if (merge_tables_linearLayout.getVisibility() == View.VISIBLE) {
                     setVisibility("editTable");
-                    changeAllCheckBox(false);
+                    changeAllCheckBox();
                 } else {
                     parameterWrite = "stopAerial";
                     mBluetoothLeService.discoveringSecond();
@@ -890,7 +890,7 @@ public class AerialScanActivity extends AppCompatActivity {
             builder.setNegativeButton("Cancel", null);
             AlertDialog dialog = builder.create();
             dialog.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
         }
     }
 
@@ -955,7 +955,7 @@ public class AerialScanActivity extends AppCompatActivity {
                 edit_table_linearLayout.setVisibility(View.GONE);
                 merge_tables_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.aerial_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
                 break;
             case "scanning":
@@ -964,7 +964,7 @@ public class AerialScanActivity extends AppCompatActivity {
                 edit_table_linearLayout.setVisibility(View.GONE);
                 merge_tables_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.lb_aerial_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
@@ -1028,17 +1028,12 @@ public class AerialScanActivity extends AppCompatActivity {
         tables_merge_listView.setAdapter(tableMergeListAdapter);
     }
 
-    private void changeAllCheckBox(boolean isChecked) {
-        tableMergeListAdapter.setStateSelected(isChecked);
+    private void changeAllCheckBox() {
+        tableMergeListAdapter.setStateSelected(false);
         tableMergeListAdapter.notifyDataSetChanged();
 
-        if (isChecked) {
-            merge_tables_button.setEnabled(true);
-            merge_tables_button.setAlpha(1);
-        } else {
-            merge_tables_button.setEnabled(false);
-            merge_tables_button.setAlpha((float) 0.6);
-        }
+        merge_tables_button.setEnabled(false);
+        merge_tables_button.setAlpha((float) 0.6);
     }
 
     /**
@@ -1309,8 +1304,6 @@ public class AerialScanActivity extends AppCompatActivity {
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
         if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
-        detections = Integer.parseInt(detectionsTextView.getText().toString());
-        mort = Integer.parseInt(mortTextView.getText().toString());
     }
 
     /**
@@ -1394,8 +1387,6 @@ public class AerialScanActivity extends AppCompatActivity {
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
 
-        this.detections =  detections;
-        this.mort = isMort ? mort + 1 : mort;
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
 

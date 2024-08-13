@@ -1,0 +1,342 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.atstrack.ats.ats_vhf_receiver"
+4    android:versionCode="10001"
+5    android:versionName="1.0.1.debug" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="28"
+8-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="33" />
+9-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
+10
+11    <uses-feature
+11-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:104:5-107:40
+12        android:name="android.hardware.bluetooth_le"
+12-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:105:9-53
+13        android:required="true" />
+13-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:106:9-32
+14    <uses-feature
+14-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:109:5-111:35
+15        android:name="android.hardware.location.gps"
+15-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:110:9-53
+16        android:required="true" />
+16-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:111:9-32
+17
+18    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+18-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:112:5-81
+18-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:112:22-78
+19    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+19-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:113:5-79
+19-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:113:22-76
+20    <uses-permission
+20-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:114:5-116:38
+21        android:name="android.permission.BLUETOOTH"
+21-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:115:9-52
+22        android:maxSdkVersion="30" />
+22-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:116:9-35
+23    <uses-permission
+23-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:117:5-119:38
+24        android:name="android.permission.BLUETOOTH_ADMIN"
+24-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:118:9-58
+25        android:maxSdkVersion="30" />
+25-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:119:9-35
+26    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+26-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:120:5-73
+26-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:120:22-70
+27    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+27-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:121:5-76
+27-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:121:22-73
+28    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+28-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:122:5-78
+28-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:122:22-75
+29    <uses-permission android:name="android.permission.INTERNET" />
+29-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:123:5-67
+29-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:123:22-64
+30    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+30-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:124:5-79
+30-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:124:22-76
+31    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+31-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:125:5-76
+31-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:125:22-73
+32    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+32-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:126:5-127:40
+32-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:126:22-79
+33    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+33-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:128:5-81
+33-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:128:22-78
+34    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+34-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:129:5-80
+34-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:129:22-77
+35    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+35-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:130:5-71
+35-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:130:22-68
+36    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+36-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:131:5-133:47
+36-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:132:9-64
+37    <uses-permission android:name="android.permission.WAKE_LOCK" />
+37-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:134:5-68
+37-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:134:22-65
+38
+39    <application
+39-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:6:5-103:19
+40        android:allowBackup="true"
+40-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:7:9-35
+41        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+41-->[androidx.core:core:1.7.0] C:\Users\crepo\.gradle\caches\transforms-3\f791a70f7db898f1138b0878a89dfc50\transformed\core-1.7.0\AndroidManifest.xml:24:18-86
+42        android:debuggable="true"
+43        android:exported="true"
+43-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:8:9-32
+44        android:extractNativeLibs="false"
+45        android:fullBackupContent="@xml/backup_descriptor"
+45-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:9:9-59
+46        android:icon="@mipmap/ic_launcher"
+46-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:10:9-43
+47        android:label="@string/app_name"
+47-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:11:9-41
+48        android:noHistory="true"
+48-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:12:9-33
+49        android:requestLegacyExternalStorage="true"
+49-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:13:9-52
+50        android:roundIcon="@mipmap/ic_launcher_round"
+50-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:14:9-54
+51        android:supportsRtl="true"
+51-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:15:9-35
+52        android:testOnly="true"
+53        android:theme="@style/AppTheme" >
+53-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:16:9-40
+54        <activity
+54-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:17:9-19:39
+55            android:name="com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity"
+55-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:18:13-51
+56            android:exported="true" />
+56-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:19:13-36
+57        <activity
+57-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:20:9-22:39
+58            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity"
+58-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:21:13-51
+59            android:exported="true" />
+59-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:22:13-36
+60        <activity
+60-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:23:9-25:39
+61            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity"
+61-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:24:13-55
+62            android:exported="true" />
+62-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:25:13-36
+63        <activity
+63-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:26:9-28:39
+64            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity"
+64-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:27:13-51
+65            android:exported="true" />
+65-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:28:13-36
+66        <activity
+66-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:29:9-31:39
+67            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity"
+67-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:30:13-56
+68            android:exported="true" />
+68-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:31:13-36
+69        <activity
+69-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:32:9-34:39
+70            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity"
+70-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:33:13-52
+71            android:exported="true" />
+71-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:34:13-36
+72        <activity
+72-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:35:9-37:39
+73            android:name="com.atstrack.ats.ats_vhf_receiver.SelectValueActivity"
+73-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:36:13-48
+74            android:exported="true" />
+74-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:37:13-36
+75        <activity
+75-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:38:9-40:39
+76            android:name="com.atstrack.ats.ats_vhf_receiver.InputValueActivity"
+76-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:39:13-47
+77            android:exported="true" />
+77-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:40:13-36
+78        <activity
+78-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:41:9-43:39
+79            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity"
+79-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:42:13-55
+80            android:exported="true" />
+80-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:43:13-36
+81        <activity
+81-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:44:9-46:39
+82            android:name="com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity"
+82-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:45:13-51
+83            android:exported="true" />
+83-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:46:13-36
+84        <activity
+84-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:47:9-49:39
+85            android:name="com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity"
+85-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:48:13-49
+86            android:exported="true" />
+86-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:49:13-36
+87        <activity
+87-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:50:9-52:39
+88            android:name="com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity"
+88-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:51:13-50
+89            android:exported="true" />
+89-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:52:13-36
+90        <activity
+90-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:53:9-55:39
+91            android:name="com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity"
+91-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:54:13-55
+92            android:exported="true" />
+92-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:55:13-36
+93        <activity
+93-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:56:9-58:39
+94            android:name="com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity"
+94-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:57:13-57
+95            android:exported="true" />
+95-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:58:13-36
+96        <activity
+96-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:59:9-61:39
+97            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity"
+97-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:60:13-58
+98            android:exported="true" />
+98-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:61:13-36
+99        <activity
+99-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:62:9-64:39
+100            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity"
+100-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:63:13-51
+101            android:exported="true" />
+101-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:64:13-36
+102        <activity
+102-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:65:9-67:39
+103            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanActivity"
+103-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:66:13-47
+104            android:exported="true" />
+104-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:67:13-36
+105        <activity
+105-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:68:9-70:39
+106            android:name="com.atstrack.ats.ats_vhf_receiver.ManualScanActivity"
+106-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:69:13-47
+107            android:exported="true" />
+107-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:70:13-36
+108        <activity
+108-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:71:9-73:39
+109            android:name="com.atstrack.ats.ats_vhf_receiver.StartScanningActivity"
+109-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:72:13-50
+110            android:exported="true" />
+110-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:73:13-36
+111        <activity
+111-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:74:9-76:39
+112            android:name="com.atstrack.ats.ats_vhf_receiver.MainMenuActivity"
+112-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:75:13-45
+113            android:exported="true" />
+113-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:76:13-36
+114        <activity
+114-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:77:9-79:39
+115            android:name="com.atstrack.ats.ats_vhf_receiver.EditTablesActivity"
+115-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:78:13-47
+116            android:exported="true" />
+116-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:79:13-36
+117        <activity
+117-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:80:9-82:39
+118            android:name="com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity"
+118-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:81:13-50
+119            android:exported="true" />
+119-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:82:13-36
+120        <activity
+120-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:83:9-85:39
+121            android:name="com.atstrack.ats.ats_vhf_receiver.GetDataActivity"
+121-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:84:13-44
+122            android:exported="true" />
+122-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:85:13-36
+123        <activity
+123-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:86:9-96:20
+124            android:name="com.atstrack.ats.ats_vhf_receiver.MainActivity"
+124-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:87:13-41
+125            android:exported="true" >
+125-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:88:13-36
+126            <intent-filter>
+126-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:89:13-95:29
+127                <action
+127-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:90:17-92:47
+128                    android:name="android.intent.action.MAIN"
+128-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:91:21-62
+129                    android:exported="true" />
+129-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:92:21-44
+130
+131                <category android:name="android.intent.category.LAUNCHER" />
+131-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:94:17-77
+131-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:94:27-74
+132            </intent-filter>
+133        </activity>
+134
+135        <service
+135-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:98:9-102:41
+136            android:name="com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService"
+136-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:99:13-60
+137            android:enabled="true"
+137-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:100:13-35
+138            android:exported="false"
+138-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:101:13-37
+139            android:permission="TODO" />
+139-->D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:102:13-38
+140
+141        <activity
+141-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:23:9-27:75
+142            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+142-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:24:13-93
+143            android:excludeFromRecents="true"
+143-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:25:13-46
+144            android:exported="false"
+144-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:26:13-37
+145            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+145-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:27:13-72
+146        <!--
+147            Service handling Google Sign-In user revocation. For apps that do not integrate with
+148            Google Sign-In, this service will never be started.
+149        -->
+150        <service
+150-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:33:9-37:51
+151            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+151-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:34:13-89
+152            android:exported="true"
+152-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:35:13-36
+153            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+153-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:36:13-107
+154            android:visibleToInstantApps="true" />
+154-->[com.google.android.gms:play-services-auth:20.6.0] C:\Users\crepo\.gradle\caches\transforms-3\269d36f615df80c2157a81c7c69ec4b6\transformed\jetified-play-services-auth-20.6.0\AndroidManifest.xml:37:13-48
+155
+156        <activity
+156-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\crepo\.gradle\caches\transforms-3\d6e0081a29c0433296c7a77b26fa7f86\transformed\jetified-play-services-base-18.0.1\AndroidManifest.xml:20:9-22:45
+157            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+157-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\crepo\.gradle\caches\transforms-3\d6e0081a29c0433296c7a77b26fa7f86\transformed\jetified-play-services-base-18.0.1\AndroidManifest.xml:20:19-85
+158            android:exported="false"
+158-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\crepo\.gradle\caches\transforms-3\d6e0081a29c0433296c7a77b26fa7f86\transformed\jetified-play-services-base-18.0.1\AndroidManifest.xml:22:19-43
+159            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+159-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\crepo\.gradle\caches\transforms-3\d6e0081a29c0433296c7a77b26fa7f86\transformed\jetified-play-services-base-18.0.1\AndroidManifest.xml:21:19-78
+160
+161        <meta-data
+161-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\crepo\.gradle\caches\transforms-3\deecd1d32964434a30500eb1082c0fd7\transformed\jetified-play-services-basement-18.2.0\AndroidManifest.xml:21:9-23:69
+162            android:name="com.google.android.gms.version"
+162-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\crepo\.gradle\caches\transforms-3\deecd1d32964434a30500eb1082c0fd7\transformed\jetified-play-services-basement-18.2.0\AndroidManifest.xml:22:13-58
+163            android:value="@integer/google_play_services_version" />
+163-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\crepo\.gradle\caches\transforms-3\deecd1d32964434a30500eb1082c0fd7\transformed\jetified-play-services-basement-18.2.0\AndroidManifest.xml:23:13-66
+164
+165        <provider
+165-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:26:9-34:20
+166            android:name="androidx.startup.InitializationProvider"
+166-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:27:13-67
+167            android:authorities="com.atstrack.ats.ats_vhf_receiver.androidx-startup"
+167-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:28:13-68
+168            android:exported="false" >
+168-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:29:13-37
+169            <meta-data
+169-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:31:13-33:52
+170                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+170-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:32:17-75
+171                android:value="androidx.startup" />
+171-->[androidx.emoji2:emoji2:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\c9795409fb3f622def97af1ff702b4fe\transformed\jetified-emoji2-1.0.0\AndroidManifest.xml:33:17-49
+172            <meta-data
+172-->[androidx.lifecycle:lifecycle-process:2.4.0] C:\Users\crepo\.gradle\caches\transforms-3\492714d13db8ee0adc445f6ef3411dcf\transformed\jetified-lifecycle-process-2.4.0\AndroidManifest.xml:31:13-33:52
+173                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+173-->[androidx.lifecycle:lifecycle-process:2.4.0] C:\Users\crepo\.gradle\caches\transforms-3\492714d13db8ee0adc445f6ef3411dcf\transformed\jetified-lifecycle-process-2.4.0\AndroidManifest.xml:32:17-78
+174                android:value="androidx.startup" />
+174-->[androidx.lifecycle:lifecycle-process:2.4.0] C:\Users\crepo\.gradle\caches\transforms-3\492714d13db8ee0adc445f6ef3411dcf\transformed\jetified-lifecycle-process-2.4.0\AndroidManifest.xml:33:17-49
+175        </provider>
+176    </application>
+177
+178</manifest>

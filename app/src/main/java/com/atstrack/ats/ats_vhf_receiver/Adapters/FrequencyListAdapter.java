@@ -19,11 +19,11 @@ import androidx.activity.result.ActivityResultLauncher;
 
 public class FrequencyListAdapter extends BaseAdapter {
     private final Context context;
-    private LayoutInflater inflater;
-    private ArrayList<Integer> frequencies;
-    private int baseFrequency;
-    private int range;
-    private ActivityResultLauncher<Intent> launcher;
+    private final LayoutInflater inflater;
+    private final ArrayList<Integer> frequencies;
+    private final int baseFrequency;
+    private final int range;
+    private final ActivityResultLauncher<Intent> launcher;
 
     public FrequencyListAdapter(Context context, ArrayList<Integer> frequencies, int baseFrequency, int range, ActivityResultLauncher<Intent> launcher) {
         this.context = context;

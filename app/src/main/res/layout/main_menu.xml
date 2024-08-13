@@ -17,8 +17,8 @@
             android:id="@+id/disconnect_button"
             style="@style/button_secondary_light"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_small_height"
-            android:paddingHorizontal="20sp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16sp"
             android:text="@string/lb_disconnect" />
 
         <LinearLayout

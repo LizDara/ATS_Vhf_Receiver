@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import androidx.core.content.ContextCompat;
 
 public class TableScanListAdapter extends BaseAdapter {
-    private LayoutInflater inflater;
-    private byte[] frequencies;
-    private ArrayList<Boolean> selected;
-    private ArrayList<Integer> tables;
-    private TextView option_tables_textView;
-    private Button merge_tables_button;
+    private final LayoutInflater inflater;
+    private final byte[] frequencies;
+    private final ArrayList<Boolean> selected;
+    private final ArrayList<Integer> tables;
+    private final TextView option_tables_textView;
+    private final Button merge_tables_button;
 
     public TableScanListAdapter(Context context, byte[] frequencies, ArrayList<Integer> tables, TextView option_tables_textView, Button merge_tables_button) {
         this.frequencies = frequencies;

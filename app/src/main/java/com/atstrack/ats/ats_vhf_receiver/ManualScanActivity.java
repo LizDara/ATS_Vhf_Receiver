@@ -43,6 +43,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -114,10 +115,9 @@ public class ManualScanActivity extends AppCompatActivity {
     private int range;
     private byte detectionType;
     private int newFrequency;
-    private int code;
     private int detections;
     private int mort;
-    private byte[] audioOption = {(byte) 0x5A, 0, 0};
+    private final byte[] audioOption = {(byte) 0x5A, 0, 0};
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -518,7 +518,7 @@ public class ManualScanActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.manual_scanning);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -618,14 +618,14 @@ public class ManualScanActivity extends AppCompatActivity {
                 ready_manual_scan_LinearLayout.setVisibility(View.VISIBLE);
                 manual_scan_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.manual_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
                 break;
             case "scanning":
                 ready_manual_scan_LinearLayout.setVisibility(View.GONE);
                 manual_scan_linearLayout.setVisibility(View.VISIBLE);
                 title_toolbar.setText(R.string.lb_manual_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
@@ -682,7 +682,7 @@ public class ManualScanActivity extends AppCompatActivity {
             int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
 
             if (Converters.getHexValue(detectionType).equals("09")) { // Coded
-                code = Integer.parseInt(Converters.getDecimalValue(data[4]));
+                int code = Integer.parseInt(Converters.getDecimalValue(data[4]));
                 int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
                 int position = getPositionNumber(code, 0);
                 if (position > 0) {
@@ -817,8 +817,8 @@ public class ManualScanActivity extends AppCompatActivity {
         typeTextView.setText(String.valueOf(type));
     }
 
-    private void addNewNonCodedVariableDetail(int position, int pulseRate, int signalStrength, int period) {
-        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
+    private void addNewNonCodedVariableDetail(int pulseRate, int signalStrength, int period) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
         TextView periodTextView = (TextView) linearLayout.getChildAt(0);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
         TextView pulseRateTextView = (TextView) linearLayout.getChildAt(2);
@@ -908,7 +908,7 @@ public class ManualScanActivity extends AppCompatActivity {
             TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
             lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
         }
-        addNewNonCodedVariableDetail(2, pulseRate, signalStrength, period);
+        addNewNonCodedVariableDetail(pulseRate, signalStrength, period);
     }
 
     private void createDetail() {

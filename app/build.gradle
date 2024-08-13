@@ -26,12 +26,12 @@ List<String> dirs = [
 android {
     signingConfigs {
     }
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.atstrack.ats.ats_vhf_receiver"
         minSdkVersion 28
-        targetSdkVersion 31
+        targetSdkVersion 33
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

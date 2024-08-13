@@ -1,5 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -43,6 +44,7 @@ public class BluetoothLeService extends Service {
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
@@ -76,6 +78,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            Log.i(TAG, "CHARACTERISTIC READ " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(action, characteristic);
             }
@@ -83,6 +86,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            Log.i(TAG, "CHARACTERISTIC CHANGED");
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
 
@@ -154,6 +158,7 @@ public class BluetoothLeService extends Service {
      *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
      *         callback.
      */
+    @SuppressLint("MissingPermission")
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
             Log.w(TAG,"BluetoothAdapter not initialized or unspecified address.");
@@ -192,6 +197,7 @@ public class BluetoothLeService extends Service {
      * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
      * callback.
      */
+    @SuppressLint("MissingPermission")
     public void disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG,"BluetoothAdapter not initialized");
@@ -204,6 +210,7 @@ public class BluetoothLeService extends Service {
      * After using a given BLE device, the app must call this method to ensure resources are
      * released properly.
      */
+    @SuppressLint("MissingPermission")
     public void close() {
         if (mBluetoothGatt == null) {
             return;
@@ -234,7 +241,7 @@ public class BluetoothLeService extends Service {
         }
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(Characteristics);
-        boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
+        @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
         if (result)
             action = ACTION_DATA_AVAILABLE;
         Log.i(TAG, "Read Characteristic Diagnostic " + result);
@@ -247,7 +254,7 @@ public class BluetoothLeService extends Service {
         }
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(Characteristics);
-        boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
+        @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
         if (result)
             action = ACTION_DATA_AVAILABLE_SECOND;
         Log.i(TAG, "Read Characteristic Diagnostic " + result);
@@ -270,7 +277,7 @@ public class BluetoothLeService extends Service {
 
             BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(Characteristics);
             myGatChar.setValue(data);
-            boolean result = mBluetoothGatt.writeCharacteristic(myGatChar);
+            @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.writeCharacteristic(myGatChar);
             Log.i(TAG, "RESULT WRITE CHARACTERISTIC: " + result
                     + " " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":"
                     + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND));
@@ -285,6 +292,7 @@ public class BluetoothLeService extends Service {
      * @param Characteristics  UUID to act on.
      * @param enabled If true, enable notification.  False otherwise.
      */
+    @SuppressLint("MissingPermission")
     public void setCharacteristicNotificationRead(UUID service, UUID Characteristics, boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
@@ -298,9 +306,11 @@ public class BluetoothLeService extends Service {
         desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(desc);
 
-        mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
+        boolean result = mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
+        Log.i(TAG, "SET CHARACTERISTIC NOTIFICATION " + result);
     }
 
+    @SuppressLint("MissingPermission")
     public void readRssi() {
         mBluetoothGatt.readRemoteRssi();
     }

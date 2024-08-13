@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.atstrack.ats.ats_vhf_receiver"
+    android:versionCode="10001"
+    android:versionName="1.0.1.debug" >
+
+    <uses-sdk
+        android:minSdkVersion="28"
+        android:targetSdkVersion="33" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:allowBackup="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        android:debuggable="true"
+        android:exported="true"
+        android:extractNativeLibs="false"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:noHistory="true"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:testOnly="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.SelectValueActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.InputValueActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.ManualScanActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.StartScanningActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.MainMenuActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.EditTablesActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.GetDataActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.MainActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.MAIN"
+                    android:exported="true" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="TODO" />
+
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!--
+            Service handling Google Sign-In user revocation. For apps that do not integrate with
+            Google Sign-In, this service will never be started.
+        -->
+        <service
+            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+            android:exported="true"
+            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+            android:visibleToInstantApps="true" />
+
+        <activity
+            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="com.atstrack.ats.ats_vhf_receiver.androidx-startup"
+            android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+        </provider>
+    </application>
+
+</manifest>

@@ -28,6 +28,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Objects;
+
 public class CloneReceiverActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
@@ -74,6 +76,7 @@ public class CloneReceiverActivity extends AppCompatActivity {
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                 }
             }
             catch (Exception e) {
@@ -99,7 +102,7 @@ public class CloneReceiverActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.clone_receiver);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

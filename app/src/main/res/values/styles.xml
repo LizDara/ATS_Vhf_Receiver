@@ -69,7 +69,7 @@
     <style name="button_primary" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/button_primary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_height</item>
+        <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/white_ice</item>
         <item name="android:textStyle">bold</item>
@@ -78,7 +78,7 @@
     <style name="button_secondary" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/button_secondary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_height</item>
+        <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/mountain_meadow</item>
         <item name="android:textStyle">bold</item>
@@ -87,7 +87,7 @@
     <style name="button_tertiary" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/button_tertiary</item>
         <item name="elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_height</item>
+        <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/limed_spruce</item>
         <item name="android:textStyle">bold</item>
@@ -96,7 +96,7 @@
     <style name="button_primary_small" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/button_primary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_small_height</item>
+        <item name="android:minHeight">@dimen/button_small_height</item>
         <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/white_ice</item>
         <item name="android:textStyle">bold</item>
@@ -105,16 +105,16 @@
     <style name="button_secondary_small" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/button_secondary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_small_height</item>
+        <item name="android:minHeight">@dimen/button_small_height</item>
         <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/mountain_meadow</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="button_secondary_light" parent="Widget.AppCompat.TextView">
+    <style name="button_secondary_light" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/button_secondary_light</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_small_height</item>
+        <item name="android:minHeight">@dimen/button_small_height</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/white_ice</item>
         <item name="android:textStyle">bold</item>
@@ -123,7 +123,7 @@
     <style name="button_tertiary_small" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/button_tertiary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/paragraph_small</item>
+        <item name="android:minHeight">@dimen/button_small_height</item>
         <item name="android:textAppearance">@style/button_small</item>
         <item name="android:textColor">@color/limed_spruce</item>
         <item name="android:textStyle">bold</item>
@@ -133,8 +133,8 @@
         <item name="android:background">@color/catskill_white</item>
         <item name="android:drawableEnd">@drawable/ic_next</item>
         <item name="android:elevation">@dimen/elevation_button</item>
+        <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:gravity">start</item>
-        <item name="android:height">@dimen/button_rectangle_height</item>
         <item name="android:padding">@dimen/text_button</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/limed_spruce</item>
@@ -142,12 +142,29 @@
     </style>
 
     <style name="button_cancel" parent="Widget.AppCompat.Button">
-        <item name="android:background">@drawable/button_delete</item>
-        <item name="circleRadius">@dimen/border_radius</item>
+        <item name="android:background">@drawable/button_cancel</item>
         <item name="android:elevation">@dimen/elevation_button</item>
-        <item name="android:height">@dimen/button_height</item>
+        <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:textAppearance">@style/button</item>
         <item name="android:textColor">@color/white_ice</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="button_delete" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_delete</item>
+        <item name="android:elevation">@dimen/elevation_button</item>
+        <item name="android:minHeight">@dimen/button_height_numbers</item>
+        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textColor">@color/white_ice</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="button_number_small" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@drawable/button_number</item>
+        <item name="android:elevation">@dimen/elevation_button</item>
+        <item name="android:minHeight">@dimen/button_height_numbers</item>
+        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textColor">@color/ebony_clay</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

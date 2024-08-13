@@ -1,0 +1,134 @@
+com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.LeDeviceListAdapter
+ com.atstrack.ats.ats_vhf_receiver.Adapters.LeDeviceListAdapter$MyViewHolder
+com/atstrack/ats/ats_vhf_receiver/Utils/DriveServiceHelper.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.DriveServiceHelper
+com/atstrack/ats/ats_vhf_receiver/EnterFrequencyActivity.java
+ com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity
+ com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity$1
+com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyDeleteListAdapter
+com/atstrack/ats/ats_vhf_receiver/SetTransmitterTypeActivity.java
+ com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity
+ com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity$1
+ com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity$2
+com/atstrack/ats/ats_vhf_receiver/Utils/Converters.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.Converters
+com/atstrack/ats/ats_vhf_receiver/AerialDefaultsActivity.java
+ com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity
+ com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity$1
+ com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity$2
+com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverInformation.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation
+com/atstrack/ats/ats_vhf_receiver/MainMenuActivity.java
+ com.atstrack.ats.ats_vhf_receiver.MainMenuActivity
+ com.atstrack.ats.ats_vhf_receiver.MainMenuActivity$1
+ com.atstrack.ats.ats_vhf_receiver.MainMenuActivity$2
+ com.atstrack.ats.ats_vhf_receiver.MainMenuActivity$3
+com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter
+com/atstrack/ats/ats_vhf_receiver/StationaryScanningActivity.java
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity$1
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity$2
+com/atstrack/ats/ats_vhf_receiver/BuildConfig.java
+ com.atstrack.ats.ats_vhf_receiver.BuildConfig
+com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverStatus.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus
+com/atstrack/ats/ats_vhf_receiver/EditReceiverDefaultsActivity.java
+ com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity
+ com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity$1
+ com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity$2
+com/atstrack/ats/ats_vhf_receiver/ReceiverUpdateActivity.java
+ com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity
+ com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity$1
+ com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity$2
+com/atstrack/ats/ats_vhf_receiver/EditTablesActivity.java
+ com.atstrack.ats.ats_vhf_receiver.EditTablesActivity
+ com.atstrack.ats.ats_vhf_receiver.EditTablesActivity$1
+ com.atstrack.ats.ats_vhf_receiver.EditTablesActivity$2
+com/atstrack/ats/ats_vhf_receiver/ReceiverConfigurationActivity.java
+ com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity
+ com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity$1
+ com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity$2
+com/atstrack/ats/ats_vhf_receiver/Utils/AtsVhfReceiverUuids.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids
+com/atstrack/ats/ats_vhf_receiver/AerialScanningActivity.java
+ com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity
+ com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity$1
+ com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity$2
+com/atstrack/ats/ats_vhf_receiver/StartScanningActivity.java
+ com.atstrack.ats.ats_vhf_receiver.StartScanningActivity
+ com.atstrack.ats.ats_vhf_receiver.StartScanningActivity$1
+ com.atstrack.ats.ats_vhf_receiver.StartScanningActivity$2
+com/atstrack/ats/ats_vhf_receiver/TemporaryStationaryActivity.java
+ com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity
+ com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity$1
+ com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity$2
+com/atstrack/ats/ats_vhf_receiver/CloneReceiverActivity.java
+ com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity
+ com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity$1
+ com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity$2
+com/atstrack/ats/ats_vhf_receiver/ManualScanActivity.java
+ com.atstrack.ats.ats_vhf_receiver.ManualScanActivity
+ com.atstrack.ats.ats_vhf_receiver.ManualScanActivity$1
+ com.atstrack.ats.ats_vhf_receiver.ManualScanActivity$2
+ com.atstrack.ats.ats_vhf_receiver.ManualScanActivity$3
+com/atstrack/ats/ats_vhf_receiver/TableOverviewActivity.java
+ com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity
+ com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity$1
+ com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity$2
+com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter
+com/atstrack/ats/ats_vhf_receiver/Utils/ValueCodes.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes
+com/atstrack/ats/ats_vhf_receiver/InputValueActivity.java
+ com.atstrack.ats.ats_vhf_receiver.InputValueActivity
+ com.atstrack.ats.ats_vhf_receiver.InputValueActivity$1
+ com.atstrack.ats.ats_vhf_receiver.InputValueActivity$2
+com/atstrack/ats/ats_vhf_receiver/TemporaryAerialActivity.java
+ com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity
+ com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity$1
+ com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity$2
+com/atstrack/ats/ats_vhf_receiver/AerialScanActivity.java
+ com.atstrack.ats.ats_vhf_receiver.AerialScanActivity
+ com.atstrack.ats.ats_vhf_receiver.AerialScanActivity$1
+ com.atstrack.ats.ats_vhf_receiver.AerialScanActivity$2
+ com.atstrack.ats.ats_vhf_receiver.AerialScanActivity$3
+com/atstrack/ats/ats_vhf_receiver/Utils/Snapshots.java
+ com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots
+ com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots$1
+com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter
+com/atstrack/ats/ats_vhf_receiver/StationaryDefaultsActivity.java
+ com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity
+ com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity$1
+ com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity$2
+com/atstrack/ats/ats_vhf_receiver/StationaryScanActivity.java
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity$1
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity$2
+ com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity$3
+com/atstrack/ats/ats_vhf_receiver/TestReceiverActivity.java
+ com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity
+ com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity$1
+ com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity$2
+com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.java
+ com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService
+ com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService$1
+ com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService$LocalBinder
+com/atstrack/ats/ats_vhf_receiver/SelectValueActivity.java
+ com.atstrack.ats.ats_vhf_receiver.SelectValueActivity
+ com.atstrack.ats.ats_vhf_receiver.SelectValueActivity$1
+ com.atstrack.ats.ats_vhf_receiver.SelectValueActivity$2
+ com.atstrack.ats.ats_vhf_receiver.SelectValueActivity$3
+com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.java
+ com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyListAdapter
+com/atstrack/ats/ats_vhf_receiver/MainActivity.java
+ com.atstrack.ats.ats_vhf_receiver.MainActivity
+ com.atstrack.ats.ats_vhf_receiver.MainActivity$1
+com/atstrack/ats/ats_vhf_receiver/GetDataActivity.java
+ com.atstrack.ats.ats_vhf_receiver.GetDataActivity
+ com.atstrack.ats.ats_vhf_receiver.GetDataActivity$1
+ com.atstrack.ats.ats_vhf_receiver.GetDataActivity$2
+ com.atstrack.ats.ats_vhf_receiver.GetDataActivity$3

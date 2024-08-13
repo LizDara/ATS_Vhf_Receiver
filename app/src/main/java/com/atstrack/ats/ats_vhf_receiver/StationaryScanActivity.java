@@ -38,6 +38,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -110,9 +111,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     private int secondTable;
     private int thirdTable;
     private int numberAntennas;
-    private int code;
-    private int detections;
-    private int mort;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -159,6 +157,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     switch (parameter) {
                         case "stationary": // Gets stationary defaults data
                             downloadData(packet);
@@ -275,6 +274,7 @@ public class StationaryScanActivity extends AppCompatActivity {
             clear();
             isScanning = false;
             setVisibility("overview");
+            animationDrawable.stop();
             if (previousScanning) {
                 parameter = "stationary";
                 new Handler().postDelayed(() -> {
@@ -314,7 +314,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         receiverInformation = ReceiverInformation.getReceiverInformation();
@@ -391,7 +391,7 @@ public class StationaryScanActivity extends AppCompatActivity {
             builder.setNegativeButton("Cancel", null);
             AlertDialog dialog = builder.create();
             dialog.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
         }
     }
 
@@ -449,14 +449,14 @@ public class StationaryScanActivity extends AppCompatActivity {
                 ready_stationary_scan_LinearLayout.setVisibility(View.VISIBLE);
                 stationary_result_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.stationary_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
                 state_view.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
                 break;
             case "scanning":
                 ready_stationary_scan_LinearLayout.setVisibility(View.GONE);
                 stationary_result_linearLayout.setVisibility(View.VISIBLE);
                 title_toolbar.setText(R.string.lb_stationary_scanning);
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+                Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
                 state_view.setBackgroundResource(R.drawable.scanning_animation);
                 animationDrawable = (AnimationDrawable) state_view.getBackground();
                 animationDrawable.start();
@@ -491,7 +491,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                 if (data[i] != 0)
                     tables += Converters.getDecimalValue(data[i]) + ", ";
             }
-            if (tables.equals("")) { // There are no tables with frequencies to scan
+            if (tables.isEmpty()) { // There are no tables with frequencies to scan
                 selected_frequency_stationary_textView.setText(R.string.lb_none);
                 start_stationary_button.setEnabled(false);
                 start_stationary_button.setAlpha((float) 0.6);
@@ -505,7 +505,7 @@ public class StationaryScanActivity extends AppCompatActivity {
             scan_rate_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             timeout_stationary_textView.setText(Converters.getDecimalValue(data[4]));
             if (Converters.getHexValue(data[5]).equals("FF"))
-                store_rate_stationary_textView.setText("Continuous Store");
+                store_rate_stationary_textView.setText(R.string.lb_continuous_store);
             else
                 store_rate_stationary_textView.setText((Converters.getDecimalValue(data[5]).equals("0")) ? "No Store Rate" :
                         Converters.getDecimalValue(data[5]));
@@ -675,8 +675,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
         if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
-        detections = Integer.parseInt(detectionsTextView.getText().toString());
-        mort = Integer.parseInt(mortTextView.getText().toString());
     }
 
     private int positionCode(int code) {
@@ -742,8 +740,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         newSignalStrengthTextView.setText(String.valueOf(signalStrength));
         newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
 
-        this.detections =  detections;
-        this.mort = isMort ? mort + 1 : mort;
         Log.i(TAG, "Code: " + newCodeTextView.getText() + " SS: " + newSignalStrengthTextView.getText() + " Det: " + newDetectionsTextView.getText() + " Mort: " + newMortTextView.getText() + " Size: " + scan_details_linearLayout.getChildCount());
     }
 

@@ -41,6 +41,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class StationaryDefaultsActivity extends AppCompatActivity {
@@ -124,6 +125,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                         onClickStationaryDefaults();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     if (parameter.equals("stationary")) // Gets stationary defaults data
                         downloadData(packet);
                 }
@@ -275,7 +277,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         } else {
             Log.i(TAG, "No Reference");
             reference_frequency_stationary_linearLayout.setEnabled(false);
-            frequency_reference_stationary_textView.setText("No Reference Frequency");
+            frequency_reference_stationary_textView.setText(R.string.lb_no_reference_frequency);
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(false);
             reference_frequency_store_rate_stationary_textView.setText("0");
         }
@@ -306,7 +308,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.stationary_defaults);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -317,7 +319,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
         range = sharedPreferences.getInt("Range", 0);
         parameter = "stationary";
-        originalData = new HashMap();
+        originalData = new HashMap<>();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -402,14 +404,14 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                 if (data[i] != 0)
                     tables += Converters.getDecimalValue(data[i]) + ", ";
             }
-            frequency_table_number_stationary_textView.setText(tables.equals("") ? "None" : tables.substring(0, tables.length() - 2));
+            frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables.substring(0, tables.length() - 2));
             int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
             number_of_antennas_stationary_textView.setText((antennaNumber == 0) ? "None" : String.valueOf(antennaNumber));
             stationary_external_data_transfer_switch.setChecked(data[2] != 0);
             scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
             if (Converters.getHexValue(data[5]).equals("00"))
-                store_rate_minutes_stationary_textView.setText("Continuous Store");
+                store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
             else
                 store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
             int frequency = 0;

@@ -24,7 +24,7 @@ public class Snapshots implements Parcelable {
     private String fileName;
     private boolean error;
     private boolean filled;
-    private byte[] snapshot;
+    private final byte[] snapshot;
     public int byteIndex;
     private int size;
 

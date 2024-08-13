@@ -63,9 +63,9 @@
 
                 <Button
                     android:id="@+id/cancel_update_button"
-                    style="@style/button_tertiary"
+                    style="@style/button_tertiary_small"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/button_small_height"
+                    android:layout_height="wrap_content"
                     android:paddingHorizontal="8sp"
                     android:text="@string/lb_cancel_update" />
 

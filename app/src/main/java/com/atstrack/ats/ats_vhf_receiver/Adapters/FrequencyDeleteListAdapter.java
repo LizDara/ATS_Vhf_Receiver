@@ -13,11 +13,11 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import java.util.ArrayList;
 
 public class FrequencyDeleteListAdapter extends BaseAdapter {
-    private LayoutInflater inflater;
-    private ArrayList<Integer> frequencies;
-    private ArrayList<Boolean> selected;
-    private CheckBox all_frequencies_checkBox;
-    private Button delete_selected_frequencies_button;
+    private final LayoutInflater inflater;
+    private final ArrayList<Integer> frequencies;
+    private final ArrayList<Boolean> selected;
+    private final CheckBox all_frequencies_checkBox;
+    private final Button delete_selected_frequencies_button;
 
     public FrequencyDeleteListAdapter(Context context, ArrayList<Integer> frequencies, CheckBox all_frequencies_checkBox, Button delete_selected_frequencies_button) {
         this.frequencies = frequencies;

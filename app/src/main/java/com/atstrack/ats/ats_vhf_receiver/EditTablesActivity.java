@@ -41,6 +41,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -349,7 +350,7 @@ public class EditTablesActivity extends AppCompatActivity {
         originalTotalFrequencies = getIntent().getExtras().getInt("total");
         setSupportActionBar(toolbar);
         title_toolbar.setText("Table " + number + " (" + originalTotalFrequencies + " Frequencies)");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

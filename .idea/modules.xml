@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ATS_VHF_Receiver.iml" filepath="$PROJECT_DIR$/ATS_VHF_Receiver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.unitTest.iml" />
+    </modules>
+  </component>
+</project>

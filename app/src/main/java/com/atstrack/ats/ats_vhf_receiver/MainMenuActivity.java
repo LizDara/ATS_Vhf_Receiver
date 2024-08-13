@@ -118,7 +118,7 @@ public class MainMenuActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                Log.i(TAG, action);
+                Log.i(TAG, "Action: " + action);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                     invalidateOptionsMenu();
@@ -130,6 +130,7 @@ public class MainMenuActivity extends AppCompatActivity {
                         onClickScanning();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     Log.i(TAG, Converters.getHexValue(packet));
                     if (Converters.getHexValue(packet[0]).equals("50")) // Checks if the BLE device is scanning
                         downloadScanning(packet);
@@ -194,6 +195,7 @@ public class MainMenuActivity extends AppCompatActivity {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
+        Log.i(TAG, "On click Scanning notification");
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
@@ -244,7 +246,6 @@ public class MainMenuActivity extends AppCompatActivity {
 
         boolean isMenu = getIntent().getBooleanExtra("menu", false);
         if (!isMenu) { // Connecting to the selected BLE device
-            Log.i(TAG, "ASK SCANNING AND BOARD STATUS");
             parameter = "scanning"; // Checks if the BLE device is scanning
             receiverInformation.changeInformation((byte) 0, (byte) 0,
                     getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
@@ -265,10 +266,11 @@ public class MainMenuActivity extends AppCompatActivity {
             menu_linearLayout.setVisibility(View.GONE);
             connectingToDevice();
         } else { // Only displays the main menu
-            Log.i(TAG, "SHOW ONLY MENU");
             vhf_constraintLayout.setVisibility(View.GONE);
             menu_linearLayout.setVisibility(View.VISIBLE);
             connecting_device_linearLayout.setVisibility(View.GONE);
+            sd_card_menu_textView.setText(receiverInformation.getSDCard());
+            sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getSDCard().equals("Inserted") ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
         }
         status_textView.setText("Receiver " + receiverInformation.getDeviceName());
         percent_battery_menu_textView.setText(receiverInformation.getPercentBattery() + "%");

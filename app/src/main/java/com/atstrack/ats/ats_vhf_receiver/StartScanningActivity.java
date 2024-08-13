@@ -31,6 +31,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class StartScanningActivity extends AppCompatActivity {
@@ -88,6 +89,7 @@ public class StartScanningActivity extends AppCompatActivity {
                         onClickTables();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     if (parameter.equals("tables")) // Gets the number of frequencies from each table
                         downloadData(packet);
                 }
@@ -161,7 +163,7 @@ public class StartScanningActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.lb_start_scanning);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

@@ -49,6 +49,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.UUID;
 
 import androidx.annotation.Nullable;
@@ -118,8 +119,6 @@ public class GetDataActivity extends AppCompatActivity {
     private ArrayList<byte[]> packets;
     private ArrayList<Snapshots> snapshotArray;
     private Snapshots rawDataCollector;
-    private Snapshots processDataCollector;
-    private Handler processHandler;
     private Handler receiveHandler;
     private DriveServiceHelper driveServiceHelper;
     private int finalPageNumber;
@@ -169,12 +168,13 @@ public class GetDataActivity extends AppCompatActivity {
                             onClickDownloadData();
                             break;
                         case "response": // Response about erase data
-                            onClickResponse();
+                            onClickResponseErase();
                             break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    Log.i(TAG, Converters.getHexValue(packet));
+                    if (packet == null) return;
+                    //Log.i(TAG, Converters.getHexValue(packet));
                     switch (parameter) {
                         case "downloadData":
                             // Gets raw data in pages, each page contains 2048 bytes.
@@ -211,6 +211,8 @@ public class GetDataActivity extends AppCompatActivity {
                         onClickEraseData();
                     else if ("readData".equals(secondParameter))
                         onClickReadData();
+                    else if ("ready".equals(secondParameter))
+                        onClickResponseDownload();
                 }
             }
             catch (Exception e) {
@@ -250,7 +252,6 @@ public class GetDataActivity extends AppCompatActivity {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
-        secondParameter = "";
     }
 
     /**
@@ -274,7 +275,19 @@ public class GetDataActivity extends AppCompatActivity {
         snapshotArray = new ArrayList<>(); // The list that stores the raw and processed data
     }
 
-    private void onClickResponse() {
+    private void onClickResponseDownload() {
+        byte[] b = new byte[]{(byte) 0x94};
+
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA;
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+
+        if (result) {
+            secondParameter = "";
+        }
+    }
+
+    private void onClickResponseErase() {
         secondParameter = "eraseData";
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
@@ -356,7 +369,7 @@ public class GetDataActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -365,7 +378,6 @@ public class GetDataActivity extends AppCompatActivity {
 
         parameter = "test";
         downloading = false;
-        processHandler = new Handler();
         receiveHandler = new Handler();
         setVisibility("menu");
 
@@ -741,6 +753,7 @@ public class GetDataActivity extends AppCompatActivity {
     private void readData(byte[] packet) {
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
+        Log.i(TAG, "Total Pages: " + finalPageNumber);
         rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
         if (finalPageNumber == 0) { // No data to download
             setVisibility("menu");
@@ -761,8 +774,10 @@ public class GetDataActivity extends AppCompatActivity {
                     error = true;
                     printSnapshotFiles();
                 }
-            }, 5000 * finalPageNumber);
+            }, 5000L * finalPageNumber);
         }
+        secondParameter = "ready";
+        mBluetoothLeService.discoveringSecond();
     }
 
     private boolean isErrorPacket(byte[] packet) {
@@ -782,8 +797,6 @@ public class GetDataActivity extends AppCompatActivity {
             checkPackets();
         else if (downloading)
             packets.add(packet);
-        //Log.i(TAG, Converters.getDecimalValue(packet) + " Number: " + packets.size());
-        //mBluetoothLeService.readRssi();
     }
 
     private void checkPackets() {
@@ -799,9 +812,8 @@ public class GetDataActivity extends AppCompatActivity {
                 return;
             } else if ((packetNumber + 1) == findPacketNumber(new byte[] {packet[228], packet[229]})) { // Copy the downloaded package
                 packetNumber++;
-                extraNumbers = 2;
-                //Log.i(TAG, "Packed number: " + packetNumber + " Page number: " + pageNumber);
-                //Log.i(TAG, Converters.getHexValue(packet));
+                Log.i(TAG, "Packed number: " + packetNumber + " Page number: " + pageNumber);
+                Log.i(TAG, Converters.getHexValue(packet));
                 if (packetNumber % 9 == 0) { //Get current page number when is first package
                     if ((pageNumber + 1) == findPageNumber(new byte[] {packet[224], packet[225], packet[226], packet[227]}) && (pageNumber + 1) < finalPageNumber) {
                         extraNumbers = 6;
@@ -831,7 +843,7 @@ public class GetDataActivity extends AppCompatActivity {
             String processData = readPacket(rawDataCollector.getSnapshot());
             if (!error) { // Adds the data to the list if you didn't find any errors during processing
                 byte[] data = Converters.convertToUTF8(processData);
-                processDataCollector = new Snapshots(data.length);
+                Snapshots processDataCollector = new Snapshots(data.length);
                 processDataCollector.processSnapshot(data);
                 snapshotArray.add(processDataCollector);
             }
@@ -882,7 +894,7 @@ public class GetDataActivity extends AppCompatActivity {
                 preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
                 preparing_progressBar.setVisibility(View.GONE);
                 if (mConnected) {
-                    msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded.";
+                    msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * pageNumber) + " byte(s) downloaded.";
                     if (error) {
                         msg += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + packets.size() + ". Expected: " + (finalPageNumber * 9);
                         if (packets.size() != totalPackagesNumber)
@@ -897,7 +909,7 @@ public class GetDataActivity extends AppCompatActivity {
             preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
             preparing_progressBar.setVisibility(View.GONE);
             if (mConnected) {
-                msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * finalPageNumber) + " byte(s) downloaded.";
+                msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * pageNumber) + " byte(s) downloaded.";
                 if (error) {
                     msg += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + packets.size() + ". Expected: " + (finalPageNumber * 9);
                     if (packets.size() != totalPackagesNumber)
@@ -936,7 +948,7 @@ public class GetDataActivity extends AppCompatActivity {
             });
         AlertDialog dialog = builder.create();
         dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.catskill_white)));
     }
 
     /**

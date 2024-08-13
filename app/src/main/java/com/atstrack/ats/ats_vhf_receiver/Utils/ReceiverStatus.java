@@ -10,10 +10,10 @@ import androidx.core.content.ContextCompat;
 
 public class ReceiverStatus {
     public static void setReceiverStatus(Activity context) {
-        ImageView percent_battery_imageView = (ImageView) context.findViewById(R.id.percent_battery_imageView);
-        TextView percent_battery_textView = (TextView) context.findViewById(R.id.percent_battery_textView);
-        ImageView sd_card_imageView = (ImageView) context.findViewById(R.id.sd_card_imageView);
-        TextView sd_card_textView = (TextView) context.findViewById(R.id.sd_card_textView);
+        ImageView percent_battery_imageView = context.findViewById(R.id.percent_battery_imageView);
+        TextView percent_battery_textView = context.findViewById(R.id.percent_battery_textView);
+        ImageView sd_card_imageView = context.findViewById(R.id.sd_card_imageView);
+        TextView sd_card_textView = context.findViewById(R.id.sd_card_textView);
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
 
         percent_battery_imageView.setBackground(ContextCompat.getDrawable(context, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));

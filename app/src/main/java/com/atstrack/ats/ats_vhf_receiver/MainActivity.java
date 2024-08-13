@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -102,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(enableLocIntent, REQUEST_ENABLE_LOC);
     }
 
-    @OnClick (R.id.bluetooth_button)
+    @SuppressLint("MissingPermission")
+    @OnClick(R.id.bluetooth_button)
     public void enableBluetooth(View v) {
         bluetooth_enable_linearLayout.setVisibility(View.GONE);
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -199,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
             location_enable_linearLayout.setVisibility(View.VISIBLE);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
         super.onResume();
@@ -239,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
      * Method for scanning and displaying available BLE devices.
      * @param enable If true, enable to scan available devices.
      */
+    @SuppressLint("MissingPermission")
     private void scanLeDevice(final boolean enable) {
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         if (enable) {

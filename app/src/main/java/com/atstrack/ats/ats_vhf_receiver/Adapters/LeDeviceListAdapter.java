@@ -1,5 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.Adapters;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -26,10 +27,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapter.MyViewHolder> {
 
-    private ArrayList<BluetoothDevice> mLeDevices;
-    private ArrayList<byte[]> mScanRecords;
+    private final ArrayList<BluetoothDevice> mLeDevices;
+    private final ArrayList<byte[]> mScanRecords;
     private final Context context;
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
     public LeDeviceListAdapter(Context context) {
         mLeDevices = new ArrayList<>();
@@ -45,7 +46,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
      */
     public void addDevice(BluetoothDevice device, byte[] scanRecord) {
         if(!mLeDevices.contains(device)) {
-            final String deviceName = device.getName();
+            @SuppressLint("MissingPermission") final String deviceName = device.getName();
             if(deviceName != null) {
                 if (deviceName.contains("ATSvr")) { // filter only ATS Vhf Rec device
                     mLeDevices.add(device);
@@ -114,15 +115,15 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) { // Set all remote device information
-        BluetoothDevice device = mLeDevices.get(position);
+        @SuppressLint("MissingPermission") String device = mLeDevices.get(position).getName();
         int percent = getPercentBattery(mScanRecords.get(position));
-        final String deviceName = device.getName().substring(0, 7);
+        final String deviceName = device.substring(0, 7);
         if (!deviceName.equals("#000000")) {
-            final int baseFrequency = Integer.parseInt(device.getName().substring(12, 15)) * 1000;
-            final int frequencyRange = ((Integer.parseInt(device.getName().substring(17)) + (baseFrequency / 1000)) * 1000) - 1;
+            final int baseFrequency = Integer.parseInt(device.substring(12, 15)) * 1000;
+            final int frequencyRange = ((Integer.parseInt(device.substring(17)) + (baseFrequency / 1000)) * 1000) - 1;
             final String range = Converters.getFrequency(baseFrequency) + "-" + Converters.getFrequency(frequencyRange);
 
-            String type = device.getName().substring(15, 16);
+            String type = device.substring(15, 16);
             final String status = getStatus(mScanRecords.get(position));
             switch (type) {
                 case "C":
@@ -141,7 +142,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             holder.deviceBattery.setBackground(ContextCompat.getDrawable(context, percent > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
         } else {
             holder.deviceName.setText(deviceName);
-            holder.deviceRange.setText("None");
+            holder.deviceRange.setText(R.string.lb_none);
             holder.percentBattery.setText("0%");
             holder.deviceBattery.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_low_battery));
         }
@@ -164,6 +165,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
         ImageView deviceBattery;
         BluetoothDevice device;
 
+        @SuppressLint("MissingPermission")
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             receiver_status = itemView.findViewById(R.id.receiver_status);

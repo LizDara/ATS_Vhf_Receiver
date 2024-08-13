@@ -1,6 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 // Converters - converts value between different numeral system
 public class Converters {
@@ -8,7 +9,7 @@ public class Converters {
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     // Gets value in hexadecimal system
-    public static String getHexValue(byte value[]) {
+    public static String getHexValue(byte[] value) {
         if (value == null)
             return "";
 
@@ -34,7 +35,7 @@ public class Converters {
     }
 
     // Gets value in decimal system
-    public static String getDecimalValue(byte value[]) {
+    public static String getDecimalValue(byte[] value) {
         if (value == null)
             return "";
 
@@ -54,12 +55,7 @@ public class Converters {
 
     public static byte[] convertToUTF8(String input) {
         byte[] returnVal;
-        try {
-            returnVal = input.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            returnVal = input.getBytes();
-            e.printStackTrace();
-        }
+        returnVal = input.getBytes(StandardCharsets.UTF_8);
         return returnVal;
     }
 

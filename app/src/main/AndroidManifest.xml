@@ -16,101 +16,76 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".EnterFrequencyActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".ReceiverUpdateActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".StationaryScanningActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".AerialScanningActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".TemporaryStationaryActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".TemporaryAerialActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".SelectValueActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".InputValueActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".StationaryDefaultsActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".AerialDefaultsActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".TestReceiverActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".CloneReceiverActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".SetTransmitterTypeActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".EditReceiverDefaultsActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".ReceiverConfigurationActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".StationaryScanActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".AerialScanActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".ManualScanActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".StartScanningActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".MainMenuActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".EditTablesActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".TableOverviewActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".GetDataActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN"
@@ -148,15 +123,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 </manifest>

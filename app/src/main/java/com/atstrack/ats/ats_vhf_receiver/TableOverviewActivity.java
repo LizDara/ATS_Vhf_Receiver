@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TableOverviewActivity extends AppCompatActivity {
@@ -63,7 +64,6 @@ public class TableOverviewActivity extends AppCompatActivity {
     private BluetoothLeService mBluetoothLeService;
 
     private TableListAdapter tableListAdapter;
-    private int[][] tables;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -100,6 +100,7 @@ public class TableOverviewActivity extends AppCompatActivity {
                         onClickTables();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     if (parameter.equals("tables")) // Gets the number of frequencies from each table
                         downloadData(packet);
                 }
@@ -142,7 +143,7 @@ public class TableOverviewActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.edit_frequency_tables);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -250,7 +251,7 @@ public class TableOverviewActivity extends AppCompatActivity {
 
                 String line;
                 int tableNumber = 0;
-                tables = new int[12][];
+                int[][] tables = new int[12][];
                 List<Integer> frequenciesList = new LinkedList<>();
                 while ((line = bufferedReader.readLine()) != null) { // Reads each line of the file and add it to the list
                     line = line.replace(" ", "");

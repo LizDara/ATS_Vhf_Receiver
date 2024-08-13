@@ -100,6 +100,7 @@ public class TemporaryAerialActivity extends AppCompatActivity {
                         onClickAerialDefaults();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     if (parameter.equals("aerial")) // Gets aerial defaults data
                         downloadData(packet);
                 }

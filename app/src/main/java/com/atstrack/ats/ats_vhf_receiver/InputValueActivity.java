@@ -132,6 +132,7 @@ public class InputValueActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     switch (type) {
                         case ValueCodes.FREQUENCY_TABLE_NUMBER: // Gets the frequency table number
                         case ValueCodes.TABLES_NUMBER:

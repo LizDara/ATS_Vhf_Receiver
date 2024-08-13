@@ -16,10 +16,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 public class TableListAdapter extends BaseAdapter {
     private final Context context;
-    private LayoutInflater inflater;
-    private byte[] tables;
-    private int baseFrequency;
-    private int range;
+    private final LayoutInflater inflater;
+    private final byte[] tables;
+    private final int baseFrequency;
+    private final int range;
     private int[][] frequencies;
 
     public TableListAdapter(Context context, byte[] tables) {

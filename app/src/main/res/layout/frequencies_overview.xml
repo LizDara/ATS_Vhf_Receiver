@@ -32,9 +32,9 @@
 
         <Button
             android:id="@+id/delete_frequencies_button"
-            style="@style/button_tertiary"
+            style="@style/button_tertiary_small"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_small_height"
+            android:layout_height="wrap_content"
             android:paddingStart="8sp"
             android:paddingEnd="8sp"
             android:text="@string/lb_delete_frequencies" />

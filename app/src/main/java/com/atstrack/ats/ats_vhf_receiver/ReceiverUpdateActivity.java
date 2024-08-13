@@ -32,6 +32,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Objects;
+
 public class ReceiverUpdateActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
@@ -117,7 +119,7 @@ public class ReceiverUpdateActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.receiver_update);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

@@ -14,11 +14,11 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import java.util.ArrayList;
 
 public class TableMergeListAdapter extends BaseAdapter {
-    private LayoutInflater inflater;
-    private ArrayList<Integer> tables;
-    private ArrayList<Integer> frequencies;
-    private ArrayList<Boolean> selected;
-    private Button merge_tables_button;
+    private final LayoutInflater inflater;
+    private final ArrayList<Integer> tables;
+    private final ArrayList<Integer> frequencies;
+    private final ArrayList<Boolean> selected;
+    private final Button merge_tables_button;
 
     public TableMergeListAdapter(Context context, ArrayList<Integer> tables, ArrayList<Integer> frequencies, Button merge_tables_button) {
         this.tables = tables;

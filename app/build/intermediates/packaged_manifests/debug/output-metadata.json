@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "PACKAGED_MANIFESTS",
+    "kind": "Directory"
+  },
+  "applicationId": "com.atstrack.ats.ats_vhf_receiver",
+  "variantName": "debug",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 10001,
+      "versionName": "1.0.1.debug",
+      "outputFile": "AndroidManifest.xml"
+    }
+  ]
+}

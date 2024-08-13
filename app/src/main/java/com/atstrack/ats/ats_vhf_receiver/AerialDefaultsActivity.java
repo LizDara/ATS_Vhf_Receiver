@@ -36,6 +36,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AerialDefaultsActivity extends AppCompatActivity {
@@ -99,6 +100,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
                         onClickAerialDefaults();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    if (packet == null) return;
                     if (parameter.equals("aerial")) // Gets aerial defaults data
                         downloadData(packet);
                 }
@@ -184,7 +186,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.aerial_defaults);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -192,7 +194,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         ReceiverStatus.setReceiverStatus(this);
 
         parameter = "aerial";
-        originalData = new HashMap();
+        originalData = new HashMap<>();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);

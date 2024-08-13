@@ -29,6 +29,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Objects;
+
 public class EditReceiverDefaultsActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
@@ -88,13 +90,13 @@ public class EditReceiverDefaultsActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.aerial_defaults_button)
-    public void onClickAerialDefaults(View v){
+    public void onClickAerialDefaults(View v) {
         Intent intent = new Intent(this, AerialDefaultsActivity.class);
         startActivity(intent);
     }
 
     @OnClick(R.id.stationary_defaults_button)
-    public void onClickStationaryDefaults(View v){
+    public void onClickStationaryDefaults(View v) {
         Intent intent = new Intent(this, StationaryDefaultsActivity.class);
         startActivity(intent);
     }
@@ -107,7 +109,7 @@ public class EditReceiverDefaultsActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.edit_receiver_defaults);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

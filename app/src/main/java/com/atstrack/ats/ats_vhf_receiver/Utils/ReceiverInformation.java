@@ -61,10 +61,6 @@ public class ReceiverInformation {
         mDeviceBattery = deviceBattery;
     }
 
-    public String getDeviceStatus() {
-        return mDeviceStatus;
-    }
-
     public String getDeviceAddress() {
         return mDeviceAddress;
     }

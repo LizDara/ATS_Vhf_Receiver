@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config>
+        <device id="pixel_2" />
+        <device id="pixel_2_xl" />
+        <device id="pixel_4_xl" />
+        <device id="pixel_3_xl" />
+        <device id="pixel_xl" />
+        <device id="pixel_3" />
+        <device id="pixel" />
+      </config>
+    </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_aerial_defaults.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_aerial_scan.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_clone_receiver.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_edit_receiver_defaults.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_enter_frequency.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_receiver_configuration.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_receiver_update.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_temporary_aerial.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_temporary_stationary.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_test_receiver.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/aerial_current_settings.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/aerial_settings.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/audio_options.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/begin_download.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/delete_frequencies.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/main_menu.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/numbers.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/receiver_status.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+    </layouts>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4b651b20-dfa1-4718-80bb-d9835253cf15" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialDefaultsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialScanActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialScanningActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/AerialScanningActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/CloneReceiverActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/CloneReceiverActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EditReceiverDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EditReceiverDefaultsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EditTablesActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EditTablesActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EnterFrequencyActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/EnterFrequencyActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/GetDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/GetDataActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/InputValueActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/InputValueActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainMenuActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainMenuActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ManualScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ManualScanActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ReceiverConfigurationActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ReceiverConfigurationActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ReceiverUpdateActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ReceiverUpdateActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/SelectValueActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/SelectValueActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/SetTransmitterTypeActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/SetTransmitterTypeActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StartScanningActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StartScanningActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryDefaultsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryScanActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryScanningActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/StationaryScanningActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TableOverviewActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TableOverviewActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TemporaryAerialActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TemporaryAerialActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TemporaryStationaryActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TemporaryStationaryActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TestReceiverActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/TestReceiverActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/DriveServiceHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/DriveServiceHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverInformation.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverInformation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Snapshots.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Snapshots.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/button_cancel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/button_cancel.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/button_delete.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/button_delete.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/button_secondary_light.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/button_secondary_light.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_receiver_update.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_receiver_update.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_test_receiver.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_test_receiver.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequencies_overview.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/frequencies_overview.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/main_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/main_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/numbers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/numbers.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/dimens.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/dimens.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=N0AA003791K82000314)]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/app">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="ATS_VHF_Receiver" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="ATS_VHF_Receiver" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="ATS_VHF_Receiver" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="ATS_VHF_Receiver" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="android" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="valueResourceFile" />
+        <option value="layoutResourceFile" />
+        <option value="Class" />
+        <option value="resourceFile" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="1fMZGV0zMWtYAV7yuCrcQfMoHUW" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Android App.app.executor": "Run",
+    "Gradle.Upgrade Gradle wrapper.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/tinkler",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
+  }
+}]]></component>
+  <component name="PsdUISettings">
+    <option name="MODULE_TAB" value="Properties" />
+  </component>
+  <component name="RecentsManager">
+    <key name="android.template.1752835862">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="android.template.311988773">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="android.template.337292953">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="android.template.packageName">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="android.template.1687919482">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.atstrack.ats.ats_vhf_receiver.Utils" />
+    </key>
+    <key name="android.template.1446233608">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="android.template.-1982006920">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res\values" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\java\com\atstrack\ats\ats_vhf_receiver" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res\drawable" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res\layout" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.atstrack.ats.ats_vhf_receiver.Utils" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res\layout" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res\drawable" />
+      <recent name="D:\ATS_VHF_Receiver\app\src\main\res" />
+    </key>
+    <key name="android.template.1774173795">
+      <recent name="com.atstrack.ats.ats_vhf_receiver" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Android App.app">
+    <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="ATS_VHF_Receiver.app.main" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="CLEAR_APP_STORAGE" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Hybrid>
+      <Java>
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Java>
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ATS_VHF_Receiver:app [signingReport]" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/app" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="signingReport" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4b651b20-dfa1-4718-80bb-d9835253cf15" name="Default Changelist" comment="" />
+      <created>1596029826617</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596029826617</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+</project>

@@ -203,6 +203,7 @@
     <string name="lb_60_minutes">60 minutes</string>
     <string name="lb_120_minutes">120 minutes</string>
     <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate (Minutes)</string>
+    <string name="lb_no_reference_frequency">No Reference Frequency</string>
 
     <!--SET TRANSMITTER TYPE-->
     <string name="set_transmitter_type">Select Detection Filter</string>

@@ -1,0 +1,10 @@
+#Mon Aug 12 15:12:46 BOT 2024
+base.0=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\classes.dex
+base.2=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+path.0=classes.dex
+path.1=classes.dex
+path.2=classes2.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex
+renamed.2=classes3.dex

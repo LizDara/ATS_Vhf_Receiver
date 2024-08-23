@@ -1111,13 +1111,17 @@ public class AerialScanActivity extends AppCompatActivity {
                 logScanHeader(data);
                 break;
             case "F1":
-                logScanFix(data);
+                logScanCoded(data); //Coded 0x09
                 break;
             case "A1":
                 //GPS
                 break;
-            default: //E1 and E2
-                logScanData(data);
+            default: //E1, E2, EA Non Coded
+                int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
+                if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
+                    logScanNonCodedFixed(data, signalStrength);
+                else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
+                    logScanNonCodedVariable(data, signalStrength);
                 break;
         }
     }
@@ -1152,188 +1156,136 @@ public class AerialScanActivity extends AppCompatActivity {
         frequency_aerial_textView.setText(Converters.getFrequency(frequency));
     }
 
-    /**
-     * With the received packet, processes the data to display. The pulse rate type is code.
-     * @param data The received packet.
-     */
-    private void logScanFix(byte[] data) {
-        int position;
+    private void logScanCoded(byte[] data) {
         int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
         int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
-        int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
-
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
-            refreshFirstCode(signalStrength, mort > 0);
-        else if ((position = positionCode(code)) != 0)
-            refreshPosition(position, signalStrength, mort > 0);
-        else
-            createCodeDetail(code, signalStrength, detections, mort > 0);
+        int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int position = getPositionNumber(code, 0);
+        if (position > 0) {
+            refreshCodedPosition(position, signalStrength, mortality > 0);
+        } else if (position < 0) {
+            createDetail();
+            addNewCodedDetailInPosition(-position, code, signalStrength, 1, mortality > 0);
+        } else {
+            createDetail();
+            addNewCodedDetail(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, 1, mortality > 0);
+        }
     }
 
-    /**
-     * With the received packet, processes the data to display. The pulse rate type is code.
-     * @param data The received packet.
-     */
-    private void logScanFixConsolidated(byte[] data) {
-        int position;
-        int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int detections = Integer.parseInt(Converters.getDecimalValue(data[7]));
-        int mort = Integer.parseInt(Converters.getDecimalValue(data[5]));
-
-        if (scan_details_linearLayout.getChildCount() > 2 && isEqualFirstCode(code))
-            refreshFirstCode(signalStrength, mort > 1);
-        else if ((position = positionCode(code)) != 0)
-            refreshPosition(position, signalStrength, mort > 0);
-        else
-            createCodeDetail(code, signalStrength, detections, mort > 0);
-    }
-
-    /**
-     * With the received packet, processes the data to display. The pulse rate type is non code.
-     * @param data The received packet.
-     */
-    private void logScanData(byte[] data) {
+    private void logScanNonCodedFixed(byte[] data, int signalStrength) {
         int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-        float pulseRate = (float) (60000 / period);
-        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int detections = Integer.parseInt(Converters.getDecimalValue(data[2])) / 10;
+        int pulseRate = 60000 / period;
+        int type = Integer.parseInt(Converters.getHexValue(data[0]).replace("E", ""));
+        int position = getPositionNumber(type, 4);
+        if (position > 0) {
+            refreshNonCodedPosition(position, signalStrength, period, pulseRate);
+        } else if (position < 0) {
+            createDetail();
+            addNewNonCodedDetailInPosition(-position, pulseRate, signalStrength, 1, period, type);
+        } else {
+            createDetail();
+            addNewNonCodedFixedDetail(scan_details_linearLayout.getChildCount() - 2, pulseRate, signalStrength, 1, period, type);
+        }
+    }
 
-        refreshNonCoded(period, pulseRate, signalStrength, detections);
+    private void logScanNonCodedVariable(byte[] data, int signalStrength) {
+        int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        int pulseRate = 60000 / period;
+        refreshNonCodedVariable(period, pulseRate, signalStrength);
     }
 
     /**
-     * Creates a row of code data and display it.
-     * @param code Number of code.
-     * @param signalStrength Number of signal strength.
-     * @param detections Number of detections.
-     * @param isMort True, if the code is mort.
+     * Looks for the position in the table of code received.
+     * @param number Number of code or period to look.
+     * @return Returns the position of code in the table.
      */
-    private void createCodeDetail(int code, int signalStrength, int detections, boolean isMort) {
-        LinearLayout newCode = new LinearLayout(this);
-        newCode.setOrientation(LinearLayout.HORIZONTAL);
-        newCode.setPadding(0, 8, 0, 8);
+    private int getPositionNumber(int number, int position) {
+        for (int i = 2; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
+            LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
+            TextView numberTextView = (TextView) linearLayout.getChildAt(position);
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.weight = 1;
-
-        TextView codeTextView = new TextView(this);
-        codeTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        codeTextView.setTextAppearance(body_regular);
-        codeTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        codeTextView.setLayoutParams(params);
-
-        TextView detectionsTextView = new TextView(this);
-        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(body_regular);
-        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        detectionsTextView.setLayoutParams(params);
-
-        TextView mortalityTextView = new TextView(this);
-        mortalityTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        mortalityTextView.setTextAppearance(body_regular);
-        mortalityTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        mortalityTextView.setLayoutParams(params);
-
-        TextView signalStrengthTextView = new TextView(this);
-        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(body_regular);
-        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        signalStrengthTextView.setLayoutParams(params);
-
-        TextView mortTextView = new TextView(this);
-        mortTextView.setVisibility(View.GONE);
-
-        newCode.addView(codeTextView);
-        newCode.addView(detectionsTextView);
-        newCode.addView(mortalityTextView);
-        newCode.addView(signalStrengthTextView);
-        newCode.addView(mortTextView);
-
-        LinearLayout line = new LinearLayout(this);
-        line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
-        line.setLayoutParams(line_view.getLayoutParams());
-
-        scan_details_linearLayout.addView(newCode);
-        scan_details_linearLayout.addView(line);
-
-        refreshCode(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections + 1, isMort, 0); //detections start in 1
+            if (Integer.parseInt(numberTextView.getText().toString()) == number)
+                return i;
+            else if (number < Integer.parseInt(numberTextView.getText().toString()))
+                return -i;
+        }
+        return 0;
     }
 
-    /**
-     * Checks that the first code in the table is equal to code received.
-     * @param code Number of code received.
-     * @return Returns true, if the first code is equal to code received.
-     */
-    private boolean isEqualFirstCode(int code) {
-        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
-        TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-
-        return Integer.parseInt(codeTextView.getText().toString()) == code;
-    }
-
-    /**
-     * Updates data in the first row in the table.
-     * @param signalStrength Number of signal strength to update.
-     */
-    private void refreshFirstCode(int signalStrength, boolean isMort) {
-        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+    private void refreshCodedPosition(int position, int signalStrength, boolean isMort) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
         TextView mortalityTextView = (TextView) linearLayout.getChildAt(2);
         TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
         TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
+        int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        int mort = isMort ? Integer.parseInt(mortTextView.getText().toString()) + 1 : Integer.parseInt(mortTextView.getText().toString());
+        detectionsTextView.setText(String.valueOf(detections));
         mortalityTextView.setText(isMort ? "M" : "-");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
-        detectionsTextView.setText(String.valueOf(Integer.parseInt(detectionsTextView.getText().toString()) + 1));
-        if (isMort) mortTextView.setText(String.valueOf(Integer.parseInt(mortTextView.getText().toString()) + 1));
+        mortTextView.setText(String.valueOf(mort));
     }
 
-    /**
-     * Looks for the position in the table of code received.
-     * @param code Number of code to look.
-     * @return Returns the position of code in the table.
-     */
-    private int positionCode(int code) {
-        int position = 0;
-        for (int i = 4; i < scan_details_linearLayout.getChildCount() - 1; i += 2) {
-            LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
-            TextView codeTextView = (TextView) linearLayout.getChildAt(0);
-            if (Integer.parseInt(codeTextView.getText().toString()) == code)
-                position = i;
-        }
-        return position;
+    private void refreshNonCodedPosition(int position, int signalStrength, int period, int pulseRate) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
+        TextView periodTextView = (TextView) linearLayout.getChildAt(0);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView pulseRateTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+
+        int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        periodTextView.setText(String.valueOf(period));
+        detectionsTextView.setText(String.valueOf(detections));
+        pulseRateTextView.setText(String.valueOf(pulseRate));
+        signalStrengthTextView.setText(String.valueOf(signalStrength));
     }
 
-    /**
-     * Updates data at a specific position in the table.
-     * @param position Number of position in the table to update.
-     * @param signalStrength Number of signal strength.
-     */
-    private void refreshPosition(int position, int signalStrength, boolean isMort) {
+    private void addNewCodedDetail(int position, int code, int signalStrength, int detections, boolean isMort) {
         LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
         TextView codeTextView = (TextView) linearLayout.getChildAt(0);
         TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView mortalityTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
         TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        int code = Integer.parseInt(codeTextView.getText().toString());
-        int detections = Integer.parseInt(detectionsTextView.getText().toString());
-        int mort = Integer.parseInt(mortTextView.getText().toString());
-
-        refreshCode(position, code, signalStrength, detections + 1, isMort, mort);
+        codeTextView.setText(String.valueOf(code));
+        detectionsTextView.setText(String.valueOf(detections));
+        mortalityTextView.setText(isMort ? "M" : "-");
+        signalStrengthTextView.setText(String.valueOf(signalStrength));
+        mortTextView.setText(isMort ? "1" : "0");
     }
 
-    /**
-     * Updates data from a specific position to the first position in the table.
-     * @param finalPosition Number of rows to update in the table.
-     * @param code Number of code received.
-     * @param signalStrength Number of signal strength received.
-     * @param detections Number of signal strength calculated.
-     * @param isMort True, if the code is mort.
-     */
-    private void refreshCode(int finalPosition, int code, int signalStrength, int detections, boolean isMort, int mort) {
-        for (int i = finalPosition; i > 3 ; i -= 2) {
+    private void addNewNonCodedFixedDetail(int position, int pulseRate, int signalStrength, int detections, int period, int type) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(position);
+        TextView periodTextView = (TextView) linearLayout.getChildAt(0);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView pulseRateTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+        TextView typeTextView = (TextView) linearLayout.getChildAt(4);
+
+        periodTextView.setText(String.valueOf(period));
+        detectionsTextView.setText(String.valueOf(detections));
+        pulseRateTextView.setText(String.valueOf(pulseRate));
+        signalStrengthTextView.setText(String.valueOf(signalStrength));
+        typeTextView.setText(String.valueOf(type));
+    }
+
+    private void addNewNonCodedVariableDetail(int pulseRate, int signalStrength, int period) {
+        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
+        TextView periodTextView = (TextView) linearLayout.getChildAt(0);
+        TextView detectionsTextView = (TextView) linearLayout.getChildAt(1);
+        TextView pulseRateTextView = (TextView) linearLayout.getChildAt(2);
+        TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+
+        periodTextView.setText(String.valueOf(period));
+        detectionsTextView.setText("-");
+        pulseRateTextView.setText(String.valueOf(pulseRate));
+        signalStrengthTextView.setText(String.valueOf(signalStrength));
+    }
+
+    private void addNewCodedDetailInPosition(int position, int code, int signalStrength, int detections, boolean isMort) {
+        for (int i = scan_details_linearLayout.getChildCount() - 2; i > position ; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
 
@@ -1357,72 +1309,39 @@ public class AerialScanActivity extends AppCompatActivity {
             TextView penultimateMortTextView = (TextView) penultimateLinearLayout.getChildAt(4);
             lastMortTextView.setText(penultimateMortTextView.getText());
         }
-
-        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
-        TextView newCodeTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newMortalityTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
-        TextView newMortTextView = (TextView) linearLayout.getChildAt(4);
-
-        newCodeTextView.setText(String.valueOf(code));
-        newDetectionsTextView.setText(String.valueOf(detections));
-        newMortalityTextView.setText(isMort ? "M" : "-");
-        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
-        newMortTextView.setText(isMort ? String.valueOf(mort + 1) : String.valueOf(mort));
+        addNewCodedDetail(position, code, signalStrength, detections, isMort);
     }
 
-    /**
-     * Creates a row of non code data and display it.
-     * @param period Number of period received.
-     * @param pulseRate Number of pulse rate received.
-     * @param signalStrength Number of signal strength received.
-     * @param detections Number of detections received.
-     */
-    private void refreshNonCoded(int period, float pulseRate, int signalStrength, int detections) {
-        LinearLayout newNonCoded = new LinearLayout(this);
-        newNonCoded.setOrientation(LinearLayout.HORIZONTAL);
-        newNonCoded.setPadding(0, 8, 0, 8);
+    private void addNewNonCodedDetailInPosition(int position, int pulseRate, int signalStrength, int detections, int period, int type) {
+        for (int i = scan_details_linearLayout.getChildCount() - 2; i > position ; i -= 2) {
+            LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
+            LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.weight = 1;
+            TextView lastPeriodTextView = (TextView) lastLinearLayout.getChildAt(0);
+            TextView penultimatePeriodTextView = (TextView) penultimateLinearLayout.getChildAt(0);
+            lastPeriodTextView.setText(penultimatePeriodTextView.getText());
 
-        TextView periodTextView = new TextView(this);
-        periodTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        periodTextView.setTextAppearance(body_regular);
-        periodTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        periodTextView.setLayoutParams(params);
+            TextView lastDetectionsTextView = (TextView) lastLinearLayout.getChildAt(1);
+            TextView penultimateDetectionsTextView = (TextView) penultimateLinearLayout.getChildAt(1);
+            lastDetectionsTextView.setText(penultimateDetectionsTextView.getText());
 
-        TextView detectionsTextView = new TextView(this);
-        detectionsTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        detectionsTextView.setTextAppearance(body_regular);
-        detectionsTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        detectionsTextView.setLayoutParams(params);
+            TextView lastPulseRateTextView = (TextView) lastLinearLayout.getChildAt(2);
+            TextView penultimatePulseRateTextView = (TextView) penultimateLinearLayout.getChildAt(2);
+            lastPulseRateTextView.setText(penultimatePulseRateTextView.getText());
 
-        TextView pulseRateTextView = new TextView(this);
-        pulseRateTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        pulseRateTextView.setTextAppearance(body_regular);
-        pulseRateTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        pulseRateTextView.setLayoutParams(params);
+            TextView lastSignalStrengthTextView = (TextView) lastLinearLayout.getChildAt(3);
+            TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
+            lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
 
-        TextView signalStrengthTextView = new TextView(this);
-        signalStrengthTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        signalStrengthTextView.setTextAppearance(body_regular);
-        signalStrengthTextView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        signalStrengthTextView.setLayoutParams(params);
+            TextView lastTypeTextView = (TextView) lastLinearLayout.getChildAt(4);
+            TextView penultimateTypeTextView = (TextView) penultimateLinearLayout.getChildAt(4);
+            lastTypeTextView.setText(penultimateTypeTextView.getText());
+        }
+        addNewNonCodedFixedDetail(position, pulseRate, signalStrength, detections, period, type);
+    }
 
-        newNonCoded.addView(periodTextView);
-        newNonCoded.addView(detectionsTextView);
-        newNonCoded.addView(pulseRateTextView);
-        newNonCoded.addView(signalStrengthTextView);
-
-        LinearLayout line = new LinearLayout(this);
-        line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
-        line.setLayoutParams(line_view.getLayoutParams());
-
-        scan_details_linearLayout.addView(newNonCoded);
-        scan_details_linearLayout.addView(line);
-
+    private void refreshNonCodedVariable(int period, int pulseRate, int signalStrength) {
+        createDetail();
         for (int i = scan_details_linearLayout.getChildCount() - 2; i > 3 ; i -= 2) {
             LinearLayout lastLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i);
             LinearLayout penultimateLinearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(i - 2);
@@ -1443,17 +1362,45 @@ public class AerialScanActivity extends AppCompatActivity {
             TextView penultimateSignalStrengthTextView = (TextView) penultimateLinearLayout.getChildAt(3);
             lastSignalStrengthTextView.setText(penultimateSignalStrengthTextView.getText());
         }
+        addNewNonCodedVariableDetail(pulseRate, signalStrength, period);
+    }
 
-        LinearLayout linearLayout = (LinearLayout) scan_details_linearLayout.getChildAt(2);
-        TextView newPeriodTextView = (TextView) linearLayout.getChildAt(0);
-        TextView newDetectionsTextView = (TextView) linearLayout.getChildAt(1);
-        TextView newPulseRateTextView = (TextView) linearLayout.getChildAt(2);
-        TextView newSignalStrengthTextView = (TextView) linearLayout.getChildAt(3);
+    private void createDetail() {
+        LinearLayout detail = new LinearLayout(this);
+        detail.setOrientation(LinearLayout.HORIZONTAL);
+        detail.setPadding(0, 8, 0, 8);
 
-        newPeriodTextView.setText(String.valueOf(period));
-        newDetectionsTextView.setText(String.valueOf(detections));
-        newPulseRateTextView.setText(String.valueOf(pulseRate));
-        newSignalStrengthTextView.setText(String.valueOf(signalStrength));
+        TableRow.LayoutParams params = new TableRow.LayoutParams();
+        params.weight = 1;
+
+        TextView firstTextView = createTextView(params);
+        TextView detectionsTextView = createTextView(params);
+        TextView secondTextView = createTextView(params);
+        TextView signalStrengthTextView = createTextView(params);
+        TextView extraTextView = new TextView(this);
+        extraTextView.setVisibility(View.GONE);
+
+        detail.addView(firstTextView);
+        detail.addView(detectionsTextView);
+        detail.addView(secondTextView);
+        detail.addView(signalStrengthTextView);
+        detail.addView(extraTextView);
+
+        LinearLayout line = new LinearLayout(this);
+        line.setBackgroundColor(ContextCompat.getColor(this, light_gray));
+        line.setLayoutParams(line_view.getLayoutParams());
+
+        scan_details_linearLayout.addView(detail);
+        scan_details_linearLayout.addView(line);
+    }
+
+    private TextView createTextView(TableRow.LayoutParams params) {
+        TextView textView = new TextView(this);
+        textView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+        textView.setTextAppearance(body_regular);
+        textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        textView.setLayoutParams(params);
+        return textView;
     }
 
     /**

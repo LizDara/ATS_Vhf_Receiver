@@ -115,8 +115,6 @@ public class ManualScanActivity extends AppCompatActivity {
     private int range;
     private byte detectionType;
     private int newFrequency;
-    private int detections;
-    private int mort;
     private final byte[] audioOption = {(byte) 0x5A, 0, 0};
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -658,55 +656,26 @@ public class ManualScanActivity extends AppCompatActivity {
      */
     private void setCurrentLog(byte[] data) {
         Log.i(TAG, Converters.getHexValue(data));
-        if (Converters.getHexValue(data[0]).equals("50")) {
-            scanState(data);
-        } else if (Converters.getHexValue(data[0]).equals("51")) {
-            gpsState(data);
-        } else if (Converters.getHexValue(data[0]).equals("F0")) {
-            clear();
-            int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
-                    (Integer.parseInt(Converters.getDecimalValue(data[2]))));
-            frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
-            frequency_manual_textView.setText(Converters.getFrequency(frequency));
-        } else if (Converters.getHexValue(data[0]).equals("D0") || Converters.getHexValue(data[0]).equals("E0")) {
-            int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
-
-            if (Converters.getHexValue(detectionType).equals("09")) { // Coded
-                int code = Integer.parseInt(Converters.getDecimalValue(data[4]));
-                int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int position = getPositionNumber(code, 0);
-                if (position > 0) {
-                    refreshCodedPosition(position, signalStrength, mortality > 0);
-                } else if (position < 0) {
-                    detections = 1;
-                    createDetail();
-                    addNewCodedDetailInPosition(-position, code, signalStrength, detections, mortality > 0);
-                } else {
-                    detections = 1;
-                    createDetail();
-                    addNewCodedDetail(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, detections, mortality > 0);
-                }
-            } else if (Converters.getHexValue(detectionType).equals("08")) { // Non Coded Fixed
-                int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int pulseRate =  60000 / period;
-                int type = Integer.parseInt(Converters.getHexValue(data[0]).replace("E", ""));
-                int position = getPositionNumber(type, 4);
-                if (position > 0) {
-                    refreshNonCodedPosition(position, signalStrength, period, pulseRate);
-                } else if (position < 0) {
-                    detections = 1;
-                    createDetail();
-                    addNewNonCodedDetailInPosition(-position, pulseRate, signalStrength, detections, period, type);
-                } else {
-                    detections = 1;
-                    createDetail();
-                    addNewNonCodedFixedDetail(scan_details_linearLayout.getChildCount() - 2, pulseRate, signalStrength, detections, period, type);
-                }
-            } else if (Converters.getHexValue(detectionType).equals("07")) { // Non Coded Variable
-                int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
-                int pulseRate =  60000 / period;
-                refreshNonCodedVariable(period, pulseRate, signalStrength);
-            }
+        switch (Converters.getHexValue(data[0])) {
+            case "50":
+                scanState(data);
+                break;
+            case "51":
+                gpsState(data);
+                break;
+            case "F0":
+                logScanHeader(data);
+                break;
+            case "D0": // Coded
+                logScanCoded(data);
+                break;
+            case "E0": // Non Coded
+                int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
+                if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
+                    logScanNonCodedFixed(data, signalStrength);
+                else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
+                    logScanNonCodedVariable(data, signalStrength);
+                break;
         }
     }
 
@@ -727,6 +696,52 @@ public class ManualScanActivity extends AppCompatActivity {
             setGpsFailed();
         else if (state == 1) // Searching
             setGpsSearching();
+    }
+
+    private void logScanHeader(byte[] data) {
+        clear();
+        int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+                (Integer.parseInt(Converters.getDecimalValue(data[2]))));
+        frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
+        frequency_manual_textView.setText(Converters.getFrequency(frequency));
+    }
+
+    private void logScanCoded(byte[] data) {
+        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        int code = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int position = getPositionNumber(code, 0);
+        if (position > 0) {
+            refreshCodedPosition(position, signalStrength, mortality > 0);
+        } else if (position < 0) {
+            createDetail();
+            addNewCodedDetailInPosition(-position, code, signalStrength, 1, mortality > 0);
+        } else {
+            createDetail();
+            addNewCodedDetail(scan_details_linearLayout.getChildCount() - 2, code, signalStrength, 1, mortality > 0);
+        }
+    }
+
+    private void logScanNonCodedFixed(byte[] data, int signalStrength) {
+        int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int pulseRate = 60000 / period;
+        int type = Integer.parseInt(Converters.getHexValue(data[0]).replace("E", ""));
+        int position = getPositionNumber(type, 4);
+        if (position > 0) {
+            refreshNonCodedPosition(position, signalStrength, period, pulseRate);
+        } else if (position < 0) {
+            createDetail();
+            addNewNonCodedDetailInPosition(-position, pulseRate, signalStrength, 1, period, type);
+        } else {
+            createDetail();
+            addNewNonCodedFixedDetail(scan_details_linearLayout.getChildCount() - 2, pulseRate, signalStrength, 1, period, type);
+        }
+    }
+
+    private void logScanNonCodedVariable(byte[] data, int signalStrength) {
+        int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int pulseRate = 60000 / period;
+        refreshNonCodedVariable(period, pulseRate, signalStrength);
     }
 
     /**
@@ -754,8 +769,8 @@ public class ManualScanActivity extends AppCompatActivity {
         TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
         TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
-        detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
-        mort = isMort ? Integer.parseInt(mortTextView.getText().toString()) + 1 : Integer.parseInt(mortTextView.getText().toString());
+        int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        int mort = isMort ? Integer.parseInt(mortTextView.getText().toString()) + 1 : Integer.parseInt(mortTextView.getText().toString());
         detectionsTextView.setText(String.valueOf(detections));
         mortalityTextView.setText(isMort ? "M" : "-");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
@@ -769,7 +784,7 @@ public class ManualScanActivity extends AppCompatActivity {
         TextView pulseRateTextView = (TextView) linearLayout.getChildAt(2);
         TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
 
-        detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
         periodTextView.setText(String.valueOf(period));
         detectionsTextView.setText(String.valueOf(detections));
         pulseRateTextView.setText(String.valueOf(pulseRate));
@@ -789,7 +804,6 @@ public class ManualScanActivity extends AppCompatActivity {
         mortalityTextView.setText(isMort ? "M" : "-");
         signalStrengthTextView.setText(String.valueOf(signalStrength));
         mortTextView.setText(isMort ? "1" : "0");
-        mort = isMort ? 1 : 0;
     }
 
     private void addNewNonCodedFixedDetail(int position, int pulseRate, int signalStrength, int detections, int period, int type) {

@@ -454,10 +454,12 @@ public class MainMenuActivity extends AppCompatActivity {
                         + Integer.parseInt(Converters.getDecimalValue(data[8]));
                 maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256)
                         + Integer.parseInt(Converters.getDecimalValue(data[6]));
+                int currentAntenna = Integer.parseInt(Converters.getDecimalValue(data[9]));
                 intent = new Intent(this, StationaryScanActivity.class);
                 intent.putExtra(ValueCodes.FREQUENCY, currentFrequency);
                 intent.putExtra(ValueCodes.INDEX, currentIndex);
                 intent.putExtra(ValueCodes.MAX_INDEX, maxIndex);
+                intent.putExtra(ValueCodes.ANTENNA_NUMBER, currentAntenna);
                 break;
             case "86": // The BLE device is in manual scanning
                 intent = new Intent(this, ManualScanActivity.class);

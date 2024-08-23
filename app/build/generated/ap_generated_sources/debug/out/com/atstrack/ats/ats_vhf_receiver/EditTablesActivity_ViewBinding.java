@@ -19,11 +19,11 @@ import java.lang.Override;
 public class EditTablesActivity_ViewBinding implements Unbinder {
   private EditTablesActivity target;
 
-  private View view7f0a0052;
+  private View view7f0a0050;
 
-  private View view7f0a00b0;
+  private View view7f0a00ad;
 
-  private View view7f0a00aa;
+  private View view7f0a00a7;
 
   private View view7f0a0043;
 
@@ -46,7 +46,7 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.edit_options_linearLayout = Utils.findRequiredViewAsType(source, R.id.edit_options_linearLayout, "field 'edit_options_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.all_frequencies_checkBox, "field 'all_frequencies_checkBox' and method 'onClickAllFrequencies'");
     target.all_frequencies_checkBox = Utils.castView(view, R.id.all_frequencies_checkBox, "field 'all_frequencies_checkBox'", CheckBox.class);
-    view7f0a0052 = view;
+    view7f0a0050 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -56,7 +56,7 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.delete_frequencies_linearLayout = Utils.findRequiredViewAsType(source, R.id.delete_frequencies_linearLayout, "field 'delete_frequencies_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.delete_selected_frequencies_button, "field 'delete_selected_frequencies_button' and method 'onClickDeleteSelectedFrequencies'");
     target.delete_selected_frequencies_button = Utils.castView(view, R.id.delete_selected_frequencies_button, "field 'delete_selected_frequencies_button'", Button.class);
-    view7f0a00b0 = view;
+    view7f0a00ad = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -67,7 +67,7 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.frequencies_listView = Utils.findRequiredViewAsType(source, R.id.frequencies_listView, "field 'frequencies_listView'", ListView.class);
     target.frequencies_delete_listView = Utils.findRequiredViewAsType(source, R.id.frequencies_delete_listView, "field 'frequencies_delete_listView'", ListView.class);
     view = Utils.findRequiredView(source, R.id.delete_frequencies_button, "method 'onClickDeleteFrequencies'");
-    view7f0a00aa = view;
+    view7f0a00a7 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -111,12 +111,12 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.frequencies_listView = null;
     target.frequencies_delete_listView = null;
 
-    view7f0a0052.setOnClickListener(null);
-    view7f0a0052 = null;
-    view7f0a00b0.setOnClickListener(null);
-    view7f0a00b0 = null;
-    view7f0a00aa.setOnClickListener(null);
-    view7f0a00aa = null;
+    view7f0a0050.setOnClickListener(null);
+    view7f0a0050 = null;
+    view7f0a00ad.setOnClickListener(null);
+    view7f0a00ad = null;
+    view7f0a00a7.setOnClickListener(null);
+    view7f0a00a7 = null;
     view7f0a0043.setOnClickListener(null);
     view7f0a0043 = null;
     view7f0a0045.setOnClickListener(null);

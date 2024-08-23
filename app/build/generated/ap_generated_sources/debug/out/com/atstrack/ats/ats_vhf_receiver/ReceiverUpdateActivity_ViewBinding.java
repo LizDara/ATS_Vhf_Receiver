@@ -18,7 +18,7 @@ import java.lang.Override;
 public class ReceiverUpdateActivity_ViewBinding implements Unbinder {
   private ReceiverUpdateActivity target;
 
-  private View view7f0a007b;
+  private View view7f0a0078;
 
   @UiThread
   public ReceiverUpdateActivity_ViewBinding(ReceiverUpdateActivity target) {
@@ -38,7 +38,7 @@ public class ReceiverUpdateActivity_ViewBinding implements Unbinder {
     target.update_receiver_linearLayout = Utils.findRequiredViewAsType(source, R.id.update_receiver_linearLayout, "field 'update_receiver_linearLayout'", LinearLayout.class);
     target.update_done_imageView = Utils.findRequiredViewAsType(source, R.id.update_done_imageView, "field 'update_done_imageView'", ImageView.class);
     view = Utils.findRequiredView(source, R.id.cancel_update_button, "method 'onClickCancelUpdate'");
-    view7f0a007b = view;
+    view7f0a0078 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -62,7 +62,7 @@ public class ReceiverUpdateActivity_ViewBinding implements Unbinder {
     target.update_receiver_linearLayout = null;
     target.update_done_imageView = null;
 
-    view7f0a007b.setOnClickListener(null);
-    view7f0a007b = null;
+    view7f0a0078.setOnClickListener(null);
+    view7f0a0078 = null;
   }
 }

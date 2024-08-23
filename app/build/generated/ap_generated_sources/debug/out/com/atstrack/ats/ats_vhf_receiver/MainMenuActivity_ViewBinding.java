@@ -18,15 +18,15 @@ import java.lang.Override;
 public class MainMenuActivity_ViewBinding implements Unbinder {
   private MainMenuActivity target;
 
-  private View view7f0a00c4;
+  private View view7f0a00c1;
 
-  private View view7f0a0232;
+  private View view7f0a0220;
 
-  private View view7f0a01d0;
+  private View view7f0a01c2;
 
-  private View view7f0a0153;
+  private View view7f0a014c;
 
-  private View view7f0a00bb;
+  private View view7f0a00b8;
 
   @UiThread
   public MainMenuActivity_ViewBinding(MainMenuActivity target) {
@@ -44,7 +44,7 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
     target.status_textView = Utils.findRequiredViewAsType(source, R.id.status_device_menu_textView, "field 'status_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.disconnect_button, "field 'disconnect_button' and method 'onClickDisconnect'");
     target.disconnect_button = Utils.castView(view, R.id.disconnect_button, "field 'disconnect_button'", TextView.class);
-    view7f0a00c4 = view;
+    view7f0a00c1 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -58,8 +58,10 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
     target.sd_card_menu_textView = Utils.findRequiredViewAsType(source, R.id.sd_card_menu_textView, "field 'sd_card_menu_textView'", TextView.class);
     target.battery_menu_imageView = Utils.findRequiredViewAsType(source, R.id.battery_menu_imageView, "field 'battery_menu_imageView'", ImageView.class);
     target.sd_card_menu_imageView = Utils.findRequiredViewAsType(source, R.id.sd_card_menu_imageView, "field 'sd_card_menu_imageView'", ImageView.class);
+    target.prueba = Utils.findRequiredViewAsType(source, R.id.prueba, "field 'prueba'", TextView.class);
+    target.prueba_connecting = Utils.findRequiredViewAsType(source, R.id.prueba_connecting, "field 'prueba_connecting'", TextView.class);
     view = Utils.findRequiredView(source, R.id.start_scanning_button, "method 'onClickStartScanning'");
-    view7f0a0232 = view;
+    view7f0a0220 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -67,7 +69,7 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.receiver_configuration_button, "method 'onClickReceiverConfiguration'");
-    view7f0a01d0 = view;
+    view7f0a01c2 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -75,7 +77,7 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.manage_receiver_data_button, "method 'onClickManageReceiverData'");
-    view7f0a0153 = view;
+    view7f0a014c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -83,7 +85,7 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.diagnostics_button, "method 'onClickDiagnostics'");
-    view7f0a00bb = view;
+    view7f0a00b8 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -111,16 +113,18 @@ public class MainMenuActivity_ViewBinding implements Unbinder {
     target.sd_card_menu_textView = null;
     target.battery_menu_imageView = null;
     target.sd_card_menu_imageView = null;
+    target.prueba = null;
+    target.prueba_connecting = null;
 
-    view7f0a00c4.setOnClickListener(null);
-    view7f0a00c4 = null;
-    view7f0a0232.setOnClickListener(null);
-    view7f0a0232 = null;
-    view7f0a01d0.setOnClickListener(null);
-    view7f0a01d0 = null;
-    view7f0a0153.setOnClickListener(null);
-    view7f0a0153 = null;
-    view7f0a00bb.setOnClickListener(null);
-    view7f0a00bb = null;
+    view7f0a00c1.setOnClickListener(null);
+    view7f0a00c1 = null;
+    view7f0a0220.setOnClickListener(null);
+    view7f0a0220 = null;
+    view7f0a01c2.setOnClickListener(null);
+    view7f0a01c2 = null;
+    view7f0a014c.setOnClickListener(null);
+    view7f0a014c = null;
+    view7f0a00b8.setOnClickListener(null);
+    view7f0a00b8 = null;
   }
 }

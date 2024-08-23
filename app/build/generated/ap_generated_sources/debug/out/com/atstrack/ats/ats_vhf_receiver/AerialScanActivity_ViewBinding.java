@@ -3,12 +3,14 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.CallSuper;
 import androidx.annotation.UiThread;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.Unbinder;
 import butterknife.internal.DebouncingOnClickListener;
@@ -19,33 +21,39 @@ import java.lang.Override;
 public class AerialScanActivity_ViewBinding implements Unbinder {
   private AerialScanActivity target;
 
-  private View view7f0a00d8;
+  private View view7f0a004a;
 
-  private View view7f0a022e;
+  private View view7f0a0048;
 
-  private View view7f0a0123;
+  private View view7f0a021c;
 
-  private View view7f0a00a8;
+  private View view7f0a011c;
 
-  private View view7f0a0134;
+  private View view7f0a00a5;
 
-  private View view7f0a00e3;
+  private View view7f0a012d;
 
-  private View view7f0a0168;
+  private View view7f0a00de;
 
-  private View view7f0a01d2;
+  private View view7f0a0161;
+
+  private View view7f0a01c4;
+
+  private View view7f0a0109;
+
+  private View view7f0a01d9;
 
   private View view7f0a0044;
 
-  private View view7f0a00ac;
+  private View view7f0a00a9;
 
-  private View view7f0a0167;
+  private View view7f0a0160;
 
-  private View view7f0a0142;
+  private View view7f0a013b;
 
-  private View view7f0a01e0;
+  private View view7f0a01d2;
 
-  private View view7f0a00d9;
+  private View view7f0a00d5;
 
   @UiThread
   public AerialScanActivity_ViewBinding(AerialScanActivity target) {
@@ -62,22 +70,29 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.state_view = Utils.findRequiredView(source, R.id.state_view, "field 'state_view'");
     target.ready_aerial_scan_LinearLayout = Utils.findRequiredViewAsType(source, R.id.ready_aerial_scan_LinearLayout, "field 'ready_aerial_scan_LinearLayout'", LinearLayout.class);
     target.ready_aerial_textView = Utils.findRequiredViewAsType(source, R.id.ready_aerial_textView, "field 'ready_aerial_textView'", TextView.class);
-    target.scan_rate_aerial_textView = Utils.findRequiredViewAsType(source, R.id.scan_rate_aerial_textView, "field 'scan_rate_aerial_textView'", TextView.class);
-    target.selected_frequency_aerial_textView = Utils.findRequiredViewAsType(source, R.id.selected_frequency_aerial_textView, "field 'selected_frequency_aerial_textView'", TextView.class);
-    target.gps_aerial_textView = Utils.findRequiredViewAsType(source, R.id.gps_aerial_textView, "field 'gps_aerial_textView'", TextView.class);
-    target.auto_record_aerial_textView = Utils.findRequiredViewAsType(source, R.id.auto_record_aerial_textView, "field 'auto_record_aerial_textView'", TextView.class);
-    view = Utils.findRequiredView(source, R.id.edit_aerial_settings_button, "field 'edit_aerial_defaults_textView' and method 'onClickEditAerialSettings'");
-    target.edit_aerial_defaults_textView = Utils.castView(view, R.id.edit_aerial_settings_button, "field 'edit_aerial_defaults_textView'", TextView.class);
-    view7f0a00d8 = view;
-    view.setOnClickListener(new DebouncingOnClickListener() {
+    target.scan_rate_seconds_aerial_textView = Utils.findRequiredViewAsType(source, R.id.scan_rate_seconds_aerial_textView, "field 'scan_rate_seconds_aerial_textView'", TextView.class);
+    target.frequency_table_number_aerial_textView = Utils.findRequiredViewAsType(source, R.id.frequency_table_number_aerial_textView, "field 'frequency_table_number_aerial_textView'", TextView.class);
+    view = Utils.findRequiredView(source, R.id.aerial_gps_switch, "field 'aerial_gps_switch' and method 'onCheckedChangedGps'");
+    target.aerial_gps_switch = Utils.castView(view, R.id.aerial_gps_switch, "field 'aerial_gps_switch'", SwitchCompat.class);
+    view7f0a004a = view;
+    ((CompoundButton) view).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
-      public void doClick(View p0) {
-        target.onClickEditAerialSettings(p0);
+      public void onCheckedChanged(CompoundButton p0, boolean p1) {
+        target.onCheckedChangedGps(p0, p1);
+      }
+    });
+    view = Utils.findRequiredView(source, R.id.aerial_auto_record_switch, "field 'aerial_auto_record_switch' and method 'onCheckedChangedAutoRecord'");
+    target.aerial_auto_record_switch = Utils.castView(view, R.id.aerial_auto_record_switch, "field 'aerial_auto_record_switch'", SwitchCompat.class);
+    view7f0a0048 = view;
+    ((CompoundButton) view).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton p0, boolean p1) {
+        target.onCheckedChangedAutoRecord(p0, p1);
       }
     });
     view = Utils.findRequiredView(source, R.id.start_aerial_button, "field 'start_aerial_button' and method 'onClickStartAerial'");
     target.start_aerial_button = Utils.castView(view, R.id.start_aerial_button, "field 'start_aerial_button'", Button.class);
-    view7f0a022e = view;
+    view7f0a021c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -97,7 +112,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.hold_aerial_imageView = Utils.findRequiredViewAsType(source, R.id.hold_aerial_imageView, "field 'hold_aerial_imageView'", ImageView.class);
     view = Utils.findRequiredView(source, R.id.hold_aerial_button, "field 'hold_aerial_button' and method 'onClickHoldAerial'");
     target.hold_aerial_button = Utils.castView(view, R.id.hold_aerial_button, "field 'hold_aerial_button'", TextView.class);
-    view7f0a0123 = view;
+    view7f0a011c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -106,7 +121,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.decrease_imageView, "field 'decrease_imageView' and method 'onClickDecrease'");
     target.decrease_imageView = Utils.castView(view, R.id.decrease_imageView, "field 'decrease_imageView'", ImageView.class);
-    view7f0a00a8 = view;
+    view7f0a00a5 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -115,7 +130,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.increase_imageView, "field 'increase_imageView' and method 'onClickIncrease'");
     target.increase_imageView = Utils.castView(view, R.id.increase_imageView, "field 'increase_imageView'", ImageView.class);
-    view7f0a0134 = view;
+    view7f0a012d = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -124,7 +139,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.edit_table_textView, "field 'edit_table_textView' and method 'onClickEditTable'");
     target.edit_table_textView = Utils.castView(view, R.id.edit_table_textView, "field 'edit_table_textView'", TextView.class);
-    view7f0a00e3 = view;
+    view7f0a00de = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -135,7 +150,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.merge_tables_linearLayout = Utils.findRequiredViewAsType(source, R.id.merge_tables_linearLayout, "field 'merge_tables_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.merge_tables_button, "field 'merge_tables_button' and method 'onClickMergeTables'");
     target.merge_tables_button = Utils.castView(view, R.id.merge_tables_button, "field 'merge_tables_button'", Button.class);
-    view7f0a0168 = view;
+    view7f0a0161 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -145,7 +160,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.audio_aerial_linearLayout = Utils.findRequiredViewAsType(source, R.id.audio_aerial_linearLayout, "field 'audio_aerial_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.record_data_aerial_button, "field 'record_data_aerial_button' and method 'onClickRecordData'");
     target.record_data_aerial_button = Utils.castView(view, R.id.record_data_aerial_button, "field 'record_data_aerial_button'", Button.class);
-    view7f0a01d2 = view;
+    view7f0a01c4 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -158,6 +173,22 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.tables_merge_listView = Utils.findRequiredViewAsType(source, R.id.tables_merge_listView, "field 'tables_merge_listView'", ListView.class);
     target.gps_aerial_imageView = Utils.findRequiredViewAsType(source, R.id.gps_aerial_imageView, "field 'gps_aerial_imageView'", ImageView.class);
     target.gps_state_aerial_textView = Utils.findRequiredViewAsType(source, R.id.gps_state_aerial_textView, "field 'gps_state_aerial_textView'", TextView.class);
+    view = Utils.findRequiredView(source, R.id.frequency_table_number_aerial_linearLayout, "method 'onClickFrequencyTableNumber'");
+    view7f0a0109 = view;
+    view.setOnClickListener(new DebouncingOnClickListener() {
+      @Override
+      public void doClick(View p0) {
+        target.onClickFrequencyTableNumber(p0);
+      }
+    });
+    view = Utils.findRequiredView(source, R.id.scan_rate_seconds_aerial_linearLayout, "method 'onClickScanRateSeconds'");
+    view7f0a01d9 = view;
+    view.setOnClickListener(new DebouncingOnClickListener() {
+      @Override
+      public void doClick(View p0) {
+        target.onClickScanRateSeconds(p0);
+      }
+    });
     view = Utils.findRequiredView(source, R.id.add_frequency_scan_button, "method 'onClickAddFrequencyScan'");
     view7f0a0044 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
@@ -167,7 +198,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.delete_frequency_scan_button, "method 'onClickDeleteFrequencyScan'");
-    view7f0a00ac = view;
+    view7f0a00a9 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -175,7 +206,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.merge_table_scan_button, "method 'onClickMergeTableScan'");
-    view7f0a0167 = view;
+    view7f0a0160 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -183,7 +214,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.left_imageView, "method 'onClickLeft'");
-    view7f0a0142 = view;
+    view7f0a013b = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -191,7 +222,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.right_imageView, "method 'onClickRight'");
-    view7f0a01e0 = view;
+    view7f0a01d2 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -199,7 +230,7 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.edit_audio_aerial_textView, "method 'onClickEditAudio'");
-    view7f0a00d9 = view;
+    view7f0a00d5 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -220,11 +251,10 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.state_view = null;
     target.ready_aerial_scan_LinearLayout = null;
     target.ready_aerial_textView = null;
-    target.scan_rate_aerial_textView = null;
-    target.selected_frequency_aerial_textView = null;
-    target.gps_aerial_textView = null;
-    target.auto_record_aerial_textView = null;
-    target.edit_aerial_defaults_textView = null;
+    target.scan_rate_seconds_aerial_textView = null;
+    target.frequency_table_number_aerial_textView = null;
+    target.aerial_gps_switch = null;
+    target.aerial_auto_record_switch = null;
     target.start_aerial_button = null;
     target.aerial_result_linearLayout = null;
     target.max_index_aerial_textView = null;
@@ -253,33 +283,39 @@ public class AerialScanActivity_ViewBinding implements Unbinder {
     target.gps_aerial_imageView = null;
     target.gps_state_aerial_textView = null;
 
-    view7f0a00d8.setOnClickListener(null);
-    view7f0a00d8 = null;
-    view7f0a022e.setOnClickListener(null);
-    view7f0a022e = null;
-    view7f0a0123.setOnClickListener(null);
-    view7f0a0123 = null;
-    view7f0a00a8.setOnClickListener(null);
-    view7f0a00a8 = null;
-    view7f0a0134.setOnClickListener(null);
-    view7f0a0134 = null;
-    view7f0a00e3.setOnClickListener(null);
-    view7f0a00e3 = null;
-    view7f0a0168.setOnClickListener(null);
-    view7f0a0168 = null;
-    view7f0a01d2.setOnClickListener(null);
-    view7f0a01d2 = null;
+    ((CompoundButton) view7f0a004a).setOnCheckedChangeListener(null);
+    view7f0a004a = null;
+    ((CompoundButton) view7f0a0048).setOnCheckedChangeListener(null);
+    view7f0a0048 = null;
+    view7f0a021c.setOnClickListener(null);
+    view7f0a021c = null;
+    view7f0a011c.setOnClickListener(null);
+    view7f0a011c = null;
+    view7f0a00a5.setOnClickListener(null);
+    view7f0a00a5 = null;
+    view7f0a012d.setOnClickListener(null);
+    view7f0a012d = null;
+    view7f0a00de.setOnClickListener(null);
+    view7f0a00de = null;
+    view7f0a0161.setOnClickListener(null);
+    view7f0a0161 = null;
+    view7f0a01c4.setOnClickListener(null);
+    view7f0a01c4 = null;
+    view7f0a0109.setOnClickListener(null);
+    view7f0a0109 = null;
+    view7f0a01d9.setOnClickListener(null);
+    view7f0a01d9 = null;
     view7f0a0044.setOnClickListener(null);
     view7f0a0044 = null;
-    view7f0a00ac.setOnClickListener(null);
-    view7f0a00ac = null;
-    view7f0a0167.setOnClickListener(null);
-    view7f0a0167 = null;
-    view7f0a0142.setOnClickListener(null);
-    view7f0a0142 = null;
-    view7f0a01e0.setOnClickListener(null);
-    view7f0a01e0 = null;
-    view7f0a00d9.setOnClickListener(null);
-    view7f0a00d9 = null;
+    view7f0a00a9.setOnClickListener(null);
+    view7f0a00a9 = null;
+    view7f0a0160.setOnClickListener(null);
+    view7f0a0160 = null;
+    view7f0a013b.setOnClickListener(null);
+    view7f0a013b = null;
+    view7f0a01d2.setOnClickListener(null);
+    view7f0a01d2 = null;
+    view7f0a00d5.setOnClickListener(null);
+    view7f0a00d5 = null;
   }
 }

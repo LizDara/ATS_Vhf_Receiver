@@ -16,13 +16,13 @@ import java.lang.Override;
 public class StartScanningActivity_ViewBinding implements Unbinder {
   private StartScanningActivity target;
 
-  private View view7f0a0231;
+  private View view7f0a021f;
 
-  private View view7f0a022f;
+  private View view7f0a021d;
 
-  private View view7f0a0234;
+  private View view7f0a0222;
 
-  private View view7f0a0116;
+  private View view7f0a0110;
 
   @UiThread
   public StartScanningActivity_ViewBinding(StartScanningActivity target) {
@@ -40,7 +40,7 @@ public class StartScanningActivity_ViewBinding implements Unbinder {
     target.menu_scan_linearLayout = Utils.findRequiredViewAsType(source, R.id.menu_scan_linearLayout, "field 'menu_scan_linearLayout'", LinearLayout.class);
     target.warning_no_tables_linearLayout = Utils.findRequiredViewAsType(source, R.id.warning_no_tables_linearLayout, "field 'warning_no_tables_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.start_manual_scan_button, "method 'onClickStartManualScan'");
-    view7f0a0231 = view;
+    view7f0a021f = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -48,7 +48,7 @@ public class StartScanningActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.start_aerial_scan_button, "method 'onClickStartAerialScan'");
-    view7f0a022f = view;
+    view7f0a021d = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -56,7 +56,7 @@ public class StartScanningActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.start_stationary_scan_button, "method 'onClickStartStationaryScan'");
-    view7f0a0234 = view;
+    view7f0a0222 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -64,7 +64,7 @@ public class StartScanningActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.go_tables_button, "method 'onClickGoTables'");
-    view7f0a0116 = view;
+    view7f0a0110 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -86,13 +86,13 @@ public class StartScanningActivity_ViewBinding implements Unbinder {
     target.menu_scan_linearLayout = null;
     target.warning_no_tables_linearLayout = null;
 
-    view7f0a0231.setOnClickListener(null);
-    view7f0a0231 = null;
-    view7f0a022f.setOnClickListener(null);
-    view7f0a022f = null;
-    view7f0a0234.setOnClickListener(null);
-    view7f0a0234 = null;
-    view7f0a0116.setOnClickListener(null);
-    view7f0a0116 = null;
+    view7f0a021f.setOnClickListener(null);
+    view7f0a021f = null;
+    view7f0a021d.setOnClickListener(null);
+    view7f0a021d = null;
+    view7f0a0222.setOnClickListener(null);
+    view7f0a0222 = null;
+    view7f0a0110.setOnClickListener(null);
+    view7f0a0110 = null;
   }
 }

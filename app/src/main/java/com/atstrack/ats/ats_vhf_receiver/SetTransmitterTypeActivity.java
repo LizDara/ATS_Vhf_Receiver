@@ -21,13 +21,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -75,14 +75,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     TextView pr2_textView;
     @BindView(R.id.pr2_tolerance_textView)
     TextView pr2_tolerance_textView;
-    @BindView(R.id.pr3_textView)
-    TextView pr3_textView;
-    @BindView(R.id.pr3_tolerance_textView)
-    TextView pr3_tolerance_textView;
-    @BindView(R.id.pr4_textView)
-    TextView pr4_textView;
-    @BindView(R.id.pr4_tolerance_textView)
-    TextView pr4_tolerance_textView;
     @BindView(R.id.pulse_rate_type_linearLayout)
     LinearLayout pulse_rate_type_linearLayout;
 
@@ -109,7 +101,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -117,21 +108,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("txType")) // Gets the tx type information
+                    if (parameter.equals(ValueCodes.DETECTION_TYPE)) // Gets the tx type information
                         onClickTxType();
-                    else if (parameter.equals("save")) // Saves the updated data
+                    else if (parameter.equals(ValueCodes.SAVE)) // Saves the updated data
                         onClickSave();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
-                    if (parameter.equals("txType")) //  Gets the tx type
+                    if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
                         downloadData(packet);
                 }
             }
@@ -147,51 +135,43 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     return;
                 int value = result.getData().getExtras().getInt(ValueCodes.VALUE);
                 switch (result.getResultCode()) {
-                    case ValueCodes.PULSE_RATE_TYPE: // Gets the modified pulse rate type
-                        if (value == ValueCodes.FIXED_PULSE_RATE)
+                    case ValueCodes.PULSE_RATE_TYPE_CODE: // Gets the modified pulse rate type
+                        if (value == ValueCodes.FIXED_PULSE_RATE_CODE)
                             setVisibility("Fixed");
-                        else if (value == ValueCodes.VARIABLE_PULSE_RATE)
+                        else if (value == ValueCodes.VARIABLE_PULSE_RATE_CODE)
                             setVisibility("Variable");
-                        else if (value == ValueCodes.CODED)
+                        else if (value == ValueCodes.CODED_CODE)
                             setVisibility("Coded");
                         break;
-                    case ValueCodes.MATCHES_FOR_VALID_PATTERN: // Gets the modified matches for valid pattern
+                    case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE: // Gets the modified matches for valid pattern
                         matches_for_valid_pattern_textView.setText(String.valueOf(value));
                         break;
-                    case ValueCodes.MAX_PULSE_RATE: // Gets the modified max pulse rate
+                    case ValueCodes.MAX_PULSE_RATE_CODE: // Gets the modified max pulse rate
                         max_pulse_rate_textView.setText(String.valueOf(value));
                         break;
-                    case ValueCodes.MIN_PULSE_RATE:
+                    case ValueCodes.MIN_PULSE_RATE_CODE:
                         min_pulse_rate_textView.setText(String.valueOf(value));
                         break;
-                    case ValueCodes.DATA_CALCULATION_TYPES:
+                    case ValueCodes.DATA_CALCULATION_TYPE_CODE:
                         switch (value) {
-                            case ValueCodes.NONE:
+                            case ValueCodes.NONE_CODE:
                                 optional_data_textView.setText(R.string.lb_none);
                                 break;
-                            case ValueCodes.TEMPERATURE:
+                            case ValueCodes.TEMPERATURE_CODE:
                                 optional_data_textView.setText(R.string.lb_temperature);
                                 break;
-                            case ValueCodes.PERIOD:
+                            case ValueCodes.PERIOD_CODE:
                                 optional_data_textView.setText(R.string.lb_period);
                                 break;
                         }
                         break;
-                    case ValueCodes.PULSE_RATE_1:
+                    case ValueCodes.PULSE_RATE_1_CODE:
                         pr1_textView.setText(String.valueOf(value / 100));
                         pr1_tolerance_textView.setText(String.valueOf(value % 100));
                         break;
-                    case ValueCodes.PULSE_RATE_2:
+                    case ValueCodes.PULSE_RATE_2_CODE:
                         pr2_textView.setText(String.valueOf(value / 100));
                         pr2_tolerance_textView.setText(String.valueOf(value % 100));
-                        break;
-                    case ValueCodes.PULSE_RATE_3:
-                        pr3_textView.setText(String.valueOf(value / 100));
-                        pr3_tolerance_textView.setText(String.valueOf(value % 100));
-                        break;
-                    case ValueCodes.PULSE_RATE_4:
-                        pr4_textView.setText(String.valueOf(value / 100));
-                        pr4_tolerance_textView.setText(String.valueOf(value % 100));
                         break;
                 }
             });
@@ -228,10 +208,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                         (!pr1_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()) : 0,
                         (byte) Integer.parseInt(pr2_textView.getText().toString()),
                         (!pr2_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()) : 0,
-                        (byte) Integer.parseInt(pr3_textView.getText().toString()),
-                        (!pr3_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr3_tolerance_textView.getText().toString()) : 0,
-                        (byte) Integer.parseInt(pr4_textView.getText().toString()),
-                        (!pr4_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr4_tolerance_textView.getText().toString()) : 0};
+                        0, 0, 0, 0};
                 break;
             case "Non Coded (Variable Pulse Rate)":
                 txType = (byte) 0x07;
@@ -253,9 +230,9 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
 
         if (result) {
-            SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
-            sharedPreferencesEdit.putInt("DetectionType", Integer.parseInt(Converters.getDecimalValue(b[1])));
+            sharedPreferencesEdit.putInt(ValueCodes.DETECTION_TYPE, Integer.parseInt(Converters.getDecimalValue(b[1])));
             sharedPreferencesEdit.apply();
             receiverInformation.changeTxType(b[1]);
             showMessage(0);
@@ -266,63 +243,49 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     @OnClick(R.id.pulse_rate_type_linearLayout)
     public void onClickPulseRateType(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.PULSE_RATE_TYPE);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_TYPE_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.matches_for_valid_pattern_linearLayout)
     public void onClickMatchesValidPattern(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.MATCHES_FOR_VALID_PATTERN);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.max_pulse_rate_linearLayout)
     public void onClickMaxPulseRate(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.MAX_PULSE_RATE);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.MAX_PULSE_RATE_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.min_pulse_rate_linearLayout)
     public void onClickMinPulseRate(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.MIN_PULSE_RATE);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.MIN_PULSE_RATE_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.optional_data_linearLayout)
     public void onClickOptionalDataCalculations(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.DATA_CALCULATION_TYPES);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.DATA_CALCULATION_TYPE_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.pr1_linearLayout)
     public void onClickPR1(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.PULSE_RATE_1);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_1_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.pr2_linearLayout)
     public void onClickPR2(View v) {
         Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.PULSE_RATE_2);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.pr3_linearLayout)
-    public void onClickPR3(View v) {
-        Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.PULSE_RATE_3);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.pr4_linearLayout)
-    public void onClickPR4(View v) {
-        Intent intent = new Intent(this, SelectValueActivity.class);
-        intent.putExtra("type", ValueCodes.PULSE_RATE_4);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_2_CODE);
         launcher.launch(intent);
     }
 
@@ -341,7 +304,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        parameter = "txType";
+        parameter = ValueCodes.DETECTION_TYPE;
         originalData = new HashMap<>();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -373,7 +336,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (checkChanges()) {
-                parameter = "save";
+                parameter = ValueCodes.SAVE;
                 mBluetoothLeService.discovering();
             } else {
                 finish();
@@ -384,24 +347,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         parameter = "";
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -466,10 +423,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     pr1_tolerance_textView.setText(Converters.getDecimalValue(data[4]));
                     pr2_textView.setText(Converters.getDecimalValue(data[5]));
                     pr2_tolerance_textView.setText(Converters.getDecimalValue(data[6]));
-                    pr3_textView.setText(Converters.getDecimalValue(data[7]));
-                    pr3_tolerance_textView.setText(Converters.getDecimalValue(data[8]));
-                    pr4_textView.setText(Converters.getDecimalValue(data[9]));
-                    pr4_tolerance_textView.setText(Converters.getDecimalValue(data[10]));
 
                     pulseRate1 = Integer.parseInt(Converters.getDecimalValue(data[3]));
                     pulseRateTolerance1 = Integer.parseInt(Converters.getDecimalValue(data[4]));
@@ -491,18 +444,18 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     optional_data_textView.setText(R.string.lb_none);
                     break;
             }
-            originalData.put("PulseRateType", pulseRateType);
-            originalData.put("Matches", matches);
-            originalData.put("PulseRate1", pulseRate1);
-            originalData.put("PulseRate2", pulseRate2);
-            originalData.put("PulseRate3", pulseRate3);
-            originalData.put("PulseRate4", pulseRate4);
-            originalData.put("PulseRateTolerance1", pulseRateTolerance1);
-            originalData.put("PulseRateTolerance2", pulseRateTolerance2);
-            originalData.put("PulseRateTolerance3", pulseRateTolerance3);
-            originalData.put("PulseRateTolerance4", pulseRateTolerance4);
-            originalData.put("MaxPulseRate", maxPulseRate);
-            originalData.put("MinPulseRate", minPulseRate);
+            originalData.put(ValueCodes.PULSE_RATE_TYPE, pulseRateType);
+            originalData.put(ValueCodes.MATCHES, matches);
+            originalData.put(ValueCodes.PULSE_RATE_1, pulseRate1);
+            originalData.put(ValueCodes.PULSE_RATE_2, pulseRate2);
+            originalData.put(ValueCodes.PULSE_RATE_3, pulseRate3);
+            originalData.put(ValueCodes.PULSE_RATE_4, pulseRate4);
+            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_1, pulseRateTolerance1);
+            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_2, pulseRateTolerance2);
+            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_3, pulseRateTolerance3);
+            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_4, pulseRateTolerance4);
+            originalData.put(ValueCodes.MAX_PULSE_RATE, maxPulseRate);
+            originalData.put(ValueCodes.MIN_PULSE_RATE, minPulseRate);
         }
     }
 
@@ -529,12 +482,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 pulseRateType = (byte) 0x08;
                 pulseRate1 = Integer.parseInt(pr1_textView.getText().toString());
                 pulseRate2 = Integer.parseInt(pr2_textView.getText().toString());
-                pulseRate3 = Integer.parseInt(pr3_textView.getText().toString());
-                pulseRate4 = Integer.parseInt(pr4_textView.getText().toString());
                 pulseRateTolerance1 = Integer.parseInt(pr1_tolerance_textView.getText().toString());
                 pulseRateTolerance2 = Integer.parseInt(pr2_tolerance_textView.getText().toString());
-                pulseRateTolerance3 = Integer.parseInt(pr3_tolerance_textView.getText().toString());
-                pulseRateTolerance4 = Integer.parseInt(pr4_tolerance_textView.getText().toString());
                 break;
             case "Non Coded (Variable Pulse Rate)":
                 pulseRateType = (byte) 0x07;
@@ -545,13 +494,13 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 pulseRateType = (byte) 0x09;
                 break;
         }
-        return (int) originalData.get("PulseRateType") != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
-                || (int) originalData.get("Matches") != matches || (int) originalData.get("PulseRate1") != pulseRate1
-                || (int) originalData.get("PulseRate2") != pulseRate2 || (int) originalData.get("PulseRate3") != pulseRate3
-                || (int) originalData.get("PulseRate4") != pulseRate4 || (int) originalData.get("PulseRateTolerance1") != pulseRateTolerance1
-                || (int) originalData.get("PulseRateTolerance2") != pulseRateTolerance2 || (int) originalData.get("PulseRateTolerance3") != pulseRateTolerance3
-                || (int) originalData.get("PulseRateTolerance4") != pulseRateTolerance4 || (int) originalData.get("MaxPulseRate") != maxPulseRate
-                || (int) originalData.get("MinPulseRate") != minPulseRate;
+        return (int) originalData.get(ValueCodes.PULSE_RATE_TYPE) != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
+                || (int) originalData.get(ValueCodes.MATCHES) != matches || (int) originalData.get(ValueCodes.PULSE_RATE_1) != pulseRate1
+                || (int) originalData.get(ValueCodes.PULSE_RATE_2) != pulseRate2 || (int) originalData.get(ValueCodes.PULSE_RATE_3) != pulseRate3
+                || (int) originalData.get(ValueCodes.PULSE_RATE_4) != pulseRate4 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_1) != pulseRateTolerance1
+                || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_2) != pulseRateTolerance2 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_3) != pulseRateTolerance3
+                || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_4) != pulseRateTolerance4 || (int) originalData.get(ValueCodes.MAX_PULSE_RATE) != maxPulseRate
+                || (int) originalData.get(ValueCodes.MIN_PULSE_RATE) != minPulseRate;
     }
 
     /**

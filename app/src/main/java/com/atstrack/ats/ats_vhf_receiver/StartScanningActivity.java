@@ -18,12 +18,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -70,7 +70,6 @@ public class StartScanningActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -78,19 +77,16 @@ public class StartScanningActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
+                    if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                         onClickTables();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
-                    if (parameter.equals("tables")) // Gets the number of frequencies from each table
+                    if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                         downloadData(packet);
                 }
             }
@@ -121,7 +117,6 @@ public class StartScanningActivity extends AppCompatActivity {
     @OnClick(R.id.start_manual_scan_button)
     public void onClickStartManualScan(View v) {
         Intent intent = new Intent(this, ManualScanActivity.class);
-        intent.putExtra("scanning", false);
         startActivity(intent);
     }
 
@@ -131,7 +126,7 @@ public class StartScanningActivity extends AppCompatActivity {
             menu_scan_linearLayout.setVisibility(View.GONE);
             warning_no_tables_linearLayout.setVisibility(View.VISIBLE);
         } else {
-            Intent intent = new Intent(this, AerialScanningActivity.class);
+            Intent intent = new Intent(this, AerialScanActivity.class);
             startActivity(intent);
         }
     }
@@ -142,7 +137,7 @@ public class StartScanningActivity extends AppCompatActivity {
             menu_scan_linearLayout.setVisibility(View.GONE);
             warning_no_tables_linearLayout.setVisibility(View.VISIBLE);
         } else {
-            Intent intent = new Intent(this, StationaryScanningActivity.class);
+            Intent intent = new Intent(this, StationaryScanActivity.class);
             startActivity(intent);
         }
     }
@@ -170,7 +165,7 @@ public class StartScanningActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        parameter = "tables";
+        parameter = ValueCodes.TABLES;
         isEmpty = false;
         menu_scan_linearLayout.setVisibility(View.VISIBLE);
         warning_no_tables_linearLayout.setVisibility(View.GONE);
@@ -208,7 +203,7 @@ public class StartScanningActivity extends AppCompatActivity {
                 warning_no_tables_linearLayout.setVisibility(View.GONE);
             } else {
                 Intent intent = new Intent(this, MainMenuActivity.class); // In the MainMenuActivity, only displays the main menu
-                intent.putExtra("menu", true);
+                intent.putExtra(ValueCodes.MENU, true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -218,19 +213,13 @@ public class StartScanningActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

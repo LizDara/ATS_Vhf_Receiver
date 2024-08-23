@@ -135,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
     public void onDarkModeClick(View v) {
         if (isNightModeOn) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            sharedPreferencesEditor.putBoolean("NightMode", false);
+            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, false);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            sharedPreferencesEditor.putBoolean("NightMode", true);
+            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, true);
         }
         sharedPreferencesEditor.apply();
     }
@@ -156,15 +156,13 @@ public class MainActivity extends AppCompatActivity {
         init();
         mHandler = new Handler();
 
-        // Use this check to determine whether BLE is supported on the device.  Then you can
-        // selectively disable BLE-related features.
+        // Use this check to determine whether BLE is supported on the device. Then you can selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
+        // Initializes a Bluetooth adapter.
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -181,10 +179,10 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         searching_receivers_constraintLayout.setVisibility(View.GONE);
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        SharedPreferences appSettingPrefs = getSharedPreferences("AppSettingPrefs", 0);
+        SharedPreferences appSettingPrefs = getSharedPreferences(ValueCodes.SETTING_PREFERENCES, 0);
         sharedPreferencesEditor = appSettingPrefs.edit();
         isNightModeOn = hour > 25;
-        sharedPreferencesEditor.putBoolean("NightMode", isNightModeOn);
+        sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, isNightModeOn);
         sharedPreferencesEditor.apply();
         //isNightModeOn = appSettingPrefs.getBoolean("NightMode", false);
 
@@ -274,7 +272,6 @@ public class MainActivity extends AppCompatActivity {
                     retry_button.setVisibility(View.VISIBLE);
                     refresh_button.setVisibility(View.GONE);
                 }
-
                 invalidateOptionsMenu();
             }, ValueCodes.SCAN_PERIOD);
         } else {
@@ -301,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.BLUETOOTH_SCAN");
             permissionCheck += this.checkSelfPermission("Manifest.permission.MANAGE_EXTERNAL_STORAGE");
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
-
             if (permissionCheck != 0) {
                 this.requestPermissions(
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.EditTablesActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class TableListAdapter extends BaseAdapter {
     private final Context context;
@@ -69,13 +70,13 @@ public class TableListAdapter extends BaseAdapter {
         frequenciesNumber.setText(Converters.getDecimalValue(tables[position + 1]) + " frequencies");
         table.setOnClickListener(v -> {
             Intent intent = new Intent(context, EditTablesActivity.class);
-            intent.putExtra("number", position + 1);
-            intent.putExtra("total", Integer.parseInt(Converters.getDecimalValue(tables[position + 1])));
-            intent.putExtra("baseFrequency", baseFrequency);
-            intent.putExtra("range", range);
-            intent.putExtra("isFile", frequencies[position] != null);
+            intent.putExtra(ValueCodes.TABLE_NUMBER, position + 1);
+            intent.putExtra(ValueCodes.TOTAL, Integer.parseInt(Converters.getDecimalValue(tables[position + 1])));
+            intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+            intent.putExtra(ValueCodes.RANGE, range);
+            intent.putExtra(ValueCodes.IS_FILE, frequencies[position] != null);
             if (frequencies[position] != null)
-                intent.putExtra("frequencies", frequencies[position]);
+                intent.putExtra(ValueCodes.FREQUENCIES, frequencies[position]);
             context.startActivity(intent);
         });
 

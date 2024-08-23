@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyDeleteListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyListAdapter;
@@ -101,7 +101,6 @@ public class EditTablesActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -109,27 +108,21 @@ public class EditTablesActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     switch (parameter) {
-                        case "table": // Ask for frequencies from a table
+                        case ValueCodes.TABLE: // Gets the frequencies from a table
                             onClickTable();
                             break;
-                        case "receive": // Gets the frequencies from a table
-                            onReceiveTable();
-                            break;
-                        case "sendTable": // Sends the modified frequencies
+                        case ValueCodes.SAVE: // Sends the modified frequencies
                             onClickSendTable();
                             break;
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameter.equals("table")) // Gets the frequencies from a table
+                    if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
                         downloadData(packet);
                 }
             }
@@ -144,8 +137,8 @@ public class EditTablesActivity extends AppCompatActivity {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
-                    int position = result.getData().getExtras().getInt("position");
-                    int frequency = result.getData().getExtras().getInt("frequency");
+                    int position = result.getData().getExtras().getInt(ValueCodes.POSITION);
+                    int frequency = result.getData().getExtras().getInt(ValueCodes.VALUE);
                     if (position != -1) {
                         if (frequencyListAdapter.getFrequency(position) != frequency)
                             changeSelectedFrequency(frequency, position);
@@ -211,15 +204,6 @@ public class EditTablesActivity extends AppCompatActivity {
                 characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         }
         mBluetoothLeService.readCharacteristicDiagnostic(service, characteristic);
-    }
-
-    /**
-     * Enables notification for receive the frequencies from that table.
-     */
-    private void onReceiveTable() {
-        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
-        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
     /**
@@ -311,7 +295,6 @@ public class EditTablesActivity extends AppCompatActivity {
 
         frequencyDeleteListAdapter.setStateSelected(false);
         frequencyDeleteListAdapter.notifyDataSetChanged();
-
         delete_selected_frequencies_button.setEnabled(false);
         delete_selected_frequencies_button.setAlpha((float) 0.6);
     }
@@ -320,10 +303,10 @@ public class EditTablesActivity extends AppCompatActivity {
     public void onClickAddFrequency(View v) {
         if (isWithinLimit()) {
             Intent intent = new Intent(this, EnterFrequencyActivity.class);
-            intent.putExtra("title", "Add Frequency");
-            intent.putExtra("position", -1);
-            intent.putExtra("baseFrequency", baseFrequency);
-            intent.putExtra("range", range);
+            intent.putExtra(ValueCodes.TITLE, "Add Frequency");
+            intent.putExtra(ValueCodes.POSITION, -1);
+            intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+            intent.putExtra(ValueCodes.RANGE, range);
             launcher.launch(intent);
         } else {
             showMessage(1);
@@ -346,8 +329,8 @@ public class EditTablesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_tables);
         ButterKnife.bind(this);
 
-        number = getIntent().getExtras().getInt("number");
-        originalTotalFrequencies = getIntent().getExtras().getInt("total");
+        number = getIntent().getIntExtra(ValueCodes.TABLE_NUMBER, 0);
+        originalTotalFrequencies = getIntent().getIntExtra(ValueCodes.TOTAL, 0);
         setSupportActionBar(toolbar);
         title_toolbar.setText("Table " + number + " (" + originalTotalFrequencies + " Frequencies)");
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -358,12 +341,12 @@ public class EditTablesActivity extends AppCompatActivity {
         ReceiverStatus.setReceiverStatus(this);
 
         handlerMessage = new Handler();
-        baseFrequency = getIntent().getExtras().getInt("baseFrequency") * 1000;
-        range = getIntent().getExtras().getInt("range");
-        isFile = getIntent().getExtras().getBoolean("isFile");
-        if (isFile) { // Asks for the frequencies obtained from a file
+        baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0) * 1000;
+        range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
+        isFile = getIntent().getBooleanExtra(ValueCodes.IS_FILE, false);
+        if (isFile) { // Ask for the frequencies obtained from a file
             setVisibility("overview");
-            originalTable = getIntent().getExtras().getIntArray("frequencies");
+            originalTable = getIntent().getIntArrayExtra(ValueCodes.FREQUENCIES);
             ArrayList<Integer> frequencies = new ArrayList<>();
             for (int frequency : originalTable)
                 frequencies.add(frequency);
@@ -372,9 +355,9 @@ public class EditTablesActivity extends AppCompatActivity {
             frequencies_listView.setAdapter(frequencyListAdapter);
             frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
             frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
-        } else { // Asks for the frequencies from that table, the frequency base and range
-            if (originalTotalFrequencies > 0) { // Asks for the frequencies from the table
-                parameter = "table";
+        } else { // Ask for the frequencies from that table, the frequency base and range
+            if (originalTotalFrequencies > 0) { // Ask for the frequencies from the table
+                parameter = ValueCodes.TABLE;
                 setVisibility("overview");
             } else { // Initializes empty
                 originalTable = new int[]{};
@@ -392,7 +375,7 @@ public class EditTablesActivity extends AppCompatActivity {
             if (frequencies_overview_linearLayout.getVisibility() == View.VISIBLE
                     || no_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
                 if (existChanges()) {
-                    parameter = "sendTable";
+                    parameter = ValueCodes.SAVE;
                     mBluetoothLeService.discovering();
                 } else {
                     finish();
@@ -430,23 +413,17 @@ public class EditTablesActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -570,7 +547,7 @@ public class EditTablesActivity extends AppCompatActivity {
             else
                 setVisibility("overview");
             title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getCount() + " Frequencies)");
-        }, ValueCodes.WAITING_PERIOD);
+        }, ValueCodes.MESSAGE_PERIOD);
     }
 
     private boolean existChanges() {

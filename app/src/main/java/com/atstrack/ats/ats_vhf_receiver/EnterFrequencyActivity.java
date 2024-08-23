@@ -109,8 +109,8 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     public void onClickSaveChanges(View v) {
         int newFrequency = Integer.parseInt(frequency_textView.getText().toString());
         Intent intent = new Intent();
-        intent.putExtra("position", position);
-        intent.putExtra("frequency", newFrequency);
+        intent.putExtra(ValueCodes.POSITION, position);
+        intent.putExtra(ValueCodes.VALUE, newFrequency);
         setResult(ValueCodes.RESULT_OK, intent);
         finish();
     }
@@ -122,17 +122,17 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        title_toolbar.setText(getIntent().getExtras().getString("title"));
+        title_toolbar.setText(getIntent().getStringExtra(ValueCodes.TITLE));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         ReceiverStatus.setReceiverStatus(this);
 
-        baseFrequency = getIntent().getExtras().getInt("baseFrequency");
-        int range = getIntent().getExtras().getInt("range");
+        baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0);
+        int range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
-        position = getIntent().getExtras().getInt("position");
+        position = getIntent().getIntExtra(ValueCodes.POSITION, -2);
 
         frequency_textView.addTextChangedListener(textChangedListener);
         String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;

@@ -24,7 +24,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -135,7 +135,6 @@ public class ManualScanActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
     private String parameterWrite = "";
 
@@ -144,20 +143,17 @@ public class ManualScanActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if ("sendLog".equals(parameter)) // Receives the data
+                    if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
                         onClickLog();
-                    else if ("sendLogScanning".equals(parameter))
+                    else if (parameter.equals(ValueCodes.CONTINUE_LOG))
                         onClickLogScanning();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                    if (parameter.equals("sendLog")) // Receives the data
+                    if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
                         setCurrentLog(packet);
                 }
             }
@@ -174,22 +170,22 @@ public class ManualScanActivity extends AppCompatActivity {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
                     switch (parameterWrite) {
-                        case "startManual": // Starts to scan
+                        case ValueCodes.START_SCAN: // Starts to scan
                             onClickStart();
                             break;
-                        case "stopManual": // Stops scan
+                        case ValueCodes.STOP_SCAN: // Stops scan
                             onClickStop();
                             break;
-                        case "recordData": // Records a code
+                        case ValueCodes.RECORD: // Records a code
                             onClickRecord();
                             break;
-                        case "decrease":
+                        case ValueCodes.DECREASE:
                             onClickDecrease();
                             break;
-                        case "increase":
+                        case ValueCodes.INCREASE:
                             onClickIncrease();
                             break;
-                        case "audio":
+                        case ValueCodes.AUDIO:
                             onClickAudio();
                             break;
                     }
@@ -206,9 +202,9 @@ public class ManualScanActivity extends AppCompatActivity {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     setVisibility("overview");
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
-                    newFrequency = result.getData().getExtras().getInt("frequency");
+                    newFrequency = result.getData().getExtras().getInt(ValueCodes.VALUE);
                     frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
-                    parameter = "sendLog";
+                    parameter = ValueCodes.START_LOG;
                     mBluetoothLeService.discovering();
                 }
             });
@@ -261,7 +257,7 @@ public class ManualScanActivity extends AppCompatActivity {
      * Enables notification for receive the data.
      */
     private void onClickLog() {
-        parameterWrite = "startManual";
+        parameterWrite = ValueCodes.START_SCAN;
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
@@ -288,9 +284,9 @@ public class ManualScanActivity extends AppCompatActivity {
             if (isEditFrequency) {
                 isEditFrequency = false;
                 Intent intent = new Intent(this, EnterFrequencyActivity.class);
-                intent.putExtra("title", "Change Frequency");
-                intent.putExtra("baseFrequency", baseFrequency);
-                intent.putExtra("range", range);
+                intent.putExtra(ValueCodes.TITLE, "Change Frequency");
+                intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+                intent.putExtra(ValueCodes.RANGE, range);
                 launcher.launch(intent);
             } else {
                 animationDrawable.stop();
@@ -319,7 +315,7 @@ public class ManualScanActivity extends AppCompatActivity {
     }
 
     private void onClickLogScanning() {
-        parameter = "sendLog";
+        parameter = ValueCodes.START_LOG;
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
@@ -377,28 +373,28 @@ public class ManualScanActivity extends AppCompatActivity {
     @OnClick(R.id.enter_new_frequency_button)
     public void onClickEnterNewFrequency(View v) {
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
-        intent.putExtra("title", "Change Frequency");
-        intent.putExtra("baseFrequency", baseFrequency);
-        intent.putExtra("range", range);
+        intent.putExtra(ValueCodes.TITLE, "Change Frequency");
+        intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+        intent.putExtra(ValueCodes.RANGE, range);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.start_manual_button)
     public void onClickStartManual(View v) {
-        parameter = "sendLog";
+        parameter = ValueCodes.START_LOG;
         mBluetoothLeService.discovering();
     }
 
     @OnClick(R.id.edit_frequency_button)
     public void onClickEditFrequency(View v) {
         isEditFrequency = true;
-        parameterWrite = "stopManual";
+        parameterWrite = ValueCodes.STOP_SCAN;
         mBluetoothLeService.discoveringSecond();
     }
 
     @OnClick(R.id.record_data_manual_button)
     public void onClickRecordData(View v) {
-        parameterWrite = "recordData";
+        parameterWrite = ValueCodes.RECORD;
         mBluetoothLeService.discoveringSecond();
 
         record_data_manual_button.setText(R.string.lb_saving_targets);
@@ -409,14 +405,14 @@ public class ManualScanActivity extends AppCompatActivity {
     @OnClick(R.id.minus_imageView)
     public void onClickMinus(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) - 1;
-        parameterWrite = "decrease";
+        parameterWrite = ValueCodes.DECREASE;
         mBluetoothLeService.discoveringSecond();
     }
 
     @OnClick(R.id.plus_imageView)
     public void onClickPlus(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) + 1;
-        parameterWrite = "increase";
+        parameterWrite = ValueCodes.INCREASE;
         mBluetoothLeService.discoveringSecond();
     }
 
@@ -501,7 +497,7 @@ public class ManualScanActivity extends AppCompatActivity {
         saveChanges.setOnClickListener(v12 -> {
             audioOption[1] = Converters.getHexValue(audioOption[0]).equals("59") ? (byte) Integer.parseInt(number.getText().toString()) : 0;
             audioOption[2] = background.isChecked() ? (byte) 1 : 0;
-            parameterWrite = "audio";
+            parameterWrite = ValueCodes.AUDIO;
             mBluetoothLeService.discoveringSecond();
 
             dialog.dismiss();
@@ -525,18 +521,18 @@ public class ManualScanActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        isScanning = getIntent().getExtras().getBoolean("scanning");
-        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
-        range = sharedPreferences.getInt("Range", 0);
+        isScanning = getIntent().getBooleanExtra(ValueCodes.SCANNING, false);
+        SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
+        baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
+        range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         isEditFrequency = false;
 
         frequency_manual_textView.setText(Converters.getFrequency(baseFrequency));
         newFrequency = baseFrequency;
         if (isScanning) { // The device is already scanning
-            parameter = "sendLogScanning";
-            detectionType = getIntent().getExtras().getByte("detectionType");
+            parameter = ValueCodes.CONTINUE_LOG;
+            detectionType = getIntent().getByteExtra(ValueCodes.DETECTION_TYPE, (byte) 0);
             frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
 
             updateVisibility();
@@ -581,7 +577,7 @@ public class ManualScanActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             } else {
-                parameterWrite = "stopManual";
+                parameterWrite = ValueCodes.STOP_SCAN;
                 mBluetoothLeService.discoveringSecond();
             }
             return true;
@@ -589,19 +585,13 @@ public class ManualScanActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected )
-            showDisconnectionMessage();
-        return true;
-    }
-
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

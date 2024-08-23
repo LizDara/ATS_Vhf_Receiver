@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
@@ -40,6 +40,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class InputValueActivity extends AppCompatActivity {
@@ -104,7 +105,6 @@ public class InputValueActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -112,21 +112,18 @@ public class InputValueActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     switch (parameter) {
-                        case "aerial":  // Gets aerial defaults data
+                        case ValueCodes.MOBILE_DEFAULTS:  // Gets aerial defaults data
                             onClickAerialDefaults();
                             break;
-                        case "stationary":  // Gets stationary defaults data
+                        case ValueCodes.STATIONARY_DEFAULTS:  // Gets stationary defaults data
                             onClickStationaryDefaults();
                             break;
-                        case "tables":
+                        case ValueCodes.TABLES:
                             onClickTables();
                             break;
                     }
@@ -134,23 +131,23 @@ public class InputValueActivity extends AppCompatActivity {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
                     switch (type) {
-                        case ValueCodes.FREQUENCY_TABLE_NUMBER: // Gets the frequency table number
-                        case ValueCodes.TABLES_NUMBER:
+                        case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
+                        case ValueCodes.TABLES_NUMBER_CODE:
                             downloadTable(packet);
                             break;
-                        case ValueCodes.SCAN_RATE_SECONDS: // Gets the scan rate seconds
+                        case ValueCodes.SCAN_RATE_SECONDS_CODE: // Gets the scan rate seconds
                             downloadScanRate(packet);
                             break;
-                        case ValueCodes.NUMBER_OF_ANTENNAS: // Gets number of antennas
+                        case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Gets number of antennas
                             downloadAntennas(packet);
                             break;
-                        case ValueCodes.SCAN_TIMEOUT_SECONDS: // Gets the scan timeout seconds
+                        case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Gets the scan timeout seconds
                             downloadTimeout(packet);
                             break;
-                        case ValueCodes.STORE_RATE: // Gets the store rate
+                        case ValueCodes.STORE_RATE_CODE: // Gets the store rate
                             downloadStoreRate(packet);
                             break;
-                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE: // Gets the reference frequency store rate
+                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Gets the reference frequency store rate
                             downloadReferenceFrequencyStoreRate(packet);
                             break;
                     }
@@ -286,18 +283,18 @@ public class InputValueActivity extends AppCompatActivity {
     public void onClickSaveChanges(View v) {
         Intent intent = new Intent();
         int value = 0;
-        if (parameter.equals("aerial") && type == ValueCodes.SCAN_RATE_SECONDS) // Sends the scan rate value for aerial
+        if (parameter.equals(ValueCodes.MOBILE_DEFAULTS) && type == ValueCodes.SCAN_RATE_SECONDS_CODE) // Sends the scan rate value for aerial
             value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
-        else if (parameter.equals("stationary") && type == ValueCodes.SCAN_RATE_SECONDS) // Sends the scan rate value for stationary
+        else if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS) && type == ValueCodes.SCAN_RATE_SECONDS_CODE) // Sends the scan rate value for stationary
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        else if (type == ValueCodes.FREQUENCY_TABLE_NUMBER) // Sends the frequency table number
+        else if (type == ValueCodes.TABLE_NUMBER_CODE) // Sends the frequency table number
             value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
                     Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
-        else if (type == ValueCodes.NUMBER_OF_ANTENNAS) // Sends the number of antennas
+        else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Sends the number of antennas
             value = value_spinner.getSelectedItemPosition() + 1;
-        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS) // Sends scan timeout value
+        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Sends scan timeout value
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE)
+        else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
             value = value_spinner.getSelectedItemPosition();
         intent.putExtra(ValueCodes.VALUE, value);
         setResult(type, intent);
@@ -322,18 +319,18 @@ public class InputValueActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        parameter = getIntent().getStringExtra("parameter");
-        type = getIntent().getIntExtra("type", 0);
-        if (type == ValueCodes.STORE_RATE)
+        parameter = getIntent().getStringExtra(ValueCodes.PARAMETER);
+        type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
+        if (type == ValueCodes.STORE_RATE_CODE)
             setVisibility("storeRate");
-        else if (type == ValueCodes.TABLES_NUMBER)
+        else if (type == ValueCodes.TABLES_NUMBER_CODE)
             setVisibility("tables");
         else
             setVisibility("");
@@ -345,7 +342,7 @@ public class InputValueActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (type == ValueCodes.STORE_RATE) {
+            if (type == ValueCodes.STORE_RATE_CODE) {
                 Intent intent = new Intent();
                 intent.putExtra(ValueCodes.VALUE, storeRate);
                 setResult(type, intent);
@@ -380,23 +377,17 @@ public class InputValueActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -434,15 +425,15 @@ public class InputValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadTable(byte[] data) {
-        if (type == ValueCodes.TABLES_NUMBER) {
+        if (type == ValueCodes.TABLES_NUMBER_CODE) {
             ArrayList<Integer> tables = new ArrayList<>();
-            int table = getIntent().getIntExtra("firstTable", 0);
+            int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);
             if (table != 0 && table <= 12)
                 tables.add(table);
-            table = getIntent().getIntExtra("secondTable", 0);
+            table = getIntent().getIntExtra(ValueCodes.SECOND_TABLE_NUMBER, 0);
             if (table != 0 && table <= 12)
                 tables.add(table);
-            table = getIntent().getIntExtra("thirdTable", 0);
+            table = getIntent().getIntExtra(ValueCodes.THIRD_TABLE_NUMBER, 0);
             if (table != 0 && table <= 12)
                 tables.add(table);
             option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
@@ -472,7 +463,7 @@ public class InputValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadScanRate(byte[] data) {
-        if (parameter.equals("aerial")) {
+        if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) {
             ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             value_spinner.setAdapter(scanRateAdapter);

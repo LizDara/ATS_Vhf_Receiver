@@ -69,6 +69,11 @@
             android:textAppearance="@style/body_large"
             android:textColor="@color/light_blue" />
 
+        <TextView
+            android:id="@+id/prueba_connecting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

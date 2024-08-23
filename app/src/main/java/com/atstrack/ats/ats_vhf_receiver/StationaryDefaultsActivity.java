@@ -23,7 +23,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,6 +30,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -104,7 +104,6 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -112,21 +111,19 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("save")) // Save stationary defaults data
+                    if (parameter.equals(ValueCodes.SAVE)) // Save stationary defaults data
                         onClickSave();
-                    else if (parameter.equals("stationary")) // Gets stationary defaults data
+                    else if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
                         onClickStationaryDefaults();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    Log.i(TAG, Converters.getHexValue(packet));
                     if (packet == null) return;
-                    if (parameter.equals("stationary")) // Gets stationary defaults data
+                    if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
                         downloadData(packet);
                 }
             }
@@ -140,7 +137,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
-                else if (ValueCodes.TABLES_NUMBER == result.getResultCode()) { // Gets the modified frequency table number
+                if (ValueCodes.TABLES_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     int[] value = result.getData().getExtras().getIntArray(ValueCodes.VALUE);
                     String numbers = "";
                     for (int number : value)
@@ -149,19 +146,19 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
                 } else {
                     int value = result.getData().getExtras().getInt(ValueCodes.VALUE);
                     switch (result.getResultCode()) {
-                        case ValueCodes.SCAN_RATE_SECONDS: // Gets the modified scan rate
+                        case ValueCodes.SCAN_RATE_SECONDS_CODE: // Gets the modified scan rate
                             scan_rate_seconds_stationary_textView.setText(String.valueOf(value));
                             break;
-                        case ValueCodes.SCAN_TIMEOUT_SECONDS: // Gets the modified scan timeout
+                        case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Gets the modified scan timeout
                             scan_timeout_seconds_stationary_textView.setText(String.valueOf(value));
                             break;
-                        case ValueCodes.NUMBER_OF_ANTENNAS: // Gets the modified number of antennas
+                        case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Gets the modified number of antennas
                             number_of_antennas_stationary_textView.setText(String.valueOf(value));
                             break;
-                        case ValueCodes.STORE_RATE:
+                        case ValueCodes.STORE_RATE_CODE:
                             store_rate_minutes_stationary_textView.setText((value == 100) ? "Continuous Store" : String.valueOf(value));
                             break;
-                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE:
+                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE:
                             reference_frequency_store_rate_stationary_textView.setText(String.valueOf(value));
                             break;
                         case ValueCodes.RESULT_OK:
@@ -209,7 +206,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         int frequency = (stationary_reference_frequency_switch.isChecked()) ?
                 (Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) - baseFrequency) : 0;
-        int referenceFrequencyStoreRate = Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
+        int referenceFrequencyStoreRate = reference_frequency_store_rate_stationary_textView.getText().toString().isEmpty() ? 0 : Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x4C, (byte) antennasNumber, (byte) externalDataPush, (byte) scanRate, (byte) scanTimeout,
                 (byte) storeRate, (byte) (frequency / 256), (byte) (frequency % 256), (byte) referenceFrequencyStoreRate,
                 (byte) firstTableNumber, (byte) secondTableNumber, (byte) thirdTableNumber};
@@ -227,43 +224,43 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     @OnClick(R.id.frequency_table_number_stationary_linearLayout)
     public void onClickFrequencyTableNumber(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "tables");
-        intent.putExtra("type", ValueCodes.TABLES_NUMBER);
-        intent.putExtra("firstTable", (int) originalData.get("FirstTableNumber"));
-        intent.putExtra("secondTable", (int) originalData.get("SecondTableNumber"));
-        intent.putExtra("thirdTable", (int) originalData.get("ThirdTableNumber"));
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLES_NUMBER_CODE);
+        intent.putExtra(ValueCodes.FIRST_TABLE_NUMBER, (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER));
+        intent.putExtra(ValueCodes.SECOND_TABLE_NUMBER, (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER));
+        intent.putExtra(ValueCodes.THIRD_TABLE_NUMBER, (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER));
         launcher.launch(intent);
     }
 
     @OnClick(R.id.scan_rate_seconds_stationary_linearLayout)
     public void onClickScanRateSeconds(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "stationary");
-        intent.putExtra("type", ValueCodes.SCAN_RATE_SECONDS);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_SECONDS_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.scan_timeout_seconds_stationary_linearLayout)
     public void onClickScanTimeoutSeconds(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "stationary");
-        intent.putExtra("type", ValueCodes.SCAN_TIMEOUT_SECONDS);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_TIMEOUT_SECONDS_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.number_of_antennas_stationary_linearLayout)
     public void onClickNumberOfAntennas(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "stationary");
-        intent.putExtra("type", ValueCodes.NUMBER_OF_ANTENNAS);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.NUMBER_OF_ANTENNAS_CODE);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.store_rate_stationary_linearLayout)
     public void onClickStoreRate(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "stationary");
-        intent.putExtra("type", ValueCodes.STORE_RATE);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.STORE_RATE_CODE);
         launcher.launch(intent);
     }
 
@@ -271,11 +268,12 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     public void onCheckedChangedReferenceFrequency(CompoundButton button, boolean isChecked) {
         if (isChecked) {
             reference_frequency_stationary_linearLayout.setEnabled(true);
-            int frequency = (int) originalData.get("ReferenceFrequency");
+            int frequency = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY);
             frequency_reference_stationary_textView.setText(frequency != 0 ? Converters.getFrequency(frequency) : "0");
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(true);
+            int storeRate = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE);
+            reference_frequency_store_rate_stationary_textView.setText(String.valueOf(storeRate));
         } else {
-            Log.i(TAG, "No Reference");
             reference_frequency_stationary_linearLayout.setEnabled(false);
             frequency_reference_stationary_textView.setText(R.string.lb_no_reference_frequency);
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(false);
@@ -286,17 +284,17 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     @OnClick(R.id.reference_frequency_stationary_linearLayout)
     public void onClickReferenceFrequency(View v) {
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
-        intent.putExtra("title", "Reference Frequency");
-        intent.putExtra("baseFrequency", baseFrequency);
-        intent.putExtra("range", range);
+        intent.putExtra(ValueCodes.TITLE, "Reference Frequency");
+        intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+        intent.putExtra(ValueCodes.RANGE, range);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.reference_frequency_store_rate_stationary_linearLayout)
     public void onClickReferenceFrequencyStoreRate(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
-        intent.putExtra("parameter", "stationary");
-        intent.putExtra("type", ValueCodes.REFERENCE_FREQUENCY_STORE_RATE);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE);
         launcher.launch(intent);
     }
 
@@ -315,10 +313,10 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
-        baseFrequency = sharedPreferences.getInt("BaseFrequency", 0) * 1000;
-        range = sharedPreferences.getInt("Range", 0);
-        parameter = "stationary";
+        SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
+        baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
+        range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
+        parameter = ValueCodes.STATIONARY_DEFAULTS;
         originalData = new HashMap<>();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -330,7 +328,7 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (checkChanges()) {
                 if (isDataCorrect()) {
-                    parameter = "save";
+                    parameter = ValueCodes.SAVE;
                     mBluetoothLeService.discovering();
                 } else {
                     showMessage(1);
@@ -365,23 +363,17 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -418,20 +410,20 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
                 frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                         Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-            stationary_reference_frequency_switch.setChecked(frequency != 0);
-            frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-            reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
+            //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
+            //reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
 
-            originalData.put("FirstTableNumber", Integer.parseInt(Converters.getDecimalValue(data[9])));
-            originalData.put("SecondTableNumber", Integer.parseInt(Converters.getDecimalValue(data[10])));
-            originalData.put("ThirdTableNumber", Integer.parseInt(Converters.getDecimalValue(data[11])));
-            originalData.put("AntennaNumber", antennaNumber);
-            originalData.put("ScanTime", Integer.parseInt(Converters.getDecimalValue(data[3])));
-            originalData.put("ScanTimeout", Integer.parseInt(Converters.getDecimalValue(data[4])));
-            originalData.put("StoreRate", Integer.parseInt(Converters.getDecimalValue(data[5])));
-            originalData.put("ExternalDataTransfer", Integer.parseInt(Converters.getDecimalValue(data[2])));
-            originalData.put("ReferenceFrequency", frequency);
-            originalData.put("ReferenceFrequencyStoreRate", Integer.parseInt(Converters.getDecimalValue(data[8])));
+            originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
+            originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
+            originalData.put(ValueCodes.THIRD_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[11])));
+            originalData.put(ValueCodes.ANTENNA_NUMBER, antennaNumber);
+            originalData.put(ValueCodes.SCAN_RATE, Integer.parseInt(Converters.getDecimalValue(data[3])));
+            originalData.put(ValueCodes.SCAN_TIMEOUT, Integer.parseInt(Converters.getDecimalValue(data[4])));
+            originalData.put(ValueCodes.STORE_RATE, Integer.parseInt(Converters.getDecimalValue(data[5])));
+            originalData.put(ValueCodes.EXTERNAL_DATA_TRANSFER, Integer.parseInt(Converters.getDecimalValue(data[2])));
+            originalData.put(ValueCodes.REFERENCE_FREQUENCY, frequency);
+            originalData.put(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE, Integer.parseInt(Converters.getDecimalValue(data[8])));
+            stationary_reference_frequency_switch.setChecked(frequency != 0);
         }
     }
 
@@ -482,14 +474,14 @@ public class StationaryDefaultsActivity extends AppCompatActivity {
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         int referenceFrequency = stationary_reference_frequency_switch.isChecked() ?
                 Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;
-        int referenceFrequencyStoreRate = Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
+        int referenceFrequencyStoreRate = reference_frequency_store_rate_stationary_textView.getText().toString().isEmpty() ? 0 : Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
 
-        return (int) originalData.get("FirstTableNumber") != firstTableNumber || (int) originalData.get("SecondTableNumber") != secondTableNumber
-                || (int) originalData.get("ThirdTableNumber") != thirdTableNumber || (int) originalData.get("AntennaNumber") != antennaNumber
-                || (int) originalData.get("ScanTime") != scanRate || (int) originalData.get("ScanTimeout") != timeout
-                || (int) originalData.get("StoreRate") != storeRate || (int) originalData.get("ReferenceFrequency") != referenceFrequency
-                || (int) originalData.get("ReferenceFrequencyStoreRate") != referenceFrequencyStoreRate
-                || (int) originalData.get("ExternalDataTransfer") != externalData;
+        return (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER) != firstTableNumber || (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER) != secondTableNumber
+                || (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER) != thirdTableNumber || (int) originalData.get(ValueCodes.ANTENNA_NUMBER) != antennaNumber
+                || (int) originalData.get(ValueCodes.SCAN_RATE) != scanRate || (int) originalData.get(ValueCodes.SCAN_TIMEOUT) != timeout
+                || (int) originalData.get(ValueCodes.STORE_RATE) != storeRate || (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY) != referenceFrequency
+                || (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE) != referenceFrequencyStoreRate
+                || (int) originalData.get(ValueCodes.EXTERNAL_DATA_TRANSFER) != externalData;
     }
 
     /**

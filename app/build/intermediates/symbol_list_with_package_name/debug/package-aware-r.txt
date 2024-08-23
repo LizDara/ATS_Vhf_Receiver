@@ -1141,8 +1141,6 @@ id aerial_auto_record_switch
 id aerial_defaults_button
 id aerial_gps_switch
 id aerial_result_linearLayout
-id aerial_scan_defaults_button
-id aerial_scan_temporary_button
 id alertTitle
 id aligned
 id allStates
@@ -1161,7 +1159,6 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
-id auto_record_aerial_textView
 id barrier
 id baseline
 id battery_device_textView
@@ -1281,7 +1278,6 @@ id easeIn
 id easeInOut
 id easeOut
 id east
-id edit_aerial_settings_button
 id edit_audio_aerial_textView
 id edit_audio_manual_textView
 id edit_frequency_button
@@ -1290,7 +1286,6 @@ id edit_frequency_tables_button
 id edit_options_linearLayout
 id edit_query
 id edit_receiver_defaults_button
-id edit_stationary_settings_button
 id edit_table_linearLayout
 id edit_table_textView
 id eight_button
@@ -1304,7 +1299,6 @@ id enter_new_frequency_button
 id erase_data_button
 id expand_activities_button
 id expanded_menu
-id external_data_transfer_stationary_textView
 id fifteen_minutes_imageView
 id fifteen_minutes_linearLayout
 id fifth_table_textView
@@ -1346,7 +1340,6 @@ id frost
 id go_tables_button
 id gone
 id gps_aerial_imageView
-id gps_aerial_textView
 id gps_manual_imageView
 id gps_state_aerial_textView
 id gps_state_manual_textView
@@ -1452,7 +1445,6 @@ id north
 id notification_background
 id notification_main_column
 id notification_main_column_container
-id number_antennas_stationary_textView
 id number_buttons_linearLayout
 id number_of_antennas_stationary_linearLayout
 id number_of_antennas_stationary_textView
@@ -1494,12 +1486,6 @@ id pr1_tolerance_textView
 id pr2_linearLayout
 id pr2_textView
 id pr2_tolerance_textView
-id pr3_linearLayout
-id pr3_textView
-id pr3_tolerance_textView
-id pr4_linearLayout
-id pr4_textView
-id pr4_tolerance_textView
 id preparing_file_imageView
 id preparing_file_textView
 id preparing_progressBar
@@ -1509,6 +1495,8 @@ id processing_progressBar
 id progressBar
 id progress_circular
 id progress_horizontal
+id prueba
+id prueba_connecting
 id pulse_rate_editText
 id pulse_rate_linearLayout
 id pulse_rate_textView
@@ -1522,12 +1510,10 @@ id radio
 id range_textView
 id ratio
 id ready_aerial_scan_LinearLayout
-id ready_aerial_scan_button
 id ready_aerial_textView
 id ready_clone_linearLayout
 id ready_manual_scan_linearLayout
 id ready_stationary_scan_LinearLayout
-id ready_stationary_scan_button
 id ready_stationary_textView
 id receiver_configuration_button
 id receiver_status
@@ -1552,12 +1538,10 @@ id save_changes_input_value_button
 id save_digit_button
 id sawtooth
 id scan_details_linearLayout
-id scan_rate_aerial_textView
 id scan_rate_seconds_aerial_linearLayout
 id scan_rate_seconds_aerial_textView
 id scan_rate_seconds_stationary_linearLayout
 id scan_rate_seconds_stationary_textView
-id scan_rate_stationary_textView
 id scan_timeout_seconds_stationary_linearLayout
 id scan_timeout_seconds_stationary_textView
 id screen
@@ -1583,8 +1567,6 @@ id searching_receivers_linearLayout
 id second_table_textView
 id select_dialog_listview
 id select_pulse_rate_linearLayout
-id selected_frequency_aerial_textView
-id selected_frequency_stationary_textView
 id set_transmitter_type_button
 id set_value_linearLayout
 id seven_button
@@ -1641,15 +1623,12 @@ id stationary_defaults_button
 id stationary_external_data_transfer_switch
 id stationary_reference_frequency_switch
 id stationary_result_linearLayout
-id stationary_scan_defaults_button
-id stationary_scan_temporary_button
 id status_device_menu_textView
 id stop
 id store_rate_linearLayout
 id store_rate_minutes_stationary_textView
 id store_rate_stationary_imageView
 id store_rate_stationary_linearLayout
-id store_rate_stationary_textView
 id submenuarrow
 id submit_area
 id supportScrollUp
@@ -1706,7 +1685,6 @@ id three_button
 id three_imageView
 id three_linearLayout
 id time
-id timeout_stationary_textView
 id title
 id titleDividerNoCustom
 id title_template
@@ -1799,7 +1777,6 @@ layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_aerial_defaults
 layout activity_aerial_scan
-layout activity_aerial_scanning
 layout activity_clone_receiver
 layout activity_edit_receiver_defaults
 layout activity_edit_tables
@@ -1816,10 +1793,7 @@ layout activity_set_transmitter_type
 layout activity_start_scanning
 layout activity_stationary_defaults
 layout activity_stationary_scan
-layout activity_stationary_scanning
 layout activity_table_overview
-layout activity_temporary_aerial
-layout activity_temporary_stationary
 layout activity_test_receiver
 layout aerial_current_settings
 layout aerial_scanning

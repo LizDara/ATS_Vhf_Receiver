@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 
@@ -69,10 +70,10 @@ public class FrequencyListAdapter extends BaseAdapter {
         frequencyNumber.setText(String.valueOf(frequencies.get(position)));
         frequency.setOnClickListener(v -> {
             Intent intent = new Intent(context, EnterFrequencyActivity.class);
-            intent.putExtra("title", "Edit Frequency " + frequencies.get(position));
-            intent.putExtra("position", position);
-            intent.putExtra("baseFrequency", baseFrequency);
-            intent.putExtra("range", range);
+            intent.putExtra(ValueCodes.TITLE, "Edit Frequency " + frequencies.get(position));
+            intent.putExtra(ValueCodes.POSITION, position);
+            intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+            intent.putExtra(ValueCodes.RANGE, range);
             launcher.launch(intent);
         });
 

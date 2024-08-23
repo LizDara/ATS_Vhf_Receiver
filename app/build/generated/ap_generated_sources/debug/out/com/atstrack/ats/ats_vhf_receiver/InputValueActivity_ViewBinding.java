@@ -20,23 +20,23 @@ import java.lang.Override;
 public class InputValueActivity_ViewBinding implements Unbinder {
   private InputValueActivity target;
 
-  private View view7f0a0168;
+  private View view7f0a0161;
 
-  private View view7f0a009b;
+  private View view7f0a0098;
 
-  private View view7f0a00f8;
+  private View view7f0a00f2;
 
-  private View view7f0a0272;
+  private View view7f0a025d;
 
-  private View view7f0a00f1;
+  private View view7f0a00eb;
 
-  private View view7f0a027c;
+  private View view7f0a0267;
 
-  private View view7f0a021b;
+  private View view7f0a0209;
 
-  private View view7f0a018d;
+  private View view7f0a0185;
 
-  private View view7f0a01e3;
+  private View view7f0a01d5;
 
   @UiThread
   public InputValueActivity_ViewBinding(InputValueActivity target) {
@@ -66,7 +66,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
     target.tables_merge_listView = Utils.findRequiredViewAsType(source, R.id.tables_merge_listView, "field 'tables_merge_listView'", ListView.class);
     view = Utils.findRequiredView(source, R.id.merge_tables_button, "field 'merge_tables_button' and method 'onClickSaveTables'");
     target.merge_tables_button = Utils.castView(view, R.id.merge_tables_button, "field 'merge_tables_button'", Button.class);
-    view7f0a0168 = view;
+    view7f0a0161 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -74,7 +74,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.continuous_store_linearLayout, "method 'onClickContinuousStore'");
-    view7f0a009b = view;
+    view7f0a0098 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -82,7 +82,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.five_minutes_linearLayout, "method 'onClickFiveMinutes'");
-    view7f0a00f8 = view;
+    view7f0a00f2 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -90,7 +90,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.ten_minutes_linearLayout, "method 'onClickTenMinutes'");
-    view7f0a0272 = view;
+    view7f0a025d = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -98,7 +98,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.fifteen_minutes_linearLayout, "method 'onClickFifteenMinutes'");
-    view7f0a00f1 = view;
+    view7f0a00eb = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -106,7 +106,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.thirty_minutes_linearLayout, "method 'onClickThirtyMinutes'");
-    view7f0a027c = view;
+    view7f0a0267 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -114,7 +114,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.sixty_minutes_linearLayout, "method 'onClickSixtyMinutes'");
-    view7f0a021b = view;
+    view7f0a0209 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -122,7 +122,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.one_hundred_twenty_minutes_linearLayout, "method 'onClickOneHundredTwentyMinutes'");
-    view7f0a018d = view;
+    view7f0a0185 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -130,7 +130,7 @@ public class InputValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.save_changes_input_value_button, "method 'onClickSaveChanges'");
-    view7f0a01e3 = view;
+    view7f0a01d5 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -164,23 +164,23 @@ public class InputValueActivity_ViewBinding implements Unbinder {
     target.tables_merge_listView = null;
     target.merge_tables_button = null;
 
-    view7f0a0168.setOnClickListener(null);
-    view7f0a0168 = null;
-    view7f0a009b.setOnClickListener(null);
-    view7f0a009b = null;
-    view7f0a00f8.setOnClickListener(null);
-    view7f0a00f8 = null;
-    view7f0a0272.setOnClickListener(null);
-    view7f0a0272 = null;
-    view7f0a00f1.setOnClickListener(null);
-    view7f0a00f1 = null;
-    view7f0a027c.setOnClickListener(null);
-    view7f0a027c = null;
-    view7f0a021b.setOnClickListener(null);
-    view7f0a021b = null;
-    view7f0a018d.setOnClickListener(null);
-    view7f0a018d = null;
-    view7f0a01e3.setOnClickListener(null);
-    view7f0a01e3 = null;
+    view7f0a0161.setOnClickListener(null);
+    view7f0a0161 = null;
+    view7f0a0098.setOnClickListener(null);
+    view7f0a0098 = null;
+    view7f0a00f2.setOnClickListener(null);
+    view7f0a00f2 = null;
+    view7f0a025d.setOnClickListener(null);
+    view7f0a025d = null;
+    view7f0a00eb.setOnClickListener(null);
+    view7f0a00eb = null;
+    view7f0a0267.setOnClickListener(null);
+    view7f0a0267 = null;
+    view7f0a0209.setOnClickListener(null);
+    view7f0a0209 = null;
+    view7f0a0185.setOnClickListener(null);
+    view7f0a0185 = null;
+    view7f0a01d5.setOnClickListener(null);
+    view7f0a01d5 = null;
   }
 }

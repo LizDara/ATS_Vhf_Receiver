@@ -54,7 +54,7 @@ public class ReceiverInformation {
     }
 
     public void changeSDCard(byte state) {
-        mSDCard = Converters.getHexValue(state).equals("80") ? "Inserted" : "None";
+        mSDCard = Converters.getHexValue(state).equals("01") ? "Inserted" : "None";
     }
 
     public void changeDeviceBattery(int deviceBattery) {

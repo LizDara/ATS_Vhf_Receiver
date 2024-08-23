@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -30,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -65,6 +65,10 @@ public class MainMenuActivity extends AppCompatActivity {
     ImageView battery_menu_imageView;
     @BindView(R.id.sd_card_menu_imageView)
     ImageView sd_card_menu_imageView;
+    @BindView(R.id.prueba)
+    TextView prueba;
+    @BindView(R.id.prueba_connecting)
+    TextView prueba_connecting;
 
     private final static String TAG = MainMenuActivity.class.getSimpleName();
 
@@ -118,15 +122,18 @@ public class MainMenuActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                Log.i(TAG, "Action: " + action);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
-                    invalidateOptionsMenu();
+                    connecting_device_linearLayout.setVisibility(View.VISIBLE);
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     mConnected = false;
-                    invalidateOptionsMenu();
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    if (menu_linearLayout.getVisibility() == View.VISIBLE)
+                        showDisconnectionMessage("Receiver Disconnected", status);
+                    else
+                        showDisconnectionMessage("Failed to connect to receiver", status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("scanning"))
+                    if (parameter.equals(ValueCodes.SCAN_STATUS))
                         onClickScanning();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
@@ -139,7 +146,9 @@ public class MainMenuActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                Log.i(TAG, e.toString() + " " + e.getLocalizedMessage());
+                prueba.setText("First Gatt: " + e.getLocalizedMessage());
+                prueba_connecting.setText(prueba.getText());
+                mBluetoothLeService.disconnect();
             }
         }
     };
@@ -150,12 +159,14 @@ public class MainMenuActivity extends AppCompatActivity {
             try {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
-                    if (secondParameter.equals("boardState")) // Checks if the BLE device is scanning
+                    if (secondParameter.equals(ValueCodes.BOARD_STATUS)) // Checks if the BLE device is scanning
                         onClickBoardState();
                 }
             }
             catch (Exception e) {
-                Log.i(TAG, e.toString());
+                prueba.setText("Second Gatt: " + e.getLocalizedMessage());
+                prueba_connecting.setText(prueba.getText());
+                mBluetoothLeService.disconnect();
             }
         }
     };
@@ -190,7 +201,7 @@ public class MainMenuActivity extends AppCompatActivity {
      * Requests a read for scan state.
      */
     private void onClickScanning() {
-        secondParameter = "boardState";
+        secondParameter = ValueCodes.BOARD_STATUS;
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
@@ -199,7 +210,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             mBluetoothLeService.discoveringSecond();
-        }, ValueCodes.MESSAGE_PERIOD);
+        }, ValueCodes.WAITING_PERIOD);
     }
 
     @OnClick(R.id.disconnect_button)
@@ -244,9 +255,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
         receiverInformation = ReceiverInformation.getReceiverInformation(); // Get device data from previous activity
 
-        boolean isMenu = getIntent().getBooleanExtra("menu", false);
+        boolean isMenu = getIntent().getBooleanExtra(ValueCodes.MENU, false);
         if (!isMenu) { // Connecting to the selected BLE device
-            parameter = "scanning"; // Checks if the BLE device is scanning
+            parameter = ValueCodes.SCAN_STATUS; // Checks if the BLE device is scanning
             receiverInformation.changeInformation((byte) 0, (byte) 0,
                     getIntent().getStringExtra(EXTRAS_DEVICE_NAME),
                     getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS),
@@ -293,8 +304,8 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        registerReceiver(mSecondGattUpdateReceiver, makeSecondGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter(), RECEIVER_EXPORTED);
+        registerReceiver(mSecondGattUpdateReceiver, makeSecondGattUpdateIntentFilter(), RECEIVER_EXPORTED);
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(receiverInformation.getDeviceAddress());
             Log.d(TAG, "Connect request result=" + result);
@@ -315,20 +326,11 @@ public class MainMenuActivity extends AppCompatActivity {
         mBluetoothLeService = null;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (mConnected)
-            connecting_device_linearLayout.setVisibility(View.VISIBLE);
-        else if (menu_linearLayout.getVisibility() == View.VISIBLE)
-            showDisconnectionMessage("Receiver Disconnected");
-        return true;
-    }
-
     /**
      * Shows an alert dialog because the connection with the BLE device was lost or the client disconnected it.
      * @param message The message that will be displayed on the screen.
      */
-    private void showDisconnectionMessage(String message) {
+    private void showDisconnectionMessage(String message, int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
@@ -336,6 +338,7 @@ public class MainMenuActivity extends AppCompatActivity {
         disconnect_message.setText(message);
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_SHORT).show();
 
         // The message disappears after a pre-defined period and will search for other available BLE devices again
         mHandlerMenu.postDelayed(() -> {
@@ -362,8 +365,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     vhf_constraintLayout.setVisibility(View.GONE);
                     connecting_device_linearLayout.setVisibility(View.GONE);
                 }, ValueCodes.MESSAGE_PERIOD);
-            } else {
-                showDisconnectionMessage("Failed to connect to receiver");
             }
         }, ValueCodes.CONNECT_PERIOD);
     }
@@ -376,10 +377,10 @@ public class MainMenuActivity extends AppCompatActivity {
         checkSDCard(data[7]);
         int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[1]));
         int range = Integer.parseInt(Converters.getDecimalValue(data[2]));
-        SharedPreferences sharedPreferences = getSharedPreferences("Defaults", 0);
+        SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
         SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
-        sharedPreferencesEdit.putInt("BaseFrequency", baseFrequency);
-        sharedPreferencesEdit.putInt("Range", range);
+        sharedPreferencesEdit.putInt(ValueCodes.BASE_FREQUENCY, baseFrequency);
+        sharedPreferencesEdit.putInt(ValueCodes.RANGE, range);
         sharedPreferencesEdit.apply();
 
         if (detectionType == 0) {
@@ -404,7 +405,6 @@ public class MainMenuActivity extends AppCompatActivity {
                 UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE;
                 boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
                 if (result) {
-                    Log.i(TAG, "Detection type: " + Converters.getHexValue(b));
                     receiverInformation.changeTxType(b[1]);
                     dialog.dismiss();
                 }
@@ -441,11 +441,11 @@ public class MainMenuActivity extends AppCompatActivity {
                 maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256)
                         + Integer.parseInt(Converters.getDecimalValue(data[6]));
                 intent = new Intent(this, AerialScanActivity.class);
-                intent.putExtra("isHold", Converters.getHexValue(data[1]).equals("81"));
-                intent.putExtra("autoRecord", autoRecord == 1);
-                intent.putExtra("frequency", currentFrequency);
-                intent.putExtra("index", currentIndex);
-                intent.putExtra("maxIndex", maxIndex);
+                intent.putExtra(ValueCodes.HOLD, Converters.getHexValue(data[1]).equals("81"));
+                intent.putExtra(ValueCodes.AUTO_RECORD, autoRecord == 1);
+                intent.putExtra(ValueCodes.FREQUENCY, currentFrequency);
+                intent.putExtra(ValueCodes.INDEX, currentIndex);
+                intent.putExtra(ValueCodes.MAX_INDEX, maxIndex);
                 break;
             case "83": // The BLE device is in stationary scanning
                 currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
@@ -454,18 +454,17 @@ public class MainMenuActivity extends AppCompatActivity {
                         + Integer.parseInt(Converters.getDecimalValue(data[8]));
                 maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256)
                         + Integer.parseInt(Converters.getDecimalValue(data[6]));
-                intent = new Intent(this, AerialScanActivity.class);
-                intent.putExtra("frequency", currentFrequency);
-                intent.putExtra("index", currentIndex);
-                intent.putExtra("maxIndex", maxIndex);
                 intent = new Intent(this, StationaryScanActivity.class);
+                intent.putExtra(ValueCodes.FREQUENCY, currentFrequency);
+                intent.putExtra(ValueCodes.INDEX, currentIndex);
+                intent.putExtra(ValueCodes.MAX_INDEX, maxIndex);
                 break;
             case "86": // The BLE device is in manual scanning
                 intent = new Intent(this, ManualScanActivity.class);
                 break;
         }
-        intent.putExtra("detectionType", data[18]);
-        intent.putExtra("scanning", true);
+        intent.putExtra(ValueCodes.DETECTION_TYPE, data[18]);
+        intent.putExtra(ValueCodes.SCANNING, true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -474,6 +473,6 @@ public class MainMenuActivity extends AppCompatActivity {
     private void checkSDCard(byte state) {
         receiverInformation.changeSDCard(state);
         sd_card_menu_textView.setText(receiverInformation.getSDCard());
-        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, Converters.getHexValue(state).equals("80") ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
+        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, Converters.getHexValue(state).equals("01") ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

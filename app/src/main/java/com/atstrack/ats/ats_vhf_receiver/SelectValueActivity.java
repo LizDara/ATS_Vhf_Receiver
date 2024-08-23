@@ -21,7 +21,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -126,7 +126,6 @@ public class SelectValueActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -134,43 +133,40 @@ public class SelectValueActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("txType"))
+                    if (parameter.equals(ValueCodes.DETECTION_TYPE))
                         onClickTxType();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
                     switch (type) {
-                        case ValueCodes.PULSE_RATE_TYPE: // Gets the pulse rate type
+                        case ValueCodes.PULSE_RATE_TYPE_CODE: // Gets the pulse rate type
                             downloadPulseRateType(packet);
                             break;
-                        case ValueCodes.MATCHES_FOR_VALID_PATTERN: // Gets the matches for valid pattern
+                        case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE: // Gets the matches for valid pattern
                             downloadMatchesForValidPattern(packet);
                             break;
-                        case ValueCodes.MAX_PULSE_RATE: // Gets the max pulse rate
+                        case ValueCodes.MAX_PULSE_RATE_CODE: // Gets the max pulse rate
                             downloadMaxPulseRate(packet);
                             break;
-                        case ValueCodes.MIN_PULSE_RATE: // Gets the min pulse rate
+                        case ValueCodes.MIN_PULSE_RATE_CODE: // Gets the min pulse rate
                             downloadMinPulseRate(packet);
                             break;
-                        case ValueCodes.DATA_CALCULATION_TYPES: // Gets data calculation types
+                        case ValueCodes.DATA_CALCULATION_TYPE_CODE: // Gets data calculation types
                             downloadDataCalculation(packet);
-                        case ValueCodes.PULSE_RATE_1: // Gets the pulse rate 1
+                        case ValueCodes.PULSE_RATE_1_CODE: // Gets the pulse rate 1
                             downloadPulseRate1(packet);
                             break;
-                        case ValueCodes.PULSE_RATE_2: // Gets the pulse rate 2
+                        case ValueCodes.PULSE_RATE_2_CODE: // Gets the pulse rate 2
                             downloadPulseRate2(packet);
                             break;
-                        case ValueCodes.PULSE_RATE_3: // Gets the pulse rate 3
+                        case ValueCodes.PULSE_RATE_3_CODE: // Gets the pulse rate 3
                             downloadPulseRate3(packet);
                             break;
-                        case ValueCodes.PULSE_RATE_4: // Gets the pulse rate 4
+                        case ValueCodes.PULSE_RATE_4_CODE: // Gets the pulse rate 4
                             downloadPulseRate4(packet);
                             break;
                     }
@@ -221,7 +217,7 @@ public class SelectValueActivity extends AppCompatActivity {
         coded_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.CODED;
+        value = ValueCodes.CODED_CODE;
     }
 
     @OnClick(R.id.fixed_pulse_rate_linearLayout)
@@ -229,7 +225,7 @@ public class SelectValueActivity extends AppCompatActivity {
         coded_imageView.setVisibility(View.GONE);
         fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.FIXED_PULSE_RATE;
+        value = ValueCodes.FIXED_PULSE_RATE_CODE;
     }
 
     @OnClick(R.id.variable_pulse_rate_linearLayout)
@@ -237,7 +233,7 @@ public class SelectValueActivity extends AppCompatActivity {
         coded_imageView.setVisibility(View.GONE);
         variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.VARIABLE_PULSE_RATE;
+        value = ValueCodes.VARIABLE_PULSE_RATE_CODE;
     }
 
     @OnClick(R.id.none_linearLayout)
@@ -245,7 +241,7 @@ public class SelectValueActivity extends AppCompatActivity {
         none_imageView.setVisibility(View.VISIBLE);
         temperature_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = ValueCodes.NONE;
+        value = ValueCodes.NONE_CODE;
     }
 
     @OnClick(R.id.temperature_linearLayout)
@@ -253,7 +249,7 @@ public class SelectValueActivity extends AppCompatActivity {
         temperature_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         period_imageView.setVisibility(View.GONE);
-        value = ValueCodes.TEMPERATURE;
+        value = ValueCodes.TEMPERATURE_CODE;
     }
 
     @OnClick(R.id.period_linearLayout)
@@ -261,7 +257,7 @@ public class SelectValueActivity extends AppCompatActivity {
         period_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
         temperature_imageView.setVisibility(View.GONE);
-        value = ValueCodes.PERIOD;
+        value = ValueCodes.PERIOD_CODE;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -362,53 +358,53 @@ public class SelectValueActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        type = getIntent().getIntExtra("type", 0);
+        type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
         switch (type) {
-            case ValueCodes.PULSE_RATE_TYPE:
+            case ValueCodes.PULSE_RATE_TYPE_CODE:
                 setVisibility("pulseRateTypes");
                 break;
-            case ValueCodes.MATCHES_FOR_VALID_PATTERN:
+            case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE:
                 setVisibility("matches");
                 break;
-            case ValueCodes.MAX_PULSE_RATE:
+            case ValueCodes.MAX_PULSE_RATE_CODE:
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.max_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_max_pulse_rate);
                 break;
-            case ValueCodes.MIN_PULSE_RATE:
+            case ValueCodes.MIN_PULSE_RATE_CODE:
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.min_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_min_pulse_rate);
                 break;
-            case ValueCodes.DATA_CALCULATION_TYPES:
+            case ValueCodes.DATA_CALCULATION_TYPE_CODE:
                 setVisibility("calculation");
                 break;
-            case ValueCodes.PULSE_RATE_1:
+            case ValueCodes.PULSE_RATE_1_CODE:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_1);
                 pulse_rate_textView.setText(R.string.lb_pr1);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_2:
+            case ValueCodes.PULSE_RATE_2_CODE:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_2);
                 pulse_rate_textView.setText(R.string.lb_pr2);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_3:
+            case ValueCodes.PULSE_RATE_3_CODE:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_3);
                 pulse_rate_textView.setText(R.string.lb_pr3);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_4:
+            case ValueCodes.PULSE_RATE_4_CODE:
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_4);
                 pulse_rate_textView.setText(R.string.lb_pr4);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
                 break;
         }
-        parameter = "txType";
+        parameter = ValueCodes.DETECTION_TYPE;
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -418,7 +414,7 @@ public class SelectValueActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             Intent intent = new Intent();
-            if (type == ValueCodes.PULSE_RATE_1 || type == ValueCodes.PULSE_RATE_2 || type == ValueCodes.PULSE_RATE_3 || type == ValueCodes.PULSE_RATE_4) {
+            if (type == ValueCodes.PULSE_RATE_1_CODE || type == ValueCodes.PULSE_RATE_2_CODE || type == ValueCodes.PULSE_RATE_3_CODE || type == ValueCodes.PULSE_RATE_4_CODE) {
                 int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
                 int tolerance = Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
                 if (pulseRate > 0 && pulseRate <= 150 && tolerance > 0 && tolerance <= 10) {
@@ -433,7 +429,7 @@ public class SelectValueActivity extends AppCompatActivity {
                     Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(getResources().getColor(catskill_white)));
                     return true;
                 }
-            } else if (type == ValueCodes.MAX_PULSE_RATE || type == ValueCodes.MIN_PULSE_RATE) {
+            } else if (type == ValueCodes.MAX_PULSE_RATE_CODE || type == ValueCodes.MIN_PULSE_RATE_CODE) {
                 value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
             }
             intent.putExtra(ValueCodes.VALUE, value);
@@ -466,23 +462,17 @@ public class SelectValueActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         Log.i(TAG, "Back Button Pressed");
     }
 
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -545,13 +535,13 @@ public class SelectValueActivity extends AppCompatActivity {
         setVisibility("pulseRateTypes");
         if (Converters.getHexValue(data[1]).equals("09")) {
             coded_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.CODED;
+            value = ValueCodes.CODED_CODE;
         } else if (Converters.getHexValue(data[1]).equals("08")) {
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.FIXED_PULSE_RATE;
+            value = ValueCodes.FIXED_PULSE_RATE_CODE;
         } else if (Converters.getHexValue(data[1]).equals("07")) {
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.VARIABLE_PULSE_RATE;
+            value = ValueCodes.VARIABLE_PULSE_RATE_CODE;
         }
     }
 
@@ -618,15 +608,15 @@ public class SelectValueActivity extends AppCompatActivity {
         switch (Converters.getHexValue(data[11])) {
             case "00":
                 none_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.NONE;
+                value = ValueCodes.NONE_CODE;
                 break;
             case "08":
                 period_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.PERIOD;
+                value = ValueCodes.PERIOD_CODE;
                 break;
             case "04":
                 temperature_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.TEMPERATURE;
+                value = ValueCodes.TEMPERATURE_CODE;
                 break;
         }
     }

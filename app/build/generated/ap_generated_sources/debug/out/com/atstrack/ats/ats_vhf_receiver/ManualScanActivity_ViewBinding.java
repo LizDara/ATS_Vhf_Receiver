@@ -19,19 +19,19 @@ import java.lang.Override;
 public class ManualScanActivity_ViewBinding implements Unbinder {
   private ManualScanActivity target;
 
-  private View view7f0a01d3;
+  private View view7f0a01c5;
 
-  private View view7f0a016e;
+  private View view7f0a0167;
 
-  private View view7f0a01a4;
+  private View view7f0a019c;
 
-  private View view7f0a00eb;
+  private View view7f0a00e6;
 
-  private View view7f0a0230;
+  private View view7f0a021e;
 
-  private View view7f0a00db;
+  private View view7f0a00d7;
 
-  private View view7f0a00da;
+  private View view7f0a00d6;
 
   @UiThread
   public ManualScanActivity_ViewBinding(ManualScanActivity target) {
@@ -59,7 +59,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
     target.line_view = Utils.findRequiredView(source, R.id.line_view, "field 'line_view'");
     view = Utils.findRequiredView(source, R.id.record_data_manual_button, "field 'record_data_manual_button' and method 'onClickRecordData'");
     target.record_data_manual_button = Utils.castView(view, R.id.record_data_manual_button, "field 'record_data_manual_button'", Button.class);
-    view7f0a01d3 = view;
+    view7f0a01c5 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -69,7 +69,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
     target.audio_manual_linearLayout = Utils.findRequiredViewAsType(source, R.id.audio_manual_linearLayout, "field 'audio_manual_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.minus_imageView, "field 'minus_imageView' and method 'onClickMinus'");
     target.minus_imageView = Utils.castView(view, R.id.minus_imageView, "field 'minus_imageView'", ImageView.class);
-    view7f0a016e = view;
+    view7f0a0167 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -78,7 +78,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.plus_imageView, "field 'plus_imageView' and method 'onClickPlus'");
     target.plus_imageView = Utils.castView(view, R.id.plus_imageView, "field 'plus_imageView'", ImageView.class);
-    view7f0a01a4 = view;
+    view7f0a019c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -88,7 +88,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
     target.gps_manual_imageView = Utils.findRequiredViewAsType(source, R.id.gps_manual_imageView, "field 'gps_manual_imageView'", ImageView.class);
     target.gps_state_manual_textView = Utils.findRequiredViewAsType(source, R.id.gps_state_manual_textView, "field 'gps_state_manual_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.enter_new_frequency_button, "method 'onClickEnterNewFrequency'");
-    view7f0a00eb = view;
+    view7f0a00e6 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -96,7 +96,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.start_manual_button, "method 'onClickStartManual'");
-    view7f0a0230 = view;
+    view7f0a021e = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -104,7 +104,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.edit_frequency_button, "method 'onClickEditFrequency'");
-    view7f0a00db = view;
+    view7f0a00d7 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -112,7 +112,7 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.edit_audio_manual_textView, "method 'onClickEditAudio'");
-    view7f0a00da = view;
+    view7f0a00d6 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -149,19 +149,19 @@ public class ManualScanActivity_ViewBinding implements Unbinder {
     target.gps_manual_imageView = null;
     target.gps_state_manual_textView = null;
 
-    view7f0a01d3.setOnClickListener(null);
-    view7f0a01d3 = null;
-    view7f0a016e.setOnClickListener(null);
-    view7f0a016e = null;
-    view7f0a01a4.setOnClickListener(null);
-    view7f0a01a4 = null;
-    view7f0a00eb.setOnClickListener(null);
-    view7f0a00eb = null;
-    view7f0a0230.setOnClickListener(null);
-    view7f0a0230 = null;
-    view7f0a00db.setOnClickListener(null);
-    view7f0a00db = null;
-    view7f0a00da.setOnClickListener(null);
-    view7f0a00da = null;
+    view7f0a01c5.setOnClickListener(null);
+    view7f0a01c5 = null;
+    view7f0a0167.setOnClickListener(null);
+    view7f0a0167 = null;
+    view7f0a019c.setOnClickListener(null);
+    view7f0a019c = null;
+    view7f0a00e6.setOnClickListener(null);
+    view7f0a00e6 = null;
+    view7f0a021e.setOnClickListener(null);
+    view7f0a021e = null;
+    view7f0a00d7.setOnClickListener(null);
+    view7f0a00d7 = null;
+    view7f0a00d6.setOnClickListener(null);
+    view7f0a00d6 = null;
   }
 }

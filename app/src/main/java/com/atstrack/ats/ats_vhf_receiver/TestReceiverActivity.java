@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -138,7 +138,6 @@ public class TestReceiverActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mConnected = true;
     private String parameter = "";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -146,19 +145,16 @@ public class TestReceiverActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                    mConnected = true;
-                    invalidateOptionsMenu();
-                } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    mConnected = false;
-                    invalidateOptionsMenu();
+                if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
+                    showDisconnectionMessage(status);
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals("test")) // Gets BLE device data
+                    if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
                         onClickTest();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
-                    if (parameter.equals("test")) // Gets BLE device data
+                    if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
                         downloadData(packet);
                 }
             }
@@ -207,7 +203,7 @@ public class TestReceiverActivity extends AppCompatActivity {
         receiverInformation = ReceiverInformation.getReceiverInformation();
         ReceiverStatus.setReceiverStatus(this);
 
-        parameter = "test";
+        parameter = ValueCodes.TEST;
         mHandlerTest = new Handler();
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -246,19 +242,13 @@ public class TestReceiverActivity extends AppCompatActivity {
         mBluetoothLeService = null;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mConnected)
-            showDisconnectionMessage();
-        return true;
-    }
-
-    private void showDisconnectionMessage() {
+    private void showDisconnectionMessage(int status) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
+        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -352,7 +342,6 @@ public class TestReceiverActivity extends AppCompatActivity {
             table12_linearLayout.setVisibility(View.VISIBLE);
         }
 
-        Log.i(TAG, "TX TYPE: " + Converters.getHexValue(data[25]));
         tx_type_textView.setText(
                 Converters.getHexValue(data[25]).equals("09")  ? "Coded" : "Non coded");
         software_version_textView.setText(Converters.getDecimalValue(data[26]));

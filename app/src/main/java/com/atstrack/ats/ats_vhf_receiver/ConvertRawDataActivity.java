@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -193,6 +194,15 @@ public class ConvertRawDataActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

@@ -1,5 +1,9 @@
 [
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_plus.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\ic_plus.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
@@ -28,6 +32,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_gps_failed.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_fragment_audio_options.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_audio_options.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_frequency_message.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_message.xml"
     },
@@ -36,36 +44,40 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_low_battery.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_menu_scan.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\menu_scan.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_right.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_right.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_menu_scan.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\menu_scan.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_manual_scanning.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\manual_scanning.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_fragment_view_detection_filter.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_view_detection_filter.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_download_complete.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\download_complete.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_circle.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_circle.xml"
-    },
-    {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_clone_receiver.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_clone_receiver.xml"
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_edit_table_scan.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\edit_table_scan.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_set_transmitter_type.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_set_transmitter_type.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_edit_table_scan.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\edit_table_scan.xml"
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_clone_receiver.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_clone_receiver.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_circle.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_circle.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_receiver_configuration.xml.flat",
@@ -232,10 +244,6 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\merge_tables_scan.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_audio_options.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\audio_options.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_select_value.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_select_value.xml"
     },
@@ -280,10 +288,6 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_rectangle_92.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_select_detection_filter.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\select_detection_filter.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_receiver_status.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\receiver_status.xml"
     },
@@ -314,6 +318,14 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxhdpi_ic_launcher_foreground.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_foreground.png"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_convert_raw_data.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_convert_raw_data.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_sd_card_alert.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\ic_sd_card_alert.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_next.xml.flat",
@@ -468,6 +480,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_rotate_cw.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_fragment_detection_filter.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_detection_filter.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_decrease.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_decrease.xml"
     },
@@ -510,6 +526,10 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_scanning_animation.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\scanning_animation.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_file.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\ic_file.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\res\\merged\\debug\\layout_store_rate_values.xml.flat",

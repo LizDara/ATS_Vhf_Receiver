@@ -1,10 +1,14 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
+import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,7 +18,6 @@ import butterknife.OnClick;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -26,8 +29,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -78,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.refresh_button)
     ImageButton refresh_button;
 
+    private final static String TAG = MainActivity.class.getSimpleName();
+
     private SharedPreferences.Editor sharedPreferencesEditor;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
@@ -96,6 +103,17 @@ public class MainActivity extends AppCompatActivity {
                     mLeDeviceListAdapter.notifyDataSetChanged();
                 }
             };
+
+    ActivityResultLauncher<Intent> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                Log.i("MAIN ACTIVITY", "RESULT: " + result.getResultCode());
+                    if (result.getResultCode() == -1)
+                        initializeScan(ValueCodes.MESSAGE_PERIOD);
+                    else {
+                        Log.i(TAG, "THE APP CLOSED CAUSED BY A PROBLEM WITH LAUNCHER");
+                        finish();
+                    }
+            });
 
     @OnClick(R.id.location_button)
     public void enableLocation(View v) {
@@ -153,24 +171,8 @@ public class MainActivity extends AppCompatActivity {
 
         String version = "version: " + BuildConfig.VERSION_NAME;
         version_textView.setText(version);
-        init();
         mHandler = new Handler();
-
-        // Use this check to determine whether BLE is supported on the device. Then you can selectively disable BLE-related features.
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        // Initializes a Bluetooth adapter.
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        init();
     }
 
     /**
@@ -186,56 +188,72 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferencesEditor.apply();
         //isNightModeOn = appSettingPrefs.getBoolean("NightMode", false);
 
-        if (isNightModeOn) {
+        if (isNightModeOn)
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            switch_dark_mode.setChecked(true);
-        } else {
+        else
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            switch_dark_mode.setChecked(false);
-        }
+        switch_dark_mode.setChecked(isNightModeOn);
 
         checkPermissions();
-        if (!BluetoothAdapter.getDefaultAdapter().isEnabled())
-            bluetooth_enable_linearLayout.setVisibility(View.VISIBLE);
-        if (!isLocationEnable())
-            location_enable_linearLayout.setVisibility(View.VISIBLE);
     }
 
-    @SuppressLint("MissingPermission")
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
-        if (!mBluetoothAdapter.isEnabled()) {
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, ValueCodes.REQUEST_ENABLE_BT);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        /*for (int result : grantResults) {
+            if (result == PackageManager.PERMISSION_DENIED) {
+                finish();
+                return;
             }
-        }
-        // Initializes list view adapter.
-        mLeDeviceListAdapter = new LeDeviceListAdapter(this);
-        new Handler().postDelayed(() -> {
-            branding_constraintLayout.setVisibility(View.GONE);
-            searching_receivers_constraintLayout.setVisibility(View.VISIBLE);
-            scanLeDevice(true);
-        }, ValueCodes.BRANDING_PERIOD);
-    }
+        }*/
+        Log.i(TAG, "AFTER CHECK GRANT RESULTS " + requestCode);
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ValueCodes.REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) { // User chose not to enable Bluetooth.
+        // Use this check to determine whether BLE is supported on the device. Then you can selectively disable BLE-related features.
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            //Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "THE APP CLOSED CAUSED BY A PROBLEM WITH BLUETOOTH LE");
             finish();
-            return;
         }
-        super.onActivityResult(requestCode, resultCode, data);
+
+        // Initializes a Bluetooth adapter.
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        Log.i(TAG, "AFTER GET ADAPTER BLUETOOTH " + requestCode);
+
+        // Checks if Bluetooth is supported on the device.
+        if (mBluetoothAdapter == null) {
+            //Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "THE APP CLOSED CAUSED BY A PROBLEM WITH BLUETOOTH NOT SUPPORTED");
+            finish();
+        }
+        Log.i(TAG, "AFTER ADAPTER " + requestCode);
+
+        // Ensures Bluetooth is enabled on the device. If Bluetooth is not currently enabled, fire an intent to display a dialog asking the user to grant permission to enable it.
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            requestPermissionLauncher.launch(enableBtIntent);
+            Log.i(TAG, "AFTER BLUETOOTH NO ENABLE");
+        } else {
+            initializeScan(ValueCodes.MESSAGE_PERIOD);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        scanLeDevice(false);
-        mLeDeviceListAdapter.clear();
+        if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+            scanLeDevice(false);
+            mLeDeviceListAdapter.clear();
+        }
+    }
+
+    private void initializeScan(int TIME) {
+        mLeDeviceListAdapter = new LeDeviceListAdapter(this); // Initializes list view adapter.
+        new Handler().postDelayed(() -> {
+            branding_constraintLayout.setVisibility(View.GONE);
+            searching_receivers_constraintLayout.setVisibility(View.VISIBLE);
+            scanLeDevice(true);
+        }, TIME);
     }
 
     /**
@@ -277,7 +295,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mBluetoothLeScanner.stopScan(mLeScanCallback);
         }
-        invalidateOptionsMenu();
     }
 
     @Override
@@ -290,24 +307,48 @@ public class MainActivity extends AppCompatActivity {
      * If Location Permissions are needed, it's capable to ask the user for them.
      */
     private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= 33) {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
             permissionCheck += this.checkSelfPermission("Manifest.permission.BLUETOOTH_CONNECT");
             permissionCheck += this.checkSelfPermission("Manifest.permission.BLUETOOTH_SCAN");
-            permissionCheck += this.checkSelfPermission("Manifest.permission.MANAGE_EXTERNAL_STORAGE");
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.MANAGE_EXTERNAL_STORAGE");
             if (permissionCheck != 0) {
                 this.requestPermissions(
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH,
+                                Manifest.permission.BLUETOOTH_CONNECT,
+                                Manifest.permission.BLUETOOTH_ADVERTISE,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001); //Any number
+            } else {
+                initializeScan(ValueCodes.BRANDING_PERIOD);
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.BLUETOOTH_CONNECT");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.BLUETOOTH_SCAN");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
+            permissionCheck += this.checkSelfPermission("Manifest.permission.MANAGE_EXTERNAL_STORAGE");
+            if (permissionCheck != 0) {
+                this.requestPermissions(
+                        new String[]{
+                                Manifest.permission.BLUETOOTH,
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH_CONNECT,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.MANAGE_EXTERNAL_STORAGE,
                                 Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.BLUETOOTH,
-                                Manifest.permission.BLUETOOTH_CONNECT,
-                                Manifest.permission.BLUETOOTH_SCAN}, 1001); //Any number
+                                Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
+            } else {
+                initializeScan(ValueCodes.BRANDING_PERIOD);
             }
         } else {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
@@ -316,13 +357,16 @@ public class MainActivity extends AppCompatActivity {
             permissionCheck += this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
             if (permissionCheck != 0) {
                 this.requestPermissions(
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        new String[]{Manifest.permission.BLUETOOTH,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.BLUETOOTH}, 1001); //Any number
+                                Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
+            } else {
+                initializeScan(ValueCodes.BRANDING_PERIOD);
             }
         }
+        Log.i(TAG, "AFTER REQUEST " + Build.VERSION.SDK_INT);
     }
 
     /**

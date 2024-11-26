@@ -24,10 +24,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -99,8 +101,8 @@ public class SelectValueActivity extends AppCompatActivity {
     EditText pulse_rate_editText;
     @BindView(R.id.pulse_rate_tolerance_textView)
     TextView pulse_rate_tolerance_textView;
-    @BindView(R.id.pulse_rate_tolerance_editText)
-    EditText pulse_rate_tolerance_editText;
+    @BindView(R.id.pulse_rate_tolerance_spinner)
+    Spinner pulse_rate_tolerance_spinner;
 
     private final static String TAG = SelectValueActivity.class.getSimpleName();
 
@@ -171,8 +173,7 @@ public class SelectValueActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -416,8 +417,8 @@ public class SelectValueActivity extends AppCompatActivity {
             Intent intent = new Intent();
             if (type == ValueCodes.PULSE_RATE_1_CODE || type == ValueCodes.PULSE_RATE_2_CODE || type == ValueCodes.PULSE_RATE_3_CODE || type == ValueCodes.PULSE_RATE_4_CODE) {
                 int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
-                int tolerance = Integer.parseInt(pulse_rate_tolerance_editText.getText().toString());
-                if (pulseRate > 0 && pulseRate <= 150 && tolerance > 0 && tolerance <= 10) {
+                int tolerance = pulse_rate_tolerance_spinner.getSelectedItemPosition() + 4;
+                if (pulseRate >= 8 && pulseRate <= 150) {
                     value = (pulseRate * 100) + tolerance;
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -472,7 +473,6 @@ public class SelectValueActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -507,6 +507,9 @@ public class SelectValueActivity extends AppCompatActivity {
                 pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 max_min_pulse_rate_linearLayout.setVisibility(View.GONE);
                 data_calculation_types_linearLayout.setVisibility(View.GONE);
+                ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.pulseRateTolerance, android.R.layout.simple_spinner_item);
+                scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                pulse_rate_tolerance_spinner.setAdapter(scanRateAdapter);
                 break;
             case "maxMin":
                 select_pulse_rate_linearLayout.setVisibility(View.GONE);
@@ -626,8 +629,9 @@ public class SelectValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadPulseRate1(byte[] data) {
+        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[4]));
         pulse_rate_editText.setText(Converters.getDecimalValue(data[3]));
-        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[4]));
+        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
         value = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[4]));
     }
 
@@ -636,8 +640,9 @@ public class SelectValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadPulseRate2(byte[] data) {
+        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[6]));
         pulse_rate_editText.setText(Converters.getDecimalValue(data[5]));
-        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[6]));
+        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
         value = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[6]));
     }
 
@@ -646,8 +651,9 @@ public class SelectValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadPulseRate3(byte[] data) {
+        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[8]));
         pulse_rate_editText.setText(Converters.getDecimalValue(data[7]));
-        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[8]));
+        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
         value = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[8]));
     }
 
@@ -656,8 +662,9 @@ public class SelectValueActivity extends AppCompatActivity {
      * @param data The received packet.
      */
     private void downloadPulseRate4(byte[] data) {
+        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[10]));
         pulse_rate_editText.setText(Converters.getDecimalValue(data[9]));
-        pulse_rate_tolerance_editText.setText(Converters.getDecimalValue(data[10]));
+        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
         value = (Integer.parseInt(Converters.getDecimalValue(data[9])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[10]));
     }
 }

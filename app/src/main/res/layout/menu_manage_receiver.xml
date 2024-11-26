@@ -28,7 +28,7 @@
             android:id="@+id/memory_used_progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="24sp"
+            android:layout_height="@dimen/line_height"
             android:progressDrawable="@drawable/progress_bar" />
 
         <TextView

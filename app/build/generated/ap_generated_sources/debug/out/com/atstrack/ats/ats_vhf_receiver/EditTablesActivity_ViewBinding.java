@@ -21,9 +21,9 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
 
   private View view7f0a0050;
 
-  private View view7f0a00ad;
+  private View view7f0a00b4;
 
-  private View view7f0a00a7;
+  private View view7f0a00ae;
 
   private View view7f0a0043;
 
@@ -56,7 +56,7 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.delete_frequencies_linearLayout = Utils.findRequiredViewAsType(source, R.id.delete_frequencies_linearLayout, "field 'delete_frequencies_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.delete_selected_frequencies_button, "field 'delete_selected_frequencies_button' and method 'onClickDeleteSelectedFrequencies'");
     target.delete_selected_frequencies_button = Utils.castView(view, R.id.delete_selected_frequencies_button, "field 'delete_selected_frequencies_button'", Button.class);
-    view7f0a00ad = view;
+    view7f0a00b4 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -67,7 +67,7 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
     target.frequencies_listView = Utils.findRequiredViewAsType(source, R.id.frequencies_listView, "field 'frequencies_listView'", ListView.class);
     target.frequencies_delete_listView = Utils.findRequiredViewAsType(source, R.id.frequencies_delete_listView, "field 'frequencies_delete_listView'", ListView.class);
     view = Utils.findRequiredView(source, R.id.delete_frequencies_button, "method 'onClickDeleteFrequencies'");
-    view7f0a00a7 = view;
+    view7f0a00ae = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -113,10 +113,10 @@ public class EditTablesActivity_ViewBinding implements Unbinder {
 
     view7f0a0050.setOnClickListener(null);
     view7f0a0050 = null;
-    view7f0a00ad.setOnClickListener(null);
-    view7f0a00ad = null;
-    view7f0a00a7.setOnClickListener(null);
-    view7f0a00a7 = null;
+    view7f0a00b4.setOnClickListener(null);
+    view7f0a00b4 = null;
+    view7f0a00ae.setOnClickListener(null);
+    view7f0a00ae = null;
     view7f0a0043.setOnClickListener(null);
     view7f0a0043 = null;
     view7f0a0045.setOnClickListener(null);

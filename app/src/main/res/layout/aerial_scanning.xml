@@ -235,6 +235,7 @@
                         style="@style/body_large"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/lb_all"
                         android:textColor="@color/ebony_clay"
                         android:textStyle="bold" />
 
@@ -264,5 +265,15 @@
             layout="@layout/scan_details"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/view_detection_aerial_textView"
+        style="@style/button_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4sp"
+        android:layout_marginStart="16sp"
+        android:text="@string/lb_view_detection_filter"
+        android:textColor="@color/ebony_clay" />
 
 </LinearLayout>

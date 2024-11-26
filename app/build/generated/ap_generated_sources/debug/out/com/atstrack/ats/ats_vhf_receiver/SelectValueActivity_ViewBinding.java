@@ -6,6 +6,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.CallSuper;
 import androidx.annotation.UiThread;
@@ -19,31 +20,31 @@ import java.lang.Override;
 public class SelectValueActivity_ViewBinding implements Unbinder {
   private SelectValueActivity target;
 
-  private View view7f0a008b;
+  private View view7f0a008d;
 
-  private View view7f0a00f4;
+  private View view7f0a0100;
 
-  private View view7f0a0288;
+  private View view7f0a02a0;
 
-  private View view7f0a0176;
+  private View view7f0a0184;
 
-  private View view7f0a025b;
+  private View view7f0a0273;
 
-  private View view7f0a0198;
+  private View view7f0a01aa;
 
-  private View view7f0a027a;
+  private View view7f0a0292;
 
-  private View view7f0a026a;
+  private View view7f0a0282;
 
-  private View view7f0a00f9;
+  private View view7f0a0105;
 
-  private View view7f0a00f0;
+  private View view7f0a00fc;
 
-  private View view7f0a0206;
+  private View view7f0a021e;
 
-  private View view7f0a01fa;
+  private View view7f0a0212;
 
-  private View view7f0a00e1;
+  private View view7f0a00e8;
 
   @UiThread
   public SelectValueActivity_ViewBinding(SelectValueActivity target) {
@@ -82,9 +83,9 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
     target.pulse_rate_textView = Utils.findRequiredViewAsType(source, R.id.pulse_rate_textView, "field 'pulse_rate_textView'", TextView.class);
     target.pulse_rate_editText = Utils.findRequiredViewAsType(source, R.id.pulse_rate_editText, "field 'pulse_rate_editText'", EditText.class);
     target.pulse_rate_tolerance_textView = Utils.findRequiredViewAsType(source, R.id.pulse_rate_tolerance_textView, "field 'pulse_rate_tolerance_textView'", TextView.class);
-    target.pulse_rate_tolerance_editText = Utils.findRequiredViewAsType(source, R.id.pulse_rate_tolerance_editText, "field 'pulse_rate_tolerance_editText'", EditText.class);
+    target.pulse_rate_tolerance_spinner = Utils.findRequiredViewAsType(source, R.id.pulse_rate_tolerance_spinner, "field 'pulse_rate_tolerance_spinner'", Spinner.class);
     view = Utils.findRequiredView(source, R.id.coded_linearLayout, "method 'onClickCoded'");
-    view7f0a008b = view;
+    view7f0a008d = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -92,7 +93,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.fixed_pulse_rate_linearLayout, "method 'onClickFixedPulseRate'");
-    view7f0a00f4 = view;
+    view7f0a0100 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -100,7 +101,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.variable_pulse_rate_linearLayout, "method 'onClickVariablePulseRate'");
-    view7f0a0288 = view;
+    view7f0a02a0 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -108,7 +109,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.none_linearLayout, "method 'onClickNone'");
-    view7f0a0176 = view;
+    view7f0a0184 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -116,7 +117,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.temperature_linearLayout, "method 'onClickTemperature'");
-    view7f0a025b = view;
+    view7f0a0273 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -124,7 +125,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.period_linearLayout, "method 'onClickPeriod'");
-    view7f0a0198 = view;
+    view7f0a01aa = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -132,7 +133,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.two_linearLayout, "method 'onClickTwo'");
-    view7f0a027a = view;
+    view7f0a0292 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -140,7 +141,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.three_linearLayout, "method 'onClickThree'");
-    view7f0a026a = view;
+    view7f0a0282 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -148,7 +149,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.four_linearLayout, "method 'onClickFour'");
-    view7f0a00f9 = view;
+    view7f0a0105 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -156,7 +157,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.five_linearLayout, "method 'onClickFive'");
-    view7f0a00f0 = view;
+    view7f0a00fc = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -164,7 +165,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.six_linearLayout, "method 'onClickSix'");
-    view7f0a0206 = view;
+    view7f0a021e = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -172,7 +173,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.seven_linearLayout, "method 'onClickSeven'");
-    view7f0a01fa = view;
+    view7f0a0212 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -180,7 +181,7 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.eight_linearLayout, "method 'onClickEight'");
-    view7f0a00e1 = view;
+    view7f0a00e8 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -223,33 +224,33 @@ public class SelectValueActivity_ViewBinding implements Unbinder {
     target.pulse_rate_textView = null;
     target.pulse_rate_editText = null;
     target.pulse_rate_tolerance_textView = null;
-    target.pulse_rate_tolerance_editText = null;
+    target.pulse_rate_tolerance_spinner = null;
 
-    view7f0a008b.setOnClickListener(null);
-    view7f0a008b = null;
-    view7f0a00f4.setOnClickListener(null);
-    view7f0a00f4 = null;
-    view7f0a0288.setOnClickListener(null);
-    view7f0a0288 = null;
-    view7f0a0176.setOnClickListener(null);
-    view7f0a0176 = null;
-    view7f0a025b.setOnClickListener(null);
-    view7f0a025b = null;
-    view7f0a0198.setOnClickListener(null);
-    view7f0a0198 = null;
-    view7f0a027a.setOnClickListener(null);
-    view7f0a027a = null;
-    view7f0a026a.setOnClickListener(null);
-    view7f0a026a = null;
-    view7f0a00f9.setOnClickListener(null);
-    view7f0a00f9 = null;
-    view7f0a00f0.setOnClickListener(null);
-    view7f0a00f0 = null;
-    view7f0a0206.setOnClickListener(null);
-    view7f0a0206 = null;
-    view7f0a01fa.setOnClickListener(null);
-    view7f0a01fa = null;
-    view7f0a00e1.setOnClickListener(null);
-    view7f0a00e1 = null;
+    view7f0a008d.setOnClickListener(null);
+    view7f0a008d = null;
+    view7f0a0100.setOnClickListener(null);
+    view7f0a0100 = null;
+    view7f0a02a0.setOnClickListener(null);
+    view7f0a02a0 = null;
+    view7f0a0184.setOnClickListener(null);
+    view7f0a0184 = null;
+    view7f0a0273.setOnClickListener(null);
+    view7f0a0273 = null;
+    view7f0a01aa.setOnClickListener(null);
+    view7f0a01aa = null;
+    view7f0a0292.setOnClickListener(null);
+    view7f0a0292 = null;
+    view7f0a0282.setOnClickListener(null);
+    view7f0a0282 = null;
+    view7f0a0105.setOnClickListener(null);
+    view7f0a0105 = null;
+    view7f0a00fc.setOnClickListener(null);
+    view7f0a00fc = null;
+    view7f0a021e.setOnClickListener(null);
+    view7f0a021e = null;
+    view7f0a0212.setOnClickListener(null);
+    view7f0a0212 = null;
+    view7f0a00e8.setOnClickListener(null);
+    view7f0a00e8 = null;
   }
 }

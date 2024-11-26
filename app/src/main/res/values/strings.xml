@@ -25,7 +25,6 @@
     <string name="lb_DarkMode">Dark Mode</string>
 
     <!--HOME-->
-    <string name="lb_view_receiver_options">View Receiver Options</string>
     <string name="lb_start_scanning">Start Scanning</string>
     <string name="lb_connecting_device">Connecting ...</string>
     <string name="lb_connected">Connected</string>
@@ -33,12 +32,6 @@
     <string name="lb_sd_card">SD Card</string>
     <string name="lb_inserted">Inserted</string>
     <string name="lb_disconnect">Disconnect</string>
-
-    <!--RECEIVER OPTIONS-->
-    <string name="receiver_options">Receiver Options</string>
-    <string name="lb_receiver_configuration">Receiver Configuration</string>
-    <string name="lb_manage_receiver">Manage Receiver Data</string>
-    <string name="lb_diagnostics">Diagnostics</string>
 
     <!--START SCANNING-->
     <string name="lb_manual_scan">Manual Scan</string>
@@ -81,7 +74,7 @@
     <string name="aerial_scanning">Mobile Scanning</string>
     <string name="lb_scan_defaults">Scan With Default Settings</string>
     <string name="lb_scan_temporary">Scan With Temporary Settings</string>
-    <string name="lb_current_settings">Current Settings</string>
+    <string name="lb_scan_settings">Scan Settings</string>
     <string name="lb_scan_time_seconds">Scan Time (Seconds)</string>
     <string name="lb_scan_rate">Scan Rate</string>
     <string name="lb_selected_frequency">Selected Frequency Table</string>
@@ -110,9 +103,9 @@
     <string name="lb_off">OFF</string>
     <string name="lb_stop_scanning">Stop Scanning</string>
     <string name="lb_stop_recording">Stop Recording</string>
-
-    <!--TEMPORARY AERIAL-->
-    <string name="temporary_aerial">Temporary Mobile Settings</string>
+    <string name="lb_view_detection_filter"><u>View Detection Filter Settings</u></string>
+    <string name="lb_non_coded_detection">Non Coded Detection Filter</string>
+    <string name="lb_filter_type">Filter Type</string>
 
     <!--EDIT TABLE SCAN-->
     <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
@@ -121,7 +114,7 @@
     <string name="lb_merge_tables">Merge Tables</string>
     <string name="lb_select_table_merge">Select tables to merge into scan table</string>
     <string name="lb_frequency_deleted">Frequency Deleted</string>
-    <string name="lb_tables_merged">Tables Merged</string>
+    <string name="lb_tables_merged">Table Merged</string>
 
     <!--STATIONARY SCAN-->
     <string name="stationary_scanning">Stationary Scanning</string>
@@ -134,9 +127,6 @@
     <string name="lb_stationary_scanning">Stationary Scanning ...</string>
     <string name="lb_current_antenna">Antenna #</string>
     <string name="lb_scan_details">Scan Details</string>
-
-    <!--TEMPORARY STATIONARY-->
-    <string name="temporary_stationary">Temporary Stationary Settings</string>
 
     <!--RECEIVER CONFIGURATION-->
     <string name="receiver_configuration">Receiver Configuration</string>
@@ -230,13 +220,13 @@
     <string name="lb_optional_data">Optional Data Calculation</string>
     <string name="lb_target_pulse_rates">Target Pulse Rates</string>
     <string name="lb_pr1">PR1 (ppm)</string>
-    <string name="lb_pr1_tolerance">PR1 Tolerance (ppm)</string>
+    <string name="lb_pr1_tolerance">Period 1 Tolerance (ms)</string>
     <string name="lb_pr2">PR2 (ppm)</string>
-    <string name="lb_pr2_tolerance">PR2 Tolerance (ppm)</string>
+    <string name="lb_pr2_tolerance">Period 2 Tolerance (ms)</string>
     <string name="lb_pr3">PR3 (ppm)</string>
-    <string name="lb_pr3_tolerance">PR3 Tolerance (ppm)</string>
+    <string name="lb_pr3_tolerance">Period 3 Tolerance (ms)</string>
     <string name="lb_pr4">PR4 (ppm)</string>
-    <string name="lb_pr4_tolerance">PR4 Tolerance (ppm)</string>
+    <string name="lb_pr4_tolerance">Period 4 Tolerance (ms)</string>
     <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
     <string name="lb_temperature">Temperature</string>
     <string name="lb_select_type">Select Type:</string>
@@ -275,6 +265,18 @@
     <string name="lb_deleting">Deleting Memory ...</string>
     <string name="lb_return_screen">Return to Data Screen</string>
     <string name="lb_deletion_complete">Deletion Complete</string>
+
+    <!--CONVERT RAW DATA (SD CARD)-->
+    <string name="convert_raw_data">Convert Raw Data (SD Card)</string>
+    <string name="lb_file_source">File Source</string>
+    <string name="lb_none_detected">None Detected</string>
+    <string name="lb_message_none_detected">Please check your mobile device and ensure an SD Card is connected.</string>
+    <string name="lb_selected_file">Selected File</string>
+    <string name="lb_select_file">Select File</string>
+    <string name="lb_convert_data_file">Convert Data File</string>
+    <string name="lb_converting_raw_file">Converting Raw File ...</string>
+    <string name="lb_cancel_conversion">Cancel Conversion</string>
+    <string name="lb_file_converted">File Converted</string>
 
     <!--TEST RECEIVER-->
     <string name="receiver_diagnostics">Receiver Diagnostics</string>
@@ -850,4 +852,27 @@
         <item>23</item>
         <item>24</item>
     </string-array>
+
+    <string-array name="pulseRateTolerance">
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_convert_raw_data">ConvertRawDataActivity</string>
 </resources>

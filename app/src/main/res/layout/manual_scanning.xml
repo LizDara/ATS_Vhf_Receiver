@@ -29,8 +29,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="8sp"
             android:gravity="bottom"
-            android:textColor="@color/ebony_clay"
-            android:visibility="gone" />
+            android:textColor="@color/ebony_clay"/>
 
         <Space
             android:layout_width="0dp"
@@ -153,6 +152,7 @@
                         style="@style/body_large"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/lb_all"
                         android:textColor="@color/ebony_clay"
                         android:textStyle="bold" />
 
@@ -181,5 +181,15 @@
             layout="@layout/scan_details"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/view_detection_manual_textView"
+        style="@style/button_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4sp"
+        android:layout_marginStart="16sp"
+        android:text="@string/lb_view_detection_filter"
+        android:textColor="@color/ebony_clay" />
 
 </LinearLayout>

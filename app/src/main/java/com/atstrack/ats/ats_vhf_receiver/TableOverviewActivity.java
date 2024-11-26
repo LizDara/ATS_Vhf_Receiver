@@ -2,6 +2,8 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -10,16 +12,20 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,7 +34,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
@@ -36,10 +41,12 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverStatus;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.google.api.client.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
@@ -89,8 +96,7 @@ public class TableOverviewActivity extends AppCompatActivity {
             try {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                    int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
-                    showDisconnectionMessage(status);
+                    showDisconnectionMessage();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                         onClickTables();
@@ -126,8 +132,11 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     @OnClick(R.id.load_from_file_button)
     public void onClickLoadTablesFromFile(View v) {
+        File[] externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
+        File externalFile = externalStorageVolumes[0];
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory().getPath()), "*/*");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.parse(externalFile.getPath()), "*/*");
         startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
     }
 
@@ -158,20 +167,16 @@ public class TableOverviewActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) { // Gets the Uri of the selected file
                 Uri uri = data.getData();
                 String uriString = uri.toString();
-                File myFile = new File(uriString);
-                String path = myFile.getAbsolutePath();
                 if (uriString.startsWith("content://")) {
                     try (Cursor cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null)) {
                         if (cursor != null && cursor.moveToFirst()) {
-                            @SuppressLint("Range") String fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                            Log.i(TAG, "FILE NAME: " + fileName);
-                            readFile(path);
+                            readFile(uri);
                         }
                     } catch (Exception ex) {
-                        Log.i(TAG, "Cursor exception: " + ex.toString());
+                        Log.i(TAG, "Cursor exception: " + ex);
                     }
                 } else if (uriString.startsWith("file://")) {
-                    readFile(path);
+                    readFile(uri);
                 }
             }
         }
@@ -208,13 +213,12 @@ public class TableOverviewActivity extends AppCompatActivity {
         mBluetoothLeService = null;
     }
 
-    private void showDisconnectionMessage(int status) {
+    private void showDisconnectionMessage() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -227,20 +231,25 @@ public class TableOverviewActivity extends AppCompatActivity {
 
     /**
      * Reads a file from the local storage and get the frequencies from each table.
-     * @param path The directory path where is the file.
+     * @param fileUri The directory path where is the file.
      */
-    private void readFile(String path) {
+    private void readFile(Uri fileUri) {
         if (isExternalStorageReadable()) {
             try {
-                String newPath = findPath(path); // Gets the selected file
-                File file = new File(Environment.getExternalStorageDirectory(), newPath);
-                FileInputStream fileInputStream = new FileInputStream(file);
+                ContentResolver contentResolver = getContentResolver();
+                ParcelFileDescriptor parcelFileDescriptor = contentResolver.openFileDescriptor(fileUri, "r");
+                FileInputStream inputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
+                File file = new File(getCacheDir(), getFileName(getContentResolver(), fileUri));
+                FileOutputStream outputStream = new FileOutputStream(file);
+                IOUtils.copy(inputStream, outputStream);
 
+                FileInputStream fileInputStream = new FileInputStream(file);
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-                BufferedReader bufferedReader =  new BufferedReader(inputStreamReader);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
                 String line;
                 int tableNumber = 0;
+                String message = "";
                 int[][] tables = new int[12][];
                 List<Integer> frequenciesList = new LinkedList<>();
                 while ((line = bufferedReader.readLine()) != null) { // Reads each line of the file and add it to the list
@@ -251,6 +260,8 @@ public class TableOverviewActivity extends AppCompatActivity {
                             tables[tableNumber - 1] = new int[frequenciesList.size()];
                             for (int i = 0; i < frequenciesList.size(); i++)
                                 tables[tableNumber - 1][i] = frequenciesList.get(i);
+
+                            message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded" + ValueCodes.CR + ValueCodes.LF;
                         }
                         tableNumber = Integer.parseInt(line.toUpperCase().replace("TABLE", ""));
                         frequenciesList = new LinkedList<>();
@@ -263,11 +274,14 @@ public class TableOverviewActivity extends AppCompatActivity {
                 for (int i = 0; i < frequenciesList.size(); i++)
                     tables[tableNumber - 1][i] = frequenciesList.get(i);
 
+                message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded." + ValueCodes.CR + ValueCodes.LF;
+
                 parameter = "";
                 tableListAdapter.setFrequenciesFile(tables);
                 tableListAdapter.notifyDataSetChanged();
 
                 fileInputStream.close();
+                showMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -276,17 +290,16 @@ public class TableOverviewActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Finds the directory path of the selected file.
-     * @param path The directory path where is the file.
-     * @return Returns the directory path separated by /.
-     */
-    private String findPath(String path) {
-        String[] splitPath = path.split("%");
-        String newPath = "";
-        for (int i = 1; i < splitPath.length; i++)
-            newPath += "/" + splitPath[i].substring(2);
-        return newPath;
+    private String getFileName(ContentResolver contentResolver, Uri fileUri) {
+        String name = "";
+        Cursor returnCursor = contentResolver.query(fileUri, null, null, null, null);
+        if (returnCursor != null) {
+            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            returnCursor.moveToFirst();
+            name = returnCursor.getString(nameIndex);
+            returnCursor.close();
+        }
+        return name;
     }
 
     /**
@@ -296,6 +309,15 @@ public class TableOverviewActivity extends AppCompatActivity {
     private boolean isExternalStorageReadable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
+    }
+
+    private void showMessage(String message) {
+        message += "You now must review each of these tables in order for each one to be stored.";
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Message!");
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", null);
+        builder.show();
     }
 
     /**

@@ -102,18 +102,7 @@ public class Snapshots implements Parcelable {
             if (byteIndex == size) filled = true;
         }
         catch (Exception e) {
-            Log.i("Snapshot", "Error Process Snapshot Raw");
-            //setFileName(getFileName() + "||repeated_pages");
-            error = true;
-        }
-    }
-
-    public void replaceSnapshotRaw(byte[] packRead) {
-        try {
-            System.arraycopy(packRead, 0, snapshot, byteIndex - packRead.length, packRead.length);
-        }
-        catch (Exception e) {
-            Log.i("Snapshot", "Error Replace Snapshot Raw");
+            Log.i("Snapshot", "Error Process Snapshot Raw" + e.getLocalizedMessage());
             //setFileName(getFileName() + "||repeated_pages");
             error = true;
         }
@@ -134,23 +123,6 @@ public class Snapshots implements Parcelable {
         } catch (Exception e) {
             Log.i("Snapshot", "Error Process Snapshot");
             //setFileName(getFileName() + "||repeated_pages");
-            error = true;
-        }
-    }
-
-    /**
-     * GET PACKAGES WRITTEN IN THE TXT FORMAT
-     * @param packRead Conceived to receive 244 bytes.
-     */
-    public void processSnapshotManual(byte[] packRead) {
-        try {
-            if (packRead.length > 0) {
-                System.arraycopy(packRead, 0, snapshot, byteIndex, packRead.length);
-                byteIndex += packRead.length;
-                if (byteIndex == size) filled = true;
-            }
-        } catch (Exception e) {
-            setFileName(getFileName() + " || error: " + e.getMessage());
             error = true;
         }
     }

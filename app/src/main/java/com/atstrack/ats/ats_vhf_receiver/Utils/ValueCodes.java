@@ -28,6 +28,8 @@ public class ValueCodes {
     public static final int TEMPERATURE_CODE = 1021;
     public static final int PERIOD_CODE = 1022;
 
+    public static final String WIDTH = "width";
+    public static final String HEIGHT = "height";
     public static final String VALUE = "value";
     public static final String NIGHT_MODE = "NightMode";
     public static final String SETTING_PREFERENCES = "AppSettingPrefs";
@@ -37,9 +39,6 @@ public class ValueCodes {
     public static final String BASE_FREQUENCY = "baseFrequency";
     public static final String RANGE = "range";
     public static final String MENU = "menu";
-    public static final String FREQUENCY = "frequency";
-    public static final String INDEX = "index";
-    public static final String MAX_INDEX = "maxIndex";
     public static final String TITLE = "title";
     public static final String POSITION = "position";
     public static final String PARAMETER = "parameter";
@@ -77,6 +76,7 @@ public class ValueCodes {
     public static final String SCAN_STATUS = "scanStatus";
     public static final String BOARD_STATUS = "boardStatus";
     public static final String AUDIO = "audio";
+    public static final String BACKGROUND = "background";
     public static final String UPDATE = "update";
     public static final String DETECTION_TYPE = "detectionType";
 
@@ -105,15 +105,16 @@ public class ValueCodes {
     public static final String PULSE_RATE_TOLERANCE_4 = "PulseRateTolerance4";
     public static final String MAX_PULSE_RATE = "MaxPulseRate";
     public static final String MIN_PULSE_RATE = "MinPulseRate";
+    public static final String DATA_CALCULATION = "DataCalculation";
 
-    public static final int DISCONNECTION_MESSAGE_PERIOD = 3000;
+    public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;
     public static final int WAITING_PERIOD = 180;
     public static final int MESSAGE_PERIOD = 1000;
-    public static final int DOWNLOAD_PERIOD = 300;
+    public static final int DOWNLOAD_PERIOD = 280;
     public static final int REQUEST_CODE_SIGN_IN = 1;
     public static final int SCAN_PERIOD = 6000;
-    public static final int BRANDING_PERIOD = 4000;
-    public static final int CONNECT_PERIOD = 1700;
+    public static final int BRANDING_PERIOD = 2000;
+    public static final int CONNECT_PERIOD = 1900;
     public final static char CR = (char) 0x0D;
     public final static char LF = (char) 0x0A;
     public static final int REQUEST_ENABLE_BT = 1;

@@ -100,8 +100,7 @@ public class AerialDefaultsActivity extends AppCompatActivity {
                     if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) // Gets aerial defaults data
                         downloadData(packet);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -242,7 +241,6 @@ public class AerialDefaultsActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

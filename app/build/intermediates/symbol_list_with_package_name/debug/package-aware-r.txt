@@ -31,6 +31,7 @@ animator fragment_fade_exit
 animator fragment_open_enter
 animator fragment_open_exit
 array antennas
+array pulseRateTolerance
 array referenceFrequencyStoreRate
 array scanRateAerial
 array scanRateStationary
@@ -1018,6 +1019,7 @@ drawable ic_close
 drawable ic_decrease
 drawable ic_decrease_light
 drawable ic_delete
+drawable ic_file
 drawable ic_full_battery
 drawable ic_gps_failed
 drawable ic_gps_off
@@ -1031,6 +1033,7 @@ drawable ic_logo
 drawable ic_low_battery
 drawable ic_next
 drawable ic_no_sd_card
+drawable ic_plus
 drawable ic_rectangle
 drawable ic_rectangle_84
 drawable ic_rectangle_89
@@ -1041,6 +1044,7 @@ drawable ic_rectangle_93
 drawable ic_right
 drawable ic_rotate_cw
 drawable ic_sd_card
+drawable ic_sd_card_alert
 drawable ic_unlock
 drawable notification_action_background
 drawable notification_bg
@@ -1183,7 +1187,9 @@ id buttonPanel
 id bytes_stored_test_textView
 id bytes_stored_textView
 id cache_measures
+id calculation_description_textView
 id callMeasure
+id cancel_conversion_button
 id cancel_download_button
 id cancel_update_button
 id carryVelocity
@@ -1218,6 +1224,10 @@ id continue_button
 id continuousVelocity
 id continuous_store_imageView
 id continuous_store_linearLayout
+id convert_data_button
+id convert_raw_data_button
+id converting_raw_linearLayout
+id converting_raw_progressBar
 id cos
 id currentState
 id current_antenna_stationary_textView
@@ -1232,6 +1242,7 @@ id decelerateAndComplete
 id decor_content_parent
 id decrease_imageView
 id default_activity_button
+id delete_file_imageView
 id delete_frequencies_button
 id delete_frequencies_linearLayout
 id delete_frequency_scan_button
@@ -1302,6 +1313,11 @@ id expanded_menu
 id fifteen_minutes_imageView
 id fifteen_minutes_linearLayout
 id fifth_table_textView
+id file_converted_linearLayout
+id file_description_textView
+id file_name_textView
+id file_source_linearLayout
+id filter_type_textView
 id first_table_textView
 id five_button
 id five_imageView
@@ -1421,6 +1437,7 @@ id merge_table_scan_button
 id merge_tables_button
 id merge_tables_linearLayout
 id message
+id message_no_inserted_textView
 id middle
 id min_pulse_rate_linearLayout
 id min_pulse_rate_textView
@@ -1431,6 +1448,7 @@ id multiply
 id never
 id neverCompleteToEnd
 id neverCompleteToStart
+id new_file_name_textView
 id nine_button
 id ninth_table_textView
 id noState
@@ -1446,6 +1464,7 @@ id notification_background
 id notification_main_column
 id notification_main_column_container
 id number_buttons_linearLayout
+id number_matches_textView
 id number_of_antennas_stationary_linearLayout
 id number_of_antennas_stationary_textView
 id number_of_matches_scrollView
@@ -1458,6 +1477,7 @@ id one_hundred_twenty_minutes_linearLayout
 id open_file_button
 id optionLinearLayout
 id option_tables_textView
+id optional_data_calculation_textView
 id optional_data_linearLayout
 id optional_data_textView
 id overshoot
@@ -1472,6 +1492,8 @@ id percent_battery_device_textView
 id percent_battery_imageView
 id percent_battery_menu_textView
 id percent_battery_textView
+id period_1_tolerance_textView
+id period_2_tolerance_textView
 id period_imageView
 id period_linearLayout
 id period_pulse_rate_textView
@@ -1483,9 +1505,13 @@ id postLayout
 id pr1_linearLayout
 id pr1_textView
 id pr1_tolerance_textView
+id pr2_description_textView
 id pr2_linearLayout
 id pr2_textView
+id pr2_tolerance_description_textView
 id pr2_tolerance_textView
+id pr_description_textView
+id pr_tolerance_description_textView
 id preparing_file_imageView
 id preparing_file_textView
 id preparing_progressBar
@@ -1495,12 +1521,12 @@ id processing_progressBar
 id progressBar
 id progress_circular
 id progress_horizontal
-id prueba
-id prueba_connecting
+id pulse_rate_1_textView
+id pulse_rate_2_textView
 id pulse_rate_editText
 id pulse_rate_linearLayout
 id pulse_rate_textView
-id pulse_rate_tolerance_editText
+id pulse_rate_tolerance_spinner
 id pulse_rate_tolerance_textView
 id pulse_rate_type_imageView
 id pulse_rate_type_linearLayout
@@ -1510,11 +1536,9 @@ id radio
 id range_textView
 id ratio
 id ready_aerial_scan_LinearLayout
-id ready_aerial_textView
 id ready_clone_linearLayout
 id ready_manual_scan_linearLayout
 id ready_stationary_scan_LinearLayout
-id ready_stationary_textView
 id receiver_configuration_button
 id receiver_status
 id record_data_aerial_button
@@ -1551,6 +1575,8 @@ id scrollView
 id sd_card_imageView
 id sd_card_menu_imageView
 id sd_card_menu_textView
+id sd_card_raw_imageView
+id sd_card_raw_textView
 id sd_card_textView
 id search_badge
 id search_bar
@@ -1566,7 +1592,9 @@ id searching_receivers_constraintLayout
 id searching_receivers_linearLayout
 id second_table_textView
 id select_dialog_listview
+id select_file_linearLayout
 id select_pulse_rate_linearLayout
+id selected_file_linearLayout
 id set_transmitter_type_button
 id set_value_linearLayout
 id seven_button
@@ -1718,6 +1746,9 @@ id version_textView
 id vertical_only
 id vhf_constraintLayout
 id view_data_button
+id view_detection_aerial_textView
+id view_detection_manual_textView
+id view_detection_stationary_textView
 id view_transition
 id view_tree_lifecycle_owner
 id view_tree_saved_state_registry_owner
@@ -1778,6 +1809,7 @@ layout abc_tooltip
 layout activity_aerial_defaults
 layout activity_aerial_scan
 layout activity_clone_receiver
+layout activity_convert_raw_data
 layout activity_edit_receiver_defaults
 layout activity_edit_tables
 layout activity_enter_frequency
@@ -1798,7 +1830,6 @@ layout activity_test_receiver
 layout aerial_current_settings
 layout aerial_scanning
 layout aerial_settings
-layout audio_options
 layout begin_download
 layout branding
 layout connecting_receiver
@@ -1814,6 +1845,9 @@ layout disconnect_message
 layout download_complete
 layout downloading_file
 layout edit_table_scan
+layout fragment_audio_options
+layout fragment_detection_filter
+layout fragment_view_detection_filter
 layout frequencies_overview
 layout frequency_edit
 layout frequency_information
@@ -1841,7 +1875,6 @@ layout pulse_rate_values
 layout receiver_status
 layout scan_details
 layout searching_receivers
-layout select_detection_filter
 layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
@@ -1912,11 +1945,13 @@ string common_google_play_services_wear_update_text
 string common_open_on_phone
 string common_signin_button_text
 string common_signin_button_text_long
+string convert_raw_data
 string disconnect_receiver
 string edit_frequency_tables
 string edit_receiver_defaults
 string enable
 string error_bluetooth_not_supported
+string hello_blank_fragment
 string lb_10_minutes
 string lb_120_minutes
 string lb_15_minutes
@@ -1939,6 +1974,7 @@ string lb_battery_percent
 string lb_begin_download
 string lb_begin_download_note
 string lb_bytes_stored
+string lb_cancel_conversion
 string lb_cancel_download
 string lb_cancel_update
 string lb_change_frequency
@@ -1951,10 +1987,11 @@ string lb_connected
 string lb_connecting_device
 string lb_continue
 string lb_continuous_store
+string lb_convert_data_file
+string lb_converting_raw_file
 string lb_current_antenna
 string lb_current_frequency
 string lb_current_index
-string lb_current_settings
 string lb_data_calculation_types
 string lb_data_recorded
 string lb_delete_all
@@ -1964,7 +2001,6 @@ string lb_delete_receiver_data
 string lb_deleting
 string lb_deletion_complete
 string lb_detections
-string lb_diagnostics
 string lb_diagnostics_complete
 string lb_disconnect
 string lb_download_complete
@@ -1989,6 +2025,9 @@ string lb_erase_data
 string lb_external_data_transfer
 string lb_failed_gps
 string lb_fifth_table
+string lb_file_converted
+string lb_file_source
+string lb_filter_type
 string lb_first_table
 string lb_fourth_table
 string lb_frequencies_deleted
@@ -2006,7 +2045,6 @@ string lb_id_audio
 string lb_inserted
 string lb_load_table_from_file
 string lb_make_sure_receivers
-string lb_manage_receiver
 string lb_manual_scan
 string lb_manual_scanning
 string lb_matches_for_valid_pattern
@@ -2014,6 +2052,7 @@ string lb_max_pulse_rate
 string lb_memory_used_percent
 string lb_merge_table_scan
 string lb_merge_tables
+string lb_message_none_detected
 string lb_min_pulse_rate
 string lb_mortality
 string lb_ninth_table
@@ -2022,9 +2061,11 @@ string lb_no_receiver_detected
 string lb_no_receivers_found
 string lb_no_reference_frequency
 string lb_non_coded
+string lb_non_coded_detection
 string lb_non_coded_fixed
 string lb_non_coded_variable
 string lb_none
+string lb_none_detected
 string lb_number_antennas
 string lb_number_matches
 string lb_off
@@ -2048,7 +2089,6 @@ string lb_pulse_rate
 string lb_pulse_rate_type
 string lb_ready_clone
 string lb_ready_to_scan
-string lb_receiver_configuration
 string lb_receiver_is_up
 string lb_record_data
 string lb_recording
@@ -2067,6 +2107,7 @@ string lb_scan_defaults
 string lb_scan_details
 string lb_scan_feed
 string lb_scan_rate
+string lb_scan_settings
 string lb_scan_table
 string lb_scan_tables
 string lb_scan_temporary
@@ -2078,6 +2119,7 @@ string lb_searching_gps
 string lb_searching_receivers
 string lb_second_table
 string lb_select_detection_message
+string lb_select_file
 string lb_select_frequencies_delete
 string lb_select_ids_audio
 string lb_select_pulse_rate
@@ -2086,6 +2128,7 @@ string lb_select_store_rate
 string lb_select_table
 string lb_select_table_merge
 string lb_select_type
+string lb_selected_file
 string lb_selected_frequency
 string lb_set_frequency
 string lb_set_transmitter_type
@@ -2139,7 +2182,7 @@ string lb_updating_receiver
 string lb_valid_gps
 string lb_vhf_receiver
 string lb_view_data
-string lb_view_receiver_options
+string lb_view_detection_filter
 string lb_warning_no_tables
 string location_adapter_is_disabled
 string low_power_mode
@@ -2152,7 +2195,6 @@ string optional_data_calculations
 string pulse_rate_type_options
 string receiver_configuration
 string receiver_diagnostics
-string receiver_options
 string receiver_update
 string search_menu_title
 string set_transmitter_type
@@ -2165,10 +2207,9 @@ string target_pulse_rate_1
 string target_pulse_rate_2
 string target_pulse_rate_3
 string target_pulse_rate_4
-string temporary_aerial
-string temporary_stationary
 string temporary_store_rate
 string temporary_tables_scan
+string title_activity_convert_raw_data
 string unknown_device
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

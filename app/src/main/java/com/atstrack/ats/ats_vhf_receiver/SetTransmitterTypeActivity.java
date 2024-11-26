@@ -122,8 +122,7 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                     if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
                         downloadData(packet);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -204,10 +203,8 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
             case "Non Coded (Fixed Pulse Rate)":
                 txType = (byte) 0x08;
                 b = new byte[] {(byte) 0x47, txType, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
-                        (byte) Integer.parseInt(pr1_textView.getText().toString()),
-                        (!pr1_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()) : 0,
-                        (byte) Integer.parseInt(pr2_textView.getText().toString()),
-                        (!pr2_textView.getText().toString().equals("0")) ? (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()) : 0,
+                        (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
+                        (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
                         0, 0, 0, 0};
                 break;
             case "Non Coded (Variable Pulse Rate)":
@@ -336,8 +333,12 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (checkChanges()) {
-                parameter = ValueCodes.SAVE;
-                mBluetoothLeService.discovering();
+                if (isDataCorrect()) {
+                    parameter = ValueCodes.SAVE;
+                    mBluetoothLeService.discovering();
+                } else {
+                    showMessage(1);
+                }
             } else {
                 finish();
             }
@@ -358,7 +359,6 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -503,21 +503,34 @@ public class SetTransmitterTypeActivity extends AppCompatActivity {
                 || (int) originalData.get(ValueCodes.MIN_PULSE_RATE) != minPulseRate;
     }
 
+    private boolean isDataCorrect() {
+        if (pulse_rate_type_textView.getText().toString().equals("Non Coded (Fixed Pulse Rate)"))
+            return !pr1_textView.getText().equals("0");
+        return true;
+    }
+
     /**
      * Displays a message indicating whether the writing was successful.
      * @param status This number indicates the writing status.
      */
     private void showMessage(int status) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Success!");
-        if (status == 0) {
-            builder.setMessage("Completed.");
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                finish();
-            });
-        } else if (status == 2) {
-            builder.setMessage("Not completed.");
-            builder.setPositiveButton("OK", null);
+        builder.setTitle("Message!");
+        switch (status) {
+            case 0:
+                builder.setMessage("Completed.");
+                builder.setPositiveButton("OK", (dialog, which) -> {
+                    finish();
+                });
+                break;
+            case 1:
+                builder.setMessage("Data incorrect.");
+                builder.setPositiveButton("OK", null);
+                break;
+            case 2:
+                builder.setMessage("Not completed.");
+                builder.setPositiveButton("OK", null);
+                break;
         }
         builder.show();
     }

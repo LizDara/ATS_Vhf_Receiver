@@ -70,8 +70,7 @@ public class EditReceiverDefaultsActivity extends AppCompatActivity {
                     int status = intent.getIntExtra(ValueCodes.DISCONNECTION_STATUS, 0);
                     showDisconnectionMessage(status);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -151,7 +150,6 @@ public class EditReceiverDefaultsActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

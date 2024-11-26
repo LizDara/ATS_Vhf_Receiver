@@ -17,29 +17,29 @@ import java.lang.Override;
 public class EnterFrequencyActivity_ViewBinding implements Unbinder {
   private EnterFrequencyActivity target;
 
-  private View view7f0a01d4;
+  private View view7f0a01e8;
 
-  private View view7f0a0183;
+  private View view7f0a0192;
 
-  private View view7f0a0278;
+  private View view7f0a0290;
 
-  private View view7f0a0268;
+  private View view7f0a0280;
 
-  private View view7f0a00f7;
+  private View view7f0a0103;
 
-  private View view7f0a00ee;
+  private View view7f0a00fa;
 
-  private View view7f0a0204;
+  private View view7f0a021c;
 
-  private View view7f0a01f8;
+  private View view7f0a0210;
 
-  private View view7f0a00df;
+  private View view7f0a00e6;
 
-  private View view7f0a016e;
+  private View view7f0a017c;
 
-  private View view7f0a029c;
+  private View view7f0a02b7;
 
-  private View view7f0a00aa;
+  private View view7f0a00b1;
 
   @UiThread
   public EnterFrequencyActivity_ViewBinding(EnterFrequencyActivity target) {
@@ -60,7 +60,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
     target.number_buttons_linearLayout = Utils.findRequiredViewAsType(source, R.id.number_buttons_linearLayout, "field 'number_buttons_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.save_changes_button, "field 'save_changes_button' and method 'onClickSaveChanges'");
     target.save_changes_button = Utils.castView(view, R.id.save_changes_button, "field 'save_changes_button'", Button.class);
-    view7f0a01d4 = view;
+    view7f0a01e8 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -69,7 +69,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.one_button, "field 'one_button' and method 'onClickNumber'");
     target.one_button = Utils.castView(view, R.id.one_button, "field 'one_button'", Button.class);
-    view7f0a0183 = view;
+    view7f0a0192 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -77,7 +77,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.two_button, "method 'onClickNumber'");
-    view7f0a0278 = view;
+    view7f0a0290 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -85,7 +85,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.three_button, "method 'onClickNumber'");
-    view7f0a0268 = view;
+    view7f0a0280 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -93,7 +93,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.four_button, "method 'onClickNumber'");
-    view7f0a00f7 = view;
+    view7f0a0103 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -101,7 +101,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.five_button, "method 'onClickNumber'");
-    view7f0a00ee = view;
+    view7f0a00fa = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -109,7 +109,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.six_button, "method 'onClickNumber'");
-    view7f0a0204 = view;
+    view7f0a021c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -117,7 +117,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.seven_button, "method 'onClickNumber'");
-    view7f0a01f8 = view;
+    view7f0a0210 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -125,7 +125,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.eight_button, "method 'onClickNumber'");
-    view7f0a00df = view;
+    view7f0a00e6 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -133,7 +133,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.nine_button, "method 'onClickNumber'");
-    view7f0a016e = view;
+    view7f0a017c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -141,7 +141,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.zero_button, "method 'onClickNumber'");
-    view7f0a029c = view;
+    view7f0a02b7 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -149,7 +149,7 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.delete_imageView, "method 'onClickDelete'");
-    view7f0a00aa = view;
+    view7f0a00b1 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -175,29 +175,29 @@ public class EnterFrequencyActivity_ViewBinding implements Unbinder {
     target.save_changes_button = null;
     target.one_button = null;
 
-    view7f0a01d4.setOnClickListener(null);
-    view7f0a01d4 = null;
-    view7f0a0183.setOnClickListener(null);
-    view7f0a0183 = null;
-    view7f0a0278.setOnClickListener(null);
-    view7f0a0278 = null;
-    view7f0a0268.setOnClickListener(null);
-    view7f0a0268 = null;
-    view7f0a00f7.setOnClickListener(null);
-    view7f0a00f7 = null;
-    view7f0a00ee.setOnClickListener(null);
-    view7f0a00ee = null;
-    view7f0a0204.setOnClickListener(null);
-    view7f0a0204 = null;
-    view7f0a01f8.setOnClickListener(null);
-    view7f0a01f8 = null;
-    view7f0a00df.setOnClickListener(null);
-    view7f0a00df = null;
-    view7f0a016e.setOnClickListener(null);
-    view7f0a016e = null;
-    view7f0a029c.setOnClickListener(null);
-    view7f0a029c = null;
-    view7f0a00aa.setOnClickListener(null);
-    view7f0a00aa = null;
+    view7f0a01e8.setOnClickListener(null);
+    view7f0a01e8 = null;
+    view7f0a0192.setOnClickListener(null);
+    view7f0a0192 = null;
+    view7f0a0290.setOnClickListener(null);
+    view7f0a0290 = null;
+    view7f0a0280.setOnClickListener(null);
+    view7f0a0280 = null;
+    view7f0a0103.setOnClickListener(null);
+    view7f0a0103 = null;
+    view7f0a00fa.setOnClickListener(null);
+    view7f0a00fa = null;
+    view7f0a021c.setOnClickListener(null);
+    view7f0a021c = null;
+    view7f0a0210.setOnClickListener(null);
+    view7f0a0210 = null;
+    view7f0a00e6.setOnClickListener(null);
+    view7f0a00e6 = null;
+    view7f0a017c.setOnClickListener(null);
+    view7f0a017c = null;
+    view7f0a02b7.setOnClickListener(null);
+    view7f0a02b7 = null;
+    view7f0a00b1.setOnClickListener(null);
+    view7f0a00b1 = null;
   }
 }

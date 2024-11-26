@@ -26,7 +26,7 @@ List<String> dirs = [
 android {
     signingConfigs {
     }
-    compileSdkVersion 33
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.atstrack.ats.ats_vhf_receiver"

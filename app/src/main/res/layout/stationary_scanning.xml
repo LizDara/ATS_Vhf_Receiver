@@ -131,4 +131,14 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/view_detection_stationary_textView"
+        style="@style/button_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4sp"
+        android:layout_marginStart="16sp"
+        android:text="@string/lb_view_detection_filter"
+        android:textColor="@color/ebony_clay" />
+
 </LinearLayout>

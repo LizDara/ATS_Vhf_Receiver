@@ -17,19 +17,19 @@ import java.lang.Override;
 public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
   private SetTransmitterTypeActivity target;
 
-  private View view7f0a0151;
+  private View view7f0a015d;
 
-  private View view7f0a01b6;
+  private View view7f0a01cc;
 
-  private View view7f0a0158;
+  private View view7f0a0164;
 
-  private View view7f0a0165;
+  private View view7f0a0172;
 
-  private View view7f0a0189;
+  private View view7f0a0199;
 
-  private View view7f0a019f;
+  private View view7f0a01b1;
 
-  private View view7f0a01a2;
+  private View view7f0a01b5;
 
   @UiThread
   public SetTransmitterTypeActivity_ViewBinding(SetTransmitterTypeActivity target) {
@@ -49,7 +49,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
     target.matches_for_valid_pattern_textView = Utils.findRequiredViewAsType(source, R.id.matches_for_valid_pattern_textView, "field 'matches_for_valid_pattern_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.matches_for_valid_pattern_linearLayout, "field 'matches_for_valid_pattern_linearLayout' and method 'onClickMatchesValidPattern'");
     target.matches_for_valid_pattern_linearLayout = Utils.castView(view, R.id.matches_for_valid_pattern_linearLayout, "field 'matches_for_valid_pattern_linearLayout'", LinearLayout.class);
-    view7f0a0151 = view;
+    view7f0a015d = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -68,7 +68,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
     target.pr2_tolerance_textView = Utils.findRequiredViewAsType(source, R.id.pr2_tolerance_textView, "field 'pr2_tolerance_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.pulse_rate_type_linearLayout, "field 'pulse_rate_type_linearLayout' and method 'onClickPulseRateType'");
     target.pulse_rate_type_linearLayout = Utils.castView(view, R.id.pulse_rate_type_linearLayout, "field 'pulse_rate_type_linearLayout'", LinearLayout.class);
-    view7f0a01b6 = view;
+    view7f0a01cc = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -76,7 +76,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.max_pulse_rate_linearLayout, "method 'onClickMaxPulseRate'");
-    view7f0a0158 = view;
+    view7f0a0164 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -84,7 +84,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.min_pulse_rate_linearLayout, "method 'onClickMinPulseRate'");
-    view7f0a0165 = view;
+    view7f0a0172 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -92,7 +92,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.optional_data_linearLayout, "method 'onClickOptionalDataCalculations'");
-    view7f0a0189 = view;
+    view7f0a0199 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -100,7 +100,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.pr1_linearLayout, "method 'onClickPR1'");
-    view7f0a019f = view;
+    view7f0a01b1 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -108,7 +108,7 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.pr2_linearLayout, "method 'onClickPR2'");
-    view7f0a01a2 = view;
+    view7f0a01b5 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -142,19 +142,19 @@ public class SetTransmitterTypeActivity_ViewBinding implements Unbinder {
     target.pr2_tolerance_textView = null;
     target.pulse_rate_type_linearLayout = null;
 
-    view7f0a0151.setOnClickListener(null);
-    view7f0a0151 = null;
-    view7f0a01b6.setOnClickListener(null);
-    view7f0a01b6 = null;
-    view7f0a0158.setOnClickListener(null);
-    view7f0a0158 = null;
-    view7f0a0165.setOnClickListener(null);
-    view7f0a0165 = null;
-    view7f0a0189.setOnClickListener(null);
-    view7f0a0189 = null;
-    view7f0a019f.setOnClickListener(null);
-    view7f0a019f = null;
-    view7f0a01a2.setOnClickListener(null);
-    view7f0a01a2 = null;
+    view7f0a015d.setOnClickListener(null);
+    view7f0a015d = null;
+    view7f0a01cc.setOnClickListener(null);
+    view7f0a01cc = null;
+    view7f0a0164.setOnClickListener(null);
+    view7f0a0164 = null;
+    view7f0a0172.setOnClickListener(null);
+    view7f0a0172 = null;
+    view7f0a0199.setOnClickListener(null);
+    view7f0a0199 = null;
+    view7f0a01b1.setOnClickListener(null);
+    view7f0a01b1 = null;
+    view7f0a01b5.setOnClickListener(null);
+    view7f0a01b5 = null;
   }
 }

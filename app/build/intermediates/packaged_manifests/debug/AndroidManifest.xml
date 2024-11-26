@@ -15,26 +15,27 @@
         android:name="android.hardware.location.gps"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -52,22 +53,15 @@
         android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.ConvertRawDataActivity"
+            android:exported="false"
+            android:label="@string/title_activity_convert_raw_data"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity"
             android:exported="true" />
         <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanningActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanningActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryStationaryActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.TemporaryAerialActivity"
             android:exported="true" />
         <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.SelectValueActivity"

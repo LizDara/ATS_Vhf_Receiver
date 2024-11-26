@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -37,6 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Messages.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
@@ -64,8 +67,6 @@ public class StationaryScanActivity extends AppCompatActivity {
     View state_view;
     @BindView(R.id.ready_stationary_scan_LinearLayout)
     LinearLayout ready_stationary_scan_LinearLayout;
-    @BindView(R.id.ready_stationary_textView)
-    TextView ready_stationary_textView;
     @BindView(R.id.scan_rate_seconds_stationary_textView)
     TextView scan_rate_seconds_stationary_textView;
     @BindView(R.id.frequency_table_number_stationary_textView)
@@ -112,6 +113,8 @@ public class StationaryScanActivity extends AppCompatActivity {
     TextView pulse_rate_textView;
     @BindView(R.id.line_view)
     View line_view;
+    @BindView(R.id.view_detection_stationary_textView)
+    TextView view_detection_stationary_textView;
 
     private final static String TAG = StationaryScanActivity.class.getSimpleName();
 
@@ -127,8 +130,9 @@ public class StationaryScanActivity extends AppCompatActivity {
     private int firstTable;
     private int secondTable;
     private int thirdTable;
-    private int numberAntennas;
+    private int antennas;
     Map<String, Object> originalData;
+    private DialogFragment viewDetectionFilter;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -190,8 +194,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -212,8 +215,7 @@ public class StationaryScanActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -341,7 +343,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         int mm =  currentDate.get(Calendar.MINUTE);
         int ss = currentDate.get(Calendar.SECOND);
 
-        byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss,
+        byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) firstTable, (byte) secondTable, (byte) thirdTable};
 
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -403,7 +405,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         mBluetoothLeService.setCharacteristicNotificationRead(service, characteristic, true);
     }
 
-    @OnClick(R.id.frequency_table_number_stationary_linearLayout)
+    /*@OnClick(R.id.frequency_table_number_stationary_linearLayout)
     public void onClickFrequencyTableNumber(View v) {
         Intent intent = new Intent(this, InputValueActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
@@ -478,12 +480,17 @@ public class StationaryScanActivity extends AppCompatActivity {
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE);
         launcher.launch(intent);
-    }
+    }*/
 
     @OnClick(R.id.start_stationary_button)
     public void onClickStartStationary(View v) {
         parameter = ValueCodes.START_LOG;
         mBluetoothLeService.discovering();
+    }
+
+    @OnClick(R.id.view_detection_stationary_textView)
+    public void onClickViewDetection(View v) {
+        viewDetectionFilter.show(getSupportFragmentManager(), ViewDetectionFilter.TAG);
     }
 
     @Override
@@ -507,17 +514,19 @@ public class StationaryScanActivity extends AppCompatActivity {
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = ValueCodes.CONTINUE_LOG;
-            int currentFrequency = getIntent().getIntExtra(ValueCodes.FREQUENCY, 0) + (baseFrequency * 1000);
-            int currentIndex = getIntent().getIntExtra(ValueCodes.INDEX, 0);
-            int total = getIntent().getIntExtra(ValueCodes.MAX_INDEX, 0);
-            int currentAntenna = getIntent().getIntExtra(ValueCodes.ANTENNA_NUMBER, 0);
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+
+            int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
+                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + (baseFrequency * 1000);
+            int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
+                    + Integer.parseInt(Converters.getDecimalValue(data[8]));
+            int currentAntenna = Integer.parseInt(Converters.getDecimalValue(data[9]));
             detectionType = getIntent().getByteExtra(ValueCodes.DETECTION_TYPE, (byte) 0);
             frequency_stationary_textView.setText(Converters.getFrequency(currentFrequency));
             index_stationary_textView.setText(String.valueOf(currentIndex));
-            max_index_stationary_textView.setText("Table Index (" + total + " Total)");
             current_antenna_stationary_textView.setText((currentAntenna == 0) ? "All" : String.valueOf(currentAntenna));
 
-            updateVisibility();
+            scanState(data);
             setVisibility("scanning");
         } else { // Gets aerial defaults data
             parameter = ValueCodes.STATIONARY_DEFAULTS;
@@ -595,7 +604,6 @@ public class StationaryScanActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -634,6 +642,7 @@ public class StationaryScanActivity extends AppCompatActivity {
         //audio_manual_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         period_textView.setVisibility(visibility);
         pulse_rate_textView.setVisibility(visibility);
+        view_detection_stationary_textView.setVisibility(visibility);
     }
 
     /**
@@ -663,9 +672,10 @@ public class StationaryScanActivity extends AppCompatActivity {
                 start_stationary_button.setEnabled(true);
                 start_stationary_button.setAlpha((float) 1);
             }
-            numberAntennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            number_of_antennas_stationary_textView.setText((numberAntennas == 0) ? "None" : String.valueOf(numberAntennas));
+            antennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
+            number_of_antennas_stationary_textView.setText((antennas == 0) ? "None" : String.valueOf(antennas));
             stationary_external_data_transfer_switch.setChecked(data[2] != 0);
+            stationary_external_data_transfer_switch.setEnabled(false);
             scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
             scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
             if (Converters.getHexValue(data[5]).equals("00"))
@@ -675,21 +685,23 @@ public class StationaryScanActivity extends AppCompatActivity {
             int frequency = 0;
             if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
                 frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
-                        Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-            //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-            //reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
+                        Integer.parseInt(Converters.getDecimalValue(data[7])) + (baseFrequency * 1000);
+            stationary_reference_frequency_switch.setChecked(frequency != 0);
+            stationary_reference_frequency_switch.setEnabled(false);
+            frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
+            reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
 
             originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
             originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
             originalData.put(ValueCodes.THIRD_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[11])));
-            originalData.put(ValueCodes.ANTENNA_NUMBER, numberAntennas);
+            originalData.put(ValueCodes.ANTENNA_NUMBER, antennas);
             originalData.put(ValueCodes.SCAN_RATE, Integer.parseInt(Converters.getDecimalValue(data[3])));
             originalData.put(ValueCodes.SCAN_TIMEOUT, Integer.parseInt(Converters.getDecimalValue(data[4])));
             originalData.put(ValueCodes.STORE_RATE, Integer.parseInt(Converters.getDecimalValue(data[5])));
             originalData.put(ValueCodes.EXTERNAL_DATA_TRANSFER, Integer.parseInt(Converters.getDecimalValue(data[2])));
             originalData.put(ValueCodes.REFERENCE_FREQUENCY, frequency);
             originalData.put(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE, Integer.parseInt(Converters.getDecimalValue(data[8])));
-            stationary_reference_frequency_switch.setChecked(frequency != 0);
+            //stationary_reference_frequency_switch.setChecked(frequency != 0);
         }
     }
 
@@ -725,6 +737,25 @@ public class StationaryScanActivity extends AppCompatActivity {
         max_index_stationary_textView.setText("Table Index (" + maxIndex + " Total)");
         detectionType = data[18];
         updateVisibility();
+
+        if (!Converters.getHexValue(detectionType).equals("09")) {
+            String detection = Converters.getHexValue(detectionType).equals("08") ? "Fixed Pulse Rate" : "Variable Pulse Rate";
+            String dataCalculation = "";
+            switch (Converters.getHexValue(detectionType)) {
+                case "06":
+                    dataCalculation = "Yes";
+                    break;
+                case "07":
+                    dataCalculation = "None";
+                    break;
+            }
+            String matches = Converters.getDecimalValue(data[19]);
+            String pr1 = Converters.getDecimalValue(data[20]);
+            String pr1Tolerance = Converters.getDecimalValue(data[21]);
+            String pr2 = Converters.getDecimalValue(data[22]);
+            String pr2Tolerance = Converters.getDecimalValue(data[23]);
+            viewDetectionFilter = ViewDetectionFilter.newInstance(detection, pr1, pr1Tolerance, pr2, pr2Tolerance, dataCalculation, matches);
+        }
     }
 
     /**
@@ -733,11 +764,18 @@ public class StationaryScanActivity extends AppCompatActivity {
      */
     private void logScanHeader(byte[] data) {
         clear();
-        int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
+        int frequency = ((Integer.parseInt(Converters.getDecimalValue(data[1])) & 63) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
-        index_stationary_textView.setText(Converters.getDecimalValue(data[3]));
+        int index = (((Integer.parseInt(Converters.getDecimalValue(data[1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(data[3]));
+        antennas = Integer.parseInt(Converters.getDecimalValue(data[1])) >> 7;
+        if (antennas == 0) {
+            antennas = (Integer.parseInt(Converters.getDecimalValue(data[7])) >> 6) + 1;
+            current_antenna_stationary_textView.setText(String.valueOf(antennas));
+        } else {
+            current_antenna_stationary_textView.setText(R.string.lb_all);
+        }
+        index_stationary_textView.setText(String.valueOf(index));
         frequency_stationary_textView.setText(Converters.getFrequency(frequency));
-        current_antenna_stationary_textView.setText((numberAntennas == 0) ? "All" : String.valueOf(numberAntennas));
     }
 
     private void logScanCoded(byte[] data) {

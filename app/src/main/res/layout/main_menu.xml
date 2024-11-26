@@ -30,8 +30,7 @@
             <LinearLayout
                 android:layout_width="@dimen/connect_image"
                 android:layout_height="@dimen/connect_image"
-                android:layout_marginTop="35sp"
-                android:layout_marginBottom="24sp"
+                android:layout_marginVertical="24sp"
                 android:background="@drawable/receiver_branding"
                 android:elevation="4sp"
                 android:gravity="center">
@@ -54,7 +53,6 @@
                     style="@style/h2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12sp"
                     android:layout_marginBottom="8sp"
                     android:textColor="@color/catskill_white" />
 
@@ -149,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16sp"
             android:layout_marginTop="24sp"
-            android:text="@string/lb_receiver_configuration" />
+            android:text="@string/receiver_configuration" />
 
         <Button
             android:id="@+id/manage_receiver_data_button"
@@ -157,22 +155,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16sp"
-            android:text="@string/lb_manage_receiver" />
+            android:text="@string/manage_receiver_data" />
+
+        <Button
+            android:id="@+id/convert_raw_data_button"
+            style="@style/button_rectangle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:text="@string/convert_raw_data" />
 
         <Button
             android:id="@+id/diagnostics_button"
             style="@style/button_rectangle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16sp"
-            android:layout_marginBottom="16sp"
-            android:text="@string/lb_diagnostics" />
+            android:layout_margin="16sp"
+            android:text="@string/receiver_diagnostics" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/prueba"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
 </LinearLayout>

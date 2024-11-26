@@ -2,10 +2,14 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentResultListener;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -28,14 +32,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Messages.AudioOptions;
+import com.atstrack.ats.ats_vhf_receiver.Messages.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
@@ -47,17 +51,13 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.light_gray;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.limed_spruce;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_tertiary;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease_light;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase_light;
 import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_audio;
 
 public class ManualScanActivity extends AppCompatActivity {
 
@@ -101,6 +101,8 @@ public class ManualScanActivity extends AppCompatActivity {
     ImageView gps_manual_imageView;
     @BindView(R.id.gps_state_manual_textView)
     TextView gps_state_manual_textView;
+    @BindView(R.id.view_detection_manual_textView)
+    TextView view_detection_manual_textView;
 
     private final static String TAG = ManualScanActivity.class.getSimpleName();
 
@@ -116,6 +118,8 @@ public class ManualScanActivity extends AppCompatActivity {
     private byte detectionType;
     private int newFrequency;
     private final byte[] audioOption = {(byte) 0x5A, 0, 0};
+    private DialogFragment viewDetectionFilter;
+    private DialogFragment audioOptions;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -188,8 +192,7 @@ public class ManualScanActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -234,7 +237,7 @@ public class ManualScanActivity extends AppCompatActivity {
         int mm =  currentDate.get(Calendar.MINUTE);
         int ss = currentDate.get(Calendar.SECOND);
 
-        byte[] b = new byte[] {(byte) 0x86, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss,
+        byte[] b = new byte[] {(byte) 0x86, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256),
                 (byte) (manual_gps_switch.isChecked() ? 0x80 : 0x0)};
 
@@ -416,92 +419,25 @@ public class ManualScanActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_audio_manual_textView)
     public void onClickEditAudio(View v) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.audio_options, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                parameterWrite = bundle.getString(ValueCodes.PARAMETER);
+                if (parameterWrite != null && parameterWrite.equals(ValueCodes.AUDIO)) {
+                    audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
+                    audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
+                    audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
 
-        ImageButton close = view.findViewById(R.id.close_imageButton);
-        Button single = view.findViewById(R.id.single_button);
-        Button all = view.findViewById(R.id.all_button);
-        Button none = view.findViewById(R.id.none_button);
-        LinearLayout enterDigit = view.findViewById(R.id.enter_digit_linearLayout);
-        TextView number = view.findViewById(R.id.digit_textView);
-        Button one = view.findViewById(R.id.one_button);
-        Button two = view.findViewById(R.id.two_button);
-        Button three = view.findViewById(R.id.three_button);
-        Button four = view.findViewById(R.id.four_button);
-        Button five = view.findViewById(R.id.five_button);
-        Button six = view.findViewById(R.id.six_button);
-        Button seven = view.findViewById(R.id.seven_button);
-        Button eight = view.findViewById(R.id.eight_button);
-        Button nine = view.findViewById(R.id.nine_button);
-        Button zero = view.findViewById(R.id.zero_button);
-        ImageView delete = view.findViewById(R.id.delete_imageView);
-        SwitchCompat background = view.findViewById(R.id.play_background_signals_switch);
-        Button saveChanges = view.findViewById(R.id.save_digit_button);
-        close.setOnClickListener(v1 -> dialog.dismiss());
-        single.setOnClickListener(v14 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            enterDigit.setVisibility(View.VISIBLE);
-            number.setText("");
-            audioOption[0] = (byte) 0x59;
-        });
-        all.setOnClickListener(v15 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            enterDigit.setVisibility(View.GONE);
-            audioOption[0] = (byte) 0x5A;
-        });
-        none.setOnClickListener(v16 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            enterDigit.setVisibility(View.GONE);
-            audioOption[0] = (byte) 0x5B;
-        });
-        View.OnClickListener clickListener = v17 -> {
-            String text = number.getText().toString();
-            Button buttonNumber = (Button) v17;
-            number.setText(text + buttonNumber.getText());
-        };
-        one.setOnClickListener(clickListener);
-        two.setOnClickListener(clickListener);
-        three.setOnClickListener(clickListener);
-        four.setOnClickListener(clickListener);
-        five.setOnClickListener(clickListener);
-        six.setOnClickListener(clickListener);
-        seven.setOnClickListener(clickListener);
-        eight.setOnClickListener(clickListener);
-        nine.setOnClickListener(clickListener);
-        zero.setOnClickListener(clickListener);
-        delete.setOnClickListener(v13 -> {
-            if (!number.getText().toString().isEmpty()) {
-                String text = number.getText().toString();
-                number.setText(text.substring(0, text.length() - 1));
+                    mBluetoothLeService.discoveringSecond();
+                }
             }
         });
-        saveChanges.setOnClickListener(v12 -> {
-            audioOption[1] = Converters.getHexValue(audioOption[0]).equals("59") ? (byte) Integer.parseInt(number.getText().toString()) : 0;
-            audioOption[2] = background.isChecked() ? (byte) 1 : 0;
-            parameterWrite = ValueCodes.AUDIO;
-            mBluetoothLeService.discoveringSecond();
+        audioOptions.show(getSupportFragmentManager(), AudioOptions.TAG);
+    }
 
-            dialog.dismiss();
-        });
-        dialog.setView(view);
-        dialog.show();
+    @OnClick(R.id.view_detection_manual_textView)
+    public void onClickViewDetection(View v) {
+        viewDetectionFilter.show(getSupportFragmentManager(), ViewDetectionFilter.TAG);
     }
 
     @Override
@@ -526,16 +462,15 @@ public class ManualScanActivity extends AppCompatActivity {
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         isEditFrequency = false;
 
-        frequency_manual_textView.setText(Converters.getFrequency(baseFrequency));
-        newFrequency = baseFrequency;
         if (isScanning) { // The device is already scanning
             parameter = ValueCodes.CONTINUE_LOG;
-            detectionType = getIntent().getByteExtra(ValueCodes.DETECTION_TYPE, (byte) 0);
-            frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
 
-            updateVisibility();
+            scanState(data);
             setVisibility("scanning");
         } else { // Gets manual defaults data
+            newFrequency = baseFrequency;
+            frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
             setVisibility("overview");
         }
 
@@ -589,7 +524,6 @@ public class ManualScanActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -628,6 +562,7 @@ public class ManualScanActivity extends AppCompatActivity {
         audio_manual_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         period_textView.setVisibility(visibility);
         pulse_rate_textView.setVisibility(visibility);
+        view_detection_manual_textView.setVisibility(visibility);
     }
 
     private void setGpsOff() {
@@ -680,12 +615,33 @@ public class ManualScanActivity extends AppCompatActivity {
     }
 
     private void scanState(byte[] data) {
-        detectionType = data[18];
         int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[10])) * 256) +
                 (Integer.parseInt(Converters.getDecimalValue(data[11]))));
         frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
         frequency_manual_textView.setText(Converters.getFrequency(frequency));
+        detectionType = data[18];
         updateVisibility();
+
+        if (!Converters.getHexValue(detectionType).equals("09")) {
+            String detection = Converters.getHexValue(detectionType).equals("08") ? "Fixed Pulse Rate" : "Variable Pulse Rate";
+            String dataCalculation = "";
+            switch (Converters.getHexValue(detectionType)) {
+                case "06":
+                    dataCalculation = "Yes";
+                    break;
+                case "07":
+                    dataCalculation = "None";
+                    break;
+            }
+            String matches = Converters.getDecimalValue(data[19]);
+            String pr1 = Converters.getDecimalValue(data[20]);
+            String pr1Tolerance = Converters.getDecimalValue(data[21]);
+            String pr2 = Converters.getDecimalValue(data[22]);
+            String pr2Tolerance = Converters.getDecimalValue(data[23]);
+            viewDetectionFilter = ViewDetectionFilter.newInstance(detection, pr1, pr1Tolerance, pr2, pr2Tolerance, dataCalculation, matches);
+        } else {
+            audioOptions = AudioOptions.newInstance();
+        }
     }
 
     private void gpsState(byte[] data) {

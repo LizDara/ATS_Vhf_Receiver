@@ -17,7 +17,7 @@ import java.lang.Override;
 public class TestReceiverActivity_ViewBinding implements Unbinder {
   private TestReceiverActivity target;
 
-  private View view7f0a0281;
+  private View view7f0a0299;
 
   @UiThread
   public TestReceiverActivity_ViewBinding(TestReceiverActivity target) {
@@ -67,7 +67,7 @@ public class TestReceiverActivity_ViewBinding implements Unbinder {
     target.software_version_textView = Utils.findRequiredViewAsType(source, R.id.software_version_textView, "field 'software_version_textView'", TextView.class);
     target.hardware_version_textView = Utils.findRequiredViewAsType(source, R.id.hardware_version_textView, "field 'hardware_version_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.update_receiver_button, "method 'onClickUpdateReceiver'");
-    view7f0a0281 = view;
+    view7f0a0299 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -121,7 +121,7 @@ public class TestReceiverActivity_ViewBinding implements Unbinder {
     target.software_version_textView = null;
     target.hardware_version_textView = null;
 
-    view7f0a0281.setOnClickListener(null);
-    view7f0a0281 = null;
+    view7f0a0299.setOnClickListener(null);
+    view7f0a0299 = null;
   }
 }

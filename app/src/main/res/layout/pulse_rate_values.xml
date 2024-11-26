@@ -46,32 +46,28 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="16sp"
+        android:padding="4sp"
         android:elevation="4sp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/catskill_white">
 
         <TextView
             style="@style/body_regular"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@color/catskill_white"
+            android:layout_height="@dimen/button_small_height"
             android:gravity="center"
             android:paddingStart="16sp"
             android:text="+/-"
             android:textColor="@color/ebony_clay"
             tools:ignore="HardcodedText,RtlSymmetry" />
 
-        <EditText
-            android:id="@+id/pulse_rate_tolerance_editText"
-            style="@style/body_regular"
+        <Spinner
+            android:id="@+id/pulse_rate_tolerance_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/catskill_white"
-            android:inputType="number"
-            android:maxLines="1"
-            android:paddingHorizontal="4sp"
-            android:paddingVertical="16sp"
-            android:textColor="@color/ebony_clay"
-            tools:ignore="HardcodedText" />
+            android:layout_height="@dimen/button_small_height"
+            android:layout_marginVertical="8sp"
+            android:background="@color/catskill_white" />
 
     </LinearLayout>
 

@@ -9,11 +9,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,6 +54,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -111,8 +118,6 @@ public class GetDataActivity extends AppCompatActivity {
     private ReceiverInformation receiverInformation;
     private BluetoothLeService mBluetoothLeService;
 
-    FileOutputStream stream;
-    File newFile;
     File root;
     String fileName = "";
     private ArrayList<byte[]> packets;
@@ -189,8 +194,7 @@ public class GetDataActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -220,8 +224,7 @@ public class GetDataActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -331,6 +334,10 @@ public class GetDataActivity extends AppCompatActivity {
             secondParameter = "";
             setVisibility("deleting");
         }
+    }
+
+    @OnClick(R.id.view_data_button)
+    public void onClickViewData(View v) {
     }
 
     @OnClick(R.id.download_data_button)
@@ -459,14 +466,14 @@ public class GetDataActivity extends AppCompatActivity {
                 for (byte[] packet : packets)
                     rawDataCollector.processSnapshotRaw(packet);
             }
-            printSnapshotFiles();
+            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+            Converters.printSnapshotFiles(root, snapshotArray);
         }
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -487,7 +494,7 @@ public class GetDataActivity extends AppCompatActivity {
                 delete_linearLayout.setVisibility(View.GONE);
                 deleting_linearLayout.setVisibility(View.GONE);
                 deletion_complete_linearLayout.setVisibility(View.GONE);
-                title_toolbar.setText(R.string.lb_manage_receiver);
+                title_toolbar.setText(R.string.manage_receiver_data);
                 break;
             case "begin":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
@@ -591,6 +598,33 @@ public class GetDataActivity extends AppCompatActivity {
         preparing_progressBar.setVisibility(View.GONE);
     }
 
+    private void loadDownloading() {
+        downloading_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+        downloading_data_imageView.setBackgroundResource(R.drawable.ic_circle);
+        downloading_progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void loadProcessing() {
+        downloading_data_imageView.setBackgroundResource(R.drawable.circle_check);
+        downloading_progressBar.setVisibility(View.GONE);
+        processing_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+        processing_data_imageView.setBackgroundResource(R.drawable.ic_circle);
+        processing_progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void loadPreparing() {
+        processing_data_imageView.setBackgroundResource(R.drawable.circle_check);
+        processing_progressBar.setVisibility(View.GONE);
+        preparing_file_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+        preparing_file_imageView.setBackgroundResource(R.drawable.ic_circle);
+        preparing_progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void downloaded() {
+        preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
+        preparing_progressBar.setVisibility(View.GONE);
+    }
+
     /**
      * Finds the page number of a 4-byte packet.
      * @param packet The received packet.
@@ -639,125 +673,6 @@ public class GetDataActivity extends AppCompatActivity {
         return packetNumber;
     }
 
-    /**
-     * Processes the data when the download is complete.
-     * @param packet The raw data.
-     * @return Returns the processed data.
-     */
-    private String readPacket(byte[] packet) {
-        SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
-        int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
-        String data = "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsAge, Date, PrmNum" + ValueCodes.CR + ValueCodes.LF;
-        int index = 0;
-        int frequency = 0;
-        int frequencyTableIndex = 0;
-        int year;
-        Calendar calendar = Calendar.getInstance();
-
-        while (index < packet.length) {
-            String format = Converters.getHexValue(packet[index]);
-            if (format.equals("83") || format.equals("82")) {
-                year = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-                index += 8;
-                while (index < packet.length && !format.equals("83") && !format.equals("82") && !format.equals("86")) {
-                    if (Converters.getHexValue(packet[index]).equals("F0")) { //Header
-                        frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
-                        frequencyTableIndex = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-
-                        int date = Converters.hexToDecimal(
-                                Converters.getHexValue(packet[index + 4]) + Converters.getHexValue(packet[index + 5]) + Converters.getHexValue(packet[index + 6]));
-                        int month = date / 1000000;
-                        date = date % 1000000;
-                        int day = date / 10000;
-                        date = date % 10000;
-                        int hour = date / 100;
-                        int minute = date % 100;
-                        int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                        calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
-                    } else if (Converters.getHexValue(packet[index]).equals("F1")) {
-                        int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
-                        int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) > 128 ?
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) - 128 :
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
-                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        int numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                        calendar.add(Calendar.SECOND, secondsOffset);
-
-                        data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
-                                ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
-                                ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + ValueCodes.CR + ValueCodes.LF;
-
-                    } else if (Converters.getHexValue(packet[index]).equals("F2")) {
-                        int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) > 128 ?
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) - 128 :
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
-                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        int mort = (Integer.parseInt(Converters.getDecimalValue(packet[index + 6])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        int numberDetection = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-
-                        data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
-                                ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", 0, 0, 0, " +
-                                ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + ValueCodes.CR + ValueCodes.LF;
-
-                    } else if (Converters.getHexValue(packet[index]).equals("E1") || Converters.getHexValue(packet[index]).equals("E2")) {
-                        int secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
-                        int antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) % 10;
-                        int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        calendar.add(Calendar.SECOND, secondsOffset);
-
-                        data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
-                                ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", " + antenna + ", " + frequencyTableIndex +
-                                ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
-                                "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + ValueCodes.CR + ValueCodes.LF;
-                    }
-                    index += 8;
-                }
-            } else if (format.equals("86")) {
-                year = Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
-                int month = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                int day = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                int hour = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                int minute = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-                int seconds = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
-                calendar.set(year + 2000, month - 1, day, hour, minute, seconds);
-
-                if (Converters.getHexValue(packet[index + 8]).equals("D0")) {
-                    frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
-                            Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
-                    int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
-                    int code = Integer.parseInt(Converters.getDecimalValue(packet[index + 12]));
-                    int mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 13]));
-
-                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
-                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex +
-                            ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", 0, 0, 0, 0, " +
-                            ((calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + ValueCodes.CR + ValueCodes.LF;
-                } else if (Converters.getHexValue(packet[index + 8]).equals("E0")) {
-                    frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
-                            Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
-                    int signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
-
-                    data += (calendar.get(Calendar.YEAR) - 2000) + ", " + calendar.get(Calendar.DAY_OF_YEAR) + ", " + calendar.get(Calendar.HOUR_OF_DAY) +
-                            ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex +
-                            ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
-                            "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", 0" + ValueCodes.CR + ValueCodes.LF;
-                }
-                index += 16;
-            } else {
-                index += 8;
-            }
-        }
-        return data;
-    }
-
     private void readData(byte[] packet) {
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
@@ -771,9 +686,7 @@ public class GetDataActivity extends AppCompatActivity {
             downloading = true;
             initDownloading();
             setVisibility("downloading");
-            downloading_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-            downloading_data_imageView.setBackgroundResource(R.drawable.ic_circle);
-            downloading_progressBar.setVisibility(View.VISIBLE);
+            loadDownloading();
         }
         secondParameter = ValueCodes.READY_DOWNLOAD;
         mBluetoothLeService.discoveringSecond();
@@ -792,20 +705,19 @@ public class GetDataActivity extends AppCompatActivity {
      * @param packet The received packet.
      */
     private void downloadData(byte[] packet) {
-        Log.i(TAG, Converters.getHexValue(packet) + " " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":"
-                + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND));
         if (packet.length == 4 && downloading) {
             checkPackets();
         } else if (downloading) {
             if (pagePackets.isEmpty()) {
                 receiveHandler.postDelayed(() -> {
+                    secondParameter = ValueCodes.PAGE_BAD;
                     if (pagePackets.size() >= 9 && downloading) {
                         if (findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
-                            int number = findPageNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
+                            int number = findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
                             if (number == pageNumber) {
                                 pageNumber++;
                                 for (byte[] pagePacket : pagePackets) {
-                                    number = findPacketNumber(new byte[] {pagePacket[228], pagePacket[229]});
+                                    number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
                                     if (number == packetNumber)
                                         packetNumber++;
                                 }
@@ -822,21 +734,10 @@ public class GetDataActivity extends AppCompatActivity {
                                     }
                                     secondParameter = ValueCodes.PAGE_OK;
                                 } else {
-                                    Log.i(TAG, "Llegaron bien hasta el paquete " + (packetNumber - 1));
                                     pageNumber--;
-                                    secondParameter = ValueCodes.PAGE_BAD;
                                 }
-                            } else {
-                                Log.i(TAG, "La pagina esperada es " + pageNumber + " pero llego " + findPageNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]}));
-                                secondParameter = ValueCodes.PAGE_BAD;
                             }
-                        } else {
-                            Log.i(TAG, "El ultimo paquete no es 9 si no " + findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}));
-                            secondParameter = ValueCodes.PAGE_BAD;
                         }
-                    } else if (downloading) {
-                        Log.i(TAG, "Solo llegaron " + pagePackets.size() + " paquetes de la pagina " + pageNumber);
-                        secondParameter = ValueCodes.PAGE_BAD;
                     }
                     packetNumber = 1;
                     pagePackets = new ArrayList<>();
@@ -849,11 +750,7 @@ public class GetDataActivity extends AppCompatActivity {
 
     private void checkPackets() {
         parameter = "";
-        downloading_data_imageView.setBackgroundResource(R.drawable.circle_check);
-        downloading_progressBar.setVisibility(View.GONE);
-        processing_data_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-        processing_data_imageView.setBackgroundResource(R.drawable.ic_circle);
-        processing_progressBar.setVisibility(View.VISIBLE);
+        loadProcessing();
 
         for (byte[] packet : packets) {
             byte[] newPacket;
@@ -876,73 +773,37 @@ public class GetDataActivity extends AppCompatActivity {
         if (!error) {
             Log.i(TAG, "FILLED: " + rawDataCollector.isFilled() + " Byte Position: " + rawDataCollector.byteIndex);
             snapshotArray.add(rawDataCollector);
-            String processData = readPacket(rawDataCollector.getSnapshot());
-            if (!error) { // Adds the data to the list if you didn't find any errors during processing
-                byte[] data = Converters.convertToUTF8(processData);
-                Snapshots processDataCollector = new Snapshots(data.length);
-                processDataCollector.processSnapshot(data);
-                snapshotArray.add(processDataCollector);
-            }
-            printSnapshotFiles();
+            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
+            int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
+            String processData = Converters.readPacket(rawDataCollector.getSnapshot(), baseFrequency);
+            byte[] data = Converters.convertToUTF8(processData);
+            Snapshots processDataCollector = new Snapshots(data.length);
+            processDataCollector.processSnapshot(data);
+            snapshotArray.add(processDataCollector);
+
+            loadPreparing();
+            saveFiles();
         }
     }
 
-    /**
-     * Creates a file with the downloaded data.
-     */
-    private void printSnapshotFiles() {
-        processing_data_imageView.setBackgroundResource(R.drawable.circle_check);
-        processing_progressBar.setVisibility(View.GONE);
-        preparing_file_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-        preparing_file_imageView.setBackgroundResource(R.drawable.ic_circle);
-        preparing_progressBar.setVisibility(View.VISIBLE);
+    private void saveFiles() {
+        root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
+        fileName = snapshotArray.get(snapshotArray.size() - 1).getFileName();
+        boolean result = Converters.printSnapshotFiles(root, snapshotArray);
 
-        int i = 0;
-        boolean outcome;
-        String msg;
-        try {
-            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
-            if (!root.exists()) {
-                outcome = root.mkdirs();
-                if (!outcome)
-                    throw new Exception("Folder 'atstrack' can't be created.");
-                root.setReadable(true);
-                root.setWritable(true);
+        downloaded();
+        if (result) {
+            String message = "Download finished: " + (Snapshots.BYTES_PER_PAGE * pageNumber) + " byte(s) downloaded.";
+            if (error) {
+                message += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + packets.size() + ". Expected: " + (finalPageNumber * 9);
+                if (packets.size() != totalPackagesNumber)
+                    message += ". Timeout.";
+                else if (Snapshots.BYTES_PER_PAGE * pageNumber == Snapshots.BYTES_PER_PAGE * finalPageNumber)
+                    message += ". Not successfully.";
+                showPrintDialog("Finished", message, 1);
+            } else {
+                showPrintDialog("Finished", message, 3);
             }
-            while(i < snapshotArray.size()) {
-                fileName = snapshotArray.get(i).getFileName(); //get the fileName and create the file path
-                newFile = new File(root.getAbsolutePath(), fileName);
-                int copy = 1; //see if there's a possible copy
-                while (!(newFile.createNewFile())) {
-                    newFile = new File(root.getAbsolutePath(), fileName.substring(0, fileName.length() - 4) + " (" + copy + ").txt");
-                    copy++;
-                }
-                newFile.setReadable(true);
-                newFile.setWritable(true);
-                stream = new FileOutputStream(newFile); //write in the file created
-                stream.write(snapshotArray.get(i).getSnapshot());
-                stream.flush(); //save the file
-                stream.close();
-                i++;
-            }
-
-            if (i == snapshotArray.size()) {
-                preparing_file_imageView.setBackgroundResource(R.drawable.circle_check);
-                preparing_progressBar.setVisibility(View.GONE);
-                msg = "Download finished: " + (Snapshots.BYTES_PER_PAGE * pageNumber) + " byte(s) downloaded.";
-                if (error) {
-                    msg += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + packets.size() + ". Expected: " + (finalPageNumber * 9);
-                    if (packets.size() != totalPackagesNumber)
-                        msg += ". Timeout.";
-                    else if (Snapshots.BYTES_PER_PAGE * pageNumber == Snapshots.BYTES_PER_PAGE * finalPageNumber)
-                        msg += ". Not successfully.";
-                    showPrintDialog("Finished", msg, 1);
-                } else {
-                    showPrintDialog("Finished", msg, 3);
-                }
-            }
-        } catch (Exception e) {
-            Log.i(TAG, "Error File: " + e.getLocalizedMessage());
         }
         downloading = false;
         setVisibility("downloaded");

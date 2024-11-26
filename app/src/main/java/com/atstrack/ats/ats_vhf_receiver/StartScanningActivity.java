@@ -89,8 +89,7 @@ public class StartScanningActivity extends AppCompatActivity {
                     if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                         downloadData(packet);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -219,7 +218,6 @@ public class StartScanningActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

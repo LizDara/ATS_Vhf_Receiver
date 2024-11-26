@@ -41,6 +41,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -125,8 +126,7 @@ public class EditTablesActivity extends AppCompatActivity {
                     if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
                         downloadData(packet);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -361,6 +361,11 @@ public class EditTablesActivity extends AppCompatActivity {
                 setVisibility("overview");
             } else { // Initializes empty
                 originalTable = new int[]{};
+                ArrayList<Integer> frequencies = new ArrayList<>();
+                frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher);
+                frequencies_listView.setAdapter(frequencyListAdapter);
+                frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
+                frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
                 setVisibility("none");
             }
         }
@@ -374,7 +379,7 @@ public class EditTablesActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (frequencies_overview_linearLayout.getVisibility() == View.VISIBLE
                     || no_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
-                if (existChanges()) {
+                if (isFile || existChanges()) {
                     parameter = ValueCodes.SAVE;
                     mBluetoothLeService.discovering();
                 } else {
@@ -423,7 +428,6 @@ public class EditTablesActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();

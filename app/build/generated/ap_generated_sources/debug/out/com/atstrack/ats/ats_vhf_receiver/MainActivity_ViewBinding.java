@@ -20,15 +20,15 @@ import java.lang.Override;
 public class MainActivity_ViewBinding implements Unbinder {
   private MainActivity target;
 
-  private View view7f0a0148;
+  private View view7f0a0154;
 
   private View view7f0a0069;
 
-  private View view7f0a0237;
+  private View view7f0a024f;
 
-  private View view7f0a01cb;
+  private View view7f0a01df;
 
-  private View view7f0a01ca;
+  private View view7f0a01de;
 
   @UiThread
   public MainActivity_ViewBinding(MainActivity target) {
@@ -44,7 +44,7 @@ public class MainActivity_ViewBinding implements Unbinder {
     target.location_textView = Utils.findRequiredViewAsType(source, R.id.location_textView, "field 'location_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.location_button, "field 'location_button' and method 'enableLocation'");
     target.location_button = Utils.castView(view, R.id.location_button, "field 'location_button'", Button.class);
-    view7f0a0148 = view;
+    view7f0a0154 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -65,7 +65,7 @@ public class MainActivity_ViewBinding implements Unbinder {
     target.version_textView = Utils.findRequiredViewAsType(source, R.id.version_textView, "field 'version_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.switch_dark_mode, "field 'switch_dark_mode' and method 'onDarkModeClick'");
     target.switch_dark_mode = Utils.castView(view, R.id.switch_dark_mode, "field 'switch_dark_mode'", SwitchCompat.class);
-    view7f0a0237 = view;
+    view7f0a024f = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -77,7 +77,7 @@ public class MainActivity_ViewBinding implements Unbinder {
     target.retry_linearLayout = Utils.findRequiredViewAsType(source, R.id.retry_linearLayout, "field 'retry_linearLayout'", LinearLayout.class);
     view = Utils.findRequiredView(source, R.id.retry_button, "field 'retry_button' and method 'onClickRetry'");
     target.retry_button = Utils.castView(view, R.id.retry_button, "field 'retry_button'", Button.class);
-    view7f0a01cb = view;
+    view7f0a01df = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -90,7 +90,7 @@ public class MainActivity_ViewBinding implements Unbinder {
     target.searching_receivers_constraintLayout = Utils.findRequiredViewAsType(source, R.id.searching_receivers_constraintLayout, "field 'searching_receivers_constraintLayout'", ConstraintLayout.class);
     view = Utils.findRequiredView(source, R.id.refresh_button, "field 'refresh_button' and method 'onClickRefresh'");
     target.refresh_button = Utils.castView(view, R.id.refresh_button, "field 'refresh_button'", ImageButton.class);
-    view7f0a01ca = view;
+    view7f0a01de = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -124,15 +124,15 @@ public class MainActivity_ViewBinding implements Unbinder {
     target.searching_receivers_constraintLayout = null;
     target.refresh_button = null;
 
-    view7f0a0148.setOnClickListener(null);
-    view7f0a0148 = null;
+    view7f0a0154.setOnClickListener(null);
+    view7f0a0154 = null;
     view7f0a0069.setOnClickListener(null);
     view7f0a0069 = null;
-    view7f0a0237.setOnClickListener(null);
-    view7f0a0237 = null;
-    view7f0a01cb.setOnClickListener(null);
-    view7f0a01cb = null;
-    view7f0a01ca.setOnClickListener(null);
-    view7f0a01ca = null;
+    view7f0a024f.setOnClickListener(null);
+    view7f0a024f = null;
+    view7f0a01df.setOnClickListener(null);
+    view7f0a01df = null;
+    view7f0a01de.setOnClickListener(null);
+    view7f0a01de = null;
   }
 }

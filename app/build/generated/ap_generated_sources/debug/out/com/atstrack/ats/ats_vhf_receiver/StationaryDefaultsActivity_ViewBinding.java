@@ -19,21 +19,21 @@ import java.lang.Override;
 public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
   private StationaryDefaultsActivity target;
 
-  private View view7f0a0233;
+  private View view7f0a024b;
 
-  private View view7f0a022c;
-
-  private View view7f0a01c7;
-
-  private View view7f0a01c8;
-
-  private View view7f0a010b;
+  private View view7f0a0244;
 
   private View view7f0a01db;
 
-  private View view7f0a01dd;
+  private View view7f0a01dc;
 
-  private View view7f0a017d;
+  private View view7f0a0117;
+
+  private View view7f0a01ef;
+
+  private View view7f0a01f1;
+
+  private View view7f0a018c;
 
   @UiThread
   public StationaryDefaultsActivity_ViewBinding(StationaryDefaultsActivity target) {
@@ -59,7 +59,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
     target.reference_frequency_store_rate_stationary_textView = Utils.findRequiredViewAsType(source, R.id.reference_frequency_store_rate_stationary_textView, "field 'reference_frequency_store_rate_stationary_textView'", TextView.class);
     view = Utils.findRequiredView(source, R.id.store_rate_stationary_linearLayout, "field 'store_rate_stationary_linearLayout' and method 'onClickStoreRate'");
     target.store_rate_stationary_linearLayout = Utils.castView(view, R.id.store_rate_stationary_linearLayout, "field 'store_rate_stationary_linearLayout'", LinearLayout.class);
-    view7f0a0233 = view;
+    view7f0a024b = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -69,7 +69,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
     target.stationary_external_data_transfer_switch = Utils.findRequiredViewAsType(source, R.id.stationary_external_data_transfer_switch, "field 'stationary_external_data_transfer_switch'", SwitchCompat.class);
     view = Utils.findRequiredView(source, R.id.stationary_reference_frequency_switch, "field 'stationary_reference_frequency_switch' and method 'onCheckedChangedReferenceFrequency'");
     target.stationary_reference_frequency_switch = Utils.castView(view, R.id.stationary_reference_frequency_switch, "field 'stationary_reference_frequency_switch'", SwitchCompat.class);
-    view7f0a022c = view;
+    view7f0a0244 = view;
     ((CompoundButton) view).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton p0, boolean p1) {
@@ -78,7 +78,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.reference_frequency_stationary_linearLayout, "field 'reference_frequency_stationary_linearLayout' and method 'onClickReferenceFrequency'");
     target.reference_frequency_stationary_linearLayout = Utils.castView(view, R.id.reference_frequency_stationary_linearLayout, "field 'reference_frequency_stationary_linearLayout'", LinearLayout.class);
-    view7f0a01c7 = view;
+    view7f0a01db = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -87,7 +87,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
     });
     view = Utils.findRequiredView(source, R.id.reference_frequency_store_rate_stationary_linearLayout, "field 'reference_frequency_store_rate_stationary_linearLayout' and method 'onClickReferenceFrequencyStoreRate'");
     target.reference_frequency_store_rate_stationary_linearLayout = Utils.castView(view, R.id.reference_frequency_store_rate_stationary_linearLayout, "field 'reference_frequency_store_rate_stationary_linearLayout'", LinearLayout.class);
-    view7f0a01c8 = view;
+    view7f0a01dc = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -95,7 +95,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.frequency_table_number_stationary_linearLayout, "method 'onClickFrequencyTableNumber'");
-    view7f0a010b = view;
+    view7f0a0117 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -103,7 +103,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.scan_rate_seconds_stationary_linearLayout, "method 'onClickScanRateSeconds'");
-    view7f0a01db = view;
+    view7f0a01ef = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -111,7 +111,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.scan_timeout_seconds_stationary_linearLayout, "method 'onClickScanTimeoutSeconds'");
-    view7f0a01dd = view;
+    view7f0a01f1 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -119,7 +119,7 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.number_of_antennas_stationary_linearLayout, "method 'onClickNumberOfAntennas'");
-    view7f0a017d = view;
+    view7f0a018c = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -152,21 +152,21 @@ public class StationaryDefaultsActivity_ViewBinding implements Unbinder {
     target.reference_frequency_stationary_linearLayout = null;
     target.reference_frequency_store_rate_stationary_linearLayout = null;
 
-    view7f0a0233.setOnClickListener(null);
-    view7f0a0233 = null;
-    ((CompoundButton) view7f0a022c).setOnCheckedChangeListener(null);
-    view7f0a022c = null;
-    view7f0a01c7.setOnClickListener(null);
-    view7f0a01c7 = null;
-    view7f0a01c8.setOnClickListener(null);
-    view7f0a01c8 = null;
-    view7f0a010b.setOnClickListener(null);
-    view7f0a010b = null;
+    view7f0a024b.setOnClickListener(null);
+    view7f0a024b = null;
+    ((CompoundButton) view7f0a0244).setOnCheckedChangeListener(null);
+    view7f0a0244 = null;
     view7f0a01db.setOnClickListener(null);
     view7f0a01db = null;
-    view7f0a01dd.setOnClickListener(null);
-    view7f0a01dd = null;
-    view7f0a017d.setOnClickListener(null);
-    view7f0a017d = null;
+    view7f0a01dc.setOnClickListener(null);
+    view7f0a01dc = null;
+    view7f0a0117.setOnClickListener(null);
+    view7f0a0117 = null;
+    view7f0a01ef.setOnClickListener(null);
+    view7f0a01ef = null;
+    view7f0a01f1.setOnClickListener(null);
+    view7f0a01f1 = null;
+    view7f0a018c.setOnClickListener(null);
+    view7f0a018c = null;
   }
 }

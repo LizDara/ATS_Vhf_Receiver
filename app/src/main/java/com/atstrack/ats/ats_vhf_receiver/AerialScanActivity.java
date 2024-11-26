@@ -2,10 +2,14 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentResultListener;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -37,10 +41,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.Messages.AudioOptions;
+import com.atstrack.ats.ats_vhf_receiver.Messages.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
@@ -79,8 +84,6 @@ public class AerialScanActivity extends AppCompatActivity {
     View state_view;
     @BindView(R.id.ready_aerial_scan_LinearLayout)
     LinearLayout ready_aerial_scan_LinearLayout;
-    @BindView(R.id.ready_aerial_textView)
-    TextView ready_aerial_textView;
     @BindView(R.id.scan_rate_seconds_aerial_textView)
     TextView scan_rate_seconds_aerial_textView;
     @BindView(R.id.frequency_table_number_aerial_textView)
@@ -143,6 +146,8 @@ public class AerialScanActivity extends AppCompatActivity {
     ImageView gps_aerial_imageView;
     @BindView(R.id.gps_state_aerial_textView)
     TextView gps_state_aerial_textView;
+    @BindView(R.id.view_detection_aerial_textView)
+    TextView view_detection_aerial_textView;
 
     private final static String TAG = AerialScanActivity.class.getSimpleName();
 
@@ -164,6 +169,9 @@ public class AerialScanActivity extends AppCompatActivity {
     private int selectedTable;
     private int autoRecord; //This is the default record
     private int gps;
+    private final byte[] audioOption = {(byte) 0x5A, 0, 0};
+    private DialogFragment viewDetectionFilter;
+    private DialogFragment audioOptions;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -223,8 +231,7 @@ public class AerialScanActivity extends AppCompatActivity {
                             break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -276,11 +283,11 @@ public class AerialScanActivity extends AppCompatActivity {
                     }
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
+                    Log.i(TAG, "Second: " + Converters.getHexValue(packet));
                     if (parameterWrite.equals(ValueCodes.TABLES))
                         downloadTables(packet);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
         }
@@ -369,7 +376,7 @@ public class AerialScanActivity extends AppCompatActivity {
         int ss = currentDate.get(Calendar.SECOND);
 
         byte[] b = new byte[] {
-                (byte) 0x82, (byte) (YY % 100), (byte) MM, (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable, (byte) 0x0, (byte) 0x0};
+                (byte) 0x82, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable, (byte) 0x0, (byte) 0x0};
 
         Log.i(TAG, "On Click Start Aerial: " + Converters.getHexValue(b));
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
@@ -513,24 +520,12 @@ public class AerialScanActivity extends AppCompatActivity {
      * Writes a value for merge other tables to the selected table.
      */
     private void onClickMerge() {
-        for (int i = 0; i < tableMergeListAdapter.getCount();  i++) {
-            if (tableMergeListAdapter.isSelected(i)) {
-                byte[] b = new byte[]{(byte) 0x8A, (byte) tableMergeListAdapter.getTableNumber(i)};
-                Log.i(TAG, "MERGE AERIAL " + tableMergeListAdapter.getTableNumber(i));
-
-                UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
-                UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
-                boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
-
-                if (result)
-                    tableMergeListAdapter.setNotSelected(i);
-                new Handler().postDelayed(() -> {
-                    mBluetoothLeService.discoveringSecond();
-                }, ValueCodes.WAITING_PERIOD);
-                return;
-            }
-        }
-        manageMessage(R.string.lb_tables_merged);
+        byte[] b = new byte[]{(byte) 0x8A, (byte) tableMergeListAdapter.getTableNumber()};
+        UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCAN;
+        UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SCAN_TABLE;
+        boolean result = mBluetoothLeService.writeCharacteristic(service, characteristic, b);
+        if (result)
+            manageMessage(R.string.lb_tables_merged);
     }
 
     /**
@@ -687,6 +682,7 @@ public class AerialScanActivity extends AppCompatActivity {
         if (tableMergeListAdapter == null) {
             parameterWrite = ValueCodes.TABLES;
             mBluetoothLeService.discoveringSecond();
+            Log.i(TAG, "Tables is null");
         }
     }
 
@@ -716,82 +712,25 @@ public class AerialScanActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_audio_aerial_textView)
     public void onClickEditAudio(View v) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.audio_options, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                parameterWrite = bundle.getString(ValueCodes.PARAMETER);
+                if (parameterWrite != null && parameterWrite.equals(ValueCodes.AUDIO)) {
+                    audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
+                    audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
+                    audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
 
-        ImageButton close = view.findViewById(R.id.close_imageButton);
-        Button single = view.findViewById(R.id.single_button);
-        Button all = view.findViewById(R.id.all_button);
-        Button none = view.findViewById(R.id.none_button);
-        LinearLayout enterDigit = view.findViewById(R.id.enter_digit_linearLayout);
-        TextView number = view.findViewById(R.id.digit_textView);
-        Button one = view.findViewById(R.id.one_button);
-        Button two = view.findViewById(R.id.two_button);
-        Button three = view.findViewById(R.id.three_button);
-        Button four = view.findViewById(R.id.four_button);
-        Button five = view.findViewById(R.id.five_button);
-        Button six = view.findViewById(R.id.six_button);
-        Button seven = view.findViewById(R.id.seven_button);
-        Button eight = view.findViewById(R.id.eight_button);
-        Button nine = view.findViewById(R.id.nine_button);
-        Button zero = view.findViewById(R.id.zero_button);
-        ImageView delete = view.findViewById(R.id.delete_imageView);
-        Button saveChanges = view.findViewById(R.id.save_digit_button);
-        close.setOnClickListener(v1 -> dialog.dismiss());
-        single.setOnClickListener(v14 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            enterDigit.setVisibility(View.VISIBLE);
-            number.setText("");
-        });
-        all.setOnClickListener(v15 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            enterDigit.setVisibility(View.GONE);
-        });
-        none.setOnClickListener(v16 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            enterDigit.setVisibility(View.GONE);
-        });
-        View.OnClickListener clickListener = v17 -> {
-            String text = number.getText().toString();
-            if (!text.isEmpty()) {
-                Button buttonNumber = (Button) v17;
-                number.setText(text + buttonNumber.getText());
+                    mBluetoothLeService.discoveringSecond();
+                }
             }
-        };
-        one.setOnClickListener(clickListener);
-        two.setOnClickListener(clickListener);
-        three.setOnClickListener(clickListener);
-        four.setOnClickListener(clickListener);
-        five.setOnClickListener(clickListener);
-        six.setOnClickListener(clickListener);
-        seven.setOnClickListener(clickListener);
-        eight.setOnClickListener(clickListener);
-        nine.setOnClickListener(clickListener);
-        zero.setOnClickListener(clickListener);
-        delete.setOnClickListener(v13 -> {
-            String text = number.getText().toString();
-            number.setText(text.substring(0, text.length() - 1));
         });
-        saveChanges.setOnClickListener(v12 -> dialog.dismiss());
+        audioOptions.show(getSupportFragmentManager(), AudioOptions.TAG);
+    }
 
-        dialog.setView(view);
-        dialog.show();
+    @OnClick(R.id.view_detection_aerial_textView)
+    public void onClickViewDetection(View v) {
+        viewDetectionFilter.show(getSupportFragmentManager(), ViewDetectionFilter.TAG);
     }
 
     @Override
@@ -819,22 +758,21 @@ public class AerialScanActivity extends AppCompatActivity {
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = ValueCodes.CONTINUE_LOG;
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
 
-            isHold = getIntent().getBooleanExtra(ValueCodes.HOLD, false);
-            isRecord = getIntent().getBooleanExtra(ValueCodes.AUTO_RECORD, false);
-            int currentFrequency = getIntent().getIntExtra(ValueCodes.FREQUENCY, 0) + baseFrequency;
-            int currentIndex = getIntent().getIntExtra(ValueCodes.INDEX, 0);
-            int total = getIntent().getIntExtra(ValueCodes.MAX_INDEX, 0);
-            detectionType = getIntent().getByteExtra(ValueCodes.DETECTION_TYPE, (byte) 0);
+            int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
+                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
+            int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
+                    + Integer.parseInt(Converters.getDecimalValue(data[8]));
+            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+            isRecord = autoRecord == 1;
+            isHold = Converters.getHexValue(data[1]).equals("81");
             frequency_aerial_textView.setText(Converters.getFrequency(currentFrequency));
             table_index_aerial_textView.setText(String.valueOf(currentIndex));
-            max_index_aerial_textView.setText("Table Index (" + total + " Total)");
-            table_total_aerial_textView.setText(String.valueOf(total));
-            autoRecord = isRecord ? 1 : 0;
             if (isHold) setHold(); else removeHold();
             if (isRecord) setRecord(); else removeRecord();
 
-            updateVisibility();
+            scanState(data);
             setVisibility("scanning");
         } else { // Gets aerial defaults data
             parameter = ValueCodes.MOBILE_DEFAULTS;
@@ -919,7 +857,6 @@ public class AerialScanActivity extends AppCompatActivity {
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setView(view);
         dialog.show();
-        Toast.makeText(this, "Connection failed, status: " + status, Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
@@ -976,6 +913,7 @@ public class AerialScanActivity extends AppCompatActivity {
         audio_aerial_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         period_textView.setVisibility(visibility);
         pulse_rate_textView.setVisibility(visibility);
+        view_detection_aerial_textView.setVisibility(visibility);
     }
 
     private void manageMessage(int idStringMessage) {
@@ -1012,7 +950,7 @@ public class AerialScanActivity extends AppCompatActivity {
     }
 
     private void changeAllCheckBox() {
-        tableMergeListAdapter.setStateSelected(false);
+        tableMergeListAdapter.initialize();
         tableMergeListAdapter.notifyDataSetChanged();
 
         merge_tables_button.setEnabled(false);
@@ -1107,6 +1045,9 @@ public class AerialScanActivity extends AppCompatActivity {
             case "51":
                 gpsState(data);
                 break;
+            case "8A":
+                frequenciesNumber(data);
+                break;
             case "F0":
                 logScanHeader(data);
                 break;
@@ -1132,6 +1073,27 @@ public class AerialScanActivity extends AppCompatActivity {
         table_total_aerial_textView.setText(String.valueOf(maxIndex));
         detectionType = data[18];
         updateVisibility();
+
+        if (!Converters.getHexValue(detectionType).equals("09")) {
+            String detection = Converters.getHexValue(detectionType).equals("08") ? "Fixed Pulse Rate" : "Variable Pulse Rate";
+            String dataCalculation = "";
+            switch (Converters.getHexValue(detectionType)) {
+                case "06":
+                    dataCalculation = "Yes";
+                    break;
+                case "07":
+                    dataCalculation = "None";
+                    break;
+            }
+            String matches = Converters.getDecimalValue(data[19]);
+            String pr1 = Converters.getDecimalValue(data[20]);
+            String pr1Tolerance = Converters.getDecimalValue(data[21]);
+            String pr2 = Converters.getDecimalValue(data[22]);
+            String pr2Tolerance = Converters.getDecimalValue(data[23]);
+            viewDetectionFilter = ViewDetectionFilter.newInstance(detection, pr1, pr1Tolerance, pr2, pr2Tolerance, dataCalculation, matches);
+        } else {
+            audioOptions = AudioOptions.newInstance();
+        }
     }
 
     private void gpsState(byte[] data) {
@@ -1144,6 +1106,12 @@ public class AerialScanActivity extends AppCompatActivity {
             setGpsSearching();
     }
 
+    private void frequenciesNumber(byte[] data) {
+        int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[2]));
+        max_index_aerial_textView.setText("Table Index (" + maxIndex + " Total)");
+        table_total_aerial_textView.setText(String.valueOf(maxIndex));
+    }
+
     /**
      * With the received packet, processes the data of scan header to display.
      * @param data The received packet.
@@ -1152,7 +1120,8 @@ public class AerialScanActivity extends AppCompatActivity {
         clear();
         int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[2])) + baseFrequency;
-        table_index_aerial_textView.setText(Converters.getDecimalValue(data[3]));
+        int index = (((Integer.parseInt(Converters.getDecimalValue(data[1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(data[3]));
+        table_index_aerial_textView.setText(String.valueOf(index));
         frequency_aerial_textView.setText(Converters.getFrequency(frequency));
     }
 

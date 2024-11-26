@@ -17,7 +17,7 @@ public class EditReceiverDefaultsActivity_ViewBinding implements Unbinder {
 
   private View view7f0a0049;
 
-  private View view7f0a022a;
+  private View view7f0a0242;
 
   @UiThread
   public EditReceiverDefaultsActivity_ViewBinding(EditReceiverDefaultsActivity target) {
@@ -42,7 +42,7 @@ public class EditReceiverDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.stationary_defaults_button, "method 'onClickStationaryDefaults'");
-    view7f0a022a = view;
+    view7f0a0242 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -64,7 +64,7 @@ public class EditReceiverDefaultsActivity_ViewBinding implements Unbinder {
 
     view7f0a0049.setOnClickListener(null);
     view7f0a0049 = null;
-    view7f0a022a.setOnClickListener(null);
-    view7f0a022a = null;
+    view7f0a0242.setOnClickListener(null);
+    view7f0a0242 = null;
   }
 }

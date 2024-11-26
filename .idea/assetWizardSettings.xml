@@ -163,8 +163,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_gps_failed" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\gps_failed.svg" />
+                            <entry key="outputName" value="ic_file" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\file.svg" />
                           </map>
                         </option>
                       </PersistentState>

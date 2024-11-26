@@ -19,6 +19,7 @@ public class TableMergeListAdapter extends BaseAdapter {
     private final ArrayList<Integer> frequencies;
     private final ArrayList<Boolean> selected;
     private final Button merge_tables_button;
+    private int tableNumber;
 
     public TableMergeListAdapter(Context context, ArrayList<Integer> tables, ArrayList<Integer> frequencies, Button merge_tables_button) {
         this.tables = tables;
@@ -35,21 +36,13 @@ public class TableMergeListAdapter extends BaseAdapter {
         return tables.size();
     }
 
-    public void setStateSelected(boolean isChecked) {
+    public void initialize() {
         for (int i = 0; i < frequencies.size(); i++)
-            selected.set(i, isChecked);
+            selected.set(i, false);
     }
 
-    public boolean isSelected(int index) {
-        return selected.get(index);
-    }
-
-    public void setNotSelected(int index) {
-        selected.set(index, false);
-    }
-
-    public int getTableNumber(int index) {
-        return tables.get(index);
+    public int getTableNumber() {
+        return tableNumber;
     }
 
     @Override
@@ -75,20 +68,18 @@ public class TableMergeListAdapter extends BaseAdapter {
         frequencyNumber.setOnCheckedChangeListener((buttonView, isChecked) -> {
             selected.set(position, isChecked);
             if (isChecked) {
+                tableNumber = tables.get(position);
                 merge_tables_button.setEnabled(true);
                 merge_tables_button.setAlpha(1);
+                for (int i = 0; i < selected.size(); i++) {
+                    if (i != position)
+                        selected.set(i, false);
+                }
+                notifyDataSetChanged();
             } else {
-                int index = 0;
-                int number = 0;
-                while (index < selected.size()) {
-                    if (selected.get(index))
-                        number++;
-                    index++;
-                }
-                if (number == 0) {
-                    merge_tables_button.setEnabled(false);
-                    merge_tables_button.setAlpha((float) 0.6);
-                }
+                tableNumber = 0;
+                merge_tables_button.setEnabled(false);
+                merge_tables_button.setAlpha((float) 0.6);
             }
         });
 

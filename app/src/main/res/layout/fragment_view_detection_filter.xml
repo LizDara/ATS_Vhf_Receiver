@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".Messages.AudioOptions">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20sp"
+        android:background="@color/catskill_white"
+        android:elevation="4sp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16sp">
+
+            <TextView
+                style="@style/button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_non_coded_detection"
+                android:textColor="@color/limed_spruce"
+                android:layout_weight="1"
+                android:layout_marginEnd="12sp"/>
+
+            <ImageButton
+                android:id="@+id/close_imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_close"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_marginEnd="8sp">
+
+                <TextView
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_filter_type"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/filter_type_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"
+                    android:layout_marginBottom="12sp"/>
+
+                <TextView
+                    android:id="@+id/pr_description_textView"
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_pr1"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/pulse_rate_1_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"
+                    android:layout_marginBottom="12sp"/>
+
+                <TextView
+                    android:id="@+id/pr2_description_textView"
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_pr2"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/pulse_rate_2_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"
+                    android:layout_marginBottom="12sp"/>
+
+                <TextView
+                    android:id="@+id/calculation_description_textView"
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/optional_data_calculations"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/optional_data_calculation_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_marginStart="8sp">
+
+                <TextView
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_matches_for_valid_pattern"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/number_matches_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"
+                    android:layout_marginBottom="12sp"/>
+
+                <TextView
+                    android:id="@+id/pr_tolerance_description_textView"
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_pr1_tolerance"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/period_1_tolerance_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"
+                    android:layout_marginBottom="12sp"/>
+
+                <TextView
+                    android:id="@+id/pr2_tolerance_description_textView"
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lb_pr2_tolerance"
+                    android:textColor="@color/limed_spruce"/>
+
+                <TextView
+                    android:id="@+id/period_2_tolerance_textView"
+                    style="@style/button_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/limed_spruce"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>

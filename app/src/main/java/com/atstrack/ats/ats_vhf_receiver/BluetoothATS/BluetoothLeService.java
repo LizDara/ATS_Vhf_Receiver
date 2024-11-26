@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +33,6 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGatt mBluetoothGatt;
     private String action;
-    private Context context;
 
     public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
@@ -50,15 +50,14 @@ public class BluetoothLeService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
+            Log.i(TAG, "On Connection Changed: " + newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 broadcastUpdate(intentAction);
-                // Attempts to discover services after successful connection.
                 Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
-
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
-                broadcastUpdate(intentAction, status);
+                broadcastUpdate(intentAction);
             }
         }
 
@@ -101,12 +100,6 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action, int status) {
-        final Intent intent = new Intent(action);
-        intent.putExtra("status", status);
-        sendBroadcast(intent);
-    }
-
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
         final byte[] data = characteristic.getValue();
@@ -145,7 +138,6 @@ public class BluetoothLeService extends Service {
     public boolean initialize() {
         // For API level 18 and above, get a reference to BluetoothAdapter through BluetoothManager.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        context = getBaseContext();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
             return false;
@@ -167,13 +159,11 @@ public class BluetoothLeService extends Service {
             Log.w(TAG,"BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
-
         // Previously connected device. Try to reconnect.
         if (mBluetoothGatt != null) {
             Log.d(TAG,"Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 broadcastUpdate(ACTION_GATT_CONNECTED);
-                // Attempts to discover services after successful connection.
                 Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 return true;
             } else {
@@ -181,15 +171,17 @@ public class BluetoothLeService extends Service {
                 return false;
             }
         }
-
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
-            Log.w(TAG,"Device not found.  Unable to connect.");
+            Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
         // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
-        mBluetoothGatt = device.connectGatt(this, true, mGattCallback, BluetoothDevice.TRANSPORT_LE);
+        mBluetoothGatt = device.connectGatt(this, false, mGattCallback, BluetoothDevice.TRANSPORT_LE);
         Log.d(TAG, "Trying to create a new connection.");
+        /*BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        int connectionState = mBluetoothManager.getConnectionState(device, BluetoothProfile.GATT);
+        Log.d(TAG, "STATE CONNECTION: " + connectionState);*/
         return true;
     }
 
@@ -206,6 +198,8 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.disconnect();
+        mBluetoothAdapter = null;
+        mBluetoothGatt = null;
     }
 
     /**

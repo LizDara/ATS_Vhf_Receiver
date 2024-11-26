@@ -16,9 +16,9 @@ import java.lang.Override;
 public class AerialDefaultsActivity_ViewBinding implements Unbinder {
   private AerialDefaultsActivity target;
 
-  private View view7f0a0109;
+  private View view7f0a0115;
 
-  private View view7f0a01d9;
+  private View view7f0a01ed;
 
   @UiThread
   public AerialDefaultsActivity_ViewBinding(AerialDefaultsActivity target) {
@@ -38,7 +38,7 @@ public class AerialDefaultsActivity_ViewBinding implements Unbinder {
     target.aerial_gps_switch = Utils.findRequiredViewAsType(source, R.id.aerial_gps_switch, "field 'aerial_gps_switch'", SwitchCompat.class);
     target.aerial_auto_record_switch = Utils.findRequiredViewAsType(source, R.id.aerial_auto_record_switch, "field 'aerial_auto_record_switch'", SwitchCompat.class);
     view = Utils.findRequiredView(source, R.id.frequency_table_number_aerial_linearLayout, "method 'onClickFrequencyTableNumber'");
-    view7f0a0109 = view;
+    view7f0a0115 = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -46,7 +46,7 @@ public class AerialDefaultsActivity_ViewBinding implements Unbinder {
       }
     });
     view = Utils.findRequiredView(source, R.id.scan_rate_seconds_aerial_linearLayout, "method 'onClickScanRateSeconds'");
-    view7f0a01d9 = view;
+    view7f0a01ed = view;
     view.setOnClickListener(new DebouncingOnClickListener() {
       @Override
       public void doClick(View p0) {
@@ -70,9 +70,9 @@ public class AerialDefaultsActivity_ViewBinding implements Unbinder {
     target.aerial_gps_switch = null;
     target.aerial_auto_record_switch = null;
 
-    view7f0a0109.setOnClickListener(null);
-    view7f0a0109 = null;
-    view7f0a01d9.setOnClickListener(null);
-    view7f0a01d9 = null;
+    view7f0a0115.setOnClickListener(null);
+    view7f0a0115 = null;
+    view7f0a01ed.setOnClickListener(null);
+    view7f0a01ed = null;
   }
 }

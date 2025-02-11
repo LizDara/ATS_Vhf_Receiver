@@ -2,6 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,12 +80,13 @@ public class FrequencyDeleteListAdapter extends BaseAdapter {
                 delete_selected_frequencies_button.setAlpha(1);
             }
             selected.set(position, isChecked);
-            int index = 0;
-            while (index < selected.size() && selected.get(index)) {
-                index++;
+            int count = 0;
+            for (boolean isSelected : selected) {
+                if (isSelected)
+                    count++;
             }
-            all_frequencies_checkBox.setChecked(index == selected.size());
-            if (index == 0) {
+            all_frequencies_checkBox.setChecked(count == selected.size());
+            if (count == 0) {
                 delete_selected_frequencies_button.setEnabled(false);
                 delete_selected_frequencies_button.setAlpha((float) 0.6);
             }

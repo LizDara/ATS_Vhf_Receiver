@@ -30,8 +30,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -53,70 +53,98 @@
         android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.ConvertRawDataActivity"
-            android:exported="false"
-            android:label="@string/title_activity_convert_raw_data"
-            android:theme="@style/AppTheme" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.AcousticUpdateActivity"
+            android:exported="false" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.AcousticOptionActivity"
+            android:exported="false" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.AcousticMenuActivity"
+            android:exported="false" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.SelectValueActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfRawDataActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.InputValueActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfEnterFrequencyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfUpdateActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfValueDetectionFilterActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfValueDefaultsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfStationaryDefaultsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfMobileDefaultsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfDiagnosticsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfCloneActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfDetectionFilterActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.AerialScanActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfEditDefaultsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.ManualScanActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfConfigurationActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.StartScanningActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfStationaryScanActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.MainMenuActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfMobileScanActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.EditTablesActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfManualScanActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfScanningActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.GetDataActivity"
-            android:exported="true" />
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfMenuActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfFrequenciesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfTablesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.VhfManageDataActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN"

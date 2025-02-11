@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/catskill_white"
@@ -9,7 +10,7 @@
     <LinearLayout
         android:layout_width="@dimen/receiver_status"
         android:layout_height="@dimen/receiver_status"
-        android:background="@drawable/receiver_branding"
+        android:background="@drawable/vhf_color"
         android:elevation="4sp"
         android:layout_marginHorizontal="16sp"
         android:layout_marginVertical="8sp"
@@ -18,71 +19,40 @@
         <ImageView
             android:layout_width="@dimen/receiver_image_status"
             android:layout_height="@dimen/receiver_image_status"
-            android:src="@drawable/receiver" />
+            android:src="@drawable/receiver"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <include
+        layout="@layout/device_battery" />
+
+    <ImageView
+        android:id="@+id/sd_card_imageView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_marginEnd="8sp"
+        android:layout_marginStart="20sp"
+        tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/percent_battery_imageView"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/body_x_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8sp"
-            android:layout_marginStart="8sp" />
+            android:text="@string/lb_sd_card"
+            android:textColor="@color/slate_700"/>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/sd_card_textView"
+            style="@style/body_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/body_x_small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lb_battery"
-                android:textColor="@color/slate_gray"/>
-
-            <TextView
-                android:id="@+id/percent_battery_textView"
-                style="@style/body_regular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/sd_card_imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8sp"
-            android:layout_marginStart="20sp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/body_x_small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lb_sd_card"
-                android:textColor="@color/slate_gray"/>
-
-            <TextView
-                android:id="@+id/sd_card_textView"
-                style="@style/body_regular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay" />
-
-        </LinearLayout>
+            android:textColor="@color/slate_900" />
 
     </LinearLayout>
 

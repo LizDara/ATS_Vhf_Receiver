@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/searching_devices_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/devices_subtitle_textView"
+        style="@style/main_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32sp"
+        android:text="@string/lb_searching_devices" />
+
+    <TextView
+        android:id="@+id/searching_message_textView"
+        style="@style/body_regular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16sp"
+        android:layout_marginBottom="8sp"
+        android:gravity="center_horizontal"
+        android:text="@string/lb_message_searching" />
+
+    <include
+        layout="@layout/no_device_found" />
+
+    <include
+        layout="@layout/devices_list" />
+
+    <include
+        layout="@layout/connecting_device" />
+
+    <Button
+        android:id="@+id/connect_button"
+        style="@style/button_primary.main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="16sp"
+        android:enabled="false"
+        android:alpha="0.6"
+        android:text="@string/lb_connect" />
+
+</LinearLayout>

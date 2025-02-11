@@ -11,6 +11,12 @@
         <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
 
+    <style name="main_subtitle" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/subtitle</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="subtitle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/subtitle</item>
         <item name="android:fontFamily">@font/roboto_regular</item>
@@ -66,6 +72,15 @@
         <item name="lineHeight">@dimen/line_height</item>
     </style>
 
+    <style name="button_primary.main" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_main</item>
+        <item name="android:elevation">@dimen/elevation_button</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAppearance">@style/button</item>
+        <item name="android:textColor">@color/white_ice</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="button_primary" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/button_primary</item>
         <item name="android:elevation">@dimen/elevation_button</item>
@@ -116,7 +131,7 @@
         <item name="android:elevation">@dimen/elevation_button</item>
         <item name="android:minHeight">@dimen/button_small_height</item>
         <item name="android:textAppearance">@style/button</item>
-        <item name="android:textColor">@color/white_ice</item>
+        <item name="android:textColor">@color/humming_bird</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -130,7 +145,7 @@
     </style>
     
     <style name="button_rectangle" parent="Widget.AppCompat.Button">
-        <item name="android:background">@color/catskill_white</item>
+        <item name="android:background">@drawable/button_rectangle</item>
         <item name="android:drawableEnd">@drawable/ic_next</item>
         <item name="android:elevation">@dimen/elevation_button</item>
         <item name="android:minHeight">@dimen/button_height</item>

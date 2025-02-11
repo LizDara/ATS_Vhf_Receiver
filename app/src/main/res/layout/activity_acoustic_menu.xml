@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/slate_300"
+    tools:context=".AcousticMenuActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/slate_900"
+        android:orientation="vertical"
+        android:padding="16sp">
+
+        <include
+            layout="@layout/disconnect_menu" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:layout_marginBottom="8sp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:background="@drawable/acoustic_color"
+                android:elevation="4sp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="@dimen/input_height"
+                    android:layout_height="@dimen/input_height"
+                    android:src="@drawable/acoustic_receiver"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/acoustic_name_textView"
+                style="@style/h2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12sp"
+                android:layout_weight="1"
+                android:textColor="@color/catskill_white" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/catskill_white"
+        android:layout_margin="16sp"
+        android:elevation="@dimen/elevation_button">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16sp">
+
+            <TextView
+                style="@style/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14sp"
+                android:text="@string/lb_status"
+                android:textColor="@color/slate_700"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_battery_voltage"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/battery_voltage_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_number_dets"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/number_dets_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_battery_usage"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/battery_usage_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_utc_time"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/utc_time_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_tilt"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/tilt_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_temperature"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/temperature_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_pressure"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/pressure_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2sp"
+                android:text="@string/lb_error_code"
+                android:textColor="@color/slate_700" />
+
+            <TextView
+                android:id="@+id/error_code_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16sp"
+                android:textColor="@color/slate_900" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

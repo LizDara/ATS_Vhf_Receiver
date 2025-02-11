@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\crepo\.gradle\caches\transforms-3\fdebba9d32c5a33c1c6bf74c352313a0\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
 MERGED from [com.codesgood:justifiedtextview:2.0.1] C:\Users\crepo\.gradle\caches\transforms-3\862bd10cdcb7807a9ec9adc2bc9a6b22\transformed\jetified-justifiedtextview-2.0.1\AndroidManifest.xml:2:1-14:12
 MERGED from [androidx.appcompat:appcompat:1.4.1] C:\Users\crepo\.gradle\caches\transforms-3\7a714e469dce11f0922c24f56c500a39\transformed\appcompat-1.4.1\AndroidManifest.xml:17:1-24:12
@@ -44,22 +44,22 @@ MERGED from [androidx.lifecycle:lifecycle-runtime:2.4.0] C:\Users\crepo\.gradle\
 MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\crepo\.gradle\caches\transforms-3\ec800a9111f1fa770853e78d5d5df245\transformed\core-runtime-2.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\crepo\.gradle\caches\transforms-3\dd16cbdad95d6e379ec64dee43a1f25c\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.annotation:annotation-experimental:1.1.0] C:\Users\crepo\.gradle\caches\transforms-3\dee438712bc3e1ba872edd83ad381c28\transformed\jetified-annotation-experimental-1.1.0\AndroidManifest.xml:17:1-24:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
-INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
+INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
 	package
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:4:5-48
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
 	xmlns:tools
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:3:5-51
 	android:versionCode
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-132:12
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:1-160:12
 		INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:2:11-69
@@ -127,14 +127,14 @@ uses-permission#android.permission.ACCESS_FINE_LOCATION
 ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:30:5-79
 	android:name
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:30:22-76
-uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:31:5-81
-	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:31:22-78
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:32:5-80
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:31:5-80
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:32:22-77
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:31:22-77
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:32:5-81
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:32:22-78
 uses-permission#android.permission.GET_ACCOUNTS
 ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:33:5-71
 	android:name
@@ -154,7 +154,7 @@ ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:38:5-82
 	android:name
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:38:22-79
 application
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:40:5-130:19
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:40:5-158:19
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\crepo\.gradle\caches\transforms-3\fdebba9d32c5a33c1c6bf74c352313a0\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\crepo\.gradle\caches\transforms-3\fdebba9d32c5a33c1c6bf74c352313a0\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
 MERGED from [com.codesgood:justifiedtextview:2.0.1] C:\Users\crepo\.gradle\caches\transforms-3\862bd10cdcb7807a9ec9adc2bc9a6b22\transformed\jetified-justifiedtextview-2.0.1\AndroidManifest.xml:11:5-12:19
@@ -201,158 +201,214 @@ MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\crepo\.gradle\cach
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:41:9-35
 	android:theme
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:50:9-40
-activity#com.atstrack.ats.ats_vhf_receiver.ConvertRawDataActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:51:9-55:47
-	android:label
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:54:13-68
+activity#com.atstrack.ats.ats_vhf_receiver.AcousticUpdateActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:51:9-53:40
 	android:exported
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:53:13-37
-	android:theme
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:55:13-44
 	android:name
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:52:13-51
-activity#com.atstrack.ats.ats_vhf_receiver.EnterFrequencyActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:56:9-58:39
+activity#com.atstrack.ats.ats_vhf_receiver.AcousticOptionActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:54:9-56:40
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:58:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:56:13-37
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:57:13-51
-activity#com.atstrack.ats.ats_vhf_receiver.ReceiverUpdateActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:59:9-61:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:55:13-51
+activity#com.atstrack.ats.ats_vhf_receiver.AcousticMenuActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:57:9-59:40
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:61:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:59:13-37
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:60:13-51
-activity#com.atstrack.ats.ats_vhf_receiver.SelectValueActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:62:9-64:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:58:13-49
+activity#com.atstrack.ats.ats_vhf_receiver.VhfRawDataActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:60:9-63:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:63:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:64:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:62:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:63:13-48
-activity#com.atstrack.ats.ats_vhf_receiver.InputValueActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:65:9-67:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:61:13-47
+activity#com.atstrack.ats.ats_vhf_receiver.VhfEnterFrequencyActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:64:9-67:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:67:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:67:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:66:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:66:13-47
-activity#com.atstrack.ats.ats_vhf_receiver.StationaryDefaultsActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:68:9-70:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:65:13-54
+activity#com.atstrack.ats.ats_vhf_receiver.VhfUpdateActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:68:9-71:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:71:13-49
 	android:exported
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:70:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:69:13-55
-activity#com.atstrack.ats.ats_vhf_receiver.AerialDefaultsActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:71:9-73:39
-	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:73:13-36
-	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:72:13-51
-activity#com.atstrack.ats.ats_vhf_receiver.TestReceiverActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:74:9-76:39
-	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:76:13-36
-	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:69:13-46
+activity#com.atstrack.ats.ats_vhf_receiver.VhfValueDetectionFilterActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:72:9-75:52
+	android:screenOrientation
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:75:13-49
-activity#com.atstrack.ats.ats_vhf_receiver.CloneReceiverActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:77:9-79:39
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:79:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:74:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:78:13-50
-activity#com.atstrack.ats.ats_vhf_receiver.SetTransmitterTypeActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:80:9-82:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:73:13-60
+activity#com.atstrack.ats.ats_vhf_receiver.VhfValueDefaultsActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:76:9-79:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:79:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:78:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:77:13-53
+activity#com.atstrack.ats.ats_vhf_receiver.VhfStationaryDefaultsActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:80:9-83:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:83:13-49
 	android:exported
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:82:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:81:13-55
-activity#com.atstrack.ats.ats_vhf_receiver.EditReceiverDefaultsActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:83:9-85:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:81:13-58
+activity#com.atstrack.ats.ats_vhf_receiver.VhfMobileDefaultsActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:84:9-87:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:87:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:85:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:86:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:84:13-57
-activity#com.atstrack.ats.ats_vhf_receiver.ReceiverConfigurationActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:86:9-88:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:85:13-54
+activity#com.atstrack.ats.ats_vhf_receiver.VhfDiagnosticsActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:88:9-91:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:91:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:88:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:90:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:87:13-58
-activity#com.atstrack.ats.ats_vhf_receiver.StationaryScanActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:89:9-91:39
-	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:91:13-36
-	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:90:13-51
-activity#com.atstrack.ats.ats_vhf_receiver.AerialScanActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:92:9-94:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:89:13-51
+activity#com.atstrack.ats.ats_vhf_receiver.VhfCloneActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:92:9-95:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:95:13-49
 	android:exported
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:94:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:93:13-47
-activity#com.atstrack.ats.ats_vhf_receiver.ManualScanActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:95:9-97:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:93:13-45
+activity#com.atstrack.ats.ats_vhf_receiver.VhfDetectionFilterActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:96:9-99:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:99:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:97:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:98:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:96:13-47
-activity#com.atstrack.ats.ats_vhf_receiver.StartScanningActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:98:9-100:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:97:13-55
+activity#com.atstrack.ats.ats_vhf_receiver.VhfEditDefaultsActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:100:9-103:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:103:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:100:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:102:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:99:13-50
-activity#com.atstrack.ats.ats_vhf_receiver.MainMenuActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:101:9-103:39
-	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:103:13-36
-	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:102:13-45
-activity#com.atstrack.ats.ats_vhf_receiver.EditTablesActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:104:9-106:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:101:13-52
+activity#com.atstrack.ats.ats_vhf_receiver.VhfConfigurationActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:104:9-107:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:107:13-49
 	android:exported
 		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:106:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:105:13-47
-activity#com.atstrack.ats.ats_vhf_receiver.TableOverviewActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:107:9-109:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:105:13-53
+activity#com.atstrack.ats.ats_vhf_receiver.VhfStationaryScanActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:108:9-111:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:111:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:109:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:110:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:108:13-50
-activity#com.atstrack.ats.ats_vhf_receiver.GetDataActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:110:9-112:39
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:109:13-54
+activity#com.atstrack.ats.ats_vhf_receiver.VhfMobileScanActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:112:9-115:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:115:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:112:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:114:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:111:13-44
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:113:13-50
+activity#com.atstrack.ats.ats_vhf_receiver.VhfManualScanActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:116:9-119:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:119:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:118:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:117:13-50
+activity#com.atstrack.ats.ats_vhf_receiver.VhfScanningActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:120:9-123:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:123:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:122:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:121:13-48
+activity#com.atstrack.ats.ats_vhf_receiver.VhfMenuActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:124:9-127:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:127:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:126:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:125:13-44
+activity#com.atstrack.ats.ats_vhf_receiver.VhfFrequenciesActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:128:9-131:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:131:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:130:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:129:13-51
+activity#com.atstrack.ats.ats_vhf_receiver.VhfTablesActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:132:9-135:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:135:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:134:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:133:13-46
+activity#com.atstrack.ats.ats_vhf_receiver.VhfManageDataActivity
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:136:9-139:52
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:139:13-49
+	android:exported
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:138:13-36
+	android:name
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:137:13-50
 activity#com.atstrack.ats.ats_vhf_receiver.MainActivity
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:113:9-123:20
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:140:9-151:20
+	android:screenOrientation
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:143:13-49
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:115:13-36
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:142:13-36
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:114:13-41
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:141:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:116:13-122:29
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:144:13-150:29
 action#android.intent.action.MAIN
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:117:17-119:47
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:145:17-147:47
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:119:21-44
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:147:21-44
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:118:21-62
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:146:21-62
 category#android.intent.category.LAUNCHER
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:121:17-77
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:149:17-77
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:121:27-74
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:149:27-74
 service#com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService
-ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:125:9-129:41
+ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:153:9-157:41
 	android:enabled
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:127:13-35
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:155:13-35
 	android:exported
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:128:13-37
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:156:13-37
 	android:permission
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:129:13-38
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:157:13-38
 	android:name
-		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:126:13-60
+		ADDED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:154:13-60
 uses-sdk
 INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml

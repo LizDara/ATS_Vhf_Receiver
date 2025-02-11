@@ -21,7 +21,7 @@
     <dimen name="connect_image">128sp</dimen>
     <dimen name="receiver_connect">96sp</dimen>
     <dimen name="receiver_image">200sp</dimen>
-    <dimen name="receiver_logo">256sp</dimen>
+    <dimen name="device_logo">150sp</dimen>
     <dimen name="disconnect_message">312sp</dimen>
     <dimen name="border_radius_numbers">20sp</dimen>
     <dimen name="border_radius">4sp</dimen>
@@ -30,4 +30,5 @@
     <dimen name="receiver_status">64sp</dimen>
     <dimen name="receiver_image_status">40sp</dimen>
     <dimen name="button_height_numbers">40sp</dimen>
+    <dimen name="device_size">56sp</dimen>
 </resources>

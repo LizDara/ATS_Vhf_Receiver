@@ -1,11 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.util.Log;
+
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
+import com.atstrack.ats.ats_vhf_receiver.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -146,6 +148,106 @@ public class Converters {
     }
 
     /**
+     * Gets the status of the devices found.
+     * @param scanRecord The content of the advertisement record offered by the remote device.
+     * @return Return the device status.
+     */
+    public static String getStatusVhfReceiver(byte[] scanRecord) {
+        int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
+        String status = Converters.getHexValue(scanRecord[firstElement + 6]);
+        switch (status) {
+            case "00":
+                status = " Not scanning";
+                break;
+            case "82":
+            case "81":
+            case "80":
+                status = " Scanning, mobile";
+                break;
+            case "83":
+                status = " Scanning, stationary";
+                break;
+            case "86":
+                status = " Scanning, manual";
+                break;
+            default:
+                status = " None";
+                break;
+        }
+        return status;
+    }
+
+    public static String setDetectionFilter(String type) {
+        switch (type) {
+            case "C":
+                type = " Coded,";
+                break;
+            case "F":
+                type = " Fixed PR,";
+                break;
+            case "V":
+                type = " Variable PR,";
+                break;
+        }
+        return type;
+    }
+
+    /**
+     * Gets the percentage of the device's battery.
+     * @param scanRecord The content of the advertisement record offered by the remote device.
+     * @return Return the battery percentage.
+     */
+    public static int getPercentBatteryVhfReceiver(byte[] scanRecord) {
+        int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
+        return Integer.parseInt(Converters.getDecimalValue(scanRecord[firstElement + 5]));
+    }
+
+    public static int getDeviceType(String name, boolean isLogo) {
+        if (name.contains("vr") || name.contains("VHF")) {
+            return isLogo ? R.drawable.vhf_receiver : R.drawable.ic_vhf_receiver;
+        } else if (name.contains("ar") || name.contains("Acoustic"))
+            return isLogo ? R.drawable.acoustic_receiver : R.drawable.ic_acoustic_receiver;
+        else if (name.contains("wl") || name.contains("Wildlink"))
+            return isLogo ? R.drawable.wildlink_receiver : R.drawable.ic_wildlink_receiver;
+        else if (name.contains("Tags"))
+            return isLogo ? R.drawable.bluetooth_tag : R.drawable.ic_bluetooth_tag;
+        else if (name.contains("br") || name.contains("Bluetooth Receiver"))
+            return isLogo ? R.drawable.bluetooth_receiver : R.drawable.ic_bluetooth_tag;
+        else if (name.contains("bt") || name.contains("Beacon"))
+            return isLogo ? R.drawable.beacon_tags : R.drawable.ic_bluetooth_tag;
+        return 0;
+    }
+
+    public static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeFirstGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeSecondGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeThirdGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND);
+        return intentFilter;
+    }
+
+    /**
      * Processes the data when the download is complete.
      * @param packet The raw data.
      * @return Returns the processed data.
@@ -259,11 +361,12 @@ public class Converters {
                             ", " + calendar.get(Calendar.MINUTE) + ", " + calendar.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex +
                             ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", 0, 0, 0, 0, 0, 0, " + ((calendar.get(Calendar.MONTH) + 1) +
                             "/" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                } else if (Converters.getHexValue(packet[index]).equals("87")) {
-                    int scanSession = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 65536) + (Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) * 256) +
-                            Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
+                } else if (Converters.getHexValue(packet[index + 16]).equals("87")) {
+                    int scanSession = (Integer.parseInt(Converters.getDecimalValue(packet[index + 17])) * 65536) + (Integer.parseInt(Converters.getDecimalValue(packet[index + 18])) * 256) +
+                            Integer.parseInt(Converters.getDecimalValue(packet[index + 19]));
                     if (scanSession == sessionNumber)
                         sessionNumber++;
+                    index += 16;
                 }
                 index += 16;
             } else {

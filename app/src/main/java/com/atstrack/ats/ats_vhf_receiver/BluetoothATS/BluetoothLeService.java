@@ -50,7 +50,6 @@ public class BluetoothLeService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
-            Log.i(TAG, "On Connection Changed: " + newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 broadcastUpdate(intentAction);
@@ -64,7 +63,6 @@ public class BluetoothLeService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "On Services Discovered");
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG,"onServicesDiscovered received: " +  status);
@@ -127,7 +125,6 @@ public class BluetoothLeService extends Service {
         // After using a given device, you should make sure that BluetoothGatt.close() is called such that resources are cleaned up properly.
         // In this particular example, close() is invoked when the UI is disconnected from the Service.
         close();
-        Log.i(TAG, "On Unbind Service");
         return super.onUnbind(intent);
     }
 
@@ -167,7 +164,6 @@ public class BluetoothLeService extends Service {
                 Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 return true;
             } else {
-                Log.i(TAG, "Not Reconnected to Device.");
                 return false;
             }
         }
@@ -179,9 +175,6 @@ public class BluetoothLeService extends Service {
         // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback, BluetoothDevice.TRANSPORT_LE);
         Log.d(TAG, "Trying to create a new connection.");
-        /*BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        int connectionState = mBluetoothManager.getConnectionState(device, BluetoothProfile.GATT);
-        Log.d(TAG, "STATE CONNECTION: " + connectionState);*/
         return true;
     }
 

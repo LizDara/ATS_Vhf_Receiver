@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ATS VHF Receiver</string>
+    <string name="app_name">ATS Universal</string>
 
     <!--DISCONNECT RECEIVER-->
     <string name="disconnect_receiver">Receiver Disconnected</string>
@@ -7,23 +7,58 @@
     <!--LOW POWER MODE-->
     <string name="low_power_mode">Receiver is in Low Power mode</string>
 
+    <!--BRIDGE APP-->
+    <string name="bridge_app">BRIDGE APP</string>
+    <string name="lb_device_selection">Device Selection</string>
+    <string name="lb_type_of_device">What type of device are you using? Please select from the categories below.</string>
+    <string name="lb_device_categories">Device Categories</string>
+    <string name="lb_supported_models">List of supported models.</string>
+
+    <!--BLUETOOTH TAGS-->
+    <string name="bluetooth_tags">BLUETOOTH TAGS</string>
+    <string name="lb_bluetooth_receive_data">How are you going to receive data?</string>
+    <string name="lb_bluetooth_tags_message">Bluetooth tags give you the option of connecting to a receiver or listening to tag transmissions directly.</string>
+    <string name="lb_connection_modes">Connection Modes</string>
+    <string name="lb_brief_description">Brief Description.</string>
+
+    <!--SELECT DEVICE-->
+    <string name="select_vhf_receiver">SELECT VHF RECEIVER</string>
+    <string name="select_acoustic_receiver">SELECT ACOUSTIC RECEIVER</string>
+    <string name="select_bluetooth_tag">SELECT BLUETOOTH TAG</string>
+    <string name="select_wildlink">SELECT WILDLINK</string>
+    <string name="lb_bridge">ATS BRIDGE</string>
+    <string name="lb_searching_devices">Searching For Devices ...</string>
+    <string name="lb_message_searching">It is only going to take a few seconds.</string>
+    <string name="lb_connect">Connect</string>
+    <string name="lb_no_devices_found">No Devices Found</string>
+    <string name="lb_unable_find_device">Please make sure your devices are within bluetooth range.</string>
+    <string name="lb_retry">Retry</string>
+    <string name="lb_select_device">Select device and click the connect button.</string>
+
     <!--CONNECT TO RECEIVER-->
-    <string name="enable">ENABLE</string>
-    <string name="bluetooth_adapter_is_disabled">Bluetooth adapter is disabled.</string>
-    <string name="location_adapter_is_disabled">Location adapter is disabled.</string>
-    <string name="ble_not_supported">BLE is not supported</string>
-    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
     <string name="unknown_device">Unknown device</string>
-    <string name="lb_vhf_receiver">VHF Receiver</string>
+    <string name="lb_cancel">Cancel</string>
+    <string name="lb_connecting_message">This should only take a few seconds.</string>
+    <string name="lb_failed_connect">"Failed to connect to device"</string>
+    <string name="lb_success">Success</string>
+    <string name="lb_device_connected">Your device is connected.</string>
     <string name="lb_update_required">Update Required</string>
     <string name="lb_update">We have made an important update to the app and we need you to install the latest version. Please head to the App Store and upgrade to the latest version to continue using the app. Thank you.</string>
-    <string name="lb_searching_receivers">Searching for Receivers</string>
-    <string name="lb_no_receivers_found">No Receivers Found</string>
-    <string name="lb_unable_find">Please make sure your receivers are within bluetooth range and tap the retry button.</string>
-    <string name="lb_retry">Retry</string>
-    <string name="lb_select_receiver">Select ATS Receiver</string>
     <string name="lb_DarkMode">Dark Mode</string>
+    
+    <string-array name="categories">
+        <item>VHF Receivers</item>
+        <item>Acoustic Receivers</item>
+        <item>Bluetooth Tags</item>
+        <item>Wildlink</item>
+    </string-array>
 
+    <string-array name="connection_modes">
+        <item>Connect to Bluetooth Receiver</item>
+        <item>View Beacon Tags Directly</item>
+    </string-array>
+
+    <!--VHF RECEIVER-->
     <!--HOME-->
     <string name="lb_start_scanning">Start Scanning</string>
     <string name="lb_connecting_device">Connecting ...</string>
@@ -32,6 +67,7 @@
     <string name="lb_sd_card">SD Card</string>
     <string name="lb_inserted">Inserted</string>
     <string name="lb_disconnect">Disconnect</string>
+    <string name="lb_receiver_disconnected">Receiver Disconnected</string>
 
     <!--START SCANNING-->
     <string name="lb_manual_scan">Manual Scan</string>
@@ -872,7 +908,22 @@
         <item>19</item>
         <item>20</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_convert_raw_data">ConvertRawDataActivity</string>
+
+    <!--ACOUSTIC RECEIVER-->
+    <!--HOME-->
+    <string name="lb_status">Status</string>
+    <string name="lb_battery_voltage">Battery Voltage</string>
+    <string name="lb_number_dets"># of dets for current HR</string>
+    <string name="lb_battery_usage">Battery Usage Since Start</string>
+    <string name="lb_utc_time">UTC Time</string>
+    <string name="lb_tilt">Tilt</string>
+    <string name="lb_pressure">Pressure</string>
+    <string name="lb_error_code">Error Code</string>
+
+    <!--MENU-->
+    <string name="acoustic_receiver">Acoustic Receiver Menu</string>
+    <string name="lb_firmware_update">Firmware Update Available</string>
+    <string name="lb_firmware_version_available">A newer firmware version is available for your receiver.</string>
+    <string name="lb_dismiss">Dismiss</string>
+    <string name="lb_update_now">Update Now</string>
 </resources>

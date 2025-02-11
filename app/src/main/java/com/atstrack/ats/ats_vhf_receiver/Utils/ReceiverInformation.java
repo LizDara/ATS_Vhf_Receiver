@@ -3,54 +3,31 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 public class ReceiverInformation {
 
     private static ReceiverInformation receiverInformation = null;
-    private String mDeviceStatus;
-    private String mDeviceAddress;
-    private String mDeviceRange;
-    private int mDeviceBattery;
-    private String deviceName;
-    private byte txType;
-    private byte scanState;
+    private String deviceAddress;
+    private int deviceBattery;
+    private String serialNumber;
     private String mSDCard;
+    private String deviceStatus;
+    private byte[] statusData;
 
     private ReceiverInformation() {
-        deviceName = "Unknown";
-        mDeviceStatus = deviceName;
-        mDeviceAddress = "Unknown";
-        mDeviceRange = "None";
-        mDeviceBattery = 0;
+        serialNumber = "Unknown";
+        deviceStatus = serialNumber;
+        deviceAddress = "Unknown";
+        deviceBattery = 0;
     }
 
     public static ReceiverInformation getReceiverInformation() {
-        if (receiverInformation == null) {
+        if (receiverInformation == null)
             receiverInformation = new ReceiverInformation();
-        }
         return receiverInformation;
     }
 
-    public void changeInformation(byte txType, byte scanState, String deviceName, String deviceAddress, String deviceRange, String deviceBattery) {
-        mDeviceAddress = deviceAddress;
-        mDeviceRange = deviceRange;
-        mDeviceBattery = Integer.parseInt(deviceBattery.replace("%", ""));
-        this.deviceName = deviceName;
-        this.txType = txType;
-        this.scanState = scanState;
-        mDeviceStatus = deviceName;
-        setTxType();
-        setScanState();
-    }
-
-    public void changeTxType(byte type) {
-        mDeviceStatus = deviceName;
-        txType = type;
-        setTxType();
-        setScanState();
-    }
-
-    public void changeScanState(byte state) {
-        mDeviceStatus = deviceName;
-        scanState = state;
-        setTxType();
-        setScanState();
+    public void changeInformation(String serialNumber, String deviceAddress, String deviceBattery) {
+        this.deviceAddress = deviceAddress;
+        this.deviceBattery = Integer.parseInt(deviceBattery.replace("%", ""));
+        this.serialNumber = serialNumber;
+        deviceStatus = serialNumber;
     }
 
     public void changeSDCard(byte state) {
@@ -58,62 +35,38 @@ public class ReceiverInformation {
     }
 
     public void changeDeviceBattery(int deviceBattery) {
-        mDeviceBattery = deviceBattery;
+        this.deviceBattery = deviceBattery;
     }
 
     public String getDeviceAddress() {
-        return mDeviceAddress;
-    }
-
-    public String getDeviceRange() {
-        return mDeviceRange;
+        return deviceAddress;
     }
 
     public int getPercentBattery() {
-        return mDeviceBattery;
+        return deviceBattery;
     }
 
-    public String getDeviceName() {
-        return deviceName;
+    public String getSerialNumber() {
+        return serialNumber;
     }
 
     public String getSDCard() {
         return mSDCard;
     }
 
-    private void setTxType() {
-        switch (Converters.getHexValue(txType)) {
-            case "09":
-                mDeviceStatus += " Coded,";
-                break;
-            case "08":
-                mDeviceStatus += " Fixed PR,";
-                break;
-            case "07":
-                mDeviceStatus += " Variable PR,";
-                break;
-        }
+    public String getDeviceStatus() {
+        return deviceStatus;
     }
 
-    private void setScanState() {
-        switch (Converters.getHexValue(scanState)) {
-            case "00":
-                mDeviceStatus += " Not scanning";
-                break;
-            case "82":
-            case "81":
-            case "80":
-                mDeviceStatus += " Scanning, mobile";
-                break;
-            case "83":
-                mDeviceStatus += " Scanning, stationary";
-                break;
-            case "86":
-                mDeviceStatus += " Scanning, manual";
-                break;
-            default:
-                mDeviceStatus += " None";
-                break;
-        }
+    public void setDeviceStatus(String mDeviceStatus) {
+        this.deviceStatus = mDeviceStatus;
+    }
+
+    public byte[] getStatusData() {
+        return statusData;
+    }
+
+    public void setStatusData(byte[] statusData) {
+        this.statusData = statusData;
     }
 }

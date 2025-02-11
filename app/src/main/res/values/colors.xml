@@ -17,5 +17,14 @@
     <color name="black">#000000</color>
     <color name="light_blue">#334E68</color>
     <color name="light_red">#E26F6F</color>
+
+    <color name="slate_700">#334155</color>
+    <color name="slate_900">#0F172A</color>
+    <color name="slate_50">#F8FAFC</color>
+    <color name="slate_300">#CBD5E1</color>
+    <color name="yellow_500">#EAB308</color>
+    <color name="orange_500">#F97316</color>
+    <color name="green_500">#22C55E</color>
+    <color name="boston_blue">#3994C1</color>
     <color name="transparent">#00000000</color>
 </resources>

@@ -6,9 +6,9 @@
     tools:context=".MainActivity">
 
     <include
-        layout="@layout/branding"/>
+        layout="@layout/splash_screen"/>
 
     <include
-        layout="@layout/searching_receivers"/>
+        layout="@layout/select_device"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

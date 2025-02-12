@@ -313,8 +313,8 @@ public class VhfManageDataActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
-        registerReceiver(mSecondGattUpdateReceiver, Converters.makeSecondGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
     }
 
     @Override
@@ -327,7 +327,6 @@ public class VhfManageDataActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unbindService(leServiceConnection.getServiceConnection());
     }
 
     @Override

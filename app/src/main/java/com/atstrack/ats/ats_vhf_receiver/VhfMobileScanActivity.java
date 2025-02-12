@@ -701,8 +701,8 @@ public class VhfMobileScanActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
-        registerReceiver(mGattUpdateReceiverWrite, Converters.makeThirdGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiverWrite, TransferBleData.makeThirdGattUpdateIntentFilter());
     }
 
     @Override
@@ -715,7 +715,6 @@ public class VhfMobileScanActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unbindService(leServiceConnection.getServiceConnection());
     }
 
     private void setVisibility(String value) {

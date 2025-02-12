@@ -1,9 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
-import android.content.IntentFilter;
 import android.util.Log;
 
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.R;
 
 import java.io.File;
@@ -12,13 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-// Converters - converts value between different numeral system
 public class Converters {
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    // Gets value in hexadecimal system
-    public static String getHexValue(byte[] value) {
+    public static String getHexValue(byte[] value) { // Gets value in hexadecimal system
         if (value == null)
             return "";
 
@@ -33,8 +29,7 @@ public class Converters {
         return new String(hexChars);
     }
 
-    // Gets value in hexadecimal system for single byte
-    public static String getHexValue(byte b) {
+    public static String getHexValue(byte b) { // Gets value in hexadecimal system for single byte
         char[] hexChars = new char[2];
         int v;
         v = b & 0xFF;
@@ -43,8 +38,7 @@ public class Converters {
         return new String(hexChars);
     }
 
-    // Gets value in decimal system
-    public static String getDecimalValue(byte[] value) {
+    public static String getDecimalValue(byte[] value) { // Gets value in decimal system
         if (value == null)
             return "";
 
@@ -54,8 +48,7 @@ public class Converters {
         return result;
     }
 
-    // Gets value in decimal system for single byte
-    public static String getDecimalValue(byte b) {
+    public static String getDecimalValue(byte b) { // Gets value in decimal system for single byte
         String result = "";
         result += ((int) b & 0xff);
 
@@ -216,35 +209,6 @@ public class Converters {
         else if (name.contains("bt") || name.contains("Beacon"))
             return isLogo ? R.drawable.beacon_tags : R.drawable.ic_bluetooth_tag;
         return 0;
-    }
-
-    public static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        return intentFilter;
-    }
-
-    public static IntentFilter makeFirstGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
-    }
-
-    public static IntentFilter makeSecondGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
-        return intentFilter;
-    }
-
-    public static IntentFilter makeThirdGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND);
-        return intentFilter;
     }
 
     /**

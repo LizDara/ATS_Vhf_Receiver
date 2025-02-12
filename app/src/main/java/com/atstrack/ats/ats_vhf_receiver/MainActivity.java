@@ -610,8 +610,8 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         leServiceConnection = LeServiceConnection.getInstance();
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
-        registerReceiver(mSecondGattUpdateReceiver, Converters.makeSecondGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
     }
 
     /**

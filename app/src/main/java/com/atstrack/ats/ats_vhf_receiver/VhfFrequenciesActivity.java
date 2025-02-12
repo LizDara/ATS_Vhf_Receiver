@@ -228,7 +228,6 @@ public class VhfFrequenciesActivity extends AppCompatActivity {
                 setVisibility("none");
             }
         }
-
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
     }
@@ -256,7 +255,7 @@ public class VhfFrequenciesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override
@@ -268,9 +267,6 @@ public class VhfFrequenciesActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //if (!isFile) {
-            //unbindService(leServiceConnection.getServiceConnection());
-        //}
     }
 
     @Override

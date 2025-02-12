@@ -1,8 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -13,17 +11,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import java.util.Objects;
 
 public class VhfConfigurationActivity extends AppCompatActivity {
 
@@ -87,8 +81,7 @@ public class VhfConfigurationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeGattUpdateIntentFilter());
-        Log.i(TAG, "ON RESUME");
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
     }
 
     @Override

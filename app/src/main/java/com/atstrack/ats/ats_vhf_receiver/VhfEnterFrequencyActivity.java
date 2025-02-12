@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,7 +15,6 @@ import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
@@ -30,8 +28,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_number;
-
-import java.util.Objects;
 
 public class VhfEnterFrequencyActivity extends AppCompatActivity {
 

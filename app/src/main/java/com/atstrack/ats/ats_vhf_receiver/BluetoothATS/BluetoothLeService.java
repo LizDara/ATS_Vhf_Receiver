@@ -9,17 +9,13 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -62,17 +58,16 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
+            if (status == BluetoothGatt.GATT_SUCCESS)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-            } else {
+            else
                 Log.w(TAG,"onServicesDiscovered received: " +  status);
-            }
-
         }
+
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS) + " " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":"
-                    + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND));
+            Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS) + ":" + Calendar.getInstance().get(Calendar.MINUTE)
+                    + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND));
         }
 
         @Override
@@ -161,7 +156,7 @@ public class BluetoothLeService extends Service {
             Log.d(TAG,"Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 broadcastUpdate(ACTION_GATT_CONNECTED);
-                Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
+                Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 return true;
             } else {
                 return false;

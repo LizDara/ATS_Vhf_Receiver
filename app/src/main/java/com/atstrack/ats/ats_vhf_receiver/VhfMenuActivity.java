@@ -174,7 +174,7 @@ public class VhfMenuActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override

@@ -166,7 +166,7 @@ public class VhfDiagnosticsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override
@@ -178,7 +178,6 @@ public class VhfDiagnosticsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unbindService(leServiceConnection.getServiceConnection());
     }
 
     /**

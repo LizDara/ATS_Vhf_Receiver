@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import butterknife.BindView;
@@ -21,16 +20,12 @@ import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
-import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -44,8 +39,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public class VhfTablesActivity extends AppCompatActivity {
 
@@ -139,9 +132,8 @@ public class VhfTablesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, Converters.makeFirstGattUpdateIntentFilter());
+        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
         leServiceConnection.getBluetoothLeService().discovering();
-        Log.i(TAG, "ON RESUME");
     }
 
     @Override

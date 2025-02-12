@@ -1,5 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 
+import android.content.IntentFilter;
 import android.util.Log;
 
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
@@ -8,6 +9,35 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import java.util.UUID;
 
 public class TransferBleData {
+
+    public static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeFirstGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeSecondGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        return intentFilter;
+    }
+
+    public static IntentFilter makeThirdGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND);
+        return intentFilter;
+    }
 
     public static void readBoardState() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;

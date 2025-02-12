@@ -117,7 +117,6 @@ public class VhfRawDataActivity extends AppCompatActivity {
 
             //File root = externalStorageVolumes[1]; //set the directory path
             File root = new File(uri.getPath().split(":")[0].replace("document", "storage"), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
-            Log.i(TAG, "ROOT: " + root.getAbsolutePath() + " : " + root.getPath());
             String fileName = snapshotArray.get(0).getFileName();
             boolean result = Converters.printSnapshotFiles(root, snapshotArray);
             if (result) {
@@ -141,7 +140,6 @@ public class VhfRawDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vhf_raw_data);
         ButterKnife.bind(this);
         ActivitySetting.setToolbar(this, R.string.convert_raw_data);
-
         ActivitySetting.setReceiverStatus(this);
 
         externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
@@ -165,9 +163,8 @@ public class VhfRawDataActivity extends AppCompatActivity {
                 String uriString = uri.toString();
                 if (uriString.startsWith("content://")) {
                     try (Cursor cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null)) {
-                        if (cursor != null && cursor.moveToFirst()) {
+                        if (cursor != null && cursor.moveToFirst())
                             readFile(uri);
-                        }
                     } catch (Exception ex) {
                         Log.i(TAG, "Cursor exception: " + ex);
                     }

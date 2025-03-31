@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.atstrack.ats.ats_vhf_receiver.VhfFrequenciesActivity;
+import com.atstrack.ats.ats_vhf_receiver.VHF.FrequenciesActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -69,7 +69,7 @@ public class TableListAdapter extends BaseAdapter {
         tableNumber.setText("Table " + (position + 1));
         frequenciesNumber.setText(Converters.getDecimalValue(tables[position + 1]) + " frequencies");
         table.setOnClickListener(v -> {
-            Intent intent = new Intent(context, VhfFrequenciesActivity.class);
+            Intent intent = new Intent(context, FrequenciesActivity.class);
             intent.putExtra(ValueCodes.TABLE_NUMBER, position + 1);
             intent.putExtra(ValueCodes.TOTAL, Integer.parseInt(Converters.getDecimalValue(tables[position + 1])));
             intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);

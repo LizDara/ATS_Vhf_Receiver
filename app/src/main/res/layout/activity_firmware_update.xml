@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/slate_300"
+    tools:context=".FirmwareUpdateActivity">
+
+    <include
+        layout="@layout/main_toolbar" />
+
+    <LinearLayout
+        android:id="@+id/firmware_versions_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:visibility="visible"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/text_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:layout_marginVertical="24sp"
+            android:text="@string/lb_select_firmware"
+            android:textColor="@color/black" />
+
+        <TextView
+            style="@style/body_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:layout_marginBottom="16sp"
+            android:text="@string/lb_firmware_file"
+            android:textColor="@color/black" />
+
+        <ListView
+            android:id="@+id/versions_listView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/button_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="16sp"
+            android:text="@string/lb_local_file"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/begin_update_button"
+            style="@style/button_primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24sp"
+            android:layout_marginHorizontal="16sp"
+            android:text="@string/lb_begin_update" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/process_file_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginVertical="24sp"
+        android:padding="16sp"
+        android:background="@color/slate_50"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8sp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ProgressBar
+                android:id="@+id/downloading_file_progressBar"
+                android:layout_width="@dimen/line_height"
+                android:layout_height="@dimen/line_height" />
+
+            <TextView
+                android:id="@+id/update_progress_textView"
+                style="@style/text_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8sp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/updating_progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line_height"
+            android:progress="85"
+            android:progressDrawable="@drawable/progress_bar" />
+
+        <TextView
+            android:id="@+id/updated_file_textView"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:layout_marginBottom="16sp"
+            android:textColor="@color/slate_900" />
+
+        <include
+            layout="@layout/downloading_process" />
+
+        <Button
+            android:id="@+id/cancel_update_button"
+            style="@style/button_tertiary_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24sp"
+            android:paddingHorizontal="16sp"
+            android:text="@string/lb_cancel_update" />
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/message_complete" />
+
+</LinearLayout>

@@ -5,28 +5,28 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.MainActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 
 public class Message {
-    public static void showDisconnectionMessage(Context context, int status) {
+    public static void showDisconnectionMessage(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.disconnect_message, null);
         final AlertDialog dialog = new AlertDialog.Builder(context).create();
         dialog.setView(view);
         dialog.show();
+        LeServiceConnection leServiceConnection = LeServiceConnection.getInstance();
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
+            leServiceConnection.close();
             Intent intent = new Intent(context, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(intent);
+            ((Activity) context).finish();
         }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
     }
 
@@ -58,6 +58,15 @@ public class Message {
         builder.setTitle(title);
         builder.setMessage(message);
         builder.setPositiveButton("Ok", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public static void showMessage(Activity context, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("ERROR");
+        builder.setMessage(message);
+        builder.setPositiveButton("Ok", (dialog, which) -> context.finish());
         AlertDialog dialog = builder.create();
         dialog.show();
     }

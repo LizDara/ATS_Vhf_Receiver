@@ -1,43 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
-    tools:context=".VhfManageDataActivity">
+    android:orientation="vertical"
+    tools:context=".VHF.ManageDataActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <include
+        layout="@layout/vhf_toolbar"/>
 
-        <include
-            layout="@layout/vhf_toolbar"/>
+    <include
+        layout="@layout/menu_manage_receiver"/>
 
-        <include
-            layout="@layout/menu_manage_receiver"/>
+    <include
+        layout="@layout/begin_download"/>
 
-        <include
-            layout="@layout/begin_download"/>
+    <include
+        layout="@layout/downloading_file"/>
 
-        <include
-            layout="@layout/downloading_file"/>
+    <include
+        layout="@layout/download_complete"/>
 
-        <include
-            layout="@layout/download_complete"/>
+    <include
+        layout="@layout/delete_data_receiver"/>
 
-        <include
-            layout="@layout/delete_data_receiver"/>
+    <include
+        layout="@layout/deleting_data_receiver"/>
 
-        <include
-            layout="@layout/deleting_data_receiver"/>
+    <include
+        layout="@layout/message_complete"/>
 
-        <include
-            layout="@layout/deletion_data_receiver_complete"/>
+    <include
+        layout="@layout/receiver_status"/>
 
-        <include
-            layout="@layout/receiver_status"/>
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
-    tools:context=".VhfValueDefaultsActivity">
+    android:orientation="vertical"
+    tools:context=".VHF.ValueDefaultsActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <include
+        layout="@layout/vhf_toolbar"/>
 
-        <include
-            layout="@layout/vhf_toolbar"/>
+    <include
+        layout="@layout/set_value"/>
 
-        <include
-            layout="@layout/set_value"/>
+    <include
+        layout="@layout/store_rate_values"/>
 
-        <include
-            layout="@layout/store_rate_values"/>
+    <include
+        layout="@layout/merge_tables_scan"/>
 
-        <include
-            layout="@layout/merge_tables_scan"/>
+    <include
+        layout="@layout/receiver_status"/>
 
-        <include
-            layout="@layout/receiver_status"/>
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

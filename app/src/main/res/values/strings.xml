@@ -45,7 +45,7 @@
     <string name="lb_update_required">Update Required</string>
     <string name="lb_update">We have made an important update to the app and we need you to install the latest version. Please head to the App Store and upgrade to the latest version to continue using the app. Thank you.</string>
     <string name="lb_DarkMode">Dark Mode</string>
-    
+
     <string-array name="categories">
         <item>VHF Receivers</item>
         <item>Acoustic Receivers</item>
@@ -926,4 +926,16 @@
     <string name="lb_firmware_version_available">A newer firmware version is available for your receiver.</string>
     <string name="lb_dismiss">Dismiss</string>
     <string name="lb_update_now">Update Now</string>
+
+    <!--FIRMWARE UPDATE-->
+    <string name="firmware_update">Firmware Update</string>
+    <string name="lb_select_firmware">Select Firmware Version</string>
+    <string name="lb_firmware_file">Firmware file will be downloaded before installing.</string>
+    <string name="lb_local_file">Select Local Update File</string>
+    <string name="lb_begin_update">Begin Update</string>
+    <string name="lb_downloading_file">Downloading File</string>
+    <string name="lb_checking_file">Checking File</string>
+    <string name="lb_installing_firmware">Installing Firmware</string>
+    <string name="lb_installation_complete">Installation Complete</string>
+    <string name="lb_return_device_screen">Return to Device Screen</string>
 </resources>

@@ -9,6 +9,6 @@
         layout="@layout/splash_screen"/>
 
     <include
-        layout="@layout/select_device"/>
+        layout="@layout/bridge_app"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

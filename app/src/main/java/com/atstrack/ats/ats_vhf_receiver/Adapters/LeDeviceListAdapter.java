@@ -18,6 +18,7 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -33,6 +34,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     private final Button connect_button;
     private int selectedPosition;
     private View selectedView;
+    private Calendar startDate;
 
     public LeDeviceListAdapter(Context context, Button connect_button) {
         mLeDevices = new ArrayList<>();
@@ -48,21 +50,29 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
      * @param device Identifies the remote device.
      * @param scanRecord The content of the advertisement record offered by the remote device.
      */
+    @SuppressLint("MissingPermission")
     public void addDevice(BluetoothDevice device, byte[] scanRecord) {
-        if(!mLeDevices.contains(device)) {
-            @SuppressLint("MissingPermission") final String deviceName = device.getName();
-            if(deviceName != null) {
-                if (deviceName.contains(deviceType)) { // filter only ATS Vhf Rec device
+        if(device.getName() != null) {
+            if(!mLeDevices.contains(device)) {
+                if (device.getName().contains(deviceType)) { // filter only ATS device
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
                 }
-                Log.i("Devices", deviceName + " : " + deviceName.length());
+            } else {
+                Calendar currentDate = Calendar.getInstance();
+                currentDate.add(Calendar.SECOND, -2);
+                if (currentDate.after(startDate)) {
+                    int index = mLeDevices.indexOf(device);
+                    mLeDevices.set(index, device);
+                    startDate = Calendar.getInstance();
+                }
             }
         }
     }
 
     public void setDeviceType(String type) {
         deviceType = type;
+        startDate = Calendar.getInstance();
     }
 
     public BluetoothDevice getSelectedDevice() {

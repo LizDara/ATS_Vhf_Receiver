@@ -1,9 +1,20 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 public class ValueCodes {
+    //Device Category
+    public static final String ACOUSTIC = "ACOUSTIC";
+    public static final String VHF = "VHF";
+
+    //Codes
     public static final int CANCELLED = 1000;
     public static final int RESULT_OK = 2000;
+    public final static char CR = (char) 0x0D;
+    public final static char LF = (char) 0x0A;
+    public static final int REQUEST_ENABLE_BT = 1;
+    public static final int REQUEST_CODE_SIGN_IN = 1;
+    public static final int REQUEST_CODE_OPEN_STORAGE = 3;
 
+    //Defaults
     public static final int TABLE_NUMBER_CODE = 1001;
     public static final int TABLES_NUMBER_CODE = 1002;
     public static final int SCAN_RATE_SECONDS_CODE = 1003;
@@ -11,7 +22,6 @@ public class ValueCodes {
     public static final int SCAN_TIMEOUT_SECONDS_CODE = 1005;
     public static final int STORE_RATE_CODE = 1006;
     public static final int REFERENCE_FREQUENCY_STORE_RATE_CODE = 1007;
-
     public static final int PULSE_RATE_TYPE_CODE = 1008;
     public static final int MATCHES_FOR_VALID_PATTERN_CODE = 1009;
     public static final int CODED_CODE = 1010;
@@ -28,17 +38,18 @@ public class ValueCodes {
     public static final int TEMPERATURE_CODE = 1021;
     public static final int PERIOD_CODE = 1022;
 
+    //Values
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String VALUE = "value";
     public static final String NIGHT_MODE = "NightMode";
     public static final String SETTING_PREFERENCES = "AppSettingPrefs";
-    public static final String DISCONNECTION_STATUS = "status";
+    public static final String STATUS = "status";
     public static final String SCANNING = "scanning";
     public static final String DEFAULT_SETTING = "defaults";
     public static final String BASE_FREQUENCY = "baseFrequency";
     public static final String RANGE = "range";
-    public static final String MENU = "menu";
+    public static final String FIRST_TIME = "firstTime";
     public static final String TITLE = "title";
     public static final String POSITION = "position";
     public static final String PARAMETER = "parameter";
@@ -47,6 +58,7 @@ public class ValueCodes {
     public static final String IS_FILE = "isFile";
     public static final String FREQUENCIES = "frequencies";
 
+    //Parameters
     public static final String SAVE = "save";
     public static final String MOBILE_DEFAULTS = "mobile";
     public static final String TABLES = "tables";
@@ -80,6 +92,7 @@ public class ValueCodes {
     public static final String UPDATE = "update";
     public static final String DETECTION_TYPE = "detectionType";
 
+    //Original Data
     public static final String TABLE_NUMBER = "TableNumber";
     public static final String GPS = "Gps";
     public static final String AUTO_RECORD = "AutoRecord";
@@ -107,16 +120,12 @@ public class ValueCodes {
     public static final String MIN_PULSE_RATE = "MinPulseRate";
     public static final String DATA_CALCULATION = "DataCalculation";
 
+    //Periods
     public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;
     public static final int WAITING_PERIOD = 180;
-    public static final int MESSAGE_PERIOD = 1200;
+    public static final int MESSAGE_PERIOD = 1300;
     public static final int DOWNLOAD_PERIOD = 280;
-    public static final int REQUEST_CODE_SIGN_IN = 1;
-    public static final int SCAN_PERIOD = 4000;
+    public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
-    public static final int CONNECT_PERIOD = 1500;
-    public final static char CR = (char) 0x0D;
-    public final static char LF = (char) 0x0A;
-    public static final int REQUEST_ENABLE_BT = 1;
-    public static final int REQUEST_CODE_OPEN_STORAGE = 3;
+    public static final int CONNECT_PERIOD = 3000;
 }

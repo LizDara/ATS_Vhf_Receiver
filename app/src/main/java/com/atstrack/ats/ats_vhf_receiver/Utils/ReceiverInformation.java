@@ -15,6 +15,7 @@ public class ReceiverInformation {
         deviceStatus = serialNumber;
         deviceAddress = "Unknown";
         deviceBattery = 0;
+        statusData = null;
     }
 
     public static ReceiverInformation getReceiverInformation() {
@@ -68,5 +69,9 @@ public class ReceiverInformation {
 
     public void setStatusData(byte[] statusData) {
         this.statusData = statusData;
+    }
+
+    public void initialize() {
+        receiverInformation = new ReceiverInformation();
     }
 }

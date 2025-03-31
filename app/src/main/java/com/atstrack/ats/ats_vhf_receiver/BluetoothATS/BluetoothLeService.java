@@ -35,8 +35,8 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED_SECOND = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED_1";
-    public final static String ACTION_DATA_AVAILABLE_SECOND = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE_1";
+    public final static String ACTION_GATT_SERVICES_DISCOVERED_SECOND = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED_SECOND";
+    public final static String ACTION_DATA_AVAILABLE_SECOND = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE_SECOND";
 
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -52,6 +52,7 @@ public class BluetoothLeService extends Service {
                 Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
+                Log.i(TAG, "DISCONNECTED: " + status);
                 broadcastUpdate(intentAction);
             }
         }
@@ -181,6 +182,7 @@ public class BluetoothLeService extends Service {
      */
     @SuppressLint("MissingPermission")
     public void disconnect() {
+        Log.i(TAG, "DISCONNECTION PROGRAMMATICALLY");
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG,"BluetoothAdapter not initialized");
             return;
@@ -218,16 +220,17 @@ public class BluetoothLeService extends Service {
      * @param service UUID to act on.
      * @param Characteristics  UUID to act on.
      */
-    public void readCharacteristicDiagnostic(UUID service, UUID Characteristics) {
+    public boolean readCharacteristicDiagnostic(UUID service, UUID Characteristics) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w( TAG,"BluetoothAdapter not initialized");
-            return;
+            return false;
         }
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(Characteristics);
         @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
         if (result)
             action = ACTION_DATA_AVAILABLE;
+        return result;
     }
 
     public void readCharacteristicDiagnosticSecond(UUID service, UUID Characteristics) {

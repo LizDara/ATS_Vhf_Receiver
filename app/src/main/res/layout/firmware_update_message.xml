@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/firmware_update_message_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16sp"
+    android:padding="16sp"
+    android:orientation="vertical"
+    android:background="@color/slate_50"
+    android:elevation="@dimen/elevation_button"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageButton
+        android:id="@+id/close_update_imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_close"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="16sp"
+        android:background="@drawable/ic_download"
+        android:layout_gravity="center_horizontal"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        style="@style/body_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/lb_firmware_update"
+        android:textColor="@color/slate_700"/>
+
+    <TextView
+        style="@style/body_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp"
+        android:layout_marginBottom="16sp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/lb_firmware_version_available"
+        android:textColor="@color/slate_700" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/dismiss_textView"
+            style="@style/button_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24sp"
+            android:text="@string/lb_dismiss"
+            android:textColor="@color/slate_700" />
+
+        <Button
+            android:id="@+id/update_firmware_button"
+            style="@style/button_primary_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lb_update_now" />
+
+    </LinearLayout>
+
+</LinearLayout>

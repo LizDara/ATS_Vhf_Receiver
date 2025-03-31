@@ -12,9 +12,7 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
@@ -49,92 +47,95 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".AcousticUpdateActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AcousticOptionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AcousticMenuActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VhfRawDataActivity"
+            android:name=".ScanDevicesActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfEnterFrequencyActivity"
+            android:name=".FirmwareUpdateActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfUpdateActivity"
+            android:name=".Acoustic.OptionActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfValueDetectionFilterActivity"
+            android:name=".Acoustic.MenuActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfValueDefaultsActivity"
+            android:name=".VHF.RawDataActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfStationaryDefaultsActivity"
+            android:name=".VHF.EnterFrequencyActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfMobileDefaultsActivity"
+            android:name=".VHF.ValueDetectionFilterActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfDiagnosticsActivity"
+            android:name=".VHF.ValueDefaultsActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfCloneActivity"
+            android:name=".VHF.StationaryDefaultsActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfDetectionFilterActivity"
+            android:name=".VHF.MobileDefaultsActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfEditDefaultsActivity"
+            android:name=".VHF.DiagnosticsActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfConfigurationActivity"
+            android:name=".VHF.CloneActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfStationaryScanActivity"
+            android:name=".VHF.DetectionFilterActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfMobileScanActivity"
+            android:name=".VHF.EditDefaultsActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfManualScanActivity"
+            android:name=".VHF.ConfigurationActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfScanningActivity"
+            android:name=".VHF.StationaryScanActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfMenuActivity"
+            android:name=".VHF.MobileScanActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfFrequenciesActivity"
+            android:name=".VHF.ManualScanActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfTablesActivity"
+            android:name=".VHF.ScanningActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VhfManageDataActivity"
+            android:name=".VHF.MenuActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VHF.FrequenciesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VHF.TablesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VHF.ManageDataActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity

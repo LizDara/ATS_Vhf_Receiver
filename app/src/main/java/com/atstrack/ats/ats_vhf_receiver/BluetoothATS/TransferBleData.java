@@ -39,11 +39,10 @@ public class TransferBleData {
         return intentFilter;
     }
 
-    public static void readBoardState() {
+    public static boolean readBoardState() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_BOARD_STATE;
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(service, characteristic);
-        Log.i("TRANSFER BLE DATA", "ON CLICK BOARD STATE");
+        return LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(service, characteristic);
     }
 
     /**
@@ -53,7 +52,6 @@ public class TransferBleData {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_SCREEN;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG;
         LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(service, characteristic, true);
-        Log.i("TRANSFER BLE DATA", "ON CLICK LOG");
     }
 
     public static boolean writeDetectionFilter(byte[] data) {

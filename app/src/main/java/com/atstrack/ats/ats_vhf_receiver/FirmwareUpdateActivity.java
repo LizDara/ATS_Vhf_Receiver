@@ -9,19 +9,32 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class FirmwareUpdateActivity extends AppCompatActivity {
+public class FirmwareUpdateActivity extends BaseActivity {
 
     @BindView(R.id.firmware_versions_linearLayout)
     LinearLayout firmware_versions_linearLayout;
+    @BindView(R.id.version_name_textView)
+    TextView version_name_textView;
     @BindView(R.id.process_file_linearLayout)
     LinearLayout process_file_linearLayout;
     @BindView(R.id.message_complete_linearLayout)
@@ -50,10 +63,81 @@ public class FirmwareUpdateActivity extends AppCompatActivity {
     ProgressBar third_step_progressBar;
 
     private final static String TAG = FirmwareUpdateActivity.class.getSimpleName();
+    private String latestVersion;
+    private String idFile;
+    private byte[] firmwareFile;
+    private final int MTU = 247;
+    private int index;
+
+    private void setOtaBegin() {
+        byte[] b = new byte[] {0x00};
+        boolean result = TransferBleData.writeOTA(b);
+        if (result)
+            parameter = ValueCodes.MTU;
+    }
+
+    private void requestMTU() {
+        boolean result = TransferBleData.requestMtu(MTU + 3);
+        if (result)
+            parameter = ValueCodes.UPDATE;
+    }
+
+    private void otaUpload() {
+        loadInstalling();
+        parameter = "";
+        index = 0;
+        new Thread(() -> {
+            boolean last = false;
+            int packageCount = 0;
+            while (!last) {
+                byte[] payload = new byte[MTU];
+                if (index + MTU >= firmwareFile.length) {
+                    int restSize = firmwareFile.length - index;
+                    System.arraycopy(firmwareFile, index, payload, 0, restSize); //copy rest bytes
+                    last = true;
+                } else {
+                    payload = Arrays.copyOfRange(firmwareFile, index, index + MTU);
+                }
+                Log.d("OTA", "index :" + index + " firmware lenght:" + firmwareFile.length);
+                while (!TransferBleData.writeOTA(payload)) { // attempt to write until getting success
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                packageCount = packageCount + 1;
+                index = index + MTU;
+            }
+            Log.i("OTA", "OTA UPLOAD SEND DONE");
+            parameter = ValueCodes.OTA_END_WRITTEN;
+            leServiceConnection.getBluetoothLeService().discovering();
+        }).start();
+    }
+
+    private void otaEnd() {
+        byte[] b = new byte[] {0x03};
+        int i = 0;
+        while (!TransferBleData.writeOTA(b)) {
+            i++;
+            Log.i("OTA", "Failed to write end 0x03 retry:" + i);
+        }
+        parameter = ValueCodes.OTA_END;
+    }
+
+    private void rebootTargetDevice() {
+        installed();
+        byte[] b = new byte[] {0x04};
+        boolean result = TransferBleData.writeOTA(b);
+        if (result)
+            parameter = ValueCodes.FINISH;
+    }
 
     @OnClick(R.id.begin_update_button)
     public void onClickBeginUpdate(View v) {
         setVisibility("process");
+        downloadFile();
     }
 
     @OnClick(R.id.cancel_update_button)
@@ -68,22 +152,72 @@ public class FirmwareUpdateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        contentViewId = R.layout.activity_firmware_update;
+        showToolbar = true;
+        title = getString(R.string.firmware_update);
+        deviceCategory = ValueCodes.ACOUSTIC;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_firmware_update);
-        ButterKnife.bind(this);
-        ActivitySetting.setVhfToolbar(this, getString(R.string.firmware_update));
 
-        setVisibility("versions");
+        initializeCallback();
+        latestVersion = getIntent().getStringExtra(ValueCodes.VERSION);
+        idFile = getIntent().getStringExtra(ValueCodes.VALUE);
+        version_name_textView.setText("Firmware Version " + latestVersion);
+        setVisibility("version");
+    }
+
+    private void initializeCallback() {
+        receiverCallback = new ReceiverCallback() {
+            @Override
+            public void onGattDisconnected() {
+                unbindService(leServiceConnection.getServiceConnection());
+                Message.showDisconnectionMessage(mContext);
+            }
+
+            @Override
+            public void onGattDiscovered() {
+                switch (parameter) {
+                    case ValueCodes.OTA_BEGIN:
+                        setOtaBegin();
+                        break;
+                    case ValueCodes.MTU:
+                        requestMTU();
+                        break;
+                    case ValueCodes.UPDATE:
+                        otaUpload();
+                        break;
+                    case ValueCodes.OTA_END_WRITTEN:
+                        otaEnd();
+                        break;
+                    case ValueCodes.OTA_END:
+                        rebootTargetDevice();
+                        break;
+                    case ValueCodes.FINISH:
+                        setVisibility("completed");
+                        break;
+                }
+            }
+
+            @Override
+            public void onGattDataAvailable(byte[] packet) {}
+        };
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
     }
 
     @Override
-    public void onBackPressed() {
-        Log.i(TAG, "ON BACK PRESSED");
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     private void setVisibility(String value) {
         switch (value) {
-            case "versions":
+            case "version":
                 firmware_versions_linearLayout.setVisibility(View.VISIBLE);
                 process_file_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.GONE);
@@ -106,42 +240,55 @@ public class FirmwareUpdateActivity extends AppCompatActivity {
         }
     }
 
-    private void initDownloading() {
-        first_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
-        first_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        first_step_progressBar.setVisibility(View.GONE);
-        second_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
-        second_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        second_step_progressBar.setVisibility(View.GONE);
-        third_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
-        third_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
-        third_step_progressBar.setVisibility(View.GONE);
-    }
-
     private void loadDownloading() {
         first_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         first_step_imageView.setBackgroundResource(R.drawable.ic_circle);
-        first_step_progressBar.setVisibility(View.VISIBLE);
     }
 
-    private void loadProcessing() {
+    private void loadChecking() {
         first_step_imageView.setBackgroundResource(R.drawable.circle_check);
-        first_step_progressBar.setVisibility(View.GONE);
         second_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         second_step_imageView.setBackgroundResource(R.drawable.ic_circle);
-        second_step_progressBar.setVisibility(View.VISIBLE);
     }
 
-    private void loadPreparing() {
+    private void loadInstalling() {
         second_step_imageView.setBackgroundResource(R.drawable.circle_check);
-        second_step_progressBar.setVisibility(View.GONE);
         third_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         third_step_imageView.setBackgroundResource(R.drawable.ic_circle);
-        third_step_progressBar.setVisibility(View.VISIBLE);
     }
 
-    private void downloaded() {
+    private void installed() {
         third_step_imageView.setBackgroundResource(R.drawable.circle_check);
-        third_step_progressBar.setVisibility(View.GONE);
+    }
+
+    private void downloadFile() {
+        loadDownloading();
+        Callback<ResponseBody> callback = new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        firmwareFile = response.body().bytes();
+                        checkFile();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    Log.i(TAG, "Not successfully call.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.i(TAG, "Error: " + t.getLocalizedMessage());
+            }
+        };
+        DriveServiceHelper.getGblVersion(idFile, callback);
+    }
+
+    private void checkFile() {
+        loadChecking();
+        parameter = ValueCodes.OTA_BEGIN;
+        leServiceConnection.getBluetoothLeService().discovering();
     }
 }

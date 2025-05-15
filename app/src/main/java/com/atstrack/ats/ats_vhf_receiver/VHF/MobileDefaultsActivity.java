@@ -94,7 +94,11 @@ public class MobileDefaultsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = ValueCodes.MOBILE_DEFAULTS;
+        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        if (parameter.isEmpty()) {
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+            downloadData(data);
+        }
         originalData = new HashMap<>();
     }
 
@@ -115,6 +119,7 @@ public class MobileDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) // Gets aerial defaults data
                     downloadData(packet);
             }
@@ -125,11 +130,15 @@ public class MobileDefaultsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (checkChanges()) {
-                parameter = ValueCodes.SAVE;
-                leServiceConnection.getBluetoothLeService().discovering();
+            if (!existNotSet()) {
+                if (existChanges()) {
+                    parameter = ValueCodes.SAVE;
+                    leServiceConnection.getBluetoothLeService().discovering();
+                } else {
+                    finish();
+                }
             } else {
-                finish();
+                Message.showMessage(this, "Complete all fields.");
             }
             return true;
         }
@@ -155,15 +164,24 @@ public class MobileDefaultsActivity extends BaseActivity {
     private void downloadData(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("6D")) {
             parameter = "";
-            frequency_table_number_aerial_textView.setText(
-                    (Converters.getDecimalValue(data[1]).equals("0")) ? "None" : Converters.getDecimalValue(data[1]));
-            int gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-            aerial_gps_switch.setChecked(gps == 1);
-            int autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-            aerial_auto_record_switch.setChecked(autoRecord == 1);
-            double scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
-            scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
-
+            int gps = 0;
+            int autoRecord = 0;
+            double scanRate = 0;
+            if (!Converters.isDefaultEmpty(data)) {
+                frequency_table_number_aerial_textView.setText(
+                        (Converters.getDecimalValue(data[1]).equals("0")) ? "None" : Converters.getDecimalValue(data[1]));
+                gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
+                aerial_gps_switch.setChecked(gps == 1);
+                autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+                aerial_auto_record_switch.setChecked(autoRecord == 1);
+                scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
+                scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
+            } else {
+                frequency_table_number_aerial_textView.setText(R.string.lb_not_set);
+                scan_rate_seconds_aerial_textView.setText(R.string.lb_not_set);
+                aerial_gps_switch.setChecked(true);
+                aerial_auto_record_switch.setChecked(true);
+            }
             originalData.put(ValueCodes.TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[1])));
             originalData.put(ValueCodes.GPS, gps == 1);
             originalData.put(ValueCodes.AUTO_RECORD, autoRecord == 1);
@@ -173,11 +191,19 @@ public class MobileDefaultsActivity extends BaseActivity {
         }
     }
 
+    private boolean existNotSet() {
+        if (frequency_table_number_aerial_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (scan_rate_seconds_aerial_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        return false;
+    }
+
     /**
      * Checks for changes to the default data.
      * @return Returns true, if there are changes.
      */
-    private boolean checkChanges() {
+    private boolean existChanges() {
         int tableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
                 Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
         double scanRate = Double.parseDouble(scan_rate_seconds_aerial_textView.getText().toString());

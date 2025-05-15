@@ -14,7 +14,7 @@
         layout="@layout/menu_scan"/>
 
     <include
-        layout="@layout/warning_no_tables"/>
+        layout="@layout/warning_message"/>
 
     <include
         layout="@layout/receiver_status"/>

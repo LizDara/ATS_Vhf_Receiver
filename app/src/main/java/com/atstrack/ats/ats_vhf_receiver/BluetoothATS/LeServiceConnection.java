@@ -64,7 +64,9 @@ public class LeServiceConnection {
 
     public void close() {
         serviceConnection = null;
+        bluetoothLeService.close();
         bluetoothLeService = null;
         connected = false;
+        Log.i("LE SERVICE", "CLOSE SERVICE CONNECTION");
     }
 }

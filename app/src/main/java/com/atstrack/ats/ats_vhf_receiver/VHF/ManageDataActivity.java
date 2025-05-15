@@ -22,7 +22,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
@@ -143,10 +143,12 @@ public class ManageDataActivity extends BaseActivity {
     private void setNotification() {
         secondParameter = ValueCodes.PAGES_NUMBER;
         TransferBleData.downloadResponse();
-
-        new Handler().postDelayed(() -> {
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }, ValueCodes.WAITING_PERIOD);
+        try {
+            Thread.sleep(ValueCodes.WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        leServiceConnection.getBluetoothLeService().discoveringSecond();
 
         pageNumber = 0;
         packetNumber = 1; // 9 data packages of 230 bytes
@@ -165,7 +167,7 @@ public class ManageDataActivity extends BaseActivity {
     private void setResponsePage(boolean isOk) {
         byte[] b = new byte[]{isOk ? (byte) 0x95 : (byte) 0x96};
         boolean result = TransferBleData.writeResponse(b);
-        Log.i(TAG, "-------------------------------------------------------------Is Ok: " + isOk + " Page number: " + (pageNumber - 1));
+        Log.i(TAG, "-------------------------------------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
         if (result) secondParameter = "";
     }
 
@@ -173,9 +175,12 @@ public class ManageDataActivity extends BaseActivity {
         secondParameter = ValueCodes.DELETE;
         TransferBleData.downloadResponse();
 
-        new Handler().postDelayed(() -> {
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }, ValueCodes.WAITING_PERIOD);
+        try {
+            Thread.sleep(ValueCodes.WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        leServiceConnection.getBluetoothLeService().discoveringSecond();
     }
 
     private void setDeleteData() {
@@ -213,6 +218,7 @@ public class ManageDataActivity extends BaseActivity {
 
     @OnClick(R.id.cancel_download_button)
     public void onClickCancelDownload(View v) {
+        TransferBleData.disableNotificationLog();
         downloading = false;
         setVisibility("begin");
         parameter = "";
@@ -260,7 +266,7 @@ public class ManageDataActivity extends BaseActivity {
             public void onGattDiscovered() {
                 switch (parameter) {
                     case ValueCodes.TEST: // Get memory used and byte stored
-                        TransferBleData.readDiagnostic();
+                        TransferBleData.readDataInfo();
                         break;
                     case ValueCodes.DOWNLOAD: // Download raw bytes
                         setNotification();
@@ -273,6 +279,7 @@ public class ManageDataActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 switch (parameter) {
                     case ValueCodes.DOWNLOAD:
                         // Get raw data in pages, each page contains 2048 bytes.
@@ -428,9 +435,9 @@ public class ManageDataActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadTest(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("89")) {
-            int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
-            int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
+        if (Converters.getHexValue(data[0]).equals("52")) {
+            int numberPage = findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
+            int lastPage = findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
             memory_used_percent_textView.setText(((int) (((float) numberPage / (float) lastPage) * 100)) + "%");
             memory_used_progressBar.setProgress((int) ((((float) numberPage / (float) lastPage)) * 100));
             bytes_stored_textView.setText("Memory Used (" + (numberPage * 2048) + " bytes stored)");
@@ -602,10 +609,17 @@ public class ManageDataActivity extends BaseActivity {
                                     }
                                     secondParameter = ValueCodes.PAGE_OK;
                                 } else {
+                                    Log.i(TAG, "No se encontraron los 9 paquetes");
                                     pageNumber--;
                                 }
+                            } else {
+                                Log.i(TAG, "Numero de pagina que llego es " + number + ", numero esperado: " + pageNumber);
                             }
+                        } else {
+                            Log.i(TAG, "Ultimo paquete no es 9");
                         }
+                    } else {
+                        Log.i(TAG, "Llegaron " + pagePackets.size() + " paquetes");
                     }
                     packetNumber = 1;
                     pagePackets = new ArrayList<>();
@@ -724,7 +738,7 @@ public class ManageDataActivity extends BaseActivity {
                     ManageDataActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
 
             credential.setSelectedAccount(googleSignInAccount.getAccount());
-            Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("ATS VHF Receiver").build();
+            Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("ATS Bridge").build();
             driveServiceHelper = new DriveServiceHelper(googleDriveService);
 
             uploadFile();

@@ -25,6 +25,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.google.common.base.Converter;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -176,6 +177,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
         byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) firstTable, (byte) secondTable, (byte) thirdTable};
         isScanning = TransferBleData.writeStartScan(ValueCodes.STATIONARY_DEFAULTS, b);
+        Log.i(TAG, Converters.getHexValue(b));
         if (isScanning) {
             secondParameter = "";
             setVisibility("scanning");
@@ -194,6 +196,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
                 new Handler().postDelayed(() -> {
                     leServiceConnection.getBluetoothLeService().discovering();
                 }, ValueCodes.WAITING_PERIOD);
+                previousScanning = false;
             } else {
                 parameter = "";
             }
@@ -295,13 +298,13 @@ public class StationaryScanActivity extends ScanBaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
+        byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = ValueCodes.CONTINUE_LOG;
-            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
 
             int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
-                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + (baseFrequency * 1000);
+                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
             int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
                     + Integer.parseInt(Converters.getDecimalValue(data[8]));
             int currentAntenna = Integer.parseInt(Converters.getDecimalValue(data[9]));
@@ -312,7 +315,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
             scanState(data);
             setVisibility("scanning");
         } else { // Gets aerial defaults data
-            parameter = ValueCodes.STATIONARY_DEFAULTS;
+            downloadData(data);
             previousScanning = false;
             setVisibility("overview");
         }
@@ -353,6 +356,8 @@ public class StationaryScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 switch (parameter) {
                     case ValueCodes.STATIONARY_DEFAULTS: // Gets stationary defaults data
                         downloadData(packet);
@@ -390,6 +395,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
                 Intent intent = new Intent(this, ScanningActivity.class);
+                intent.putExtra(ValueCodes.PARAMETER, "");
                 startActivity(intent);
                 finish();
             } else {
@@ -472,7 +478,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
             int frequency = 0;
             if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
                 frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
-                        Integer.parseInt(Converters.getDecimalValue(data[7])) + (baseFrequency * 1000);
+                        Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
             stationary_reference_frequency_switch.setChecked(frequency != 0);
             stationary_reference_frequency_switch.setEnabled(false);
             frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
@@ -487,7 +493,6 @@ public class StationaryScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
             case "50":
                 scanState(data);
@@ -530,7 +535,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
     private void logScanHeader(byte[] data) {
         clear();
         int frequency = ((Integer.parseInt(Converters.getDecimalValue(data[1])) & 63) * 256) +
-                Integer.parseInt(Converters.getDecimalValue(data[2])) + (baseFrequency * 1000);
+                Integer.parseInt(Converters.getDecimalValue(data[2])) + baseFrequency;
         int index = (((Integer.parseInt(Converters.getDecimalValue(data[1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(data[3]));
         antennas = Integer.parseInt(Converters.getDecimalValue(data[1])) >> 7;
         if (antennas == 0) {

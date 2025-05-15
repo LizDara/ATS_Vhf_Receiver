@@ -1,14 +1,25 @@
 package com.atstrack.ats.ats_vhf_receiver.Acoustic;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentResultListener;
+
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.DriveService.VersionResponse;
+import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.FirmwareUpdate;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
@@ -17,9 +28,14 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MenuActivity extends BaseActivity {
 
@@ -43,9 +59,16 @@ public class MenuActivity extends BaseActivity {
     TextView error_code_textView;
 
     private final static String TAG = MenuActivity.class.getSimpleName();
+    private DialogFragment firmwareUpdate;
 
     @OnClick(R.id.disconnect_button)
     public void onClickDisconnect(View v) {
+        TransferBleData.disableNotificationLog();
+        try {
+            Thread.sleep(ValueCodes.WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         leServiceConnection.getBluetoothLeService().disconnect();
     }
 
@@ -71,6 +94,7 @@ public class MenuActivity extends BaseActivity {
             setHealthBeaconData(healthBeaconData);
         else
             Message.showMessage(this, "Package 0x70 not found.");
+        updateAvailable();
     }
 
     private void initializeCallback() {
@@ -123,5 +147,49 @@ public class MenuActivity extends BaseActivity {
             String status = (Converters.getDecimalValue(data[15]).equals("97") && Converters.getDecimalValue(data[16]).equals("97")) ? "NONE" : "ERROR";
             error_code_textView.setText(status);
         }
+    }
+
+    private void updateAvailable() {
+        Callback<VersionResponse> callback = new Callback<VersionResponse>() {
+            @Override
+            public void onResponse(Call<VersionResponse> call, Response<VersionResponse> response) {
+                if (response.isSuccessful()) {
+                    VersionResponse latestVersion = response.body();
+                    SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
+                    String version = sharedPreferences.getString(ValueCodes.VERSION, "0");
+                    Log.i(TAG, "Version: " + latestVersion.getVersion() + ", Id: " + latestVersion.getId());
+                    if (!version.equals(latestVersion.getVersion())) {
+                        firmwareUpdate = FirmwareUpdate.newInstance();
+                        showFirmwareMessage(latestVersion);
+                    }
+                } else {
+                    Log.i(TAG, "Not successfully call.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VersionResponse> call, Throwable t) {
+                Log.i(TAG, "Error: " + t.getLocalizedMessage());
+            }
+        };
+        DriveServiceHelper.getIdFileLastVersion(callback);
+    }
+
+    private void showFirmwareMessage(VersionResponse latestVersion) {
+        getSupportFragmentManager().setFragmentResultListener(ValueCodes.UPDATE, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                boolean update = bundle.getBoolean(ValueCodes.VALUE);
+                if (update) updateFirmware(latestVersion);
+            }
+        });
+        firmwareUpdate.show(getSupportFragmentManager(), FirmwareUpdate.TAG);
+    }
+
+    private void updateFirmware(VersionResponse latestVersion) {
+        Intent intent = new Intent(this, FirmwareUpdateActivity.class);
+        intent.putExtra(ValueCodes.VERSION, latestVersion.getVersion());
+        intent.putExtra(ValueCodes.VALUE, latestVersion.getId());
+        startActivity(intent);
     }
 }

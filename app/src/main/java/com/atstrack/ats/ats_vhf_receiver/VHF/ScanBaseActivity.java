@@ -60,9 +60,12 @@ public class ScanBaseActivity extends BaseActivity {
         secondParameter = ValueCodes.START_SCAN;
         TransferBleData.notificationLog();
 
-        new Handler().postDelayed(() -> {
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }, ValueCodes.WAITING_PERIOD);
+        try {
+            Thread.sleep(ValueCodes.WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        leServiceConnection.getBluetoothLeService().discoveringSecond();
     }
 
     protected void setNotificationLogScanning() {

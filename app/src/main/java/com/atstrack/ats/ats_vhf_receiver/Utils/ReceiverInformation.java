@@ -16,6 +16,7 @@ public class ReceiverInformation {
         deviceAddress = "Unknown";
         deviceBattery = 0;
         statusData = null;
+        mSDCard = null;
     }
 
     public static ReceiverInformation getReceiverInformation() {

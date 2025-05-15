@@ -75,6 +75,11 @@
     <string name="lb_stationary_scan">Stationary Scan</string>
     <string name="lb_warning_no_tables">Warning: All frequency tables are empty. You must fill one before  starting a mobile or stationary scan.</string>
     <string name="lb_go_tables">Go to Frequency Tables</string>
+    <string name="lb_warning_no_detection">Warning: Receiver detection filter not set. Please complete to be able to scan.</string>
+    <string name="lb_go_detection">Go to Detection Filter Settings</string>
+    <string name="lb_warning_no_defaults">Warning: Receiver default settings not complete. Please complete settings to be able to scan.</string>
+    <string name="lb_go_settings">Go to Receiver Settings</string>
+    <string name="lb_go_to_scan">Go to Scan</string>
 
     <!--MANUAL SCAN-->
     <string name="manual_scanning">Manual Scanning</string>
@@ -170,6 +175,7 @@
     <string name="lb_edit_receiver_defaults">Edit Receiver Defaults</string>
     <string name="lb_set_transmitter_type">Set Detection Filter</string>
     <string name="lb_clone_from_other_receiver">Clone From Other Receiver</string>
+    <string name="lb_not_set">Not Set</string>
 
     <!--EDIT FREQUENCY TABLES-->
     <string name="edit_frequency_tables">Edit Frequency Tables</string>
@@ -199,6 +205,14 @@
     <string name="lb_frequencies_deleted">Frequencies Deleted</string>
     <string name="lb_no_frequencies">No frequencies in this table.</string>
     <string name="lb_save_changes">Save Changes</string>
+    <string name="lb_temperature_coefficients">Temperature Coefficients</string>
+    <string name="lb_coefficient_a">Coef-a</string>
+    <string name="lb_coefficient_b">Coef-b</string>
+    <string name="lb_constant">Constant</string>
+    <string name="lb_enter_coefficient_a">Enter Coef-a Digits</string>
+    <string name="lb_enter_coefficient_b">Enter Coef-b Digits</string>
+    <string name="lb_enter_constant">Enter Constant Digits</string>
+    <string name="lb_save">Save</string>
 
     <!--EDIT RECEIVER DEFAULTS-->
     <string name="edit_receiver_defaults">Edit Receiver Defaults</string>
@@ -660,7 +674,6 @@
     </string-array>
 
     <string-array name="timeout">
-        <item>2</item>
         <item>3</item>
         <item>4</item>
         <item>5</item>
@@ -930,8 +943,7 @@
     <!--FIRMWARE UPDATE-->
     <string name="firmware_update">Firmware Update</string>
     <string name="lb_select_firmware">Select Firmware Version</string>
-    <string name="lb_firmware_file">Firmware file will be downloaded before installing.</string>
-    <string name="lb_local_file">Select Local Update File</string>
+    <string name="lb_firmware_file">The latest version of the firmware file will be downloaded before installing.</string>
     <string name="lb_begin_update">Begin Update</string>
     <string name="lb_downloading_file">Downloading File</string>
     <string name="lb_checking_file">Checking File</string>

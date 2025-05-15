@@ -72,6 +72,7 @@ public class MenuActivity extends BaseActivity {
     @OnClick(R.id.start_scanning_button)
     public void onClickStartScanning(View v) {
         Intent intent = new Intent(this, ScanningActivity.class);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_TYPE);
         startActivity(intent);
     }
 
@@ -147,7 +148,8 @@ public class MenuActivity extends BaseActivity {
             }
 
             @Override
-            public void onGattDataAvailable(byte[] packet) {}
+            public void onGattDataAvailable(byte[] packet) {
+            }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
     }

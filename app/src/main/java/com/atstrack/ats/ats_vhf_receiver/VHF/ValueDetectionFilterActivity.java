@@ -55,8 +55,6 @@ public class ValueDetectionFilterActivity extends BaseActivity {
     ImageView none_imageView;
     @BindView(R.id.temperature_imageView)
     ImageView temperature_imageView;
-    @BindView(R.id.period_imageView)
-    ImageView period_imageView;
     @BindView(R.id.two_imageView)
     ImageView two_imageView;
     @BindView(R.id.three_imageView)
@@ -130,24 +128,14 @@ public class ValueDetectionFilterActivity extends BaseActivity {
     public void onClickNone(View v) {
         none_imageView.setVisibility(View.VISIBLE);
         temperature_imageView.setVisibility(View.GONE);
-        period_imageView.setVisibility(View.GONE);
-        value = ValueCodes.NONE_CODE;
+        value = 0;
     }
 
     @OnClick(R.id.temperature_linearLayout)
     public void onClickTemperature(View v) {
         temperature_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
-        period_imageView.setVisibility(View.GONE);
-        value = ValueCodes.TEMPERATURE_CODE;
-    }
-
-    @OnClick(R.id.period_linearLayout)
-    public void onClickPeriod(View v) {
-        period_imageView.setVisibility(View.VISIBLE);
-        none_imageView.setVisibility(View.GONE);
-        temperature_imageView.setVisibility(View.GONE);
-        value = ValueCodes.PERIOD_CODE;
+        value = 6;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -351,7 +339,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
             if (type == ValueCodes.PULSE_RATE_1_CODE || type == ValueCodes.PULSE_RATE_2_CODE || type == ValueCodes.PULSE_RATE_3_CODE || type == ValueCodes.PULSE_RATE_4_CODE) {
                 int pulseRate = Integer.parseInt(pulse_rate_editText.getText().toString());
                 int tolerance = pulse_rate_tolerance_spinner.getSelectedItemPosition() + 4;
-                if (pulseRate >= 8 && pulseRate <= 150) {
+                if (pulseRate > 0 && pulseRate <= 240) {
                     value = (pulseRate * 100) + tolerance;
                 } else {
                     Message.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate or tolerance values.");
@@ -359,6 +347,10 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                 }
             } else if (type == ValueCodes.MAX_PULSE_RATE_CODE || type == ValueCodes.MIN_PULSE_RATE_CODE) {
                 value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
+                if (value < 1 || value > 240) {
+                    Message.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate.");
+                    return true;
+                }
             }
             intent.putExtra(ValueCodes.VALUE, value);
             setResult(type, intent);
@@ -508,15 +500,11 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         switch (Converters.getHexValue(data[11])) {
             case "00":
                 none_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.NONE_CODE;
+                value = 0;
                 break;
-            case "08":
-                period_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.PERIOD_CODE;
-                break;
-            case "04":
+            case "06":
                 temperature_imageView.setVisibility(View.VISIBLE);
-                value = ValueCodes.TEMPERATURE_CODE;
+                value = 6;
                 break;
         }
     }

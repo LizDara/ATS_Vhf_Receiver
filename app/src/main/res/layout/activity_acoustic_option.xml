@@ -11,6 +11,6 @@
         layout="@layout/main_toolbar" />
 
     <include
-        layout="@layout/firmware_update_message" />
+        layout="@layout/fragment_firmware_update" />
 
 </LinearLayout>

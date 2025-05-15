@@ -34,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.DriveService.VersionResponse;
 import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;

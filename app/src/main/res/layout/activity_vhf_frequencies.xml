@@ -20,6 +20,9 @@
         layout="@layout/delete_frequencies"/>
 
     <include
+        layout="@layout/edit_temperature_frequency"/>
+
+    <include
         layout="@layout/receiver_status"/>
 
 </LinearLayout>

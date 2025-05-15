@@ -1031,6 +1031,7 @@ drawable h2o_acoustics
 drawable ic_acoustic_receiver
 drawable ic_back
 drawable ic_bluetooth_tag
+drawable ic_bottom
 drawable ic_check
 drawable ic_checked
 drawable ic_circle
@@ -1390,7 +1391,7 @@ id frequency_table_number_stationary_textView
 id frequency_tables_textView
 id frequency_textView
 id frost
-id go_tables_button
+id go_button
 id gone
 id gps_aerial_imageView
 id gps_manual_imageView
@@ -1529,8 +1530,6 @@ id percent_battery_menu_textView
 id percent_battery_textView
 id period_1_tolerance_textView
 id period_2_tolerance_textView
-id period_imageView
-id period_linearLayout
 id period_pulse_rate_textView
 id period_textView
 id play_background_signals_switch
@@ -1762,8 +1761,8 @@ id utc_time_textView
 id value_spinner
 id variable_pulse_rate_imageView
 id variable_pulse_rate_linearLayout
+id version_name_textView
 id version_textView
-id versions_listView
 id vertical_only
 id vhf_name_textView
 id view_detection_aerial_textView
@@ -1775,7 +1774,8 @@ id view_tree_saved_state_registry_owner
 id view_tree_view_model_store_owner
 id visible
 id visible_removing_fragment_view_tag
-id warning_no_tables_linearLayout
+id warning_message_linearLayout
+id warning_message_textView
 id west
 id wide
 id withText
@@ -1871,9 +1871,9 @@ layout download_complete
 layout downloading_file
 layout downloading_process
 layout edit_table_scan
-layout firmware_update_message
 layout fragment_audio_options
 layout fragment_detection_filter
+layout fragment_firmware_update
 layout fragment_view_detection_filter
 layout frequencies_overview
 layout frequency_edit
@@ -1917,7 +1917,7 @@ layout store_rate_values
 layout support_simple_spinner_dropdown_item
 layout table_information
 layout vhf_toolbar
-layout warning_no_tables
+layout warning_message
 menu example_menu
 menu example_menu2
 mipmap ic_launcher
@@ -2089,7 +2089,10 @@ string lb_frequency_deleted
 string lb_frequency_range
 string lb_frequency_saved
 string lb_frequency_tables
+string lb_go_detection
+string lb_go_settings
 string lb_go_tables
+string lb_go_to_scan
 string lb_gps
 string lb_gps_data
 string lb_hold
@@ -2098,7 +2101,6 @@ string lb_inserted
 string lb_installation_complete
 string lb_installing_firmware
 string lb_load_table_from_file
-string lb_local_file
 string lb_make_sure_receivers
 string lb_manual_scan
 string lb_manual_scanning
@@ -2122,6 +2124,7 @@ string lb_non_coded_fixed
 string lb_non_coded_variable
 string lb_none
 string lb_none_detected
+string lb_not_set
 string lb_number_antennas
 string lb_number_dets
 string lb_number_matches
@@ -2250,6 +2253,8 @@ string lb_utc_time
 string lb_valid_gps
 string lb_view_data
 string lb_view_detection_filter
+string lb_warning_no_defaults
+string lb_warning_no_detection
 string lb_warning_no_tables
 string low_power_mode
 string manage_receiver_data

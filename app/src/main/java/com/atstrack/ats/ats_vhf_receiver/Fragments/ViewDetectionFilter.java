@@ -15,7 +15,6 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class ViewDetectionFilter extends DialogFragment {
-
     public static String TAG = ViewDetectionFilter.class.getSimpleName();
 
     public ViewDetectionFilter() {}

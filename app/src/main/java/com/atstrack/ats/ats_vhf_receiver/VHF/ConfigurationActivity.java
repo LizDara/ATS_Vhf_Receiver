@@ -22,6 +22,7 @@ public class ConfigurationActivity extends BaseActivity {
     @OnClick(R.id.edit_frequency_tables_button)
     public void onClickEditFrequencyTables(View v) {
         Intent intent = new Intent(this, TablesActivity.class);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
         startActivity(intent);
     }
 
@@ -34,6 +35,7 @@ public class ConfigurationActivity extends BaseActivity {
     @OnClick(R.id.set_transmitter_type_button)
     public void onClickSetTransmitterType(View v) {
         Intent intent = new Intent(this, DetectionFilterActivity.class);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_TYPE);
         startActivity(intent);
     }
 

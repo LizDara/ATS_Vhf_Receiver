@@ -151,6 +151,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         switch (parameter) {
             case ValueCodes.TABLE_NUMBER:
                 b[1] = (byte) Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
+                selectedTable = Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
                 break;
             case ValueCodes.SCAN_RATE:
                 b[3] = (byte) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10);
@@ -158,10 +159,12 @@ public class MobileScanActivity extends ScanBaseActivity {
             case ValueCodes.GPS:
                 b[2] = aerial_gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 128)
                         : (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) - 128);
+                gps = aerial_gps_switch.isChecked() ? 1 : 0;
                 break;
             case ValueCodes.AUTO_RECORD:
                 b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 64)
                         : (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) - 64);
+                autoRecord = aerial_auto_record_switch.isChecked() ? 1 : 0;
                 break;
         }
         boolean result = TransferBleData.writeDefaults(true, b);
@@ -204,6 +207,7 @@ public class MobileScanActivity extends ScanBaseActivity {
                 new Handler().postDelayed(() -> {
                     leServiceConnection.getBluetoothLeService().discovering();
                 }, ValueCodes.WAITING_PERIOD);
+                previousScanning = false;
             } else {
                 parameter = "";
             }
@@ -471,26 +475,28 @@ public class MobileScanActivity extends ScanBaseActivity {
         isHold = false;
         newFrequency = 0;
         handlerMessage = new Handler();
+        byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = ValueCodes.CONTINUE_LOG;
-            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
 
             int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
                     + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
             int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
                     + Integer.parseInt(Converters.getDecimalValue(data[8]));
-            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[15])) >> 6 & 1;
+            gps = Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1;
             isRecord = autoRecord == 1;
             isHold = Converters.getHexValue(data[1]).equals("81");
             frequency_aerial_textView.setText(Converters.getFrequency(currentFrequency));
             table_index_aerial_textView.setText(String.valueOf(currentIndex));
             if (isHold) setHold(); else removeHold();
             if (isRecord) setRecord(); else removeRecord();
+            if (gps == 1) setGpsSearching(); else setGpsOff();
             scanState(data);
             setVisibility("scanning");
         } else { // Gets aerial defaults data
-            parameter = ValueCodes.MOBILE_DEFAULTS;
+            downloadData(data);
             previousScanning = false;
             setVisibility("overview");
         }
@@ -528,6 +534,7 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
                 switch (parameter) {
                     case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
                         downloadData(packet);
@@ -589,6 +596,7 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (secondParameter.equals(ValueCodes.TABLES))
                     downloadTables(packet);
             }
@@ -601,6 +609,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
                 Intent intent = new Intent(this, ScanningActivity.class);
+                intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
                 startActivity(intent);
                 finish();
             } else {

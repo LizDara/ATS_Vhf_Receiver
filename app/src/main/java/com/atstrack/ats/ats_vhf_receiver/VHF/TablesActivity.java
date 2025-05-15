@@ -65,7 +65,11 @@ public class TablesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = ValueCodes.TABLES;
+        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        if (parameter.isEmpty()) {
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+            downloadData(data);
+        }
     }
 
     private void initializeCallback() {
@@ -83,6 +87,7 @@ public class TablesActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                     downloadData(packet);
             }

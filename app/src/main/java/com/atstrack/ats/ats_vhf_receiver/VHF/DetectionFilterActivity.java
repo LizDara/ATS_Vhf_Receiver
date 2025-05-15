@@ -84,14 +84,11 @@ public class DetectionFilterActivity extends BaseActivity {
                         break;
                     case ValueCodes.DATA_CALCULATION_TYPE_CODE:
                         switch (value) {
-                            case ValueCodes.NONE_CODE:
+                            case 0:
                                 optional_data_textView.setText(R.string.lb_none);
                                 break;
-                            case ValueCodes.TEMPERATURE_CODE:
+                            case 6:
                                 optional_data_textView.setText(R.string.lb_temperature);
-                                break;
-                            case ValueCodes.PERIOD_CODE:
-                                optional_data_textView.setText(R.string.lb_period);
                                 break;
                         }
                         break;
@@ -110,24 +107,23 @@ public class DetectionFilterActivity extends BaseActivity {
      * Writes the modified tx type data by the user.
      */
     private void setDetectionFilter() {
-        byte[] b = new byte[11];
+        byte[] b = new byte[12];
+        b[0] = (byte) 0x47;
         switch (pulse_rate_type_textView.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
                 b = new byte[] {(byte) 0x47, (byte) 0x08, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
                         (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
                         (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
-                        0, 0, 0, 0};
+                        0, 0, 0, 0, 0};
                 break;
             case "Non Coded (Variable Pulse Rate)":
+                int optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_none)) ? 0 : 6;
                 b = new byte[] {(byte) 0x47, (byte) 0x07, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
-                        (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) / 256),
-                        (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString()) % 256),
-                        (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) / 256),
-                        (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString()) % 256),
-                        (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
+                        (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString())), 0,
+                        (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString())), 0, 0, 0, 0, 0, (byte) optionalData};
                 break;
             case "Coded":
-                b = new byte[] {(byte) 0x47, (byte) 0x09, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
+                b[1] = (byte) 0x09;
                 break;
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
@@ -199,7 +195,11 @@ public class DetectionFilterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = ValueCodes.DETECTION_TYPE;
+        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        if (parameter.isEmpty()) {
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+            downloadData(data);
+        }
         originalData = new HashMap<>();
     }
 
@@ -220,6 +220,7 @@ public class DetectionFilterActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
                     downloadData(packet);
             }
@@ -270,12 +271,21 @@ public class DetectionFilterActivity extends BaseActivity {
                 matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
                 target_pulse_rate_linearLayout.setVisibility(View.VISIBLE);
                 pulse_rates_linearLayout.setVisibility(View.GONE);
+                matches_for_valid_pattern_textView.setText("3");
+                pr1_textView.setText("0");
+                pr1_tolerance_textView.setText("0");
+                pr2_textView.setText("0");
+                pr2_tolerance_textView.setText("0");
                 break;
             case "Variable":
                 pulse_rate_type_textView.setText(R.string.lb_non_coded_variable);
                 matches_for_valid_pattern_linearLayout.setVisibility(View.VISIBLE);
                 target_pulse_rate_linearLayout.setVisibility(View.GONE);
                 pulse_rates_linearLayout.setVisibility(View.VISIBLE);
+                matches_for_valid_pattern_textView.setText("3");
+                max_pulse_rate_textView.setText("0");
+                min_pulse_rate_textView.setText("0");
+                optional_data_textView.setText(getString(R.string.lb_none));
                 break;
         }
     }
@@ -325,11 +335,11 @@ public class DetectionFilterActivity extends BaseActivity {
                     setVisibility("Variable");
 
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    maxPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
-                    minPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+                    maxPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[3])));
+                    minPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[5])));
                     max_pulse_rate_textView.setText(String.valueOf(maxPulseRate));
                     min_pulse_rate_textView.setText(String.valueOf(minPulseRate));
-                    optional_data_textView.setText(R.string.lb_none);
+                    optional_data_textView.setText(Converters.getDecimalValue(data[11]).equals("06") ? R.string.lb_temperature : R.string.lb_none);
                     break;
             }
             originalData.put(ValueCodes.PULSE_RATE_TYPE, pulseRateType);
@@ -394,8 +404,13 @@ public class DetectionFilterActivity extends BaseActivity {
     }
 
     private boolean isDataCorrect() {
-        if (pulse_rate_type_textView.getText().toString().equals("Non Coded (Fixed Pulse Rate)"))
+        if (pulse_rate_type_textView.getText().toString().equals(getString(R.string.lb_non_coded_fixed)))
             return !pr1_textView.getText().equals("0");
+        else if (pulse_rate_type_textView.getText().toString().equals(getString(R.string.lb_non_coded_variable))) {
+            int max = Integer.parseInt(max_pulse_rate_textView.getText().toString());
+            int min = Integer.parseInt(min_pulse_rate_textView.getText().toString());
+            return (max > 0 && max <= 240) && (min > 0 && min <= 240) && (max > min);
+        }
         return true;
     }
 }

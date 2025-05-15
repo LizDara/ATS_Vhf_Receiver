@@ -54,6 +54,7 @@ public class DiagnosticsActivity extends BaseActivity {
     private final static String TAG = DiagnosticsActivity.class.getSimpleName();
 
     private Handler mHandlerTest;
+    private AlertDialog dialog;
 
     @OnClick(R.id.update_receiver_button)
     public void onClickUpdateReceiver(View v) {
@@ -79,6 +80,7 @@ public class DiagnosticsActivity extends BaseActivity {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
+                dialog.dismiss();
                 Message.showDisconnectionMessage(mContext);
             }
 
@@ -90,6 +92,7 @@ public class DiagnosticsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
                     downloadData(packet);
             }
@@ -176,7 +179,7 @@ public class DiagnosticsActivity extends BaseActivity {
     private void runningTest() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.connecting_test, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog = new AlertDialog.Builder(this).create();
         ProgressBar testing_progressBar = view.findViewById(R.id.testing_progressBar);
         ImageView complete_test_imageView = view.findViewById(R.id.complete_test_imageView);
         TextView state_test_textView = view.findViewById(R.id.state_test_textView);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/warning_no_tables_linearLayout"
+    android:id="@+id/warning_message_linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
@@ -17,20 +17,19 @@
         android:padding="16sp">
 
         <TextView
+            android:id="@+id/warning_message_textView"
             style="@style/h2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/lb_warning_no_tables"
             android:textColor="@color/black" />
 
         <Button
-            android:id="@+id/go_tables_button"
+            android:id="@+id/go_button"
             style="@style/button_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32sp"
-            android:text="@string/lb_go_tables" />
+            android:layout_marginTop="32sp" />
 
     </LinearLayout>
 

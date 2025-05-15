@@ -288,6 +288,7 @@ public class ManualScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
                     setCurrentLog(packet);
             }

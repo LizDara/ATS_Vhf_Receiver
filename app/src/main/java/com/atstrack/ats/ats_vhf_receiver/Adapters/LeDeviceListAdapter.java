@@ -131,7 +131,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             holder.device_type_linearLayout.setBackground(ContextCompat.getDrawable(context, Converters.getDeviceType(device, false)));
             holder.device_type_imageView.setBackgroundResource(Converters.getDeviceType(device, true));
             if (device.contains("vr")) {
-                String detectionFilter = Converters.setDetectionFilter(device.substring(15, 16));
+                String detectionFilter = Converters.getDetectionFilter(device.substring(15, 16));
                 String status = Converters.getStatusVhfReceiver(mScanRecords.get(position));
                 int percent = Converters.getPercentBatteryVhfReceiver(mScanRecords.get(position));
                 int baseFrequency = Integer.parseInt(device.substring(12, 15)) * 1000;
@@ -192,7 +192,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
 
             receiver_status_linearLayout.setOnClickListener(view -> {
                 if (mLeDevices.get(getLayoutPosition()) == null) return;
-                if (mLeDevices.get(getLayoutPosition()).getName().contains("000000ATS")) { // Error, factory setup required
+                if (mLeDevices.get(getLayoutPosition()).getName().contains("0000000ATS")) { // Error, factory setup required
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Error");
                     builder.setMessage("Factory Setup Required.");

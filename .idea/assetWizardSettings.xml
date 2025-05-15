@@ -358,8 +358,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_download" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\download.svg" />
+                            <entry key="outputName" value="ic_bottom" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\bottom.svg" />
                           </map>
                         </option>
                       </PersistentState>

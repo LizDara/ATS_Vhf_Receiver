@@ -29,7 +29,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_tertiary;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_audio;
 
 public class AudioOptions extends DialogFragment {
-
     public static String TAG = AudioOptions.class.getSimpleName();
     private byte audioOption;
     private int codeNumber;

@@ -10,7 +10,6 @@ public class ValueCodes {
     public static final int RESULT_OK = 2000;
     public final static char CR = (char) 0x0D;
     public final static char LF = (char) 0x0A;
-    public static final int REQUEST_ENABLE_BT = 1;
     public static final int REQUEST_CODE_SIGN_IN = 1;
     public static final int REQUEST_CODE_OPEN_STORAGE = 3;
 
@@ -34,16 +33,12 @@ public class ValueCodes {
     public static final int MAX_PULSE_RATE_CODE = 1017;
     public static final int MIN_PULSE_RATE_CODE = 1018;
     public static final int DATA_CALCULATION_TYPE_CODE = 1019;
-    public static final int NONE_CODE = 1020;
-    public static final int TEMPERATURE_CODE = 1021;
-    public static final int PERIOD_CODE = 1022;
 
     //Values
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String VALUE = "value";
-    public static final String NIGHT_MODE = "NightMode";
-    public static final String SETTING_PREFERENCES = "AppSettingPrefs";
+    public static final String VERSION = "version";
     public static final String STATUS = "status";
     public static final String SCANNING = "scanning";
     public static final String DEFAULT_SETTING = "defaults";
@@ -57,8 +52,15 @@ public class ValueCodes {
     public static final String TOTAL = "total";
     public static final String IS_FILE = "isFile";
     public static final String FREQUENCIES = "frequencies";
+    public static final String IS_TEMPERATURE = "isTemperature";
 
     //Parameters
+    public static final String OTA_BEGIN = "begin";
+    public static final String MTU = "mtu";
+    public static final String UPDATE = "update";
+    public static final String OTA_END_WRITTEN = "endWritten";
+    public static final String FINISH = "finish";
+    public static final String OTA_END = "end";
     public static final String SAVE = "save";
     public static final String MOBILE_DEFAULTS = "mobile";
     public static final String TABLES = "tables";
@@ -89,7 +91,6 @@ public class ValueCodes {
     public static final String BOARD_STATUS = "boardStatus";
     public static final String AUDIO = "audio";
     public static final String BACKGROUND = "background";
-    public static final String UPDATE = "update";
     public static final String DETECTION_TYPE = "detectionType";
 
     //Original Data
@@ -127,5 +128,5 @@ public class ValueCodes {
     public static final int DOWNLOAD_PERIOD = 280;
     public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
-    public static final int CONNECT_PERIOD = 3000;
+    public static final int CONNECT_TIMEOUT = 3000;
 }

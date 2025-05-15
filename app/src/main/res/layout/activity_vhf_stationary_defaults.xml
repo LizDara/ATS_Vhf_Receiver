@@ -35,6 +35,14 @@
 
     </ScrollView>
 
+    <!--Button
+        android:id="@+id/go_scan_button"
+        style="@style/button_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_go_to_scan" /-->
+
     <include
         layout="@layout/receiver_status"/>
 

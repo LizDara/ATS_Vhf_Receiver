@@ -120,7 +120,8 @@ public class StationaryDefaultsActivity extends BaseActivity {
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         int frequency = (stationary_reference_frequency_switch.isChecked()) ?
                 (Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) - baseFrequency) : 0;
-        int referenceFrequencyStoreRate = reference_frequency_store_rate_stationary_textView.getText().toString().isEmpty() ? 0 : Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
+        int referenceFrequencyStoreRate = stationary_reference_frequency_switch.isChecked()
+                ? Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString()) : 255;
         byte[] b = new byte[] {(byte) 0x4C, (byte) antennasNumber, (byte) externalDataPush, (byte) scanRate, (byte) scanTimeout,
                 (byte) storeRate, (byte) (frequency / 256), (byte) (frequency % 256), (byte) referenceFrequencyStoreRate,
                 (byte) firstTableNumber, (byte) secondTableNumber, (byte) thirdTableNumber};
@@ -179,15 +180,15 @@ public class StationaryDefaultsActivity extends BaseActivity {
         if (isChecked) {
             reference_frequency_stationary_linearLayout.setEnabled(true);
             int frequency = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY);
-            frequency_reference_stationary_textView.setText(frequency != 0 ? Converters.getFrequency(frequency) : "0");
+            frequency_reference_stationary_textView.setText(frequency != 0 ? Converters.getFrequency(frequency) : getString(R.string.lb_not_set));
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(true);
             int storeRate = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE);
-            reference_frequency_store_rate_stationary_textView.setText(String.valueOf(storeRate));
+            reference_frequency_store_rate_stationary_textView.setText(storeRate == 255 ? getString(R.string.lb_not_set) : String.valueOf(storeRate));
         } else {
             reference_frequency_stationary_linearLayout.setEnabled(false);
             frequency_reference_stationary_textView.setText(R.string.lb_no_reference_frequency);
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(false);
-            reference_frequency_store_rate_stationary_textView.setText("0");
+            reference_frequency_store_rate_stationary_textView.setText(R.string.lb_no_reference_frequency);
         }
     }
 
@@ -220,7 +221,11 @@ public class StationaryDefaultsActivity extends BaseActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
         baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
         range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
-        parameter = ValueCodes.STATIONARY_DEFAULTS;
+        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        if (parameter.isEmpty()) {
+            byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+            downloadData(data);
+        }
         originalData = new HashMap<>();
     }
 
@@ -241,6 +246,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
                     downloadData(packet);
             }
@@ -251,15 +257,19 @@ public class StationaryDefaultsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (checkChanges()) {
-                if (isDataCorrect()) {
-                    parameter = ValueCodes.SAVE;
-                    leServiceConnection.getBluetoothLeService().discovering();
+            if (!existNotSet()) {
+                if (existChanges()) {
+                    if (isDataCorrect()) {
+                        parameter = ValueCodes.SAVE;
+                        leServiceConnection.getBluetoothLeService().discovering();
+                    } else {
+                        Message.showMessage(this, 1);
+                    }
                 } else {
-                    Message.showMessage(this, 1);
+                    finish();
                 }
             } else {
-                finish();
+                Message.showMessage(this, "Complete all fields.");
             }
             return true;
         }
@@ -285,32 +295,41 @@ public class StationaryDefaultsActivity extends BaseActivity {
     private void downloadData(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("6C")) {
             parameter = "";
-            String tables = "";
-            for (int i = 9; i < data.length; i++) {
-                if (data[i] != 0)
-                    tables += Converters.getDecimalValue(data[i]) + ", ";
-            }
-            frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables.substring(0, tables.length() - 2));
-            int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            number_of_antennas_stationary_textView.setText((antennaNumber == 0) ? "None" : String.valueOf(antennaNumber));
-            stationary_external_data_transfer_switch.setChecked(data[2] != 0);
-            scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
-            scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            if (Converters.getHexValue(data[5]).equals("00"))
-                store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
-            else
-                store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
             int frequency = 0;
-            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
-                frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
-                        Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-            //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-            //reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
-
+            if (!Converters.isDefaultEmpty(data)) {
+                String tables = "";
+                for (int i = 9; i < data.length; i++) {
+                    if (data[i] != 0)
+                        tables += Converters.getDecimalValue(data[i]) + ", ";
+                }
+                frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables.substring(0, tables.length() - 2));
+                int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
+                number_of_antennas_stationary_textView.setText((antennaNumber == 0) ? "None" : String.valueOf(antennaNumber));
+                stationary_external_data_transfer_switch.setChecked(data[2] != 0);
+                scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
+                scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
+                if (Converters.getHexValue(data[5]).equals("00"))
+                    store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
+                else
+                    store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
+                if (!Converters.getHexValue(data[6]).equals("FF") && !Converters.getHexValue(data[7]).equals("FF"))
+                    frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
+                            Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
+                //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
+                //reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
+            } else {
+                frequency_table_number_stationary_textView.setText(getString(R.string.lb_not_set));
+                number_of_antennas_stationary_textView.setText(getString(R.string.lb_not_set));
+                stationary_external_data_transfer_switch.setChecked(true);
+                scan_rate_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
+                scan_timeout_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
+                store_rate_minutes_stationary_textView.setText(getString(R.string.lb_not_set));
+                stationary_reference_frequency_switch.setChecked(true);
+            }
             originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
             originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
             originalData.put(ValueCodes.THIRD_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[11])));
-            originalData.put(ValueCodes.ANTENNA_NUMBER, antennaNumber);
+            originalData.put(ValueCodes.ANTENNA_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[1])));
             originalData.put(ValueCodes.SCAN_RATE, Integer.parseInt(Converters.getDecimalValue(data[3])));
             originalData.put(ValueCodes.SCAN_TIMEOUT, Integer.parseInt(Converters.getDecimalValue(data[4])));
             originalData.put(ValueCodes.STORE_RATE, Integer.parseInt(Converters.getDecimalValue(data[5])));
@@ -323,11 +342,25 @@ public class StationaryDefaultsActivity extends BaseActivity {
         }
     }
 
+    private boolean existNotSet() {
+        if (frequency_table_number_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (number_of_antennas_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (scan_rate_seconds_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (scan_timeout_seconds_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (store_rate_minutes_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        return false;
+    }
+
     /**
      * Checks for changes to the default data.
      * @return Returns true, if there are changes.
      */
-    private boolean checkChanges() {
+    private boolean existChanges() {
         String[] tables = frequency_table_number_stationary_textView.getText().toString().split(", ");
         int firstTableNumber = (tables.length > 0) ? Integer.parseInt(tables[0]) : 0;
         int secondTableNumber = (tables.length > 1) ? Integer.parseInt(tables[1]) : 0;

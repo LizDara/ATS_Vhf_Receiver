@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_temperature_frequency_linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="24sp"
+        android:layout_marginBottom="16sp"
+        android:text="@string/lb_frequency"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/frequency_temperature_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp" />
+
+    <TextView
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="24sp"
+        android:layout_marginBottom="16sp"
+        android:text="@string/lb_temperature_coefficients"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        style="@style/body_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="8sp"
+        android:text="@string/lb_coefficient_a"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/coefficient_a_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp" />
+
+    <TextView
+        style="@style/body_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="8sp"
+        android:layout_marginTop="16sp"
+        android:text="@string/lb_coefficient_b"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/coefficient_b_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp" />
+
+    <TextView
+        style="@style/body_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="8sp"
+        android:layout_marginTop="16sp"
+        android:text="@string/lb_constant"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/constant_button"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/save_frequency_button"
+        style="@style/button_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginVertical="16sp"
+        android:text="@string/lb_save_changes" />
+
+</LinearLayout>

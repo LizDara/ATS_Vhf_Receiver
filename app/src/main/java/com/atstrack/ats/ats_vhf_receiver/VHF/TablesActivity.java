@@ -21,6 +21,7 @@ import android.widget.ListView;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -83,6 +84,8 @@ public class TablesActivity extends BaseActivity {
             public void onGattDiscovered() {
                 if (parameter.equals(ValueCodes.TABLES))
                     TransferBleData.readTables(false);
+                else if (parameter.equals(ValueCodes.DETECTION_TYPE))
+                    TransferBleData.readDetectionFilter();
             }
 
             @Override
@@ -90,6 +93,8 @@ public class TablesActivity extends BaseActivity {
                 if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                     downloadData(packet);
+                else if (parameter.equals(ValueCodes.DETECTION_TYPE))
+                    downloadDetectionFilter(packet);
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
@@ -233,8 +238,20 @@ public class TablesActivity extends BaseActivity {
         if (Converters.getHexValue(data[0]).equals("7A")) {
             tableListAdapter = new TableListAdapter(this, data);
             tables_listView.setAdapter(tableListAdapter);
+            parameter = ValueCodes.DETECTION_TYPE;
+            leServiceConnection.getBluetoothLeService().discovering();
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
+        }
+    }
+
+    private void downloadDetectionFilter(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("67")) {
+            parameter = ValueCodes.TABLES;
+            boolean isTemperature = Converters.getHexValue(data[1]).equals("07") && Converters.getHexValue(data[11]).equals("06");
+            tableListAdapter.setTemperature(isTemperature);
+        } else {
+            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
         }
     }
 }

@@ -52,14 +52,14 @@ public class FrequencyListAdapter extends RecyclerView.Adapter<FrequencyListAdap
 
     @NonNull
     @Override
-    public FrequencyListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.device_information, parent, false);
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.frequency_information, parent, false);
         view.setElevation(4);
-        return new FrequencyListAdapter.MyViewHolder(view);
+        return new MyViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FrequencyListAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.frequencyNumber.setText(String.valueOf(frequencies.get(position)));
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(32, 16, 32, 16);

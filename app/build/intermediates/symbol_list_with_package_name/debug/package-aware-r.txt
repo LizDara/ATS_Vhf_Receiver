@@ -1245,11 +1245,15 @@ id code_textView
 id coded_imageView
 id coded_linearLayout
 id coded_radioButton
+id coefficient_a_button
+id coefficient_b_button
+id coefficient_textView
 id collapseActionView
 id complete_test_imageView
 id connect_button
 id connected_imageView
 id connecting_device_linearLayout
+id constant_button
 id constraint
 id content
 id contentPanel
@@ -1275,6 +1279,7 @@ id decelerateAndComplete
 id decor_content_parent
 id decrease_imageView
 id default_activity_button
+id delete_coefficient_imageView
 id delete_file_imageView
 id delete_frequencies_button
 id delete_frequencies_linearLayout
@@ -1333,7 +1338,9 @@ id edit_query
 id edit_receiver_defaults_button
 id edit_table_linearLayout
 id edit_table_textView
+id edit_temperature_frequency_linearLayout
 id eight_button
+id eight_coefficient_button
 id eight_imageView
 id eight_linearLayout
 id end
@@ -1356,6 +1363,7 @@ id first_step_imageView
 id first_step_progressBar
 id first_step_textView
 id five_button
+id five_coefficient_button
 id five_imageView
 id five_linearLayout
 id five_minutes_imageView
@@ -1365,16 +1373,16 @@ id fixed_pulse_rate_linearLayout
 id flip
 id forever
 id four_button
+id four_coefficient_button
 id four_imageView
 id four_linearLayout
 id fragment_container_view_tag
 id frequencies_delete_listView
-id frequencies_linearLayout
 id frequencies_overview_linearLayout
+id frequencies_recyclerView
 id frequencies_table_linearLayout
 id frequencies_table_textView
 id frequency_aerial_textView
-id frequency_edit_linearLayout
 id frequency_linearLayout
 id frequency_manual_textView
 id frequency_number_checkBox
@@ -1389,6 +1397,7 @@ id frequency_table_number_aerial_textView
 id frequency_table_number_stationary_linearLayout
 id frequency_table_number_stationary_textView
 id frequency_tables_textView
+id frequency_temperature_button
 id frequency_textView
 id frost
 id go_button
@@ -1487,6 +1496,7 @@ id neverCompleteToEnd
 id neverCompleteToStart
 id new_file_name_textView
 id nine_button
+id nine_coefficient_button
 id noState
 id no_device_found_linearLayout
 id no_frequencies_linearLayout
@@ -1511,6 +1521,7 @@ id off
 id on
 id onInterceptTouchReturnSwipe
 id one_button
+id one_coefficient_button
 id one_hundred_twenty_minutes_imageView
 id one_hundred_twenty_minutes_linearLayout
 id open_file_button
@@ -1534,6 +1545,7 @@ id period_pulse_rate_textView
 id period_textView
 id play_background_signals_switch
 id plus_imageView
+id plus_minus_button
 id position
 id postLayout
 id pr1_linearLayout
@@ -1586,7 +1598,9 @@ id right_imageView
 id right_side
 id save_changes_button
 id save_changes_input_value_button
+id save_coefficient_button
 id save_digit_button
+id save_frequency_button
 id sawtooth
 id scan_details_linearLayout
 id scan_rate_seconds_aerial_linearLayout
@@ -1630,6 +1644,7 @@ id selected_imageView
 id set_transmitter_type_button
 id set_value_linearLayout
 id seven_button
+id seven_coefficient_button
 id seven_imageView
 id seven_linearLayout
 id sharedValueSet
@@ -1641,6 +1656,7 @@ id showTitle
 id sin
 id single_button
 id six_button
+id six_coefficient_button
 id six_imageView
 id six_linearLayout
 id sixty_minutes_imageView
@@ -1728,6 +1744,7 @@ id third_step_textView
 id thirty_minutes_imageView
 id thirty_minutes_linearLayout
 id three_button
+id three_coefficient_button
 id three_imageView
 id three_linearLayout
 id tilt_textView
@@ -1744,6 +1761,7 @@ id transitionToEnd
 id transitionToStart
 id triangle
 id two_button
+id two_coefficient_button
 id two_imageView
 id two_linearLayout
 id tx_type_textView
@@ -1785,6 +1803,7 @@ id wrap_content_constrained
 id x_left
 id x_right
 id zero_button
+id zero_coefficient_button
 integer abc_config_activityDefaultDur
 integer abc_config_activityShortDur
 integer cancel_button_image_alpha
@@ -1836,6 +1855,7 @@ layout activity_vhf_configuration
 layout activity_vhf_detection_filter
 layout activity_vhf_diagnostics
 layout activity_vhf_edit_defaults
+layout activity_vhf_enter_coefficient
 layout activity_vhf_enter_frequency
 layout activity_vhf_frequencies
 layout activity_vhf_manage_data
@@ -1855,6 +1875,7 @@ layout aerial_scanning
 layout aerial_settings
 layout begin_download
 layout bridge_app
+layout coefficients_number
 layout connecting_device
 layout connecting_test
 layout custom_dialog
@@ -1871,12 +1892,12 @@ layout download_complete
 layout downloading_file
 layout downloading_process
 layout edit_table_scan
+layout edit_temperature_frequency
 layout fragment_audio_options
 layout fragment_detection_filter
 layout fragment_firmware_update
 layout fragment_view_detection_filter
 layout frequencies_overview
-layout frequency_edit
 layout frequency_information
 layout frequency_message
 layout frequency_select_information
@@ -2022,11 +2043,14 @@ string lb_clone_from_other_receiver
 string lb_cloning
 string lb_code
 string lb_coded
+string lb_coefficient_a
+string lb_coefficient_b
 string lb_connect
 string lb_connected
 string lb_connecting_device
 string lb_connecting_message
 string lb_connection_modes
+string lb_constant
 string lb_continue
 string lb_continuous_store
 string lb_convert_data_file
@@ -2065,6 +2089,9 @@ string lb_eiler_coded
 string lb_eiler_special_coded
 string lb_eleventh_table
 string lb_empty_table
+string lb_enter_coefficient_a
+string lb_enter_coefficient_b
+string lb_enter_constant
 string lb_enter_digit_id
 string lb_enter_frequency
 string lb_enter_frequency_digits
@@ -2164,6 +2191,7 @@ string lb_return
 string lb_return_device_screen
 string lb_return_screen
 string lb_running_diagnostics
+string lb_save
 string lb_save_changes
 string lb_saving_targets
 string lb_scan_defaults
@@ -2235,6 +2263,7 @@ string lb_tables_merged
 string lb_tap_frequency
 string lb_target_pulse_rates
 string lb_temperature
+string lb_temperature_coefficients
 string lb_tenth_table
 string lb_third_table
 string lb_tilt

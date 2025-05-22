@@ -22,6 +22,7 @@ public class TableListAdapter extends BaseAdapter {
     private final int baseFrequency;
     private final int range;
     private int[][] frequencies;
+    private boolean isTemperature;
 
     public TableListAdapter(Context context, byte[] tables) {
         this.context = context;
@@ -31,6 +32,10 @@ public class TableListAdapter extends BaseAdapter {
 
         baseFrequency = Integer.parseInt(Converters.getDecimalValue(tables[13]));
         range = Integer.parseInt(Converters.getDecimalValue(tables[14]));
+    }
+
+    public void setTemperature(boolean temperature) {
+        isTemperature = temperature;
     }
 
     public void setFrequenciesFile(int[][] frequencies) {
@@ -75,6 +80,7 @@ public class TableListAdapter extends BaseAdapter {
             intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
             intent.putExtra(ValueCodes.RANGE, range);
             intent.putExtra(ValueCodes.IS_FILE, frequencies[position] != null);
+            intent.putExtra(ValueCodes.IS_TEMPERATURE, isTemperature);
             if (frequencies[position] != null)
                 intent.putExtra(ValueCodes.FREQUENCIES, frequencies[position]);
             context.startActivity(intent);

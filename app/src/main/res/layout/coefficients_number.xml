@@ -22,7 +22,7 @@
             android:text="+ / -" />
 
         <Button
-            android:id="@+id/one_button"
+            android:id="@+id/one_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
             android:text="1" />
 
         <Button
-            android:id="@+id/two_button"
+            android:id="@+id/two_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             android:text="2" />
 
         <Button
-            android:id="@+id/three_button"
+            android:id="@+id/three_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,15 +57,16 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/four_button"
+            android:id="@+id/four_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8sp"
             android:layout_weight="1"
             android:text="4" />
 
         <Button
-            android:id="@+id/five_button"
+            android:id="@+id/five_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +75,7 @@
             android:text="5" />
 
         <Button
-            android:id="@+id/six_button"
+            android:id="@+id/six_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +84,7 @@
             android:text="6" />
 
         <Button
-            android:id="@+id/seven_button"
+            android:id="@+id/seven_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,15 +100,16 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/eight_button"
+            android:id="@+id/eight_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8sp"
             android:layout_weight="1"
             android:text="8" />
 
         <Button
-            android:id="@+id/nine_button"
+            android:id="@+id/nine_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -116,7 +118,7 @@
             android:text="9" />
 
         <Button
-            android:id="@+id/zero_button"
+            android:id="@+id/zero_coefficient_button"
             style="@style/button_number_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -125,7 +127,7 @@
             android:text="0" />
 
         <ImageView
-            android:id="@+id/delete_imageView"
+            android:id="@+id/delete_coefficient_imageView"
             style="@style/button_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

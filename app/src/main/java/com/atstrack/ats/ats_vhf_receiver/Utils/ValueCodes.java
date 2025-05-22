@@ -128,5 +128,5 @@ public class ValueCodes {
     public static final int DOWNLOAD_PERIOD = 280;
     public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
-    public static final int CONNECT_TIMEOUT = 3000;
+    public static final int CONNECT_TIMEOUT = 3500;
 }

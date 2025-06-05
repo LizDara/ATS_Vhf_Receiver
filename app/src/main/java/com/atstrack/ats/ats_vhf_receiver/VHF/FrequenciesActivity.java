@@ -37,6 +37,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class FrequenciesActivity extends BaseActivity implements OnAdapterClickListener {
@@ -82,7 +84,24 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     private int range;
     private boolean isFile;
     private boolean isTemperature;
+    private boolean saveCoefficients;
     private int temperaturePosition;
+    private Map<String, String> coefficients;
+
+    private GattUpdateReceiver secondGattUpdateReceiver;
+    private final ReceiverCallback secondReceiverCallback = new ReceiverCallback() {
+        @Override
+        public void onGattDisconnected() {}
+
+        @Override
+        public void onGattDiscovered() {
+            if (secondParameter.equals(ValueCodes.FREQUENCIES))
+                sendIndex();
+        }
+
+        @Override
+        public void onGattDataAvailable(byte[] packet) {}
+    };
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -115,6 +134,19 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 }
             });
 
+    private void readCoefficients() {
+        secondParameter = ValueCodes.FREQUENCIES;
+        new Handler().postDelayed(() -> {
+            leServiceConnection.getBluetoothLeService().discoveringSecond();
+        }, ValueCodes.WAITING_PERIOD);
+    }
+
+    private void sendIndex() {
+        byte[] b = new byte[] {(byte) 0x7D, (byte) (temperaturePosition + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        boolean result = TransferBleData.writeFrequencies(number, b);
+        if (result) secondParameter = "";
+    }
+
     private void addTemperatureFrequency() {
         parameter = "";
         int frequency = Integer.parseInt(frequency_temperature_button.getText().toString());
@@ -128,14 +160,15 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         /*formatA += 8;
         formatB += 5;
         formatC += 2;*/
-        byte[] b = new byte[] { 0x7D, (byte) number, (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
+        byte[] b = new byte[] { 0x7D, (byte) (temperaturePosition == -1 ? (frequencyListAdapter.getItemCount() + 1) : (temperaturePosition + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
                 (byte) (coefficientA / 256), (byte) (coefficientA % 256), formatB, (byte) (coefficientB / 256), (byte) (coefficientB % 256), formatC,
                 (byte) (constant / 256), (byte) (constant % 256), 0, 0, 0};
         boolean result = TransferBleData.writeFrequencies(number, b);
+        Log.i(TAG, "REsult " + result + ": " + Converters.getHexValue(b));
         if (result) {
+            saveCoefficients = true;
             if (temperaturePosition != -1) {
-                if (frequencyListAdapter.getFrequency(temperaturePosition) != frequency)
-                    changeSelectedFrequency(frequency, temperaturePosition);
+                setVisibility("overview");
             } else {
                 addFrequency(frequency);
             }
@@ -144,27 +177,25 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     private void setTable() {
         parameter = "";
-        byte[] b;
+        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        int YY = currentDate.get(Calendar.YEAR);
+        int MM = currentDate.get(Calendar.MONTH);
+        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
+        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
+        int mm = currentDate.get(Calendar.MINUTE);
+        int ss = currentDate.get(Calendar.SECOND);
+        byte[] b = new byte[isTemperature ? 10 : 244];
+        b[1] = (byte) YY;
+        b[2] = (byte) MM;
+        b[3] = (byte) DD;
+        b[4] = (byte) hh;
+        b[5] = (byte) mm;
+        b[6] = (byte) ss;
+        b[7] = (byte) number;//frequency number table
+        b[8] = (byte) frequencyListAdapter.getItemCount();//Number of frequencies in the table
+        b[9] = (byte) (baseFrequency / 1000);//base frequency
         if (!isTemperature) {
-            Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-            int YY = currentDate.get(Calendar.YEAR);
-            int MM = currentDate.get(Calendar.MONTH);
-            int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-            int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-            int mm = currentDate.get(Calendar.MINUTE);
-            int ss = currentDate.get(Calendar.SECOND);
-
-            b = new byte[244];
             b[0] = (byte) 0x7E;
-            b[1] = (byte) YY;
-            b[2] = (byte) MM;
-            b[3] = (byte) DD;
-            b[4] = (byte) hh;
-            b[5] = (byte) mm;
-            b[6] = (byte) ss;
-            b[7] = (byte) number;//frequency number table
-            b[8] = (byte) frequencyListAdapter.getItemCount();//Number of frequencies in the table
-            b[9] = (byte) (baseFrequency / 1000);//base frequency
             int index = 10;
             int i = 0;
             while (i < frequencyListAdapter.getItemCount()) {
@@ -174,8 +205,9 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 index += 2;
             }
         } else {
-            b = new byte[] { (byte) 0x7F };
+            b[0] = (byte) 0x7F;
         }
+        Log.i(TAG, Converters.getHexValue(b));
         boolean result = TransferBleData.writeFrequencies(number, b);
         if (result)
             Message.showMessage(this, 0);
@@ -262,8 +294,15 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     @OnClick(R.id.save_frequency_button)
     public void onClickSaveFrequency(View v) {
-        parameter = ValueCodes.ADD_FREQUENCY;
-        leServiceConnection.getBluetoothLeService().discovering();
+        if (temperaturePosition != -1) {
+            if (existChangesInCoefficients()) {
+                parameter = ValueCodes.ADD_FREQUENCY;
+                leServiceConnection.getBluetoothLeService().discovering();
+            }
+        } else {
+            parameter = ValueCodes.ADD_FREQUENCY;
+            leServiceConnection.getBluetoothLeService().discovering();
+        }
     }
 
     @Override
@@ -282,6 +321,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
         isFile = getIntent().getBooleanExtra(ValueCodes.IS_FILE, false);
         isTemperature = getIntent().getBooleanExtra(ValueCodes.IS_TEMPERATURE, false);
+        saveCoefficients = !isTemperature;
         if (isFile) { // Ask for the frequencies obtained from a file
             setVisibility("overview");
             originalTable = getIntent().getIntArrayExtra(ValueCodes.FREQUENCIES);
@@ -324,6 +364,9 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                     case ValueCodes.TABLE: // Get the frequencies from a table
                         TransferBleData.readFrequencies(number);
                         break;
+                    case ValueCodes.FREQUENCY_COEFFICIENTS:
+                        readCoefficients();
+                        break;
                     case ValueCodes.ADD_FREQUENCY: // Add frequency with its coefficients
                         addTemperatureFrequency();
                         break;
@@ -335,12 +378,16 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
                 if (Converters.getHexValue(packet[0]).equals("88")) return;
                 if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
                     downloadData(packet);
+                else if (parameter.equals(ValueCodes.FREQUENCY_COEFFICIENTS))
+                    downloadCoefficients(packet);
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        secondGattUpdateReceiver = new GattUpdateReceiver(secondReceiverCallback, false);
     }
 
     @Override
@@ -348,7 +395,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (frequencies_overview_linearLayout.getVisibility() == View.VISIBLE
                     || no_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
-                if (isFile || existChanges()) {
+                if ((isFile || existChanges()) && saveCoefficients) {
                     parameter = ValueCodes.SAVE;
                     leServiceConnection.getBluetoothLeService().discovering();
                 } else {
@@ -372,23 +419,21 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     protected void onResume() {
         super.onResume();
         registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        unregisterReceiver(secondGattUpdateReceiver.mGattUpdateReceiver);
     }
 
     @Override
     public void onAdapterItemClickListener(int position) {
-        setVisibility("temperature");
-        title_toolbar.setText(R.string.lb_edit_frequency);
-        frequency_temperature_button.setText(String.valueOf(frequencyListAdapter.getFrequency(position)));
-        coefficient_a_button.setText("0");
-        coefficient_b_button.setText("0");
-        constant_button.setText("0");
         temperaturePosition = position;
+        parameter = ValueCodes.FREQUENCY_COEFFICIENTS;
+        leServiceConnection.getBluetoothLeService().discovering();
     }
 
     /**
@@ -454,6 +499,35 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x01 ...");
+        }
+    }
+
+    private void downloadCoefficients(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("7D")) {
+            parameter = "";
+            title_toolbar.setText(R.string.lb_edit_frequency);
+            frequency_temperature_button.setText(String.valueOf(frequencyListAdapter.getFrequency(temperaturePosition)));
+
+            if (!Converters.areCoefficientsEmpty(data)) {
+                int coefficientA = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+                int coefficientB = (Integer.parseInt(Converters.getDecimalValue(data[8])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[9]));
+                int constant = (Integer.parseInt(Converters.getDecimalValue(data[11])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[12]));
+                coefficient_a_button.setText(Converters.getHexValue(data[4]).equals("80") ? "-" + coefficientA : String.valueOf(coefficientA));
+                coefficient_b_button.setText(Converters.getHexValue(data[7]).equals("80") ? "-" + coefficientB : String.valueOf(coefficientB));
+                constant_button.setText(Converters.getHexValue(data[10]).equals("80") ? "-" + constant : String.valueOf(constant));
+            } else {
+                coefficient_a_button.setText("0");
+                coefficient_b_button.setText("0");
+                constant_button.setText("0");
+            }
+            setVisibility("temperature");
+
+            coefficients = new HashMap<>();
+            coefficients.put(ValueCodes.COEFFICIENT_A, coefficient_a_button.getText().toString());
+            coefficients.put(ValueCodes.COEFFICIENT_B, coefficient_b_button.getText().toString());
+            coefficients.put(ValueCodes.COEFFICIENT_C, constant_button.getText().toString());
+        } else {
+            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7D ...");
         }
     }
 
@@ -528,5 +602,11 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 return true;
         }
         return false;
+    }
+
+    private boolean existChangesInCoefficients() {
+        return !coefficients.get(ValueCodes.COEFFICIENT_A).equals(coefficient_a_button.getText().toString())
+                || !coefficients.get(ValueCodes.COEFFICIENT_B).equals(coefficient_b_button.getText().toString())
+                || !coefficients.get(ValueCodes.COEFFICIENT_C).equals(constant_button.getText().toString());
     }
 }

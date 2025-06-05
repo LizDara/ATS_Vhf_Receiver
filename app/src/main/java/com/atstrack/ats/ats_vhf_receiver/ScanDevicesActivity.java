@@ -284,7 +284,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mConnected) {
-            Log.i(TAG, "ON RESUME " + mConnected);
             mRegisterReceiver();
         } else if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
             scanLeDevice(true);
@@ -295,7 +294,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
     protected void onPause() {
         if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
             if (mConnected) {
-                Log.i(TAG, "ON PAUSE: UNREGISTER RECEIVER");
                 mUnregisterReceiver();
             } else if (leServiceConnection != null && !leServiceConnection.existConnection()) {
                 scanLeDevice(false);
@@ -307,7 +305,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "ON DESTROY");
     }
 
     @Override

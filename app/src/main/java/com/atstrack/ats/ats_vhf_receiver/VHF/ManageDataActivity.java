@@ -174,7 +174,6 @@ public class ManageDataActivity extends BaseActivity {
     private void setResponseErase() {
         secondParameter = ValueCodes.DELETE;
         TransferBleData.downloadResponse();
-
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
@@ -218,7 +217,6 @@ public class ManageDataActivity extends BaseActivity {
 
     @OnClick(R.id.cancel_download_button)
     public void onClickCancelDownload(View v) {
-        TransferBleData.disableNotificationLog();
         downloading = false;
         setVisibility("begin");
         parameter = "";

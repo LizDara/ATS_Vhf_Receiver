@@ -38,7 +38,7 @@ public class MobileDefaultsActivity extends BaseActivity {
 
     private final static String TAG = MobileDefaultsActivity.class.getSimpleName();
 
-    Map<String, Object> originalData;
+    private Map<String, Object> originalData;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {

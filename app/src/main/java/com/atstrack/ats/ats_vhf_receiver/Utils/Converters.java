@@ -217,6 +217,17 @@ public class Converters {
         return isEmpty;
     }
 
+    public static boolean areCoefficientsEmpty(byte[] data) {
+        boolean isEmpty = true;
+        for (int i = 4; i < data.length; i++) {
+            if (data[i] != (byte) 0xFF) {
+                isEmpty = false;
+                break;
+            }
+        }
+        return isEmpty;
+    }
+
     /**
      * Processes the data when the download is complete.
      * @param packet The raw data.

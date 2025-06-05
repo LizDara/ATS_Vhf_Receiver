@@ -54,11 +54,6 @@ public class TransferBleData {
                 AtsVhfReceiverUuids.UUID_SERVICE_SCREEN, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG, true);
     }
 
-    public static void disableNotificationLog() {
-        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(
-                AtsVhfReceiverUuids.UUID_SERVICE_SCREEN, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SEND_LOG, false);
-    }
-
     public static boolean writeDetectionFilter(byte[] data) {
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsVhfReceiverUuids.UUID_SERVICE_SCAN, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TX_TYPE, data);

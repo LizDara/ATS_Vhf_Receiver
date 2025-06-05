@@ -8,6 +8,7 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -57,7 +58,7 @@ public class DetectionFilterActivity extends BaseActivity {
 
     private final static String TAG = DetectionFilterActivity.class.getSimpleName();
 
-    Map<String, Object> originalData;
+    private Map<String, Object> originalData;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -127,6 +128,7 @@ public class DetectionFilterActivity extends BaseActivity {
                 break;
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
+        Log.i(TAG, Converters.getHexValue(b));
         if (result) {
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
@@ -295,6 +297,7 @@ public class DetectionFilterActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
+        Log.i(TAG, Converters.getHexValue(data));
         if (Converters.getHexValue(data[0]).equals("67")) {
             parameter = "";
             int pulseRateType = Integer.parseInt(Converters.getDecimalValue(data[1]));
@@ -309,6 +312,7 @@ public class DetectionFilterActivity extends BaseActivity {
             int pulseRateTolerance4 = 0;
             int maxPulseRate = 0;
             int minPulseRate = 0;
+            int optionalData = 0;
             switch (Converters.getHexValue(data[1])) {
                 case "09":
                     setVisibility("Coded");
@@ -334,12 +338,13 @@ public class DetectionFilterActivity extends BaseActivity {
                 case "07":
                     setVisibility("Variable");
 
+                    maxPulseRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
+                    minPulseRate = Integer.parseInt(Converters.getDecimalValue(data[5]));
+                    optionalData = Integer.parseInt(Converters.getDecimalValue(data[11]));
                     matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    maxPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[3])));
-                    minPulseRate = (Integer.parseInt(Converters.getDecimalValue(data[5])));
                     max_pulse_rate_textView.setText(String.valueOf(maxPulseRate));
                     min_pulse_rate_textView.setText(String.valueOf(minPulseRate));
-                    optional_data_textView.setText(Converters.getDecimalValue(data[11]).equals("06") ? R.string.lb_temperature : R.string.lb_none);
+                    optional_data_textView.setText(Converters.getHexValue(data[11]).equals("06") ? R.string.lb_temperature : R.string.lb_none);
                     break;
             }
             originalData.put(ValueCodes.PULSE_RATE_TYPE, pulseRateType);
@@ -354,6 +359,7 @@ public class DetectionFilterActivity extends BaseActivity {
             originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_4, pulseRateTolerance4);
             originalData.put(ValueCodes.MAX_PULSE_RATE, maxPulseRate);
             originalData.put(ValueCodes.MIN_PULSE_RATE, minPulseRate);
+            originalData.put(ValueCodes.DATA_CALCULATION, optionalData);
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
         }
@@ -377,6 +383,7 @@ public class DetectionFilterActivity extends BaseActivity {
         int pulseRateTolerance4 = 0;
         int maxPulseRate = 0;
         int minPulseRate = 0;
+        int optionalData = 0;
         switch (pulse_rate_type_textView.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
                 pulseRateType = (byte) 0x08;
@@ -389,6 +396,7 @@ public class DetectionFilterActivity extends BaseActivity {
                 pulseRateType = (byte) 0x07;
                 maxPulseRate = Integer.parseInt(max_pulse_rate_textView.getText().toString());
                 minPulseRate = Integer.parseInt(min_pulse_rate_textView.getText().toString());
+                optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_temperature)) ? 6 : 0;
                 break;
             case "Coded":
                 pulseRateType = (byte) 0x09;
@@ -400,7 +408,7 @@ public class DetectionFilterActivity extends BaseActivity {
                 || (int) originalData.get(ValueCodes.PULSE_RATE_4) != pulseRate4 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_1) != pulseRateTolerance1
                 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_2) != pulseRateTolerance2 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_3) != pulseRateTolerance3
                 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_4) != pulseRateTolerance4 || (int) originalData.get(ValueCodes.MAX_PULSE_RATE) != maxPulseRate
-                || (int) originalData.get(ValueCodes.MIN_PULSE_RATE) != minPulseRate;
+                || (int) originalData.get(ValueCodes.MIN_PULSE_RATE) != minPulseRate || (int) originalData.get(ValueCodes.DATA_CALCULATION) != optionalData;
     }
 
     private boolean isDataCorrect() {

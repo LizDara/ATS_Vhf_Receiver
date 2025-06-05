@@ -92,6 +92,7 @@ public class ValueCodes {
     public static final String AUDIO = "audio";
     public static final String BACKGROUND = "background";
     public static final String DETECTION_TYPE = "detectionType";
+    public static final String FREQUENCY_COEFFICIENTS = "frequencyCoefficients";
 
     //Original Data
     public static final String TABLE_NUMBER = "TableNumber";
@@ -120,6 +121,10 @@ public class ValueCodes {
     public static final String MAX_PULSE_RATE = "MaxPulseRate";
     public static final String MIN_PULSE_RATE = "MinPulseRate";
     public static final String DATA_CALCULATION = "DataCalculation";
+    public static final String COEFFICIENT_A = "coefficientA";
+    public static final String COEFFICIENT_B = "coefficientB";
+    public static final String COEFFICIENT_C = "coefficientC";
+    public static final String COEFFICIENT_D = "coefficientD";
 
     //Periods
     public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;

@@ -204,7 +204,6 @@ public class ScanningActivity extends BaseActivity {
             tablesData = data;
             areTablesEmpty = data[1] == 0 && data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0
                     && data[7] == 0 && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0 && data[12] == 0;
-            parameter = ValueCodes.DETECTION_TYPE;
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
         }
@@ -224,7 +223,6 @@ public class ScanningActivity extends BaseActivity {
                 Intent intent = new Intent(this, MobileScanActivity.class);
                 intent.putExtra(ValueCodes.VALUE, data);
                 startActivity(intent);
-                parameter = ValueCodes.DETECTION_TYPE;
             }
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6D ...");
@@ -245,7 +243,6 @@ public class ScanningActivity extends BaseActivity {
                 Intent intent = new Intent(this, StationaryScanActivity.class);
                 intent.putExtra(ValueCodes.VALUE, data);
                 startActivity(intent);
-                parameter = ValueCodes.DETECTION_TYPE;
             }
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");

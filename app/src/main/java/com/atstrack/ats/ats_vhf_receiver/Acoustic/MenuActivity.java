@@ -63,12 +63,6 @@ public class MenuActivity extends BaseActivity {
 
     @OnClick(R.id.disconnect_button)
     public void onClickDisconnect(View v) {
-        TransferBleData.disableNotificationLog();
-        try {
-            Thread.sleep(ValueCodes.WAITING_PERIOD);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         leServiceConnection.getBluetoothLeService().disconnect();
     }
 

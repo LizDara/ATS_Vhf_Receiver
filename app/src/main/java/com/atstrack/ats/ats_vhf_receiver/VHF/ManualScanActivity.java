@@ -260,6 +260,8 @@ public class ManualScanActivity extends ScanBaseActivity {
         if (isScanning) { // The device is already scanning
             parameter = ValueCodes.CONTINUE_LOG;
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
+            manual_gps_switch.setChecked((Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1);
+            if (manual_gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
             scanState(data);
             setVisibility("scanning");
         } else { // Gets manual defaults data

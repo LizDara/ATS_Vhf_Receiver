@@ -61,7 +61,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
 
     private final static String TAG = StationaryDefaultsActivity.class.getSimpleName();
 
-    Map<String, Object> originalData;
+    private Map<String, Object> originalData;
     private int baseFrequency;
     private int range;
 

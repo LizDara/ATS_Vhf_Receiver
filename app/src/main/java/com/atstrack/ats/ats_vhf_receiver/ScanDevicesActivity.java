@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +40,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ManualScanActivity;
@@ -45,6 +48,7 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryScanActivity;
 
+import java.security.Permission;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -523,8 +527,13 @@ public class ScanDevicesActivity extends AppCompatActivity {
     }
 
     private void mRegisterReceiver() {
-        registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-        registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+            registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
+        } else {
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+            registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
+        }
     }
 
     private void mUnregisterReceiver() {

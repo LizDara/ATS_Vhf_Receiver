@@ -1,18 +1,20 @@
 {
-  "version": 2,
+  "version": 3,
   "artifactType": {
     "type": "PROCESSED_RES",
     "kind": "Directory"
   },
   "applicationId": "com.atstrack.ats.ats_vhf_receiver",
-  "variantName": "processDebugResources",
+  "variantName": "debug",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
+      "attributes": [],
       "versionCode": 10001,
       "versionName": "1.0.1.debug",
       "outputFile": "resources-debug.ap_"
     }
-  ]
+  ],
+  "elementType": "File"
 }

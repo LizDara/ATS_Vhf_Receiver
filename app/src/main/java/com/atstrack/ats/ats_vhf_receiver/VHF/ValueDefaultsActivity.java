@@ -4,6 +4,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -227,6 +228,7 @@ public class ValueDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                if (Converters.getHexValue(packet[0]).equals("88")) return;
                 switch (type) {
                     case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
                     case ValueCodes.TABLES_NUMBER_CODE:
@@ -272,7 +274,10 @@ public class ValueDefaultsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override

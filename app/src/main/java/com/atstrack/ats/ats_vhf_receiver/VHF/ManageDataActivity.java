@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -92,6 +93,8 @@ public class ManageDataActivity extends BaseActivity {
     TextView third_step_textView;
     @BindView(R.id.third_step_progressBar)
     ProgressBar third_step_progressBar;
+    @BindView(R.id.download_percent_textView)
+    TextView download_percent_textView;
 
     private final static String TAG = ManageDataActivity.class.getSimpleName();
 
@@ -109,6 +112,7 @@ public class ManageDataActivity extends BaseActivity {
     private boolean error;
     private boolean downloading;
     private ArrayList<byte[]> pagePackets;
+    private int downloadPercent;
 
     private GattUpdateReceiver secondGattUpdateReceiver;
     private final ReceiverCallback secondReceiverCallback = new ReceiverCallback() {
@@ -314,8 +318,13 @@ public class ManageDataActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-        registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
+        } else {
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
+        }
     }
 
     @Override
@@ -556,6 +565,8 @@ public class ManageDataActivity extends BaseActivity {
             Message.showMessage(this, "Message", "No data to download.");
             parameter = "";
         } else {
+            download_percent_textView.setVisibility(View.VISIBLE);
+            download_percent_textView.setText(" - 0%");
             downloading = true;
             initDownloading();
             setVisibility("downloading");
@@ -605,6 +616,8 @@ public class ManageDataActivity extends BaseActivity {
                                             packetNumber++;
                                         }
                                     }
+                                    int percent = ((int) (((float) pageNumber / (float) finalPageNumber) * 100));
+                                    download_percent_textView.setText(" - " + percent + "%");
                                     secondParameter = ValueCodes.PAGE_OK;
                                 } else {
                                     Log.i(TAG, "No se encontraron los 9 paquetes");

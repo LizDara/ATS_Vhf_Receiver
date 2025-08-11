@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -257,6 +258,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         int index = Integer.parseInt(table_index_aerial_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x5C, (byte) (index / 256), (byte) (index % 256)};
         boolean result = TransferBleData.writeScanning(b);
+        Log.i(TAG, Converters.getHexValue(b));
         if (result) {
             secondParameter = "";
             manageMessage(R.string.lb_frequency_deleted);
@@ -269,7 +271,11 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void setMergeTable() {
         byte[] b = new byte[]{(byte) 0x8A, (byte) tableMergeListAdapter.getTableNumber()};
         boolean result = TransferBleData.writeScanning(b);
-        if (result) manageMessage(R.string.lb_tables_merged);
+        if (result) {
+            isHold = false;
+            removeHold();
+            manageMessage(R.string.lb_tables_merged);
+        }
     }
 
     private void setDecreaseOrIncrease(boolean isDecrease) {
@@ -534,7 +540,7 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
+                Log.i(TAG, parameter +": "+Converters.getHexValue(packet));
                 switch (parameter) {
                     case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
                         downloadData(packet);
@@ -631,8 +637,13 @@ public class MobileScanActivity extends ScanBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-        registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeThirdGattUpdateIntentFilter());
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeThirdGattUpdateIntentFilter(), 2);
+        } else {
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeThirdGattUpdateIntentFilter());
+        }
     }
 
     private void setVisibility(String value) {

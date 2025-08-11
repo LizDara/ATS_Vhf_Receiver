@@ -152,8 +152,8 @@
     <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
     <string name="lb_delete_frequency_scan">Delete Current Frequency From Table</string>
     <string name="lb_merge_table_scan">Merge Table Into Table</string>
-    <string name="lb_merge_tables">Merge Tables</string>
-    <string name="lb_select_table_merge">Select tables to merge into scan table</string>
+    <string name="lb_merge_tables">Merge Table</string>
+    <string name="lb_select_table_merge">Select table to merge into scan table</string>
     <string name="lb_frequency_deleted">Frequency Deleted</string>
     <string name="lb_tables_merged">Table Merged</string>
 

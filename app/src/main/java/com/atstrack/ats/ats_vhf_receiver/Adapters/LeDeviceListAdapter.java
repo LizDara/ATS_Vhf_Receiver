@@ -54,6 +54,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     public void addDevice(BluetoothDevice device, byte[] scanRecord) {
         if(device.getName() != null) {
             if(!mLeDevices.contains(device)) {
+                Log.i("LeDeviceListAdapter", "Device: " + device.getName());
                 if (device.getName().contains(deviceType)) { // filter only ATS device
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
@@ -132,7 +133,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             holder.device_type_imageView.setBackgroundResource(Converters.getDeviceType(device, true));
             if (device.contains("vr")) {
                 String detectionFilter = Converters.getDetectionFilter(device.substring(15, 16));
-                String status = Converters.getStatusVhfReceiver(mScanRecords.get(position));
+                String status = Converters.getStatusVhfReceiver(device);
                 int percent = Converters.getPercentBatteryVhfReceiver(mScanRecords.get(position));
                 int baseFrequency = Integer.parseInt(device.substring(12, 15)) * 1000;
                 int frequencyRange = ((Integer.parseInt(device.substring(17)) + (baseFrequency / 1000)) * 1000) - 1;

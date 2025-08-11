@@ -4,6 +4,8 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,6 +27,8 @@ public class EnterCoefficientActivity extends AppCompatActivity {
     TextView coefficient_textView;
     @BindView(R.id.save_coefficient_button)
     Button save_coefficient_button;
+
+    private final static String TAG = EnterCoefficientActivity.class.getSimpleName();
 
     private int position;
 
@@ -106,5 +110,19 @@ public class EnterCoefficientActivity extends AppCompatActivity {
             coefficient_textView.setText(R.string.lb_enter_constant);
             position = -4;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
+            setResult(ValueCodes.CANCELLED);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "ON BACK PRESSED");
     }
 }

@@ -1313,6 +1313,7 @@ int id disconnect_message 0x7f0a00d6
 int id dismiss_textView 0x7f0a00d7
 int id download_complete_linearLayout 0x7f0a00d8
 int id download_data_button 0x7f0a00d9
+int id download_percent_textView 0x7f0a02c4
 int id downloading_file_linearLayout 0x7f0a00da
 int id downloading_file_progressBar 0x7f0a00db
 int id dragAnticlockwise 0x7f0a00dc

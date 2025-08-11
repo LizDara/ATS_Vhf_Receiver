@@ -1314,6 +1314,7 @@ id disconnect_message
 id dismiss_textView
 id download_complete_linearLayout
 id download_data_button
+id download_percent_textView
 id downloading_file_linearLayout
 id downloading_file_progressBar
 id dragAnticlockwise

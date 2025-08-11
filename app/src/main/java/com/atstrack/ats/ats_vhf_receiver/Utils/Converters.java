@@ -142,25 +142,22 @@ public class Converters {
 
     /**
      * Gets the status of the devices found.
-     * @param scanRecord The content of the advertisement record offered by the remote device.
+     * @param deviceName The content of the advertisement record offered by the remote device.
      * @return Return the device status.
      */
-    public static String getStatusVhfReceiver(byte[] scanRecord) {
-        int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
-        String status = Converters.getHexValue(scanRecord[firstElement + 6]);
+    public static String getStatusVhfReceiver(String deviceName) {
+        String status = deviceName.substring(16, 17);
         switch (status) {
-            case "00":
+            case "0":
                 status = " Not scanning";
                 break;
-            case "82":
-            case "81":
-            case "80":
+            case "2":
                 status = " Scanning, mobile";
                 break;
-            case "83":
+            case "3":
                 status = " Scanning, stationary";
                 break;
-            case "86":
+            case "6":
                 status = " Scanning, manual";
                 break;
             default:

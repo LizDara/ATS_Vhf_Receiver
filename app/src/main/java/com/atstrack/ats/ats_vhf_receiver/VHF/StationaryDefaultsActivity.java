@@ -10,7 +10,9 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -137,6 +139,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLES_NUMBER_CODE);
+        Log.i(TAG, "First table: "+(int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER));
         intent.putExtra(ValueCodes.FIRST_TABLE_NUMBER, (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER));
         intent.putExtra(ValueCodes.SECOND_TABLE_NUMBER, (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER));
         intent.putExtra(ValueCodes.THIRD_TABLE_NUMBER, (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER));
@@ -222,11 +225,11 @@ public class StationaryDefaultsActivity extends BaseActivity {
         baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
         range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        originalData = new HashMap<>();
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
-        originalData = new HashMap<>();
     }
 
     private void initializeCallback() {
@@ -279,7 +282,10 @@ public class StationaryDefaultsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override
@@ -324,9 +330,9 @@ public class StationaryDefaultsActivity extends BaseActivity {
                 scan_rate_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
                 scan_timeout_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
                 store_rate_minutes_stationary_textView.setText(getString(R.string.lb_not_set));
-                stationary_reference_frequency_switch.setChecked(true);
             }
             originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
+            Log.i(TAG, "First put: " + Integer.parseInt(Converters.getDecimalValue(data[9])));
             originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
             originalData.put(ValueCodes.THIRD_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[11])));
             originalData.put(ValueCodes.ANTENNA_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[1])));

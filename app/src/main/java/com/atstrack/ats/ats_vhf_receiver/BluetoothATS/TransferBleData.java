@@ -110,6 +110,12 @@ public class TransferBleData {
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(AtsVhfReceiverUuids.UUID_SERVICE_SCAN, characteristic, data);
     }
 
+    public static boolean writeGps(boolean gpsOn) {
+        byte[] data = new byte[] {gpsOn ? (byte) 0x92 : (byte) 0x91};
+        return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
+                AtsVhfReceiverUuids.UUID_SERVICE_SCAN, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_GPS, data);
+    }
+
     /**
      * Writes a value for add one to the current frequency.
      */

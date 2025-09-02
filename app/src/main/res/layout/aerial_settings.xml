@@ -92,37 +92,8 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16sp">
-
-        <TextView
-            style="@style/body_small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/lb_gps"
-            android:textColor="@color/limed_spruce" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/aerial_gps_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:thumb="@drawable/thumb_switch"
-            app:track="@drawable/track_switch" />
-
-    </LinearLayout>
+    <include
+        layout="@layout/gps_option"/>
 
     <View
         android:layout_width="match_parent"

@@ -112,7 +112,6 @@ public class ManageDataActivity extends BaseActivity {
     private boolean error;
     private boolean downloading;
     private ArrayList<byte[]> pagePackets;
-    private int downloadPercent;
 
     private GattUpdateReceiver secondGattUpdateReceiver;
     private final ReceiverCallback secondReceiverCallback = new ReceiverCallback() {
@@ -590,7 +589,10 @@ public class ManageDataActivity extends BaseActivity {
      */
     private void downloadData(byte[] packet) {
         if (packet.length == 4 && downloading) {
-            checkPackets();
+            loadProcessing();
+            new Handler().postDelayed(() -> {
+                checkPackets();
+            }, ValueCodes.DOWNLOAD_PERIOD);
         } else if (downloading) {
             if (pagePackets.isEmpty()) {
                 receiveHandler.postDelayed(() -> {
@@ -643,7 +645,6 @@ public class ManageDataActivity extends BaseActivity {
 
     private void checkPackets() {
         parameter = "";
-        loadProcessing();
 
         for (byte[] packet : packets) {
             byte[] newPacket;
@@ -668,14 +669,16 @@ public class ManageDataActivity extends BaseActivity {
             snapshotArray.add(rawDataCollector);
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
-            String processData = Converters.readPacket(rawDataCollector.getSnapshot(), baseFrequency);
+            String processData = Converters.getPackageProcessed(rawDataCollector.getSnapshot(), baseFrequency);
             byte[] data = Converters.convertToUTF8(processData);
             Snapshots processDataCollector = new Snapshots(data.length);
             processDataCollector.processSnapshot(data);
             snapshotArray.add(processDataCollector);
 
             loadPreparing();
-            saveFiles();
+            new Handler().postDelayed(() -> {
+                saveFiles();
+            }, ValueCodes.DOWNLOAD_PERIOD);
         }
     }
 

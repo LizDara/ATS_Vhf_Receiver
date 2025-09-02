@@ -44,12 +44,16 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-hdpi\\vhf_receiver.png"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_manage_data.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_manage_data.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_disconnected.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\disconnected.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_manage_data.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_manage_data.xml"
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_gps_option.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\gps_option.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_rectangle.xml.flat",
@@ -188,12 +192,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_clone.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_clone.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_primary.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_primary.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_clone.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_clone.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xhdpi_bluetooth_tag.png.flat",
@@ -252,12 +256,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\deleting_data_receiver.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_details.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_details.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_audio.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_audio.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_details.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_details.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_number.xml.flat",
@@ -436,6 +440,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_rectangle_90.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_gps_record_options.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\gps_record_options.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_fragment_firmware_update.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_firmware_update.xml"
     },
@@ -612,6 +620,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_frequencies.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_audio_option.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\audio_option.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xhdpi_beacon_tags.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xhdpi\\beacon_tags.png"
     },
@@ -786,6 +798,10 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_fragment_audio_options.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_audio_options.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_coordinates.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\coordinates.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_begin_download.xml.flat",

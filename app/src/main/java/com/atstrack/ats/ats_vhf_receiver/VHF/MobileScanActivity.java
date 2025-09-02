@@ -62,8 +62,8 @@ public class MobileScanActivity extends ScanBaseActivity {
     TextView scan_rate_seconds_aerial_textView;
     @BindView(R.id.frequency_table_number_aerial_textView)
     TextView frequency_table_number_aerial_textView;
-    @BindView(R.id.aerial_gps_switch)
-    SwitchCompat aerial_gps_switch;
+    @BindView(R.id.gps_switch)
+    SwitchCompat gps_switch;
     @BindView(R.id.aerial_auto_record_switch)
     SwitchCompat aerial_auto_record_switch;
     @BindView(R.id.start_aerial_button)
@@ -92,12 +92,12 @@ public class MobileScanActivity extends ScanBaseActivity {
     LinearLayout merge_tables_linearLayout;
     @BindView(R.id.merge_tables_button)
     Button merge_tables_button;
-    @BindView(R.id.audio_aerial_linearLayout)
-    LinearLayout audio_aerial_linearLayout;
-    @BindView(R.id.id_audio_aerial_textView)
-    TextView id_audio_aerial_textView;
-    @BindView(R.id.record_data_aerial_button)
-    Button record_data_aerial_button;
+    @BindView(R.id.audio_linearLayout)
+    LinearLayout audio_linearLayout;
+    @BindView(R.id.id_audio_textView)
+    TextView id_audio_textView;
+    @BindView(R.id.record_data_button)
+    Button record_data_button;
     @BindView(R.id.current_frequency_aerial_textView)
     TextView current_frequency_aerial_textView;
     @BindView(R.id.current_index_aerial_textView)
@@ -106,12 +106,18 @@ public class MobileScanActivity extends ScanBaseActivity {
     TextView table_total_aerial_textView;
     @BindView(R.id.tables_merge_listView)
     ListView tables_merge_listView;
-    @BindView(R.id.gps_aerial_imageView)
-    ImageView gps_aerial_imageView;
-    @BindView(R.id.gps_state_aerial_textView)
-    TextView gps_state_aerial_textView;
+    @BindView(R.id.gps_imageView)
+    ImageView gps_imageView;
+    @BindView(R.id.gps_state_textView)
+    TextView gps_state_textView;
     @BindView(R.id.view_detection_aerial_textView)
     TextView view_detection_aerial_textView;
+    @BindView(R.id.coordinates_linearLayout)
+    LinearLayout coordinates_linearLayout;
+    @BindView(R.id.latitude_textView)
+    TextView latitude_textView;
+    @BindView(R.id.longitude_textView)
+    TextView longitude_textView;
 
     private Handler handlerMessage;
     private TableMergeListAdapter tableMergeListAdapter;
@@ -134,8 +140,7 @@ public class MobileScanActivity extends ScanBaseActivity {
                 int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
                     newFrequency = value;
-                    parameter = ValueCodes.CONTINUE_LOG;
-                    secondParameter = ValueCodes.ADD_FREQUENCY;
+                    setNewFrequency();
                     return;
                 } else if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     frequency_table_number_aerial_textView.setText(String.valueOf(value));
@@ -158,9 +163,9 @@ public class MobileScanActivity extends ScanBaseActivity {
                 b[3] = (byte) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10);
                 break;
             case ValueCodes.GPS:
-                b[2] = aerial_gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 128)
+                b[2] = gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 128)
                         : (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) - 128);
-                gps = aerial_gps_switch.isChecked() ? 1 : 0;
+                gps = gps_switch.isChecked() ? 1 : 0;
                 break;
             case ValueCodes.AUTO_RECORD:
                 b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 64)
@@ -171,7 +176,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         boolean result = TransferBleData.writeDefaults(true, b);
         if (result) parameter = "";
         else downloadData(aerialDefaults);
-        aerial_gps_switch.setEnabled(true);
+        gps_switch.setEnabled(true);
         aerial_auto_record_switch.setEnabled(true);
     }
 
@@ -189,11 +194,11 @@ public class MobileScanActivity extends ScanBaseActivity {
         isScanning = TransferBleData.writeStartScan(ValueCodes.MOBILE_DEFAULTS, b);
         if (isScanning) {
             secondParameter = "";
-            setVisibility("scanning");
             removeHold();
             isRecord = autoRecord == 1;
             if (isRecord) setRecord(); else removeRecord();
             if (gps == 1) setGpsSearching(); else setGpsOff();
+            setVisibility("scanning");
         }
     }
 
@@ -258,7 +263,6 @@ public class MobileScanActivity extends ScanBaseActivity {
         int index = Integer.parseInt(table_index_aerial_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x5C, (byte) (index / 256), (byte) (index % 256)};
         boolean result = TransferBleData.writeScanning(b);
-        Log.i(TAG, Converters.getHexValue(b));
         if (result) {
             secondParameter = "";
             manageMessage(R.string.lb_frequency_deleted);
@@ -325,7 +329,7 @@ public class MobileScanActivity extends ScanBaseActivity {
                 audioDescription = "Single (" + Converters.getDecimalValue(audioOption[1]) + ")";
             else if (Converters.getHexValue(audioOption[0]).equals("5B"))
                 audioDescription = "None";
-            id_audio_aerial_textView.setText(audioDescription);
+            id_audio_textView.setText(audioDescription);
         }
     }
 
@@ -346,12 +350,12 @@ public class MobileScanActivity extends ScanBaseActivity {
         launcher.launch(intent);
     }
 
-    @OnCheckedChanged(R.id.aerial_gps_switch)
+    @OnCheckedChanged(R.id.gps_switch)
     public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
         if (parameter.isEmpty()) {
             parameter = ValueCodes.GPS;
             leServiceConnection.getBluetoothLeService().discovering();
-            aerial_gps_switch.setEnabled(false);
+            gps_switch.setEnabled(false);
         }
     }
 
@@ -419,7 +423,6 @@ public class MobileScanActivity extends ScanBaseActivity {
         if (tableMergeListAdapter == null) {
             secondParameter = ValueCodes.TABLES;
             leServiceConnection.getBluetoothLeService().discoveringSecond();
-            Log.i(TAG, "Tables is null");
         }
     }
 
@@ -429,7 +432,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         leServiceConnection.getBluetoothLeService().discoveringSecond();
     }
 
-    @OnClick(R.id.record_data_aerial_button)
+    @OnClick(R.id.record_data_button)
     public void onClickRecordData(View v) {
         secondParameter = ValueCodes.RECORD;
         leServiceConnection.getBluetoothLeService().discoveringSecond();
@@ -447,7 +450,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         leServiceConnection.getBluetoothLeService().discoveringSecond();
     }
 
-    @OnClick(R.id.edit_audio_aerial_textView)
+    @OnClick(R.id.edit_audio_textView)
     public void onClickEditAudio(View v) {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
@@ -540,7 +543,6 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, parameter +": "+Converters.getHexValue(packet));
                 switch (parameter) {
                     case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
                         downloadData(packet);
@@ -688,7 +690,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     @Override
     protected void updateVisibility(int visibility) {
         super.updateVisibility(visibility);
-        audio_aerial_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         view_detection_aerial_textView.setVisibility(visibility);
     }
 
@@ -757,7 +759,7 @@ public class MobileScanActivity extends ScanBaseActivity {
             double scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
             scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
             gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-            aerial_gps_switch.setChecked(gps == 1);
+            gps_switch.setChecked(gps == 1);
             autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
             aerial_auto_record_switch.setChecked(autoRecord == 1);
             parameter = "";
@@ -783,33 +785,39 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     private void setRecord() {
-        record_data_aerial_button.setText(R.string.lb_stop_recording);
-        record_data_aerial_button.setBackground(ContextCompat.getDrawable(this, button_delete));
+        record_data_button.setText(R.string.lb_stop_recording);
+        record_data_button.setBackground(ContextCompat.getDrawable(this, button_delete));
     }
 
     private void removeRecord() {
-        record_data_aerial_button.setText(R.string.lb_record_data);
-        record_data_aerial_button.setBackground(ContextCompat.getDrawable(this, button_primary));
+        record_data_button.setText(R.string.lb_record_data);
+        record_data_button.setBackground(ContextCompat.getDrawable(this, button_primary));
     }
 
     private void setGpsOff() {
-        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
-        gps_state_aerial_textView.setText(R.string.lb_off_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
+        gps_state_textView.setText(R.string.lb_off_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsSearching() {
-        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
-        gps_state_aerial_textView.setText(R.string.lb_searching_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_textView.setText(R.string.lb_searching_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
+        latitude_textView.setText("");
+        longitude_textView.setText("");
     }
 
     private void setGpsFailed() {
-        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
-        gps_state_aerial_textView.setText(R.string.lb_failed_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_textView.setText(R.string.lb_failed_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsValid() {
-        gps_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
-        gps_state_aerial_textView.setText(R.string.lb_valid_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
+        gps_state_textView.setText(R.string.lb_valid_gps);
+        coordinates_linearLayout.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -817,12 +825,16 @@ public class MobileScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
+        Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
             case "50":
                 scanState(data);
                 break;
             case "51":
                 gpsState(data);
+                break;
+            case "A1":
+                logGps(data);
                 break;
             case "8A":
                 frequenciesNumber(data);
@@ -832,9 +844,6 @@ public class MobileScanActivity extends ScanBaseActivity {
                 break;
             case "F1":
                 logScanCoded(data); //Coded 0x09
-                break;
-            case "A1":
-                //GPS
                 break;
             case "E1":
             case "E2":
@@ -909,6 +918,12 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void logScanNonCodedVariable(byte[] data, int signalStrength) {
         int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
         scanNonCodedVariable(period, signalStrength);
+    }
+
+    private void logGps(byte[] data) {
+        String[] coordinates = Converters.getGpsData(data);
+        latitude_textView.setText(coordinates[0]);
+        longitude_textView.setText(coordinates[1]);
     }
 
     @Override

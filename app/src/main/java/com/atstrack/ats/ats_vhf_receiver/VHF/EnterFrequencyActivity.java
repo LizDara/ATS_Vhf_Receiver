@@ -68,7 +68,7 @@ public class EnterFrequencyActivity extends AppCompatActivity {
         public void afterTextChanged(Editable editable) {
             if (frequency_textView.getText().toString().length() == 6) {
                 int frequency = Integer.parseInt(frequency_textView.getText().toString());
-                if (frequency >= baseFrequency && frequency <= frequencyRange) {
+                if (frequency > baseFrequency && frequency <= frequencyRange) {
                     save_changes_button.setEnabled(true);
                     save_changes_button.setAlpha(1);
                     line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));

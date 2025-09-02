@@ -32,8 +32,8 @@ public class MobileDefaultsActivity extends BaseActivity {
     TextView frequency_table_number_aerial_textView;
     @BindView(R.id.scan_rate_seconds_aerial_textView)
     TextView scan_rate_seconds_aerial_textView;
-    @BindView(R.id.aerial_gps_switch)
-    SwitchCompat aerial_gps_switch;
+    @BindView(R.id.gps_switch)
+    SwitchCompat gps_switch;
     @BindView(R.id.aerial_auto_record_switch)
     SwitchCompat aerial_auto_record_switch;
 
@@ -56,7 +56,7 @@ public class MobileDefaultsActivity extends BaseActivity {
      * Writes the modified aerial defaults data by the user.
      */
     private void setMobileDefaults() {
-        int info = (aerial_gps_switch.isChecked() ? 1 : 0) << 7;
+        int info = (gps_switch.isChecked() ? 1 : 0) << 7;
         info = info | ((aerial_auto_record_switch.isChecked() ? 1 : 0) << 6);
         float scanRate = Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString());
         int frequencyTableNumber = (frequency_table_number_aerial_textView.getText().toString().equals("None")) ? 0 :
@@ -175,7 +175,7 @@ public class MobileDefaultsActivity extends BaseActivity {
                 frequency_table_number_aerial_textView.setText(
                         (Converters.getDecimalValue(data[1]).equals("0")) ? "None" : Converters.getDecimalValue(data[1]));
                 gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-                aerial_gps_switch.setChecked(gps == 1);
+                gps_switch.setChecked(gps == 1);
                 autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
                 aerial_auto_record_switch.setChecked(autoRecord == 1);
                 scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
@@ -183,7 +183,7 @@ public class MobileDefaultsActivity extends BaseActivity {
             } else {
                 frequency_table_number_aerial_textView.setText(R.string.lb_not_set);
                 scan_rate_seconds_aerial_textView.setText(R.string.lb_not_set);
-                aerial_gps_switch.setChecked(true);
+                gps_switch.setChecked(true);
                 aerial_auto_record_switch.setChecked(true);
             }
             originalData.put(ValueCodes.TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[1])));
@@ -212,7 +212,7 @@ public class MobileDefaultsActivity extends BaseActivity {
                 Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
         double scanRate = Double.parseDouble(scan_rate_seconds_aerial_textView.getText().toString());
 
-        return (int) originalData.get(ValueCodes.TABLE_NUMBER) != tableNumber || (boolean) originalData.get(ValueCodes.GPS) != aerial_gps_switch.isChecked()
+        return (int) originalData.get(ValueCodes.TABLE_NUMBER) != tableNumber || (boolean) originalData.get(ValueCodes.GPS) != gps_switch.isChecked()
                 || (boolean) originalData.get(ValueCodes.AUTO_RECORD) != aerial_auto_record_switch.isChecked()
                 || (double) originalData.get(ValueCodes.SCAN_RATE) != scanRate;
     }

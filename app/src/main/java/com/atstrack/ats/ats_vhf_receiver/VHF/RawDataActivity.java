@@ -105,7 +105,7 @@ public class RawDataActivity extends AppCompatActivity {
             converting_raw_progressBar.setProgress(40);
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
-            String processData = Converters.readPacket(rawData, baseFrequency);
+            String processData = Converters.getPackageProcessed(rawData, baseFrequency);
             byte[] data = Converters.convertToUTF8(processData);
             ArrayList<Snapshots> snapshotArray = new ArrayList<>();
             Snapshots processedData = new Snapshots(data.length);

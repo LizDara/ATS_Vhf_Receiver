@@ -31,7 +31,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,7 +39,6 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ManualScanActivity;
@@ -48,7 +46,6 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryScanActivity;
 
-import java.security.Permission;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -177,7 +174,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 if (!cancel && mConnected && receiverInformation.getStatusData() != null && receiverInformation.getSDCard() != null) {
                     connectionTimeout.cancel();
                     connectionTimeout.purge();
-                    //TransferBleData.disableNotificationLog();
                     if (device.getName().contains("vr")) {
                         connectVhfReceiver();
                     } else if (device.getName().contains("ar")) {
@@ -235,18 +231,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
         setDevicesFound();
         mBluetoothLeScanner.startScan(mLeScanCallback);
     }
-
-    /*@OnClick(R.id.switch_dark_mode)
-    public void onDarkModeClick(View v) {
-        if (isNightModeOn) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, false);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, true);
-        }
-        sharedPreferencesEditor.apply();
-    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

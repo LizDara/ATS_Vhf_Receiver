@@ -102,6 +102,8 @@
     <string name="lb_pulse_rate">Pulse Rate</string>
     <string name="lb_record_data">Record Data</string>
     <string name="lb_id_audio">ID Audio</string>
+    <string name="lb_latitude">Latitude</string>
+    <string name="lb_longitude">Longitude</string>
     <string name="lb_auto_recording">Auto-recording</string>
     <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
     <string name="lb_select_ids_audio">Select IDs for Audio</string>

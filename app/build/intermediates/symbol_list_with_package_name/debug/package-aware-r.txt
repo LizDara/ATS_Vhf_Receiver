@@ -1171,7 +1171,6 @@ id adjust_height
 id adjust_width
 id aerial_auto_record_switch
 id aerial_defaults_button
-id aerial_gps_switch
 id aerial_result_linearLayout
 id alertTitle
 id aligned
@@ -1185,8 +1184,7 @@ id antiClockwise
 id anticipate
 id asConfigured
 id async
-id audio_aerial_linearLayout
-id audio_manual_linearLayout
+id audio_linearLayout
 id auto
 id autoComplete
 id autoCompleteToEnd
@@ -1265,6 +1263,7 @@ id convert_data_button
 id convert_raw_data_button
 id converting_raw_linearLayout
 id converting_raw_progressBar
+id coordinates_linearLayout
 id cos
 id currentState
 id current_antenna_stationary_textView
@@ -1329,8 +1328,7 @@ id easeIn
 id easeInOut
 id easeOut
 id east
-id edit_audio_aerial_textView
-id edit_audio_manual_textView
+id edit_audio_textView
 id edit_frequency_button
 id edit_frequency_message_textView
 id edit_frequency_tables_button
@@ -1403,10 +1401,10 @@ id frequency_textView
 id frost
 id go_button
 id gone
-id gps_aerial_imageView
-id gps_manual_imageView
-id gps_state_aerial_textView
-id gps_state_manual_textView
+id gps_imageView
+id gps_scanning_switch
+id gps_state_textView
+id gps_switch
 id graph
 id graph_wrap
 id group_divider
@@ -1422,8 +1420,7 @@ id horizontal_only
 id icon
 id icon_group
 id icon_only
-id id_audio_aerial_textView
-id id_audio_manual_textView
+id id_audio_textView
 id ifRoom
 id ignore
 id ignoreRequest
@@ -1442,6 +1439,7 @@ id item4
 id item_touch_helper_previous_elevation
 id jumpToEnd
 id jumpToStart
+id latitude_textView
 id layout
 id left
 id left_imageView
@@ -1456,10 +1454,10 @@ id listMode
 id list_item
 id load_from_file_button
 id loading_linearLayout
+id longitude_textView
 id main_title_toolbar
 id main_toolbar
 id manage_receiver_data_button
-id manual_gps_switch
 id manual_scan_linearLayout
 id match_constraint
 id match_parent
@@ -1583,8 +1581,7 @@ id ready_manual_scan_linearLayout
 id ready_stationary_scan_LinearLayout
 id receiver_configuration_button
 id receiver_status_linearLayout
-id record_data_aerial_button
-id record_data_manual_button
+id record_data_button
 id rectangles
 id reference_frequency_stationary_linearLayout
 id reference_frequency_store_rate_stationary_linearLayout
@@ -1874,11 +1871,13 @@ layout activity_vhf_value_detection_filter
 layout aerial_current_settings
 layout aerial_scanning
 layout aerial_settings
+layout audio_option
 layout begin_download
 layout bridge_app
 layout coefficients_number
 layout connecting_device
 layout connecting_test
+layout coordinates
 layout custom_dialog
 layout data_calculation_types
 layout delete_data_receiver
@@ -1903,6 +1902,8 @@ layout frequency_information
 layout frequency_message
 layout frequency_select_information
 layout frequency_tables
+layout gps_option
+layout gps_record_options
 layout low_power_message
 layout main_toolbar
 layout manual_current_settings
@@ -2128,7 +2129,9 @@ string lb_id_audio
 string lb_inserted
 string lb_installation_complete
 string lb_installing_firmware
+string lb_latitude
 string lb_load_table_from_file
+string lb_longitude
 string lb_make_sure_receivers
 string lb_manual_scan
 string lb_manual_scanning

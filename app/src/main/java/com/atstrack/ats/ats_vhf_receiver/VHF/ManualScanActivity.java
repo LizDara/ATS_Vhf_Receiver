@@ -9,6 +9,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentResultListener;
 
 import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import android.content.Intent;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,32 +50,40 @@ public class ManualScanActivity extends ScanBaseActivity {
     LinearLayout ready_manual_scan_LinearLayout;
     @BindView(R.id.frequency_manual_textView)
     TextView frequency_manual_textView;
-    @BindView(R.id.manual_gps_switch)
-    SwitchCompat manual_gps_switch;
+    @BindView(R.id.gps_switch)
+    SwitchCompat gps_switch;
+    @BindView(R.id.gps_scanning_switch)
+    SwitchCompat gps_scanning_switch;
     @BindView(R.id.manual_scan_linearLayout)
     LinearLayout manual_scan_linearLayout;
     @BindView(R.id.frequency_scan_manual_textView)
     TextView frequency_scan_manual_textView;
-    @BindView(R.id.record_data_manual_button)
-    Button record_data_manual_button;
-    @BindView(R.id.audio_manual_linearLayout)
-    LinearLayout audio_manual_linearLayout;
-    @BindView(R.id.id_audio_manual_textView)
-    TextView id_audio_manual_textView;
+    @BindView(R.id.record_data_button)
+    Button record_data_button;
+    @BindView(R.id.audio_linearLayout)
+    LinearLayout audio_linearLayout;
+    @BindView(R.id.id_audio_textView)
+    TextView id_audio_textView;
     @BindView(R.id.minus_imageView)
     ImageView minus_imageView;
     @BindView(R.id.plus_imageView)
     ImageView plus_imageView;
-    @BindView(R.id.gps_manual_imageView)
-    ImageView gps_manual_imageView;
-    @BindView(R.id.gps_state_manual_textView)
-    TextView gps_state_manual_textView;
+    @BindView(R.id.gps_imageView)
+    ImageView gps_imageView;
+    @BindView(R.id.gps_state_textView)
+    TextView gps_state_textView;
     @BindView(R.id.view_detection_manual_textView)
     TextView view_detection_manual_textView;
+    @BindView(R.id.coordinates_linearLayout)
+    LinearLayout coordinates_linearLayout;
+    @BindView(R.id.latitude_textView)
+    TextView latitude_textView;
+    @BindView(R.id.longitude_textView)
+    TextView longitude_textView;
 
-    private boolean isEditFrequency;
     private int frequencyRange;
     private int newFrequency;
+    private boolean enableGpsScanning;
     private final byte[] audioOption = {(byte) 0x5A, 0, 0};
     private DialogFragment audioOptions;
 
@@ -83,8 +94,9 @@ public class ManualScanActivity extends ScanBaseActivity {
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
                     newFrequency = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                     frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
-                    parameter = ValueCodes.START_LOG;
-                    leServiceConnection.getBluetoothLeService().discovering();
+                    if(manual_scan_linearLayout.getVisibility() == View.VISIBLE) {
+                        setStartScan();
+                    }
                 }
             });
 
@@ -99,13 +111,17 @@ public class ManualScanActivity extends ScanBaseActivity {
 
         byte[] b = new byte[] {(byte) 0x86, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256),
-                (byte) (manual_gps_switch.isChecked() ? 0x80 : 0x0)};
+                (byte) (gps_switch.isChecked() ? 0x80 : 0x0)};
+        Log.i(TAG, "Before Start Manual Scan: " + Converters.getHexValue(b));
         isScanning = TransferBleData.writeStartScan("MANUAL", b);
         if (isScanning) {
+            clear();
             secondParameter = "";
-            setVisibility("scanning");
             frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
-            if (manual_gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
+            if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
+            gps_scanning_switch.setChecked(gps_switch.isChecked());
+            setVisibility("scanning");
+            enableGpsScanning = true;
         }
     }
 
@@ -114,17 +130,8 @@ public class ManualScanActivity extends ScanBaseActivity {
         if (result) {
             clear();
             isScanning = false;
-            if (isEditFrequency) {
-                isEditFrequency = false;
-                Intent intent = new Intent(this, EnterFrequencyActivity.class);
-                intent.putExtra(ValueCodes.TITLE, "Change Frequency");
-                intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
-                intent.putExtra(ValueCodes.RANGE, range);
-                launcher.launch(intent);
-            } else {
-                animationDrawable.stop();
-                setVisibility("overview");
-            }
+            animationDrawable.stop();
+            setVisibility("overview");
             parameter = "";
         }
     }
@@ -132,11 +139,12 @@ public class ManualScanActivity extends ScanBaseActivity {
     private void setRecord() {
         boolean result = TransferBleData.writeRecord(true, true);
         if (result) {
-            record_data_manual_button.setText(R.string.lb_record_data);
-            record_data_manual_button.setAlpha(1);
-            record_data_manual_button.setEnabled(true);
+            record_data_button.setText(R.string.lb_record_data);
+            record_data_button.setAlpha(1);
+            record_data_button.setEnabled(true);
             clear();
         }
+        secondParameter = "";
     }
 
     private void setDecreaseOrIncrease(boolean isDecrease) {
@@ -160,6 +168,7 @@ public class ManualScanActivity extends ScanBaseActivity {
                 }
             }
         }
+        secondParameter = "";
     }
 
     private void setAudio() {
@@ -175,11 +184,24 @@ public class ManualScanActivity extends ScanBaseActivity {
                 audioDescription = "Single (" + Converters.getDecimalValue(audioOption[1]) + ")";
             else if (Converters.getHexValue(audioOption[0]).equals("5B"))
                 audioDescription = "None";
-            id_audio_manual_textView.setText(audioDescription);
+            id_audio_textView.setText(audioDescription);
         }
+        secondParameter = "";
     }
 
-    @OnClick(R.id.enter_new_frequency_button)
+    private void setGps() {
+        boolean result = TransferBleData.writeGps(gps_scanning_switch.isChecked());
+        Log.i(TAG, "----------RESULT WRITE GPS " + gps_scanning_switch.isChecked() + ": " + result);
+        if (result) {
+            setGpsSearching();
+            gps_switch.setChecked(gps_scanning_switch.isChecked());
+        } else {
+            gps_scanning_switch.setChecked(!gps_scanning_switch.isChecked());
+        }
+        secondParameter = "";
+    }
+
+    @OnClick({R.id.enter_new_frequency_button, R.id.edit_frequency_button})
     public void onClickEnterNewFrequency(View v) {
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
         intent.putExtra(ValueCodes.TITLE, "Change Frequency");
@@ -194,21 +216,14 @@ public class ManualScanActivity extends ScanBaseActivity {
         leServiceConnection.getBluetoothLeService().discovering();
     }
 
-    @OnClick(R.id.edit_frequency_button)
-    public void onClickEditFrequency(View v) {
-        isEditFrequency = true;
-        secondParameter = ValueCodes.STOP_SCAN;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
-    }
-
-    @OnClick(R.id.record_data_manual_button)
+    @OnClick(R.id.record_data_button)
     public void onClickRecordData(View v) {
         secondParameter = ValueCodes.RECORD;
         leServiceConnection.getBluetoothLeService().discoveringSecond();
 
-        record_data_manual_button.setText(R.string.lb_saving_targets);
-        record_data_manual_button.setAlpha((float) 0.6);
-        record_data_manual_button.setEnabled(false);
+        record_data_button.setText(R.string.lb_saving_targets);
+        record_data_button.setAlpha((float) 0.6);
+        record_data_button.setEnabled(false);
     }
 
     @OnClick(R.id.minus_imageView)
@@ -225,7 +240,7 @@ public class ManualScanActivity extends ScanBaseActivity {
         leServiceConnection.getBluetoothLeService().discoveringSecond();
     }
 
-    @OnClick(R.id.edit_audio_manual_textView)
+    @OnClick(R.id.edit_audio_textView)
     public void onClickEditAudio(View v) {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
@@ -248,6 +263,15 @@ public class ManualScanActivity extends ScanBaseActivity {
         viewDetectionFilter.show(getSupportFragmentManager(), ViewDetectionFilter.TAG);
     }
 
+    @OnCheckedChanged(R.id.gps_scanning_switch)
+    public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
+        Log.i(TAG, "-------------------------ENABLE GPS SCANNING: " + enableGpsScanning + "-----------------------");
+        if (enableGpsScanning) {
+            secondParameter = ValueCodes.GPS;
+            leServiceConnection.getBluetoothLeService().discoveringSecond();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_vhf_manual_scan;
@@ -256,15 +280,17 @@ public class ManualScanActivity extends ScanBaseActivity {
 
         initializeCallback();
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
-        isEditFrequency = false;
+        enableGpsScanning = false;
 
         if (isScanning) { // The device is already scanning
             parameter = ValueCodes.CONTINUE_LOG;
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
-            manual_gps_switch.setChecked((Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1);
-            if (manual_gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
+            gps_switch.setChecked((Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1);
+            gps_scanning_switch.setChecked(gps_switch.isChecked());
+            if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
             scanState(data);
             setVisibility("scanning");
+            enableGpsScanning = true;
         } else { // Gets manual defaults data
             newFrequency = baseFrequency;
             frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
@@ -320,6 +346,9 @@ public class ManualScanActivity extends ScanBaseActivity {
                         break;
                     case ValueCodes.AUDIO:
                         setAudio();
+                        break;
+                    case ValueCodes.GPS:
+                        setGps();
                         break;
                 }
             }
@@ -383,28 +412,34 @@ public class ManualScanActivity extends ScanBaseActivity {
     @Override
     protected void updateVisibility(int visibility) {
         super.updateVisibility(visibility);
-        audio_manual_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         view_detection_manual_textView.setVisibility(visibility);
     }
 
     private void setGpsOff() {
-        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
-        gps_state_manual_textView.setText(R.string.lb_off_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
+        gps_state_textView.setText(R.string.lb_off_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsSearching() {
-        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
-        gps_state_manual_textView.setText(R.string.lb_searching_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_textView.setText(R.string.lb_searching_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
+        latitude_textView.setText("");
+        longitude_textView.setText("");
     }
 
     private void setGpsFailed() {
-        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
-        gps_state_manual_textView.setText(R.string.lb_failed_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_textView.setText(R.string.lb_failed_gps);
+        coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsValid() {
-        gps_manual_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
-        gps_state_manual_textView.setText(R.string.lb_valid_gps);
+        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
+        gps_state_textView.setText(R.string.lb_valid_gps);
+        coordinates_linearLayout.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -419,6 +454,9 @@ public class ManualScanActivity extends ScanBaseActivity {
                 break;
             case "51":
                 gpsState(data);
+                break;
+            case "A1":
+                logGps(data);
                 break;
             case "F0":
                 logScanHeader(data);
@@ -487,5 +525,11 @@ public class ManualScanActivity extends ScanBaseActivity {
     private void logScanNonCodedVariable(byte[] data, int signalStrength) {
         int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
         scanNonCodedVariable(period, signalStrength);
+    }
+
+    private void logGps(byte[] data) {
+        String[] coordinates = Converters.getGpsData(data);
+        latitude_textView.setText(coordinates[0]);
+        longitude_textView.setText(coordinates[1]);
     }
 }

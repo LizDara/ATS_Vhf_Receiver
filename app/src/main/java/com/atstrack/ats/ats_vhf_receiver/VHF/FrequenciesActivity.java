@@ -168,9 +168,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         byte formatA = coefficient_a_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatB = coefficient_b_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatC = constant_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
-        /*formatA += 8;
-        formatB += 5;
-        formatC += 2;*/
         byte[] b = new byte[] { 0x7D, (byte) (temperaturePosition == -1 ? (frequencyListAdapter.getItemCount() + 1) : (temperaturePosition + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
                 (byte) (coefficientA / 256), (byte) (coefficientA % 256), formatB, (byte) (coefficientB / 256), (byte) (coefficientB % 256), formatC,
                 (byte) (constant / 256), (byte) (constant % 256), 0, 0, 0};

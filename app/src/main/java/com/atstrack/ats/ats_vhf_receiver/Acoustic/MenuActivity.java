@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -19,7 +18,6 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.VersionResponse;
 import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
-import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.FirmwareUpdate;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -29,8 +27,6 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;

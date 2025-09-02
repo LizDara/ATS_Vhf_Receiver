@@ -332,7 +332,6 @@ public class StationaryDefaultsActivity extends BaseActivity {
                 store_rate_minutes_stationary_textView.setText(getString(R.string.lb_not_set));
             }
             originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
-            Log.i(TAG, "First put: " + Integer.parseInt(Converters.getDecimalValue(data[9])));
             originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
             originalData.put(ValueCodes.THIRD_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[11])));
             originalData.put(ValueCodes.ANTENNA_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[1])));

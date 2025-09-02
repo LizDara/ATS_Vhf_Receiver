@@ -34,7 +34,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryListAdapter;
-import com.atstrack.ats.ats_vhf_receiver.DriveService.VersionResponse;
 import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -81,6 +80,18 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
                         showAlert();
                     }
             });
+
+    /*@OnClick(R.id.switch_dark_mode)
+    public void onDarkModeClick(View v) {
+        if (isNightModeOn) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, false);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, true);
+        }
+        sharedPreferencesEditor.apply();
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

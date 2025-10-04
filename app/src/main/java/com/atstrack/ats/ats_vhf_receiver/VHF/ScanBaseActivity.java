@@ -184,6 +184,7 @@ public class ScanBaseActivity extends BaseActivity {
         TextView mortTextView = (TextView) linearLayout.getChildAt(4);
 
         int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        if (detections > 1000) detections = 1;
         int mort = isMort ? Integer.parseInt(mortTextView.getText().toString()) + 1 : Integer.parseInt(mortTextView.getText().toString());
         detectionsTextView.setText(String.valueOf(detections));
         mortalityTextView.setText(isMort ? "M" : "-");
@@ -267,6 +268,7 @@ public class ScanBaseActivity extends BaseActivity {
         TextView signalStrengthTextView = (TextView) linearLayout.getChildAt(3);
 
         int detections = Integer.parseInt(detectionsTextView.getText().toString()) + 1;
+        if (detections > 1000) detections = 1;
         periodTextView.setText(String.valueOf(period));
         detectionsTextView.setText(String.valueOf(detections));
         pulseRateTextView.setText(String.valueOf(pulseRate));

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -19,12 +20,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.api.client.util.IOUtils;
@@ -37,10 +41,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RawDataActivity extends AppCompatActivity {
+public class RawDataActivity extends BaseActivity {
 
     @BindView(R.id.file_source_linearLayout)
     LinearLayout file_source_linearLayout;
@@ -134,12 +137,13 @@ public class RawDataActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        contentViewId = R.layout.activity_vhf_raw_data;
+        showToolbar = true;
+        deviceCategory = ValueCodes.VHF;
+        title = getString(R.string.convert_raw_data);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vhf_raw_data);
-        ButterKnife.bind(this);
-        ActivitySetting.setVhfToolbar(this, getString(R.string.convert_raw_data));
-        ActivitySetting.setReceiverStatus(this);
 
+        initializeCallback();
         externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
         boolean sdCardInserted = externalStorageVolumes.length > 1;
         sd_card_raw_imageView.setBackgroundResource(sdCardInserted ? R.drawable.ic_sd_card : R.drawable.ic_sd_card_alert);
@@ -150,6 +154,30 @@ public class RawDataActivity extends AppCompatActivity {
 
         convert_data_button.setAlpha((float) 0.6);
         convert_data_button.setEnabled(false);
+    }
+
+    private void initializeCallback() {
+        receiverCallback = new ReceiverCallback() {
+            @Override
+            public void onGattDisconnected() {
+                Message.showDisconnectionMessage(mContext);
+            }
+
+            @Override
+            public void onGattDiscovered() {
+                TransferBleData.notificationLog();
+            }
+
+            @Override
+            public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+            }
+        };
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
     }
 
     @Override
@@ -174,17 +202,27 @@ public class RawDataActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.i(TAG, "ON BACK PRESSED");
     }
 
     /**

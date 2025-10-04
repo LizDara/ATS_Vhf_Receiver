@@ -13,7 +13,9 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import butterknife.ButterKnife;
@@ -48,6 +50,13 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(showToolbar && deviceCategory.equals(ValueCodes.VHF))
+            ActivitySetting.setReceiverStatus(this);
+    }
+
+    @Override
     public void onBackPressed() {
         Log.i(TAG, "ON BACK PRESSED ...");
     }
@@ -61,9 +70,21 @@ public class BaseActivity extends AppCompatActivity {
     private void setToolbar() {
         if (deviceCategory.equals(ValueCodes.VHF)) {
             ActivitySetting.setVhfToolbar(this, title);
-            ActivitySetting.setReceiverStatus(this);
+            //ActivitySetting.setReceiverStatus(this);
         } else {
             ActivitySetting.setAcousticToolbar(this, title);
         }
+    }
+
+    protected void setSdCardStatus(byte[] data) {
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        receiverInformation.changeSDCard(Converters.getHexValue(data[1]).equals("80"));
+        ActivitySetting.setSdCardStatus(this);
+    }
+
+    protected void setBatteryPercent(byte[] data) {
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(data[1])));
+        ActivitySetting.setBatteryPercent(this);
     }
 }

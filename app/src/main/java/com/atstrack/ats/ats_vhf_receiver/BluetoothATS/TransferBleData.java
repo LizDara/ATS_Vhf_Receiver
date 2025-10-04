@@ -40,7 +40,6 @@ public class TransferBleData {
     }
 
     public static boolean readBoardState() {
-        Log.i("TRANSFER-BLE", "Read Board State");
         return LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
                 AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_BOARD_STATE);
     }
@@ -63,7 +62,6 @@ public class TransferBleData {
      * Requests a read for get the number of frequencies from each table and display it.
      */
     public static void readTables(boolean isScanning) {
-        Log.i("TRANSFER-BLE", "Read Tables");
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
         if (isScanning) LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnosticSecond(service, characteristic);
@@ -71,7 +69,6 @@ public class TransferBleData {
     }
 
     public static boolean writeStartScan(String type, byte[] data) {
-        Log.i("TRANSFER-BLE", "Write Start Scan " + type);
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
             case ValueCodes.MOBILE_DEFAULTS:
@@ -86,7 +83,6 @@ public class TransferBleData {
     }
 
     public static boolean writeStopScan(String type) {
-        Log.i("TRANSFER-BLE", "Write Stop Scan " + type);
         byte[] data = new byte[] {(byte) 0x87};
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
@@ -149,7 +145,6 @@ public class TransferBleData {
      * Requests a read for get defaults data.
      */
     public static void readDefaults(boolean isMobile) {
-        Log.i("TRANSFER-BLE", "Read Defaults " + isMobile);
         UUID characteristic = isMobile ? AtsVhfReceiverUuids.UUID_CHARACTERISTIC_AERIAL : AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STATIONARY;
         LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
                 AtsVhfReceiverUuids.UUID_SERVICE_SCAN, characteristic);
@@ -239,7 +234,6 @@ public class TransferBleData {
     public static void readDataInfo() {
         boolean result = LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
                 AtsVhfReceiverUuids.UUID_SERVICE_DIAGNOSTIC, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_DATA_INFO);
-        Log.i("TRANFER-BLE", "RESULT READ: " + result);
     }
 
     /**

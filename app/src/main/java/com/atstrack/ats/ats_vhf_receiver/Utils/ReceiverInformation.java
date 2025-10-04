@@ -6,7 +6,7 @@ public class ReceiverInformation {
     private String deviceAddress;
     private int deviceBattery;
     private String serialNumber;
-    private String mSDCard;
+    private boolean mSDCardInserted;
     private String deviceStatus;
     private byte[] statusData;
 
@@ -16,7 +16,7 @@ public class ReceiverInformation {
         deviceAddress = "Unknown";
         deviceBattery = 0;
         statusData = null;
-        mSDCard = null;
+        mSDCardInserted = false;
     }
 
     public static ReceiverInformation getReceiverInformation() {
@@ -32,8 +32,8 @@ public class ReceiverInformation {
         deviceStatus = serialNumber;
     }
 
-    public void changeSDCard(byte state) {
-        mSDCard = Converters.getHexValue(state).equals("01") ? "Inserted" : "None";
+    public void changeSDCard(boolean inserted) {
+        mSDCardInserted = inserted;
     }
 
     public void changeDeviceBattery(int deviceBattery) {
@@ -52,8 +52,8 @@ public class ReceiverInformation {
         return serialNumber;
     }
 
-    public String getSDCard() {
-        return mSDCard;
+    public boolean isSDCardInserted() {
+        return mSDCardInserted;
     }
 
     public String getDeviceStatus() {

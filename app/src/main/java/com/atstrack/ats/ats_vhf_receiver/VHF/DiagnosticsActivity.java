@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,7 +94,11 @@ public class DiagnosticsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
                 if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
                     downloadData(packet);
             }

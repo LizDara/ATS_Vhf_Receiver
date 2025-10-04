@@ -23,6 +23,7 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
@@ -129,7 +130,6 @@ public class DetectionFilterActivity extends BaseActivity {
                 break;
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
-        Log.i(TAG, Converters.getHexValue(b));
         if (result) {
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
@@ -223,8 +223,12 @@ public class DetectionFilterActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
                     downloadData(packet);
             }
         };
@@ -301,7 +305,6 @@ public class DetectionFilterActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        Log.i(TAG, Converters.getHexValue(data));
         if (Converters.getHexValue(data[0]).equals("67")) {
             parameter = "";
             int pulseRateType = Integer.parseInt(Converters.getDecimalValue(data[1]));

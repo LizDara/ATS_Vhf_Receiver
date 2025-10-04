@@ -91,8 +91,12 @@ public class TablesActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
                     downloadData(packet);
                 else if (parameter.equals(ValueCodes.DETECTION_TYPE))
                     downloadDetectionFilter(packet);

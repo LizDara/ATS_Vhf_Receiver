@@ -3,6 +3,7 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -10,18 +11,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EnterCoefficientActivity extends AppCompatActivity {
+public class EnterCoefficientActivity extends BaseActivity {
 
     @BindView(R.id.coefficient_textView)
     TextView coefficient_textView;
@@ -93,12 +97,13 @@ public class EnterCoefficientActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        contentViewId = R.layout.activity_vhf_enter_coefficient;
+        showToolbar = true;
+        deviceCategory = ValueCodes.VHF;
+        title = getIntent().getStringExtra(ValueCodes.TYPE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vhf_enter_coefficient);
-        ButterKnife.bind(this);
-        ActivitySetting.setVhfToolbar(this, getIntent().getStringExtra(ValueCodes.TYPE));
-        ActivitySetting.setReceiverStatus(this);
 
+        initializeCallback();
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
         if (type.equals(getString(R.string.lb_coefficient_a))) {
             coefficient_textView.setText(R.string.lb_enter_coefficient_a);
@@ -112,6 +117,45 @@ public class EnterCoefficientActivity extends AppCompatActivity {
         }
     }
 
+    private void initializeCallback() {
+        receiverCallback = new ReceiverCallback() {
+            @Override
+            public void onGattDisconnected() {
+                Message.showDisconnectionMessage(mContext);
+            }
+
+            @Override
+            public void onGattDiscovered() {
+                TransferBleData.notificationLog();
+            }
+
+            @Override
+            public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+            }
+        };
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
@@ -119,10 +163,5 @@ public class EnterCoefficientActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.i(TAG, "ON BACK PRESSED");
     }
 }

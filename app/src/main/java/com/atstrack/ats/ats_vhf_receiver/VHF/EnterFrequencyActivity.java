@@ -1,12 +1,12 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,8 +20,14 @@ import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
@@ -30,7 +36,7 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_number;
 
-public class EnterFrequencyActivity extends AppCompatActivity {
+public class EnterFrequencyActivity extends BaseActivity {
 
     @BindView(R.id.frequency_textView)
     TextView frequency_textView;
@@ -111,23 +117,47 @@ public class EnterFrequencyActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        contentViewId = R.layout.activity_vhf_enter_frequency;
+        showToolbar = true;
+        deviceCategory = ValueCodes.VHF;
+        title = getIntent().getStringExtra(ValueCodes.TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vhf_enter_frequency);
-        ButterKnife.bind(this);
-        ActivitySetting.setVhfToolbar(this, getIntent().getStringExtra(ValueCodes.TITLE));
-        ActivitySetting.setReceiverStatus(this);
 
+        initializeCallback();
         baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0);
         int range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         position = getIntent().getIntExtra(ValueCodes.POSITION, -2);
-
         frequency_textView.addTextChangedListener(textChangedListener);
         String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
         edit_frequency_message_textView.setText(message);
         if (position == -1)
             save_changes_button.setText(R.string.lb_add_frequency);
         createNumberButtons(range);
+    }
+
+    private void initializeCallback() {
+        receiverCallback = new ReceiverCallback() {
+            @Override
+            public void onGattDisconnected() {
+                Message.showDisconnectionMessage(mContext);
+            }
+
+            @Override
+            public void onGattDiscovered() {
+                TransferBleData.notificationLog();
+            }
+
+            @Override
+            public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+            }
+        };
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
     }
 
     @Override
@@ -140,8 +170,18 @@ public class EnterFrequencyActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        Log.i(TAG, "ON BACK PRESSED");
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     private void createNumberButtons(int range) {

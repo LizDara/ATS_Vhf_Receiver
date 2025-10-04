@@ -6,6 +6,7 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -228,27 +229,33 @@ public class ValueDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                switch (type) {
-                    case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
-                    case ValueCodes.TABLES_NUMBER_CODE:
-                        downloadTable(packet);
-                        break;
-                    case ValueCodes.SCAN_RATE_SECONDS_CODE: // Gets the scan rate seconds
-                        downloadScanRate(packet);
-                        break;
-                    case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Gets number of antennas
-                        downloadAntennas(packet);
-                        break;
-                    case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Gets the scan timeout seconds
-                        downloadTimeout(packet);
-                        break;
-                    case ValueCodes.STORE_RATE_CODE: // Gets the store rate
-                        downloadStoreRate(packet);
-                        break;
-                    case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Gets the reference frequency store rate
-                        downloadReferenceFrequencyStoreRate(packet);
-                        break;
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (Converters.getHexValue(packet[0]).equals("6C") || Converters.getHexValue(packet[0]).equals("6D")) {
+                    switch (type) {
+                        case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
+                        case ValueCodes.TABLES_NUMBER_CODE:
+                            downloadTable(packet);
+                            break;
+                        case ValueCodes.SCAN_RATE_SECONDS_CODE: // Gets the scan rate seconds
+                            downloadScanRate(packet);
+                            break;
+                        case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Gets number of antennas
+                            downloadAntennas(packet);
+                            break;
+                        case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Gets the scan timeout seconds
+                            downloadTimeout(packet);
+                            break;
+                        case ValueCodes.STORE_RATE_CODE: // Gets the store rate
+                            downloadStoreRate(packet);
+                            break;
+                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Gets the reference frequency store rate
+                            downloadReferenceFrequencyStoreRate(packet);
+                            break;
+                    }
                 }
             }
         };
@@ -422,7 +429,7 @@ public class ValueDefaultsActivity extends BaseActivity {
 
             int timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
             if (timeout <= 200)
-                value_spinner.setSelection(timeout - 2);
+                value_spinner.setSelection(timeout - 3);
             else
                 value_spinner.setSelection(0);
         } else {

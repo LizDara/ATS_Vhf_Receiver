@@ -5,6 +5,7 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -12,6 +13,7 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -53,10 +55,18 @@ public class EditDefaultsActivity extends BaseActivity {
             }
 
             @Override
-            public void onGattDiscovered() {}
+            public void onGattDiscovered() {
+                TransferBleData.notificationLog();
+            }
 
             @Override
-            public void onGattDataAvailable(byte[] packet) {}
+            public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+            }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
     }
@@ -65,9 +75,9 @@ public class EditDefaultsActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
         else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
     }
 
     @Override

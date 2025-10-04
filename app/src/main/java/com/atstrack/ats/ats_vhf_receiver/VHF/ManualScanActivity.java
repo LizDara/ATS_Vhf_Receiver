@@ -112,7 +112,6 @@ public class ManualScanActivity extends ScanBaseActivity {
         byte[] b = new byte[] {(byte) 0x86, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256),
                 (byte) (gps_switch.isChecked() ? 0x80 : 0x0)};
-        Log.i(TAG, "Before Start Manual Scan: " + Converters.getHexValue(b));
         isScanning = TransferBleData.writeStartScan("MANUAL", b);
         if (isScanning) {
             clear();
@@ -191,7 +190,6 @@ public class ManualScanActivity extends ScanBaseActivity {
 
     private void setGps() {
         boolean result = TransferBleData.writeGps(gps_scanning_switch.isChecked());
-        Log.i(TAG, "----------RESULT WRITE GPS " + gps_scanning_switch.isChecked() + ": " + result);
         if (result) {
             setGpsSearching();
             gps_switch.setChecked(gps_scanning_switch.isChecked());
@@ -265,7 +263,6 @@ public class ManualScanActivity extends ScanBaseActivity {
 
     @OnCheckedChanged(R.id.gps_scanning_switch)
     public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
-        Log.i(TAG, "-------------------------ENABLE GPS SCANNING: " + enableGpsScanning + "-----------------------");
         if (enableGpsScanning) {
             secondParameter = ValueCodes.GPS;
             leServiceConnection.getBluetoothLeService().discoveringSecond();
@@ -317,8 +314,12 @@ public class ManualScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
                     setCurrentLog(packet);
             }
         };
@@ -447,7 +448,6 @@ public class ManualScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
             case "50":
                 scanState(data);

@@ -92,7 +92,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
     private BluetoothLeScanner mBluetoothLeScanner;
     private LeServiceConnection leServiceConnection;
     private Timer connectionTimeout;
-    private boolean mConnected, cancel = false;
+    private boolean mConnected, cancel, readBoardStatus = false;
     private String parameter, secondParameter = "";
 
     // Device scan callback.
@@ -171,7 +171,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
             ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
             setDeviceConnected();
             new Handler().postDelayed(() -> { // After connecting display the main menu of device
-                if (!cancel && mConnected && receiverInformation.getStatusData() != null && receiverInformation.getSDCard() != null) {
+                if (!cancel && mConnected && receiverInformation.getStatusData() != null && readBoardStatus) {
                     connectionTimeout.cancel();
                     connectionTimeout.purge();
                     if (device.getName().contains("vr")) {
@@ -261,6 +261,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
     private void cancelConnection() {
         cancel = true;
         mConnected = false;
+        readBoardStatus = false;
         parameter = secondParameter = "";
         unbindService(leServiceConnection.getServiceConnection());
         if (leServiceConnection.existConnection()) leServiceConnection.close();
@@ -451,7 +452,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         sharedPreferencesEdit.putString(ValueCodes.VERSION, "1.0.0");
         if (mLeDeviceListAdapter.getSelectedDevice().getName().contains("vr")) {
             ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-            receiverInformation.changeSDCard(data[7]);
+            receiverInformation.changeSDCard(Converters.getHexValue(data[7]).equals("01"));
             int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[2]));
             int range = Integer.parseInt(Converters.getDecimalValue(data[3]));
             sharedPreferencesEdit.putInt(ValueCodes.BASE_FREQUENCY, baseFrequency);
@@ -461,6 +462,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
             sharedPreferencesEdit.putInt(ValueCodes.WIDTH, metrics.widthPixels);
             sharedPreferencesEdit.putInt(ValueCodes.HEIGHT, metrics.heightPixels);
         }
+        readBoardStatus = true;
         sharedPreferencesEdit.apply();
     }
 

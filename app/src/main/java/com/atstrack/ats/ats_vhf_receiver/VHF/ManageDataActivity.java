@@ -280,24 +280,30 @@ public class ManageDataActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                switch (parameter) {
-                    case ValueCodes.DOWNLOAD:
-                        // Get raw data in pages, each page contains 2048 bytes.
-                        // 9 packets of 230 bytes
-                        if (packet.length > 4)
-                            downloadData(packet);
-                        else if (isTransmissionDone(packet))
-                            downloadData(packet);
-                        else if (packet.length == 4)// Get pages total number
-                            readData(packet);
-                        break;
-                    case ValueCodes.TEST: // Get memory used and byte stored
-                        downloadTest(packet);
-                        break;
-                    case ValueCodes.DELETE_RESPONSE: // Response about erase data
-                        deleteResponse(packet);
-                        break;
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else {
+                    switch (parameter) {
+                        case ValueCodes.DOWNLOAD:
+                            // Get raw data in pages, each page contains 2048 bytes.
+                            // 9 packets of 230 bytes
+                            if (packet.length > 4)
+                                downloadData(packet);
+                            else if (isTransmissionDone(packet))
+                                downloadData(packet);
+                            else if (packet.length == 4)// Get pages total number
+                                readData(packet);
+                            break;
+                        case ValueCodes.TEST: // Get memory used and byte stored
+                            downloadTest(packet);
+                            break;
+                        case ValueCodes.DELETE_RESPONSE: // Response about erase data
+                            deleteResponse(packet);
+                            break;
+                    }
                 }
             }
         };
@@ -557,7 +563,6 @@ public class ManageDataActivity extends BaseActivity {
     private void readData(byte[] packet) {
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
-        Log.i(TAG, "Total Pages: " + finalPageNumber);
         rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
         if (finalPageNumber == 0) { // No data to download
             setVisibility("menu");
@@ -665,7 +670,6 @@ public class ManageDataActivity extends BaseActivity {
             }
         }
         if (!error) {
-            Log.i(TAG, "FILLED: " + rawDataCollector.isFilled() + " Byte Position: " + rawDataCollector.byteIndex);
             snapshotArray.add(rawDataCollector);
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;

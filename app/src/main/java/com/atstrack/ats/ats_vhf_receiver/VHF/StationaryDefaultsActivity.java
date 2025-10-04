@@ -139,7 +139,6 @@ public class StationaryDefaultsActivity extends BaseActivity {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLES_NUMBER_CODE);
-        Log.i(TAG, "First table: "+(int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER));
         intent.putExtra(ValueCodes.FIRST_TABLE_NUMBER, (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER));
         intent.putExtra(ValueCodes.SECOND_TABLE_NUMBER, (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER));
         intent.putExtra(ValueCodes.THIRD_TABLE_NUMBER, (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER));
@@ -249,8 +248,12 @@ public class StationaryDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
                     downloadData(packet);
             }
         };
@@ -318,7 +321,8 @@ public class StationaryDefaultsActivity extends BaseActivity {
                     store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
                 else
                     store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
-                if (!Converters.getHexValue(data[6]).equals("FF") && !Converters.getHexValue(data[7]).equals("FF"))
+                if (!Converters.getHexValue(data[6]).equals("FF") && !Converters.getHexValue(data[7]).equals("FF")
+                        && !Converters.getHexValue(data[6]).equals("00") && !Converters.getHexValue(data[7]).equals("00"))
                     frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                             Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
                 //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
@@ -358,6 +362,10 @@ public class StationaryDefaultsActivity extends BaseActivity {
             return true;
         if (store_rate_minutes_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
             return true;
+        if (frequency_reference_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
+        if (reference_frequency_store_rate_stationary_textView.getText().toString().equals(getString(R.string.lb_not_set)))
+            return true;
         return false;
     }
 
@@ -382,7 +390,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         int referenceFrequency = stationary_reference_frequency_switch.isChecked() ?
                 Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;
-        int referenceFrequencyStoreRate = reference_frequency_store_rate_stationary_textView.getText().toString().isEmpty() ? 0 : Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString());
+        int referenceFrequencyStoreRate = stationary_reference_frequency_switch.isChecked() ? Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString()) : 0;
 
         return (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER) != firstTableNumber || (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER) != secondTableNumber
                 || (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER) != thirdTableNumber || (int) originalData.get(ValueCodes.ANTENNA_NUMBER) != antennaNumber

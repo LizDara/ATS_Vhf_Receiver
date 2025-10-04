@@ -543,6 +543,11 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
                 switch (parameter) {
                     case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
                         downloadData(packet);
@@ -825,7 +830,6 @@ public class MobileScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        Log.i(TAG, Converters.getHexValue(data));
         switch (Converters.getHexValue(data[0])) {
             case "50":
                 scanState(data);

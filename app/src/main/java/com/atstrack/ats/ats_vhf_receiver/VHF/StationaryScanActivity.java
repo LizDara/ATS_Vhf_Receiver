@@ -178,7 +178,6 @@ public class StationaryScanActivity extends ScanBaseActivity {
         byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
                 (byte) firstTable, (byte) secondTable, (byte) thirdTable};
         isScanning = TransferBleData.writeStartScan(ValueCodes.STATIONARY_DEFAULTS, b);
-        Log.i(TAG, Converters.getHexValue(b));
         if (isScanning) {
             secondParameter = "";
             setVisibility("scanning");
@@ -358,7 +357,10 @@ public class StationaryScanActivity extends ScanBaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
                 switch (parameter) {
                     case ValueCodes.STATIONARY_DEFAULTS: // Gets stationary defaults data
                         downloadData(packet);

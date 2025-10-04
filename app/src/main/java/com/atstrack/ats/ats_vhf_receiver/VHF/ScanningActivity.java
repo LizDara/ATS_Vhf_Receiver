@@ -6,6 +6,7 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -133,20 +134,26 @@ public class ScanningActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                switch (parameter) {
-                    case ValueCodes.DETECTION_TYPE:
-                        downloadDetectionType(packet);
-                        break;
-                    case ValueCodes.TABLES: // Gets the number of frequencies from each table
-                        downloadTables(packet);
-                        break;
-                    case ValueCodes.MOBILE_DEFAULTS:
-                        downloadMobileDefaults(packet);
-                        break;
-                    case ValueCodes.STATIONARY_DEFAULTS:
-                        downloadStationaryDefaults(packet);
-                        break;
+                Log.i(TAG, Converters.getHexValue(packet));
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else {
+                    switch (parameter) {
+                        case ValueCodes.DETECTION_TYPE:
+                            downloadDetectionType(packet);
+                            break;
+                        case ValueCodes.TABLES: // Gets the number of frequencies from each table
+                            downloadTables(packet);
+                            break;
+                        case ValueCodes.MOBILE_DEFAULTS:
+                            downloadMobileDefaults(packet);
+                            break;
+                        case ValueCodes.STATIONARY_DEFAULTS:
+                            downloadStationaryDefaults(packet);
+                            break;
+                    }
                 }
             }
         };

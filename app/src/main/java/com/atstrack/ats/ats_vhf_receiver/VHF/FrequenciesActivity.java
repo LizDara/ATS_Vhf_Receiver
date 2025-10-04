@@ -172,7 +172,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 (byte) (coefficientA / 256), (byte) (coefficientA % 256), formatB, (byte) (coefficientB / 256), (byte) (coefficientB % 256), formatC,
                 (byte) (constant / 256), (byte) (constant % 256), 0, 0, 0};
         boolean result = TransferBleData.writeFrequencies(number, b);
-        Log.i(TAG, "Result " + result + ": " + Converters.getHexValue(b));
         if (result) {
             saveCoefficients = true;
             if (temperaturePosition != -1)
@@ -387,8 +386,11 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
+                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
+                    setBatteryPercent(packet);
+                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
+                    setSdCardStatus(packet);
+                else if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
                     downloadData(packet);
                 else if (parameter.equals(ValueCodes.FREQUENCY_COEFFICIENTS))
                     downloadCoefficients(packet);

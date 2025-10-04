@@ -127,18 +127,19 @@ public class MenuActivity extends BaseActivity {
         }
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         vhf_name_textView.setText("Receiver " + receiverInformation.getSerialNumber());
-        percent_battery_menu_textView.setText(receiverInformation.getPercentBattery() + "%");
-        battery_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
-        sd_card_menu_textView.setText(receiverInformation.getSDCard());
-        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getSDCard().equals("Inserted") ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
+        setBattery(receiverInformation);
+        setSdCard(receiverInformation);
     }
 
     private void initializeCallback() {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
-                unbindService(leServiceConnection.getServiceConnection());
-                Log.i(TAG, "ON BROADCAST RECEIVER: CLOSE CONNECTION");
+                try {
+                    unbindService(leServiceConnection.getServiceConnection());
+                } catch (Exception ex) {
+                    Log.i(TAG, ex.getLocalizedMessage());
+                }
                 Message.showDisconnectionMessage(mContext);
             }
 
@@ -150,6 +151,14 @@ public class MenuActivity extends BaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
+                ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+                if (Converters.getHexValue(packet[0]).equals("56")) { // Sd Card
+                    receiverInformation.changeSDCard(Converters.getHexValue(packet[1]).equals("80"));
+                    setSdCard(receiverInformation);
+                } else if (Converters.getHexValue(packet[0]).equals("88")) { // Battery
+                    receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getHexValue(packet[1])));
+                    setBattery(receiverInformation);
+                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
@@ -158,6 +167,9 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        setSdCard(receiverInformation);
+        setBattery(receiverInformation);
         if (Build.VERSION.SDK_INT >= 33)
             registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
         else
@@ -186,5 +198,15 @@ public class MenuActivity extends BaseActivity {
             });
             detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);
         }
+    }
+
+    private void setBattery(ReceiverInformation receiverInformation) {
+        percent_battery_menu_textView.setText(receiverInformation.getPercentBattery() + "%");
+        battery_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
+    }
+
+    private void setSdCard(ReceiverInformation receiverInformation) {
+        sd_card_menu_textView.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
+        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

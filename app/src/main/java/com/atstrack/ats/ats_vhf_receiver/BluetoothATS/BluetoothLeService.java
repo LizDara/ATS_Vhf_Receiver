@@ -38,8 +38,6 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED_SECOND = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED_SECOND";
-    public final static String ACTION_DATA_AVAILABLE_SECOND = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE_SECOND";
 
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -220,14 +218,6 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
-    public void discovering() {
-        broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-    }
-
-    public void discoveringSecond() {
-        broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED_SECOND);
-    }
-
     /**
      * Request a read on a given {@code BluetoothGattCharacteristic}. The read result is reported
      * asynchronously through the {@code BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
@@ -246,18 +236,6 @@ public class BluetoothLeService extends Service {
         if (result)
             action = ACTION_DATA_AVAILABLE;
         return result;
-    }
-
-    public void readCharacteristicDiagnosticSecond(UUID service, UUID characteristics) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w( TAG,"BluetoothAdapter not initialized");
-            return;
-        }
-        BluetoothGattService myGatService = mBluetoothGatt.getService(service);
-        BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(characteristics);
-        @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
-        if (result)
-            action = ACTION_DATA_AVAILABLE_SECOND;
     }
 
     /**

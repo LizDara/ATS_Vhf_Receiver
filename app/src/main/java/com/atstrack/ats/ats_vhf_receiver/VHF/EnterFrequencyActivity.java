@@ -2,11 +2,9 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,7 +22,6 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
@@ -157,7 +154,7 @@ public class EnterFrequencyActivity extends BaseActivity {
                     setSdCardStatus(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -167,21 +164,6 @@ public class EnterFrequencyActivity extends BaseActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     private void createNumberButtons(int range) {

@@ -10,7 +10,6 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -145,8 +144,6 @@ public class MenuActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.DETECTION_TYPE))
-                    setDetectionFilter();
             }
 
             @Override
@@ -161,7 +158,7 @@ public class MenuActivity extends BaseActivity {
                 }
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -170,16 +167,6 @@ public class MenuActivity extends BaseActivity {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         setSdCard(receiverInformation);
         setBattery(receiverInformation);
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     private void checkDetectionType() {
@@ -192,7 +179,7 @@ public class MenuActivity extends BaseActivity {
                     parameter = bundle.getString(ValueCodes.PARAMETER);
                     if (parameter != null && parameter.equals(ValueCodes.DETECTION_TYPE)) {
                         detectionType = bundle.getByte(ValueCodes.VALUE);
-                        leServiceConnection.getBluetoothLeService().discovering();
+                        setDetectionFilter();
                     }
                 }
             });

@@ -9,13 +9,11 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentResultListener;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
@@ -35,9 +34,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
-import java.util.Calendar;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease_light;
@@ -101,21 +98,14 @@ public class ManualScanActivity extends ScanBaseActivity {
             });
 
     private void setStartScan() {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int YY = currentDate.get(Calendar.YEAR);
-        int MM = currentDate.get(Calendar.MONTH);
-        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-        int mm =  currentDate.get(Calendar.MINUTE);
-        int ss = currentDate.get(Calendar.SECOND);
-
-        byte[] b = new byte[] {(byte) 0x86, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
-                (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256),
-                (byte) (gps_switch.isChecked() ? 0x80 : 0x0)};
+        byte[] b = setCalendar();
+        b[0] = (byte) 0x86;
+        b[7] = (byte) ((newFrequency - baseFrequency) / 256);
+        b[8] = (byte) ((newFrequency - baseFrequency) % 256);
+        b[9] = (byte) (gps_switch.isChecked() ? 0x80 : 0x0);
         isScanning = TransferBleData.writeStartScan("MANUAL", b);
         if (isScanning) {
             clear();
-            secondParameter = "";
             frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
             if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
             gps_scanning_switch.setChecked(gps_switch.isChecked());
@@ -143,7 +133,6 @@ public class ManualScanActivity extends ScanBaseActivity {
             record_data_button.setEnabled(true);
             clear();
         }
-        secondParameter = "";
     }
 
     private void setDecreaseOrIncrease(boolean isDecrease) {
@@ -167,7 +156,6 @@ public class ManualScanActivity extends ScanBaseActivity {
                 }
             }
         }
-        secondParameter = "";
     }
 
     private void setAudio() {
@@ -185,7 +173,6 @@ public class ManualScanActivity extends ScanBaseActivity {
                 audioDescription = "None";
             id_audio_textView.setText(audioDescription);
         }
-        secondParameter = "";
     }
 
     private void setGps() {
@@ -196,7 +183,6 @@ public class ManualScanActivity extends ScanBaseActivity {
         } else {
             gps_scanning_switch.setChecked(!gps_scanning_switch.isChecked());
         }
-        secondParameter = "";
     }
 
     @OnClick({R.id.enter_new_frequency_button, R.id.edit_frequency_button})
@@ -211,31 +197,28 @@ public class ManualScanActivity extends ScanBaseActivity {
     @OnClick(R.id.start_manual_button)
     public void onClickStartManual(View v) {
         parameter = ValueCodes.START_LOG;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setNotificationLog();
+        setStartScan();
     }
 
     @OnClick(R.id.record_data_button)
     public void onClickRecordData(View v) {
-        secondParameter = ValueCodes.RECORD;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
-
         record_data_button.setText(R.string.lb_saving_targets);
         record_data_button.setAlpha((float) 0.6);
         record_data_button.setEnabled(false);
+        setRecord();
     }
 
     @OnClick(R.id.minus_imageView)
     public void onClickMinus(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) - 1;
-        secondParameter = ValueCodes.DECREASE;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDecreaseOrIncrease(true);
     }
 
     @OnClick(R.id.plus_imageView)
     public void onClickPlus(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_scan_manual_textView.getText().toString()) + 1;
-        secondParameter = ValueCodes.INCREASE;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDecreaseOrIncrease(false);
     }
 
     @OnClick(R.id.edit_audio_textView)
@@ -243,13 +226,12 @@ public class ManualScanActivity extends ScanBaseActivity {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                secondParameter = bundle.getString(ValueCodes.PARAMETER);
-                if (secondParameter != null && secondParameter.equals(ValueCodes.AUDIO)) {
+                String state = bundle.getString(ValueCodes.PARAMETER);
+                if (state != null && state.equals(ValueCodes.AUDIO)) {
                     audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
                     audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
                     audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
-
-                    leServiceConnection.getBluetoothLeService().discoveringSecond();
+                    setAudio();
                 }
             }
         });
@@ -263,10 +245,8 @@ public class ManualScanActivity extends ScanBaseActivity {
 
     @OnCheckedChanged(R.id.gps_scanning_switch)
     public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
-        if (enableGpsScanning) {
-            secondParameter = ValueCodes.GPS;
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }
+        if (enableGpsScanning)
+            setGps();
     }
 
     @Override
@@ -295,20 +275,17 @@ public class ManualScanActivity extends ScanBaseActivity {
         }
     }
 
-    @Override
-    protected void initializeCallback() {
+    private void initializeCallback() {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
-                parameter = secondParameter = "";
+                parameter = "";
                 Message.showDisconnectionMessage(mContext);
             }
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
-                    setNotificationLog();
-                else if (parameter.equals(ValueCodes.CONTINUE_LOG))
+                if (parameter.equals(ValueCodes.CONTINUE_LOG))
                     setNotificationLogScanning();
             }
 
@@ -323,53 +300,7 @@ public class ManualScanActivity extends ScanBaseActivity {
                     setCurrentLog(packet);
             }
         };
-        secondReceiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {}
-
-            @Override
-            public void onGattDiscovered() {
-                switch (secondParameter) {
-                    case ValueCodes.START_SCAN: // Starts to scan
-                        setStartScan();
-                        break;
-                    case ValueCodes.STOP_SCAN: // Stops scan
-                        setStopScan();
-                        break;
-                    case ValueCodes.RECORD: // Records a code
-                        setRecord();
-                        break;
-                    case ValueCodes.DECREASE:
-                        setDecreaseOrIncrease(true);
-                        break;
-                    case ValueCodes.INCREASE:
-                        setDecreaseOrIncrease(false);
-                        break;
-                    case ValueCodes.AUDIO:
-                        setAudio();
-                        break;
-                    case ValueCodes.GPS:
-                        setGps();
-                        break;
-                }
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {}
-        };
-        super.initializeCallback();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
-        } else {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
-        }
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -381,8 +312,7 @@ public class ManualScanActivity extends ScanBaseActivity {
                 startActivity(intent);
                 finish();
             } else {
-                secondParameter = ValueCodes.STOP_SCAN;
-                leServiceConnection.getBluetoothLeService().discoveringSecond();
+                setStopScan();
             }
             return true;
         }

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -113,45 +112,14 @@ public class ManageDataActivity extends BaseActivity {
     private boolean downloading;
     private ArrayList<byte[]> pagePackets;
 
-    private GattUpdateReceiver secondGattUpdateReceiver;
-    private final ReceiverCallback secondReceiverCallback = new ReceiverCallback() {
-        @Override
-        public void onGattDisconnected() {}
-
-        @Override
-        public void onGattDiscovered() {
-            switch (secondParameter) {
-                case ValueCodes.DELETE: // Delete data
-                    setDeleteData();
-                    break;
-                case ValueCodes.PAGES_NUMBER: // Read Final Page Number
-                    TransferBleData.readPageNumber();
-                    break;
-                case ValueCodes.READY_DOWNLOAD: // Write that it is ready to download data
-                    setStartDownload();
-                    break;
-                case ValueCodes.PAGE_OK: // Write that it received the page correctly
-                    setResponsePage(true);
-                    break;
-                case ValueCodes.PAGE_BAD: // Write that it did not receive the page
-                    setResponsePage(false);
-                    break;
-            }
-        }
-
-        @Override
-        public void onGattDataAvailable(byte[] packet) {}
-    };
-
     private void setNotification() {
-        secondParameter = ValueCodes.PAGES_NUMBER;
         TransferBleData.downloadResponse();
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        TransferBleData.readPageNumber();
 
         pageNumber = 0;
         packetNumber = 1; // 9 data packages of 230 bytes
@@ -164,34 +132,29 @@ public class ManageDataActivity extends BaseActivity {
     private void setStartDownload() {
         byte[] b = new byte[]{(byte) 0x94};
         boolean result = TransferBleData.writeResponse(b);
-        if (result) secondParameter = "";
     }
 
     private void setResponsePage(boolean isOk) {
         byte[] b = new byte[]{isOk ? (byte) 0x95 : (byte) 0x96};
         boolean result = TransferBleData.writeResponse(b);
         Log.i(TAG, "-------------------------------------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
-        if (result) secondParameter = "";
     }
 
     private void setResponseErase() {
-        secondParameter = ValueCodes.DELETE;
         TransferBleData.downloadResponse();
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDeleteData();
     }
 
     private void setDeleteData() {
         byte[] b = new byte[]{(byte) 0x93};
         boolean result = TransferBleData.writeResponse(b);
-        if (result) {
-            secondParameter = "";
+        if (result)
             setVisibility("deleting");
-        }
     }
 
     @OnClick(R.id.download_data_button)
@@ -215,7 +178,7 @@ public class ManageDataActivity extends BaseActivity {
     @OnClick(R.id.begin_download_button)
     public void onClickBeginDownload(View v) {
         parameter = ValueCodes.DOWNLOAD;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setNotification();
     }
 
     @OnClick(R.id.cancel_download_button)
@@ -233,7 +196,7 @@ public class ManageDataActivity extends BaseActivity {
     @OnClick(R.id.delete_receiver_button)
     public void onClickDeleteReceiver(View v) {
         parameter = ValueCodes.DELETE_RESPONSE;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setResponseErase();
     }
 
     @OnClick(R.id.return_screen_button)
@@ -265,17 +228,8 @@ public class ManageDataActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                switch (parameter) {
-                    case ValueCodes.TEST: // Get memory used and byte stored
-                        TransferBleData.readDataInfo();
-                        break;
-                    case ValueCodes.DOWNLOAD: // Download raw bytes
-                        setNotification();
-                        break;
-                    case ValueCodes.DELETE_RESPONSE: // Response about erase data
-                        setResponseErase();
-                        break;
-                }
+                if (parameter.equals(ValueCodes.TEST)) // Get memory used and byte stored
+                    TransferBleData.readDataInfo();
             }
 
             @Override
@@ -307,8 +261,7 @@ public class ManageDataActivity extends BaseActivity {
                 }
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-        secondGattUpdateReceiver = new GattUpdateReceiver(secondReceiverCallback, false);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -318,25 +271,6 @@ public class ManageDataActivity extends BaseActivity {
             if (resultCode == RESULT_OK)
                 handleSignInIntent(data);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
-        } else {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
-        unregisterReceiver(secondGattUpdateReceiver.mGattUpdateReceiver);
     }
 
     @Override
@@ -357,7 +291,6 @@ public class ManageDataActivity extends BaseActivity {
 
     private void showDisconnectionMessage() {
         parameter = "";
-        secondParameter = "";
         if (downloading) {
             if (rawDataCollector.byteIndex == 0) {
                 for (byte[] packet : packets)
@@ -448,6 +381,7 @@ public class ManageDataActivity extends BaseActivity {
      */
     private void downloadTest(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("52")) {
+            parameter = "";
             int numberPage = findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
             int lastPage = findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
             memory_used_percent_textView.setText(((int) (((float) numberPage / (float) lastPage) * 100)) + "%");
@@ -465,7 +399,7 @@ public class ManageDataActivity extends BaseActivity {
     private void deleteResponse(byte[] data) {
         if (Converters.getHexValue(data).equals("DD 00 BB EE ")) {
             parameter = ValueCodes.TEST;
-            leServiceConnection.getBluetoothLeService().discovering();
+            TransferBleData.readDataInfo();
             setVisibility("deleted");
         } else {
             parameter = "";
@@ -576,8 +510,7 @@ public class ManageDataActivity extends BaseActivity {
             setVisibility("downloading");
             loadDownloading();
         }
-        secondParameter = ValueCodes.READY_DOWNLOAD;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setStartDownload();
     }
 
     private boolean isErrorPacket(byte[] packet) {
@@ -601,7 +534,7 @@ public class ManageDataActivity extends BaseActivity {
         } else if (downloading) {
             if (pagePackets.isEmpty()) {
                 receiveHandler.postDelayed(() -> {
-                    secondParameter = ValueCodes.PAGE_BAD;
+                    boolean isOk = false;
                     if (pagePackets.size() >= 9 && downloading) {
                         if (findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
                             int number = findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
@@ -625,7 +558,7 @@ public class ManageDataActivity extends BaseActivity {
                                     }
                                     int percent = ((int) (((float) pageNumber / (float) finalPageNumber) * 100));
                                     download_percent_textView.setText(" - " + percent + "%");
-                                    secondParameter = ValueCodes.PAGE_OK;
+                                    isOk = true;
                                 } else {
                                     Log.i(TAG, "No se encontraron los 9 paquetes");
                                     pageNumber--;
@@ -641,7 +574,7 @@ public class ManageDataActivity extends BaseActivity {
                     }
                     packetNumber = 1;
                     pagePackets = new ArrayList<>();
-                    leServiceConnection.getBluetoothLeService().discoveringSecond();
+                    setResponsePage(isOk);
                 }, ValueCodes.DOWNLOAD_PERIOD);
             }
             pagePackets.add(packet);

@@ -93,7 +93,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
     private LeServiceConnection leServiceConnection;
     private Timer connectionTimeout;
     private boolean mConnected, cancel, readBoardStatus = false;
-    private String parameter, secondParameter = "";
+    private String parameter = "";
 
     // Device scan callback.
     private final ScanCallback mLeScanCallback =
@@ -133,27 +133,8 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 if (!cancel && leServiceConnection.existConnection() && mConnected) {
-                    parameter = ValueCodes.SCAN_STATUS;
-                    leServiceConnection.getBluetoothLeService().discovering();
-                }
-            }
-        }
-    };
-
-    private final BroadcastReceiver mSecondGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                final String action = intent.getAction();
-                if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND.equals(action)) {
-                    if (secondParameter.equals(ValueCodes.BOARD_STATUS)) // Checks if the BLE device is scanning
-                        getBoardState();
-                }
-            } catch (Exception e) {
-                if (!cancel && leServiceConnection.existConnection() && mConnected) {
-                    secondParameter = ValueCodes.BOARD_STATUS;
                     parameter = "";
-                    leServiceConnection.getBluetoothLeService().discoveringSecond();
+                    getScanStatus();
                 }
             }
         }
@@ -164,7 +145,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
      */
     @SuppressLint("MissingPermission")
     private void getBoardState() {
-        secondParameter = "";
         boolean result = TransferBleData.readBoardState();
         if (result && !cancel) {
             BluetoothDevice device = mLeDeviceListAdapter.getSelectedDevice();
@@ -191,12 +171,11 @@ public class ScanDevicesActivity extends AppCompatActivity {
      * Requests a read for scan state.
      */
     private void getScanStatus() {
-        secondParameter = ValueCodes.BOARD_STATUS;
         parameter = "";
         TransferBleData.notificationLog();
         if (!cancel && mConnected) {
             new Handler().postDelayed(() -> {
-                leServiceConnection.getBluetoothLeService().discoveringSecond();
+                getBoardState();
             }, ValueCodes.WAITING_PERIOD);
         }
     }
@@ -254,7 +233,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
 
     private void initializeParameters() {
         mConnected = cancel = false;
-        parameter = secondParameter = "";
+        parameter = "";
         connectionTimeout = new Timer();
     }
 
@@ -262,28 +241,27 @@ public class ScanDevicesActivity extends AppCompatActivity {
         cancel = true;
         mConnected = false;
         readBoardStatus = false;
-        parameter = secondParameter = "";
+        parameter = "";
         unbindService(leServiceConnection.getServiceConnection());
         if (leServiceConnection.existConnection()) leServiceConnection.close();
-        mUnregisterReceiver();
+        unregisterReceiver(mGattUpdateReceiver);
     }
 
     @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
         super.onResume();
-        if (mConnected) {
+        if (mConnected)
             mRegisterReceiver();
-        } else if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+        else if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())
             scanLeDevice(true);
-        }
     }
 
     @Override
     protected void onPause() {
         if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
             if (mConnected) {
-                mUnregisterReceiver();
+                unregisterReceiver(mGattUpdateReceiver);
             } else if (leServiceConnection != null && !leServiceConnection.existConnection()) {
                 scanLeDevice(false);
             }
@@ -513,17 +491,13 @@ public class ScanDevicesActivity extends AppCompatActivity {
     }
 
     private void mRegisterReceiver() {
-        if (Build.VERSION.SDK_INT >= 33) {
+        if (Build.VERSION.SDK_INT >= 33)
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
-        } else {
+        else
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(mSecondGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
-        }
     }
 
     private void mUnregisterReceiver() {
         unregisterReceiver(mGattUpdateReceiver);
-        unregisterReceiver(mSecondGattUpdateReceiver);
     }
 }

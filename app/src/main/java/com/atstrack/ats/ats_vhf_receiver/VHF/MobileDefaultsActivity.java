@@ -8,7 +8,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -113,9 +112,7 @@ public class MobileDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.SAVE)) // Save aerial defaults data
-                    setMobileDefaults();
-                else if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) // Gets aerial defaults data
+                if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) // Gets aerial defaults data
                     TransferBleData.readDefaults(true);
             }
 
@@ -130,40 +127,23 @@ public class MobileDefaultsActivity extends BaseActivity {
                     downloadData(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!existNotSet()) {
-                if (existChanges()) {
-                    parameter = ValueCodes.SAVE;
-                    leServiceConnection.getBluetoothLeService().discovering();
-                } else {
+                if (existChanges())
+                    setMobileDefaults();
+                else
                     finish();
-                }
             } else {
                 Message.showMessage(this, "Complete all fields.");
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     /**

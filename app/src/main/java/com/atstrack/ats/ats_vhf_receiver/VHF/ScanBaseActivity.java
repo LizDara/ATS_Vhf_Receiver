@@ -7,7 +7,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.style.body_regular;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
@@ -18,13 +17,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 
@@ -53,19 +53,26 @@ public class ScanBaseActivity extends BaseActivity {
     protected int range;
     protected byte detectionType;
     protected DialogFragment viewDetectionFilter;
-    protected GattUpdateReceiver secondGattUpdateReceiver;
-    protected ReceiverCallback secondReceiverCallback;
 
     protected void setNotificationLog() {
-        secondParameter = ValueCodes.START_SCAN;
         TransferBleData.notificationLog();
-
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+    }
+
+    protected byte[] setCalendar() {
+        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        int YY = currentDate.get(Calendar.YEAR);
+        int MM = currentDate.get(Calendar.MONTH);
+        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
+        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
+        int mm =  currentDate.get(Calendar.MINUTE);
+        int ss = currentDate.get(Calendar.SECOND);
+
+        return new byte[] {0, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss, 0, 0, 0};
     }
 
     protected void setNotificationLogScanning() {
@@ -83,18 +90,6 @@ public class ScanBaseActivity extends BaseActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
         baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
         range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
-    }
-
-    protected void initializeCallback() {
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-        secondGattUpdateReceiver = new GattUpdateReceiver(secondReceiverCallback, false);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
-        unregisterReceiver(secondGattUpdateReceiver.mGattUpdateReceiver);
     }
 
     protected void updateVisibility(int visibility) {

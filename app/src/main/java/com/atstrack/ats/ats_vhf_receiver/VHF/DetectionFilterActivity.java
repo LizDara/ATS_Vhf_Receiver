@@ -7,7 +7,6 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.HashMap;
@@ -217,8 +215,6 @@ public class DetectionFilterActivity extends BaseActivity {
             public void onGattDiscovered() {
                 if (parameter.equals(ValueCodes.DETECTION_TYPE)) // Gets the tx type information
                     TransferBleData.readDetectionFilter();
-                else if (parameter.equals(ValueCodes.SAVE)) // Saves the updated data
-                    setDetectionFilter();
             }
 
             @Override
@@ -232,34 +228,17 @@ public class DetectionFilterActivity extends BaseActivity {
                     downloadData(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (checkChanges()) {
-                if (isDataCorrect()) {
-                    parameter = ValueCodes.SAVE;
-                    leServiceConnection.getBluetoothLeService().discovering();
-                } else {
+                if (isDataCorrect())
+                    setDetectionFilter();
+                else
                     Message.showMessage(this, 1);
-                }
             } else {
                 finish();
             }

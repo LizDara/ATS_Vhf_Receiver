@@ -15,7 +15,6 @@ import butterknife.OnClick;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,6 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
@@ -40,9 +40,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
@@ -149,7 +147,7 @@ public class MobileScanActivity extends ScanBaseActivity {
                     scan_rate_seconds_aerial_textView.setText(String.valueOf(value * 0.1));
                     parameter = ValueCodes.SCAN_RATE;
                 }
-                leServiceConnection.getBluetoothLeService().discovering();
+                setTemporary();
             });
 
     private void setTemporary() {
@@ -181,19 +179,11 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     private void setStartScan() {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int YY = currentDate.get(Calendar.YEAR);
-        int MM = currentDate.get(Calendar.MONTH);
-        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-        int mm =  currentDate.get(Calendar.MINUTE);
-        int ss = currentDate.get(Calendar.SECOND);
-
-        byte[] b = new byte[] {
-                (byte) 0x82, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss, (byte) selectedTable, (byte) 0x0, (byte) 0x0};
+        byte[] b = setCalendar();
+        b[0] = (byte) 0x82;
+        b[7] = (byte) selectedTable;
         isScanning = TransferBleData.writeStartScan(ValueCodes.MOBILE_DEFAULTS, b);
         if (isScanning) {
-            secondParameter = "";
             removeHold();
             isRecord = autoRecord == 1;
             if (isRecord) setRecord(); else removeRecord();
@@ -207,11 +197,10 @@ public class MobileScanActivity extends ScanBaseActivity {
         if (result) {
             clear();
             isScanning = false;
-            secondParameter = "";
             if (previousScanning) {
                 parameter = ValueCodes.MOBILE_DEFAULTS;
                 new Handler().postDelayed(() -> {
-                    leServiceConnection.getBluetoothLeService().discovering();
+                    TransferBleData.readDefaults(true);
                 }, ValueCodes.WAITING_PERIOD);
                 previousScanning = false;
             } else {
@@ -225,21 +214,10 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void setHoldScan() {
         boolean result = TransferBleData.setHold(isHold);
         if (result) {
-            secondParameter = "";
             isHold = !isHold;
             if (isHold) setHold();
             else removeHold();
         }
-    }
-
-    @Override
-    protected void setNotificationLogScanning() {
-        super.setNotificationLogScanning();
-
-        new Handler().postDelayed(() -> {
-            if (newFrequency != 0)
-                leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }, ValueCodes.WAITING_PERIOD);
     }
 
     /**
@@ -250,7 +228,6 @@ public class MobileScanActivity extends ScanBaseActivity {
                 (byte) ((newFrequency - baseFrequency) % 256)};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            secondParameter = "";
             newFrequency = 0;
             manageMessage(R.string.lb_frequency_added);
         }
@@ -263,10 +240,8 @@ public class MobileScanActivity extends ScanBaseActivity {
         int index = Integer.parseInt(table_index_aerial_textView.getText().toString());
         byte[] b = new byte[] {(byte) 0x5C, (byte) (index / 256), (byte) (index % 256)};
         boolean result = TransferBleData.writeScanning(b);
-        if (result) {
-            secondParameter = "";
+        if (result)
             manageMessage(R.string.lb_frequency_deleted);
-        }
     }
 
     /**
@@ -285,7 +260,6 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void setDecreaseOrIncrease(boolean isDecrease) {
         boolean result = TransferBleData.writeDecreaseIncrease(isDecrease);
         if (result) {
-            secondParameter = "";
             if (isDecrease) {
                 if (newFrequency == baseFrequency) {
                     decrease_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease_light));
@@ -309,7 +283,6 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void setRecordScan() {
         boolean result = TransferBleData.writeRecord(!isRecord, false);
         if (result) {
-            secondParameter = "";
             isRecord = !isRecord;
             if (isRecord) setRecord();
             else removeRecord();
@@ -353,45 +326,41 @@ public class MobileScanActivity extends ScanBaseActivity {
     @OnCheckedChanged(R.id.gps_switch)
     public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
         if (parameter.isEmpty()) {
-            parameter = ValueCodes.GPS;
-            leServiceConnection.getBluetoothLeService().discovering();
             gps_switch.setEnabled(false);
+            setTemporary();
         }
     }
 
     @OnCheckedChanged(R.id.aerial_auto_record_switch)
     public void onCheckedChangedAutoRecord(CompoundButton button, boolean isChecked) {
         if (parameter.isEmpty()) {
-            parameter = ValueCodes.AUTO_RECORD;
-            leServiceConnection.getBluetoothLeService().discovering();
             aerial_auto_record_switch.setEnabled(false);
+            setTemporary();
         }
     }
 
     @OnClick(R.id.start_aerial_button)
     public void onClickStartAerial(View v) {
         parameter = ValueCodes.START_LOG;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setNotificationLog();
+        setStartScan();
     }
 
     @OnClick(R.id.hold_aerial_button)
     public void onClickHoldAerial(View v) {
-        secondParameter = ValueCodes.HOLD;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setHoldScan();
     }
 
     @OnClick(R.id.decrease_imageView)
     public void onClickDecrease(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) - 1;
-        secondParameter = ValueCodes.DECREASE;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDecreaseOrIncrease(true);
     }
 
     @OnClick(R.id.increase_imageView)
     public void onClickIncrease(View v) {
         newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) + 1;
-        secondParameter = ValueCodes.INCREASE;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDecreaseOrIncrease(false);
     }
 
     @OnClick(R.id.edit_table_textView)
@@ -413,41 +382,34 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     @OnClick(R.id.delete_frequency_scan_button)
     public void onClickDeleteFrequencyScan(View v) {
-        secondParameter = ValueCodes.DELETE_FREQUENCY;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setDeleteFrequency();
     }
 
     @OnClick(R.id.merge_table_scan_button)
     public void onClickMergeTableScan(View v) {
         setVisibility("mergeTable");
-        if (tableMergeListAdapter == null) {
-            secondParameter = ValueCodes.TABLES;
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
-        }
+        if (tableMergeListAdapter == null)
+            TransferBleData.readTables();
     }
 
     @OnClick(R.id.merge_tables_button)
     public void onClickMergeTables(View v) {
-        secondParameter = ValueCodes.MERGE;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setMergeTable();
     }
 
     @OnClick(R.id.record_data_button)
     public void onClickRecordData(View v) {
-        secondParameter = ValueCodes.RECORD;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        setRecordScan();
     }
 
     @OnClick(R.id.left_imageView)
     public void onClickLeft(View v) {
-        secondParameter = ValueCodes.LEFT;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        TransferBleData.writeLeftRight(true);
     }
 
     @OnClick(R.id.right_imageView)
     public void onClickRight(View v) {
-        secondParameter = ValueCodes.RIGHT;
-        leServiceConnection.getBluetoothLeService().discoveringSecond();
+        TransferBleData.writeLeftRight(false);
     }
 
     @OnClick(R.id.edit_audio_textView)
@@ -455,13 +417,12 @@ public class MobileScanActivity extends ScanBaseActivity {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                secondParameter = bundle.getString(ValueCodes.PARAMETER);
-                if (secondParameter != null && secondParameter.equals(ValueCodes.AUDIO)) {
+                String state = bundle.getString(ValueCodes.PARAMETER);
+                if (state != null && state.equals(ValueCodes.AUDIO)) {
                     audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
                     audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
                     audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
-
-                    leServiceConnection.getBluetoothLeService().discoveringSecond();
+                    setAudio();
                 }
             }
         });
@@ -511,12 +472,11 @@ public class MobileScanActivity extends ScanBaseActivity {
         }
     }
 
-    @Override
-    protected void initializeCallback() {
+    private void initializeCallback() {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
-                parameter = secondParameter = "";
+                parameter = "";
                 Message.showDisconnectionMessage(mContext);
             }
 
@@ -526,95 +486,34 @@ public class MobileScanActivity extends ScanBaseActivity {
                     case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
                         TransferBleData.readDefaults(true);
                         break;
-                    case ValueCodes.START_LOG: // Receives the data
-                        setNotificationLog();
-                        break;
                     case ValueCodes.CONTINUE_LOG:
                         setNotificationLogScanning();
-                        break;
-                    case ValueCodes.TABLE_NUMBER:
-                    case ValueCodes.SCAN_RATE:
-                    case ValueCodes.GPS:
-                    case ValueCodes.AUTO_RECORD:
-                        setTemporary();
                         break;
                 }
             }
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
+                Log.i(TAG, parameter + ": " + Converters.getHexValue(packet));
                 if (Converters.getHexValue(packet[0]).equals("88")) // Battery
                     setBatteryPercent(packet);
                 else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
                     setSdCardStatus(packet);
-                switch (parameter) {
-                    case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
-                        downloadData(packet);
-                        break;
-                    case ValueCodes.START_LOG: // Receives the data
-                        setCurrentLog(packet);
-                        break;
-                }
-            }
-        };
-        secondReceiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {}
-
-            @Override
-            public void onGattDiscovered() {
-                switch (secondParameter) {
-                    case ValueCodes.START_SCAN: // Starts to scan
-                        setStartScan();
-                        break;
-                    case ValueCodes.STOP_SCAN: // Stops scan
-                        setStopScan();
-                        break;
-                    case ValueCodes.HOLD:
-                        setHoldScan();
-                        break;
-                    case ValueCodes.TABLES:
-                        TransferBleData.readTables(true);
-                        break;
-                    case ValueCodes.ADD_FREQUENCY:
-                        setNewFrequency();
-                        break;
-                    case ValueCodes.DELETE_FREQUENCY:
-                        setDeleteFrequency();
-                        break;
-                    case ValueCodes.DECREASE:
-                        setDecreaseOrIncrease(true);
-                        break;
-                    case ValueCodes.INCREASE:
-                        setDecreaseOrIncrease(false);
-                        break;
-                    case ValueCodes.MERGE:
-                        setMergeTable();
-                        break;
-                    case ValueCodes.RECORD:
-                        setRecordScan();
-                        break;
-                    case ValueCodes.LEFT:
-                        TransferBleData.writeLeftRight(true);
-                        break;
-                    case ValueCodes.RIGHT:
-                        TransferBleData.writeLeftRight(false);
-                        break;
-                    case ValueCodes.AUDIO:
-                        setAudio();
-                        break;
-                }
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                if (Converters.getHexValue(packet[0]).equals("88")) return;
-                if (secondParameter.equals(ValueCodes.TABLES))
+                else if (Converters.getHexValue(packet[0]).equals("7A"))
                     downloadTables(packet);
+                else {
+                    switch (parameter) {
+                        case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
+                            downloadData(packet);
+                            break;
+                        case ValueCodes.START_LOG: // Receives the data
+                            setCurrentLog(packet);
+                            break;
+                    }
+                }
             }
         };
-        super.initializeCallback();
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -632,25 +531,12 @@ public class MobileScanActivity extends ScanBaseActivity {
                     setVisibility("editTable");
                     changeAllCheckBox();
                 } else {
-                    secondParameter = ValueCodes.STOP_SCAN;
-                    leServiceConnection.getBluetoothLeService().discoveringSecond();
+                    setStopScan();
                 }
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeThirdGattUpdateIntentFilter(), 2);
-        } else {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeThirdGattUpdateIntentFilter());
-        }
     }
 
     private void setVisibility(String value) {
@@ -720,7 +606,6 @@ public class MobileScanActivity extends ScanBaseActivity {
      */
     private void downloadTables(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("7A")) {
-            secondParameter = "";
             ArrayList<Integer> frequencies = new ArrayList<>();
             ArrayList<Integer> tables = new ArrayList<>();
             for (int i = 1; i <= 12; i++) {

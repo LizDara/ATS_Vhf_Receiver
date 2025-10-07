@@ -10,7 +10,6 @@ import butterknife.OnClick;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -90,21 +89,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     private int temperaturePosition;
     private Map<String, String> coefficients;
 
-    private GattUpdateReceiver secondGattUpdateReceiver;
-    private final ReceiverCallback secondReceiverCallback = new ReceiverCallback() {
-        @Override
-        public void onGattDisconnected() {}
-
-        @Override
-        public void onGattDiscovered() {
-            if (secondParameter.equals(ValueCodes.FREQUENCIES))
-                sendIndex();
-        }
-
-        @Override
-        public void onGattDataAvailable(byte[] packet) {}
-    };
-
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (ValueCodes.CANCELLED == result.getResultCode())
@@ -145,17 +129,16 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             });
 
     private void readCoefficients() {
-        secondParameter = ValueCodes.FREQUENCIES;
         TransferBleData.notificationLog();
         new Handler().postDelayed(() -> {
-            leServiceConnection.getBluetoothLeService().discoveringSecond();
+            parameter = ValueCodes.FREQUENCY_COEFFICIENTS;
+            sendIndex();
         }, ValueCodes.WAITING_PERIOD);
     }
 
     private void sendIndex() {
         byte[] b = new byte[] {(byte) 0x7D, (byte) (temperaturePosition + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        boolean result = TransferBleData.writeFrequencies(number, b);
-        if (result) secondParameter = "";
+        TransferBleData.writeFrequencies(number, b);
     }
 
     private void addTemperatureFrequency() {
@@ -303,12 +286,10 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     public void onClickSaveFrequency(View v) {
         if (temperaturePosition != -1) {
             if (existChangesInCoefficients()) {
-                parameter = ValueCodes.ADD_FREQUENCY;
-                leServiceConnection.getBluetoothLeService().discovering();
+                addTemperatureFrequency();
             }
         } else {
-            parameter = ValueCodes.ADD_FREQUENCY;
-            leServiceConnection.getBluetoothLeService().discovering();
+            addTemperatureFrequency();
         }
     }
 
@@ -367,20 +348,8 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
             @Override
             public void onGattDiscovered() {
-                switch (parameter) {
-                    case ValueCodes.TABLE: // Get the frequencies from a table
-                        TransferBleData.readFrequencies(number);
-                        break;
-                    case ValueCodes.FREQUENCY_COEFFICIENTS:
-                        readCoefficients();
-                        break;
-                    case ValueCodes.ADD_FREQUENCY: // Add frequency with its coefficients
-                        addTemperatureFrequency();
-                        break;
-                    case ValueCodes.SAVE: // Send the modified frequencies
-                        setTable();
-                        break;
-                }
+                if (parameter.equals(ValueCodes.TABLE)) // Get the frequencies from a table
+                    TransferBleData.readFrequencies(number);
             }
 
             @Override
@@ -396,8 +365,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                     downloadCoefficients(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-        secondGattUpdateReceiver = new GattUpdateReceiver(secondReceiverCallback, false);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -405,12 +373,10 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (frequencies_overview_linearLayout.getVisibility() == View.VISIBLE
                     || no_frequencies_linearLayout.getVisibility() == View.VISIBLE) {
-                if ((isFile || existChanges()) && saveCoefficients) {
-                    parameter = ValueCodes.SAVE;
-                    leServiceConnection.getBluetoothLeService().discovering();
-                } else {
+                if ((isFile || existChanges()) && saveCoefficients)
+                    setTable();
+                else
                     finish();
-                }
             } else if (delete_frequencies_linearLayout.getVisibility() == View.VISIBLE ||
                     edit_temperature_frequency_linearLayout.getVisibility() == View.VISIBLE) {
                 title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getItemCount() + " Frequencies)");
@@ -426,29 +392,9 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
-        } else {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
-        unregisterReceiver(secondGattUpdateReceiver.mGattUpdateReceiver);
-    }
-
-    @Override
     public void onAdapterItemClickListener(int position) {
         temperaturePosition = position;
-        parameter = ValueCodes.FREQUENCY_COEFFICIENTS;
-        leServiceConnection.getBluetoothLeService().discovering();
+        readCoefficients();
     }
 
     /**

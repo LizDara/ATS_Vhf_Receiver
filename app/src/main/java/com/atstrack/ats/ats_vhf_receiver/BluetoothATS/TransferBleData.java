@@ -10,32 +10,12 @@ import java.util.UUID;
 
 public class TransferBleData {
 
-    public static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        return intentFilter;
-    }
-
     public static IntentFilter makeFirstGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
-    }
-
-    public static IntentFilter makeSecondGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
-        return intentFilter;
-    }
-
-    public static IntentFilter makeThirdGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND);
         return intentFilter;
     }
 
@@ -61,11 +41,10 @@ public class TransferBleData {
     /**
      * Requests a read for get the number of frequencies from each table and display it.
      */
-    public static void readTables(boolean isScanning) {
+    public static void readTables() {
         UUID service = AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsVhfReceiverUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        if (isScanning) LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnosticSecond(service, characteristic);
-        else LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(service, characteristic);
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(service, characteristic);
     }
 
     public static boolean writeStartScan(String type, byte[] data) {

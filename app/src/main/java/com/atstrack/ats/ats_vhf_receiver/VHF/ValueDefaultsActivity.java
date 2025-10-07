@@ -4,7 +4,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -222,7 +221,7 @@ public class ValueDefaultsActivity extends BaseActivity {
                         TransferBleData.readDefaults(false);
                         break;
                     case ValueCodes.TABLES:
-                        TransferBleData.readTables(false);
+                        TransferBleData.readTables();
                         break;
                 }
             }
@@ -259,7 +258,7 @@ public class ValueDefaultsActivity extends BaseActivity {
                 }
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -276,21 +275,6 @@ public class ValueDefaultsActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     private void setVisibility(String value) {

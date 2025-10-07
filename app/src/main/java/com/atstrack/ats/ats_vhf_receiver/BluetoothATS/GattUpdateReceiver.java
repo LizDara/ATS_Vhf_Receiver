@@ -11,10 +11,10 @@ public class GattUpdateReceiver {
     private final String ACTION_SERVICES_DISCOVERED;
     private final String ACTION_DATA_AVAILABLE;
 
-    public GattUpdateReceiver(ReceiverCallback receiverCallback, boolean isMain) {
+    public GattUpdateReceiver(ReceiverCallback receiverCallback) {
         this.receiverCallback = receiverCallback;
-        ACTION_SERVICES_DISCOVERED = isMain ? BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED : BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED_SECOND;
-        ACTION_DATA_AVAILABLE = isMain ? BluetoothLeService.ACTION_DATA_AVAILABLE : BluetoothLeService.ACTION_DATA_AVAILABLE_SECOND;
+        ACTION_SERVICES_DISCOVERED = BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED;
+        ACTION_DATA_AVAILABLE = BluetoothLeService.ACTION_DATA_AVAILABLE;
     }
 
     // Handles various events fired by the Service.

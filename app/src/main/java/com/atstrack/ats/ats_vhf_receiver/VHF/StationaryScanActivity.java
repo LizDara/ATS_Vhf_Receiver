@@ -8,7 +8,6 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,6 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
@@ -26,11 +26,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-import com.google.common.base.Converter;
 
-import java.util.Calendar;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.UUID;
 
 public class StationaryScanActivity extends ScanBaseActivity {
@@ -121,7 +118,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
                             break;
                     }
                 }
-                leServiceConnection.getBluetoothLeService().discovering();
+                setTemporary();
             });*/
 
     private void onClickTemporary() {
@@ -166,22 +163,15 @@ public class StationaryScanActivity extends ScanBaseActivity {
         stationary_reference_frequency_switch.setEnabled(true);
     }
 
-    private void onClickStart() {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int YY = currentDate.get(Calendar.YEAR);
-        int MM = currentDate.get(Calendar.MONTH);
-        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-        int mm =  currentDate.get(Calendar.MINUTE);
-        int ss = currentDate.get(Calendar.SECOND);
-
-        byte[] b = new byte[] {(byte) 0x83, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss,
-                (byte) firstTable, (byte) secondTable, (byte) thirdTable};
+    private void setStartScan() {
+        byte[] b = setCalendar();
+        b[0] = (byte) 0x83;
+        b[7] = (byte) firstTable;
+        b[8] = (byte) secondTable;
+        b[9] = (byte) thirdTable;
         isScanning = TransferBleData.writeStartScan(ValueCodes.STATIONARY_DEFAULTS, b);
-        if (isScanning) {
-            secondParameter = "";
+        if (isScanning)
             setVisibility("scanning");
-        }
     }
 
     private void setStopScan() {
@@ -194,7 +184,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
             if (previousScanning) {
                 parameter = ValueCodes.STATIONARY_DEFAULTS;
                 new Handler().postDelayed(() -> {
-                    leServiceConnection.getBluetoothLeService().discovering();
+                    TransferBleData.readDefaults(false);
                 }, ValueCodes.WAITING_PERIOD);
                 previousScanning = false;
             } else {
@@ -283,7 +273,8 @@ public class StationaryScanActivity extends ScanBaseActivity {
     @OnClick(R.id.start_stationary_button)
     public void onClickStartStationary(View v) {
         parameter = ValueCodes.START_LOG;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setNotificationLog();
+        setStartScan();
     }
 
     @OnClick(R.id.view_detection_stationary_textView)
@@ -321,12 +312,10 @@ public class StationaryScanActivity extends ScanBaseActivity {
         }
     }
 
-    @Override
-    protected void initializeCallback() {
+    private void initializeCallback() {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
-                parameter = secondParameter = "";
                 Message.showDisconnectionMessage(mContext);
             }
 
@@ -336,20 +325,8 @@ public class StationaryScanActivity extends ScanBaseActivity {
                     case ValueCodes.STATIONARY_DEFAULTS: // Gets stationary defaults data
                         TransferBleData.readDefaults(false);
                         break;
-                    case ValueCodes.START_LOG: // Receives the data
-                        setNotificationLog();
-                        break;
                     case ValueCodes.CONTINUE_LOG:
                         setNotificationLogScanning();
-                        break;
-                    case ValueCodes.TABLES:
-                    case ValueCodes.SCAN_RATE:
-                    case ValueCodes.SCAN_TIMEOUT:
-                    case ValueCodes.ANTENNA_NUMBER:
-                    case ValueCodes.STORE_RATE:
-                    case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE:
-                    case ValueCodes.REFERENCE_FREQUENCY:
-                        onClickTemporary();
                         break;
                 }
             }
@@ -371,26 +348,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
                 }
             }
         };
-        secondReceiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {}
-
-            @Override
-            public void onGattDiscovered() {
-                switch (secondParameter) {
-                    case ValueCodes.START_SCAN: // Starts to scan
-                        onClickStart();
-                        break;
-                    case ValueCodes.STOP_SCAN: // Stops scan
-                        setStopScan();
-                        break;
-                }
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {}
-        };
-        super.initializeCallback();
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -402,24 +360,11 @@ public class StationaryScanActivity extends ScanBaseActivity {
                 startActivity(intent);
                 finish();
             } else {
-                secondParameter = ValueCodes.STOP_SCAN;
-                leServiceConnection.getBluetoothLeService().discoveringSecond();
+                setStopScan();
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter(), 2);
-        } else {
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-            registerReceiver(secondGattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeSecondGattUpdateIntentFilter());
-        }
     }
 
     private void setVisibility(String value) {

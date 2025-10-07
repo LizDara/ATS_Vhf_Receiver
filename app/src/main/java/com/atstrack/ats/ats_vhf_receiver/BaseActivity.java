@@ -2,6 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
@@ -30,7 +32,6 @@ public class BaseActivity extends AppCompatActivity {
 
     protected final Context mContext = this;
     protected String parameter = "";
-    protected String secondParameter = "";
     protected final LeServiceConnection leServiceConnection = LeServiceConnection.getInstance();
     protected GattUpdateReceiver gattUpdateReceiver;
     protected ReceiverCallback receiverCallback;
@@ -52,8 +53,18 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (Build.VERSION.SDK_INT >= 33)
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+        else
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
         if(showToolbar && deviceCategory.equals(ValueCodes.VHF))
             ActivitySetting.setReceiverStatus(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
     }
 
     @Override

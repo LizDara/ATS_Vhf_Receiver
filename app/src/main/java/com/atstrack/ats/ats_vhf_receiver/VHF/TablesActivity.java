@@ -9,7 +9,6 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -22,7 +21,6 @@ import android.widget.ListView;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -83,10 +81,6 @@ public class TablesActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TABLES))
-                    TransferBleData.readTables(false);
-                else if (parameter.equals(ValueCodes.DETECTION_TYPE))
-                    TransferBleData.readDetectionFilter();
             }
 
             @Override
@@ -102,7 +96,7 @@ public class TablesActivity extends BaseActivity {
                     downloadDetectionFilter(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -139,17 +133,7 @@ public class TablesActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-        leServiceConnection.getBluetoothLeService().discovering();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        TransferBleData.readTables();
     }
 
     /**
@@ -247,7 +231,7 @@ public class TablesActivity extends BaseActivity {
             tableListAdapter = new TableListAdapter(this, data);
             tables_listView.setAdapter(tableListAdapter);
             parameter = ValueCodes.DETECTION_TYPE;
-            leServiceConnection.getBluetoothLeService().discovering();
+            TransferBleData.readDetectionFilter();
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
         }

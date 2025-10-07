@@ -108,7 +108,7 @@ public class MenuActivity extends BaseActivity {
                     setHealthBeaconData(packet);
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override

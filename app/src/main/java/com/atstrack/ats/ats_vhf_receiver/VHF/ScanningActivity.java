@@ -4,7 +4,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -56,13 +55,13 @@ public class ScanningActivity extends BaseActivity {
     @OnClick(R.id.start_aerial_scan_button)
     public void onClickStartAerialScan(View v) {
         parameter = ValueCodes.MOBILE_DEFAULTS;
-        leServiceConnection.getBluetoothLeService().discovering();
+        TransferBleData.readDefaults(true);
     }
 
     @OnClick(R.id.start_stationary_scan_button)
     public void onClickStartStationaryScan(View v) {
         parameter = ValueCodes.STATIONARY_DEFAULTS;
-        leServiceConnection.getBluetoothLeService().discovering();
+        TransferBleData.readDefaults(false);
     }
 
     @OnClick(R.id.go_button)
@@ -116,20 +115,8 @@ public class ScanningActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                switch (parameter) {
-                    case ValueCodes.DETECTION_TYPE:
-                        TransferBleData.readDetectionFilter();
-                        break;
-                    case ValueCodes.TABLES: // Gets the number of frequencies from each table
-                        TransferBleData.readTables(false);
-                        break;
-                    case ValueCodes.MOBILE_DEFAULTS:
-                        TransferBleData.readDefaults(true);
-                        break;
-                    case ValueCodes.STATIONARY_DEFAULTS:
-                        TransferBleData.readDefaults(false);
-                        break;
-                }
+                if (parameter.equals(ValueCodes.DETECTION_TYPE))
+                    TransferBleData.readDetectionFilter();
             }
 
             @Override
@@ -157,22 +144,7 @@ public class ScanningActivity extends BaseActivity {
                 }
             }
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -200,7 +172,7 @@ public class ScanningActivity extends BaseActivity {
                         && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0;
             }
             parameter = ValueCodes.TABLES;
-            leServiceConnection.getBluetoothLeService().discovering();
+            TransferBleData.readTables();
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
         }

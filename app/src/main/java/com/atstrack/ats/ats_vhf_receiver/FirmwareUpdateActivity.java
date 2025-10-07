@@ -1,6 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -112,8 +111,7 @@ public class FirmwareUpdateActivity extends BaseActivity {
                 index = index + MTU;
             }
             Log.i("OTA", "OTA UPLOAD SEND DONE");
-            parameter = ValueCodes.OTA_END_WRITTEN;
-            leServiceConnection.getBluetoothLeService().discovering();
+            otaEnd();
         }).start();
     }
 
@@ -177,17 +175,11 @@ public class FirmwareUpdateActivity extends BaseActivity {
             @Override
             public void onGattDiscovered() {
                 switch (parameter) {
-                    case ValueCodes.OTA_BEGIN:
-                        setOtaBegin();
-                        break;
                     case ValueCodes.MTU:
                         requestMTU();
                         break;
                     case ValueCodes.UPDATE:
                         otaUpload();
-                        break;
-                    case ValueCodes.OTA_END_WRITTEN:
-                        otaEnd();
                         break;
                     case ValueCodes.OTA_END:
                         rebootTargetDevice();
@@ -201,22 +193,7 @@ public class FirmwareUpdateActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {}
         };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback, true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     private void setVisibility(String value) {
@@ -292,7 +269,6 @@ public class FirmwareUpdateActivity extends BaseActivity {
 
     private void checkFile() {
         loadChecking();
-        parameter = ValueCodes.OTA_BEGIN;
-        leServiceConnection.getBluetoothLeService().discovering();
+        setOtaBegin();
     }
 }

@@ -178,10 +178,13 @@ public class ManualScanActivity extends ScanBaseActivity {
     private void setGps() {
         boolean result = TransferBleData.writeGps(gps_scanning_switch.isChecked());
         if (result) {
-            setGpsSearching();
+            if (gps_scanning_switch.isChecked()) setGpsSearching();
+            else setGpsOff();
             gps_switch.setChecked(gps_scanning_switch.isChecked());
         } else {
+            enableGpsScanning = false;
             gps_scanning_switch.setChecked(!gps_scanning_switch.isChecked());
+            enableGpsScanning = true;
         }
     }
 

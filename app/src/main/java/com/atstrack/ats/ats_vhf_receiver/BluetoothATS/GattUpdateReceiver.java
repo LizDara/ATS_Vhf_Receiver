@@ -8,13 +8,9 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 
 public class GattUpdateReceiver {
     private final ReceiverCallback receiverCallback;
-    private final String ACTION_SERVICES_DISCOVERED;
-    private final String ACTION_DATA_AVAILABLE;
 
     public GattUpdateReceiver(ReceiverCallback receiverCallback) {
         this.receiverCallback = receiverCallback;
-        ACTION_SERVICES_DISCOVERED = BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED;
-        ACTION_DATA_AVAILABLE = BluetoothLeService.ACTION_DATA_AVAILABLE;
     }
 
     // Handles various events fired by the Service.
@@ -28,9 +24,9 @@ public class GattUpdateReceiver {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     receiverCallback.onGattDisconnected();
-                } else if (ACTION_SERVICES_DISCOVERED.equals(action)) {
+                } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                     receiverCallback.onGattDiscovered();
-                } else if (ACTION_DATA_AVAILABLE.equals(action)) {
+                } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
                     receiverCallback.onGattDataAvailable(packet);

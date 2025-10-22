@@ -2041,6 +2041,7 @@ string lb_cancel_update
 string lb_change_frequency
 string lb_checking_file
 string lb_choose_one
+string lb_click_connect
 string lb_clone_from_other_receiver
 string lb_cloning
 string lb_code
@@ -2071,6 +2072,7 @@ string lb_deletion_complete
 string lb_detections
 string lb_device_categories
 string lb_device_connected
+string lb_device_selected
 string lb_device_selection
 string lb_diagnostics_complete
 string lb_disconnect

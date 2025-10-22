@@ -35,6 +35,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+    <!-- uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/ -->
     <application
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -48,11 +49,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.Acoustic.MainActivity2"
-            android:exported="false" />
         <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.VHF.EnterCoefficientActivity"
             android:exported="false" />

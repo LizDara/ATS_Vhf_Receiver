@@ -79,9 +79,13 @@ public class RawDataActivity extends BaseActivity {
 
     @OnClick(R.id.select_file_linearLayout)
     public void onClickSelectFile(View v) {
-        File sdCardFile = externalStorageVolumes[1];
+        File sdCardFile = externalStorageVolumes[externalStorageVolumes.length - 1];
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setDataAndType(Uri.parse(sdCardFile.getPath()), "*/*");
+        File root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+        //intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setDataAndType(Uri.parse(root.getAbsolutePath()), "*/*");
         startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
     }
 
@@ -97,14 +101,14 @@ public class RawDataActivity extends BaseActivity {
     public void onClickConvertData(View v) {
         file_source_linearLayout.setVisibility(View.GONE);
         converting_raw_linearLayout.setVisibility(View.VISIBLE);
-        converting_raw_progressBar.setProgress(10);
+        converting_raw_progressBar.setProgress(0);
         try {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(rawFile));
             byte[] rawData = new byte[(int) rawFile.length()];
             bufferedInputStream.read(rawData, 0, rawData.length);
             bufferedInputStream.close();
 
-            converting_raw_progressBar.setProgress(40);
+            converting_raw_progressBar.setProgress(20);
             SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
             int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
             String processData = Converters.getPackageProcessed(rawData, baseFrequency);
@@ -124,6 +128,8 @@ public class RawDataActivity extends BaseActivity {
                 converting_raw_linearLayout.setVisibility(View.GONE);
                 file_converted_linearLayout.setVisibility(View.VISIBLE);
                 new_file_name_textView.setText("File saved as " + fileName);
+
+                Message.showMessage(this, 4);
             }
         } catch (IOException e) {
             e.printStackTrace();

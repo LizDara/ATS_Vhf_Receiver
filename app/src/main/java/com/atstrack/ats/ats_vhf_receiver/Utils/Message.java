@@ -49,6 +49,9 @@ public class Message {
             case 3:
                 builder.setMessage("Exceeded Table Limit. Please enter no more than 100 frequencies.");
                 builder.setPositiveButton("OK", null);
+            case 4:
+                builder.setMessage("No Message!");
+                builder.setPositiveButton("OK", null);
         }
         builder.show();
     }

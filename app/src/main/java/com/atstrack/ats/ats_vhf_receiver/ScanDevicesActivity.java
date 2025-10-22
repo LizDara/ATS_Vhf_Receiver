@@ -224,7 +224,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
 
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
         setToolbarTitle(type);
-        mLeDeviceListAdapter = new LeDeviceListAdapter(this, connect_button); // Initializes list view adapter.
+        mLeDeviceListAdapter = new LeDeviceListAdapter(this, connect_button, devices_subtitle_textView, searching_message_textView); // Initializes list view adapter.
         mLeDeviceListAdapter.setDeviceType(type);
 
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE); // Initializes a Bluetooth adapter.
@@ -495,9 +495,5 @@ public class ScanDevicesActivity extends AppCompatActivity {
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
         else
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    private void mUnregisterReceiver() {
-        unregisterReceiver(mGattUpdateReceiver);
     }
 }

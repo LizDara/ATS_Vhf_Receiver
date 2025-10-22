@@ -138,7 +138,9 @@ public class MobileScanActivity extends ScanBaseActivity {
                 int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
                     newFrequency = value;
-                    setNewFrequency();
+                    new Handler().postDelayed(() -> {
+                        setNewFrequency();
+                    }, ValueCodes.WAITING_PERIOD);
                     return;
                 } else if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     frequency_table_number_aerial_textView.setText(String.valueOf(value));

@@ -79,12 +79,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void setToolbar() {
-        if (deviceCategory.equals(ValueCodes.VHF)) {
+        if (deviceCategory.equals(ValueCodes.VHF))
             ActivitySetting.setVhfToolbar(this, title);
-            //ActivitySetting.setReceiverStatus(this);
-        } else {
+        else
             ActivitySetting.setAcousticToolbar(this, title);
-        }
     }
 
     protected void setSdCardStatus(byte[] data) {

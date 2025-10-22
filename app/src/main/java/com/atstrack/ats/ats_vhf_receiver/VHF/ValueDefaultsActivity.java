@@ -233,7 +233,8 @@ public class ValueDefaultsActivity extends BaseActivity {
                     setBatteryPercent(packet);
                 else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
                     setSdCardStatus(packet);
-                else if (Converters.getHexValue(packet[0]).equals("6C") || Converters.getHexValue(packet[0]).equals("6D")) {
+                else if (Converters.getHexValue(packet[0]).equals("6C") || Converters.getHexValue(packet[0]).equals("6D")
+                        || Converters.getHexValue(packet[0]).equals("7A")) {
                     switch (type) {
                         case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
                         case ValueCodes.TABLES_NUMBER_CODE:

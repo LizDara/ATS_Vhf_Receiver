@@ -32,17 +32,23 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     private final LayoutInflater inflater;
     private String deviceType;
     private final Button connect_button;
+    private final TextView subtitle;
+    private final TextView message;
     private int selectedPosition;
     private View selectedView;
     private Calendar startDate;
+    private ArrayList<Boolean> mSelected;
 
-    public LeDeviceListAdapter(Context context, Button connect_button) {
+    public LeDeviceListAdapter(Context context, Button connect_button, TextView subtitle, TextView message) {
         mLeDevices = new ArrayList<>();
         mScanRecords = new ArrayList<>();
         this.context = context;
         this.connect_button = connect_button;
+        this.subtitle = subtitle;
+        this.message = message;
         deviceType = "";
         inflater = LayoutInflater.from(context);
+        mSelected = new ArrayList<>();
     }
 
     /**
@@ -58,6 +64,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                 if (device.getName().contains(deviceType)) { // filter only ATS device
                     mLeDevices.add(device);
                     mScanRecords.add(scanRecord);
+                    mSelected.add(false);
                 }
             } else {
                 Calendar currentDate = Calendar.getInstance();
@@ -124,7 +131,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) { // Set all remote device information
+    public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) { // Set all remote device information
         @SuppressLint("MissingPermission") String device = mLeDevices.get(position).getName();
         final String serialNumber = device.substring(0, 7);
         if (!serialNumber.equals("0000000")) {
@@ -143,6 +150,10 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                 holder.frequency_range_textView.setText(range);
                 holder.percent_battery_textView.setText(percent + "%");
                 holder.battery_imageView.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_light_battery));
+                if (mSelected.get(position))
+                    holder.status_footer_linearLayout.setVisibility(View.VISIBLE);
+                else
+                    holder.status_footer_linearLayout.setVisibility(View.GONE);
             } else if (device.contains("ar")) {
                 holder.device_status_textView.setText("Extra Details"); // Mas adelante se agregara mas info sobre acoustic receivers
                 holder.percent_battery_textView.setText("0%");
@@ -151,6 +162,13 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                 holder.device_status_textView.setText("Extra Details");
                 holder.percent_battery_textView.setText("0%");
                 holder.battery_imageView.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_light_battery));
+            }
+            if (mSelected.get(position)) {
+                holder.receiver_status_linearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_device));
+                holder.selected_imageView.setVisibility(View.VISIBLE);
+            } else {
+                holder.receiver_status_linearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.catskill_white));
+                holder.selected_imageView.setVisibility(View.GONE);
             }
         } else {
             setUnknownDevice(holder);
@@ -200,15 +218,29 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     builder.setPositiveButton("OK", null);
                     builder.show();
                 } else { // Device selected
-                    receiver_status_linearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_device));
-                    selected_imageView.setVisibility(View.VISIBLE);
-                    connect_button.setEnabled(true);
-                    connect_button.setAlpha(1);
-                    selectedPosition = getLayoutPosition();
-                    selectedView = itemView;
-                    if (mLeDevices.get(getLayoutPosition()).getName().contains("vr")) {
-                        status_footer_linearLayout.setVisibility(View.VISIBLE);
+                    mSelected.set(getLayoutPosition(), !mSelected.get(getLayoutPosition()));
+                    if (mSelected.get(getLayoutPosition())) {
+                        connect_button.setEnabled(true);
+                        connect_button.setAlpha(1);
+                        subtitle.setText(R.string.lb_device_selected);
+                        message.setText(R.string.lb_click_connect);
+                        selectedPosition = getLayoutPosition();
+                        selectedView = itemView;
+
+                        //Clear the other selection
+                        for (int i = 0; i < mSelected.size(); i++) {
+                            if (i != getLayoutPosition())
+                                mSelected.set(i, false);
+                        }
+                    } else {
+                        connect_button.setEnabled(false);
+                        connect_button.setAlpha((float) 0.6);
+                        subtitle.setText("Found " + mLeDevices.size() + " Devices");
+                        message.setText(R.string.lb_select_device);
+                        selectedPosition = -1;
+                        selectedView = null;
                     }
+                    notifyDataSetChanged();
                 }
             });
         }

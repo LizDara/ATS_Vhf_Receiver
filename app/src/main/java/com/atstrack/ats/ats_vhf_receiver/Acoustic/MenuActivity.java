@@ -111,21 +111,6 @@ public class MenuActivity extends BaseActivity {
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
-        else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
-    }
-
     private void setHealthBeaconData(byte[] data) {
         if (Converters.getHexValue(data[0]).equals("78")) {
             Log.i(TAG, Converters.getHexValue(data));

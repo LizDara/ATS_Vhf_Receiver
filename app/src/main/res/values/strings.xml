@@ -30,6 +30,8 @@
     <string name="lb_searching_devices">Searching For Devices ...</string>
     <string name="lb_message_searching">It is only going to take a few seconds.</string>
     <string name="lb_connect">Connect</string>
+    <string name="lb_device_selected">Device Selected</string>
+    <string name="lb_click_connect">Click the connect button.</string>
     <string name="lb_no_devices_found">No Devices Found</string>
     <string name="lb_unable_find_device">Please make sure your devices are within bluetooth range.</string>
     <string name="lb_retry">Retry</string>

@@ -8,7 +8,7 @@
     tools:context=".VHF.StationaryScanActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <include
         layout="@layout/stationary_current_settings"/>

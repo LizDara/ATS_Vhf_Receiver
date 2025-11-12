@@ -42,10 +42,12 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnAdapterClickListener {
 
-    @BindView(R.id.main_toolbar)
-    Toolbar main_toolbar;
-    @BindView(R.id.main_title_toolbar)
-    TextView main_title_toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.state_view)
+    View state_view;
+    @BindView(R.id.title_toolbar)
+    TextView title_toolbar;
     @BindView(R.id.version_textView)
     TextView version_textView;
     @BindView(R.id.splash_screen_constraintLayout)
@@ -99,8 +101,9 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        setSupportActionBar(main_toolbar);
-        main_title_toolbar.setText(R.string.bridge_app);
+        setSupportActionBar(toolbar);
+        state_view.setVisibility(View.GONE);
+        title_toolbar.setText(R.string.bridge_app);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         init();
     }
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-            if (!main_title_toolbar.getText().toString().equals(getResources().getString(R.string.bridge_app)))
+            if (!title_toolbar.getText().toString().equals(getResources().getString(R.string.bridge_app)))
                 showDeviceCategories();
             else
                 finish();
@@ -214,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
 
     private void showDeviceCategories() {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        main_title_toolbar.setText(R.string.bridge_app);
+        title_toolbar.setText(R.string.bridge_app);
         splash_screen_constraintLayout.setVisibility(View.GONE);
         bridge_app_linearLayout.setVisibility(View.VISIBLE);
         bridge_app_linearLayout.setVisibility(View.VISIBLE);
@@ -232,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     private void showBluetoothTags() {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-        main_title_toolbar.setText(R.string.bluetooth_tags);
+        title_toolbar.setText(R.string.bluetooth_tags);
         bridge_subtitle_textView.setText(R.string.lb_bluetooth_receive_data);
         bridge_message_textView.setText(R.string.lb_bluetooth_tags_message);
         types_subtitle_textView.setText(R.string.lb_connection_modes);

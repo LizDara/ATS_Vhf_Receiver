@@ -76,7 +76,7 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = ValueCodes.ACOUSTIC;
+        parameter = ValueCodes.HEALTH;
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         acoustic_name_textView.setText(receiverInformation.getSerialNumber() + " Acoustic Receiver");
 
@@ -98,13 +98,13 @@ public class MenuActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.ACOUSTIC))
+                if (parameter.equals(ValueCodes.HEALTH))
                     TransferBleData.notificationLog();
             }
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (parameter.equals(ValueCodes.ACOUSTIC))
+                if (parameter.equals(ValueCodes.HEALTH))
                     setHealthBeaconData(packet);
             }
         };

@@ -467,7 +467,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadMaxPulseRate(byte[] data) {
-        int maxPulse = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[4]));
+        int maxPulse = Integer.parseInt(Converters.getDecimalValue(data[3]));
         max_min_pulse_rate_editText.setText(String.valueOf(maxPulse));
         double period = (maxPulse == 0) ? 0 : (double) 60000 / maxPulse;
         period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
@@ -479,7 +479,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadMinPulseRate(byte[] data) {
-        int minPulse = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        int minPulse = Integer.parseInt(Converters.getDecimalValue(data[5]));
         max_min_pulse_rate_editText.setText(String.valueOf(minPulse));
         double period = (minPulse == 0) ? 0 : (double) 60000 / minPulse;
         period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));

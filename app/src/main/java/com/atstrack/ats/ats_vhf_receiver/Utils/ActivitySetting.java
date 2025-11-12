@@ -1,6 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,24 +33,14 @@ public class ActivitySetting {
         percent_battery_textView.setText(ReceiverInformation.getReceiverInformation().getPercentBattery() + "%");
     }
 
-    public static void setVhfToolbar(AppCompatActivity context, String title) {
-        initializeToolbar(context, ValueCodes.VHF);
+    public static void setToolbar(AppCompatActivity context, String title, String deviceCategory) {
+        Toolbar toolbar = context.findViewById(R.id.toolbar);
+        if (!deviceCategory.equals(ValueCodes.VHF)) {
+            View state = context.findViewById(R.id.state_view);
+            state.setVisibility(View.GONE);
+        }
         TextView title_toolbar = context.findViewById(R.id.title_toolbar);
         title_toolbar.setText(title);
-    }
-
-    public static void setAcousticToolbar(AppCompatActivity context, String title) {
-        initializeToolbar(context, ValueCodes.ACOUSTIC);
-        TextView title_toolbar = context.findViewById(R.id.main_title_toolbar);
-        title_toolbar.setText(title);
-    }
-
-    private static void initializeToolbar(AppCompatActivity context, String deviceCategory) {
-        Toolbar toolbar;
-        if (deviceCategory.equals(ValueCodes.VHF))
-            toolbar = context.findViewById(R.id.toolbar);
-        else
-            toolbar = context.findViewById(R.id.main_toolbar);
         context.setSupportActionBar(toolbar);
         Objects.requireNonNull(context.getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         context.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);

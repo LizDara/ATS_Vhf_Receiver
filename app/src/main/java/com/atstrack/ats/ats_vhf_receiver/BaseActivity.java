@@ -44,7 +44,7 @@ public class BaseActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);// Keep screen on
 
         if (showToolbar)
-            setToolbar();
+            ActivitySetting.setToolbar(this, title, deviceCategory);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
@@ -76,13 +76,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "ON DESTROY ACTIVITY ...");
-    }
-
-    private void setToolbar() {
-        if (deviceCategory.equals(ValueCodes.VHF))
-            ActivitySetting.setVhfToolbar(this, title);
-        else
-            ActivitySetting.setAcousticToolbar(this, title);
     }
 
     protected void setSdCardStatus(byte[] data) {

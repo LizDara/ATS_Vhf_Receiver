@@ -348,6 +348,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
             @Override
             public void onGattDiscovered() {
+                Log.i(TAG, "Parameter: "+parameter);
                 if (parameter.equals(ValueCodes.TABLE)) // Get the frequencies from a table
                     TransferBleData.readFrequencies(number);
             }

@@ -9,7 +9,7 @@
     tools:context=".VHF.DiagnosticsActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <LinearLayout
         android:id="@+id/loading_linearLayout"

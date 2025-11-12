@@ -29,7 +29,7 @@
         layout="@layout/no_device_found" />
 
     <include
-        layout="@layout/devices_list" />
+        layout="@layout/item_list" />
 
     <include
         layout="@layout/connecting_device" />

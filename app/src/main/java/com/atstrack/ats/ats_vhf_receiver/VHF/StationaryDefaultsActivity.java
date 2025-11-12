@@ -181,7 +181,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
         if (isChecked) {
             reference_frequency_stationary_linearLayout.setEnabled(true);
             int frequency = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY);
-            frequency_reference_stationary_textView.setText(frequency != 0 ? Converters.getFrequency(frequency) : getString(R.string.lb_not_set));
+            frequency_reference_stationary_textView.setText(frequency != 0 && frequency != 255 ? Converters.getFrequency(frequency) : getString(R.string.lb_not_set));
             reference_frequency_store_rate_stationary_linearLayout.setEnabled(true);
             int storeRate = (int) originalData.get(ValueCodes.REFERENCE_FREQUENCY_STORE_RATE);
             reference_frequency_store_rate_stationary_textView.setText(storeRate == 255 ? getString(R.string.lb_not_set) : String.valueOf(storeRate));
@@ -305,15 +305,17 @@ public class StationaryDefaultsActivity extends BaseActivity {
                         && !Converters.getHexValue(data[6]).equals("00") && !Converters.getHexValue(data[7]).equals("00"))
                     frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                             Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-                //frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-                //reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
+                frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
+                reference_frequency_store_rate_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getDecimalValue(data[8]));
             } else {
-                frequency_table_number_stationary_textView.setText(getString(R.string.lb_not_set));
-                number_of_antennas_stationary_textView.setText(getString(R.string.lb_not_set));
+                frequency = 255;
+                frequency_table_number_stationary_textView.setText(R.string.lb_not_set);
+                number_of_antennas_stationary_textView.setText(R.string.lb_not_set);
                 stationary_external_data_transfer_switch.setChecked(true);
-                scan_rate_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
-                scan_timeout_seconds_stationary_textView.setText(getString(R.string.lb_not_set));
-                store_rate_minutes_stationary_textView.setText(getString(R.string.lb_not_set));
+                scan_rate_seconds_stationary_textView.setText(R.string.lb_not_set);
+                scan_timeout_seconds_stationary_textView.setText(R.string.lb_not_set);
+                store_rate_minutes_stationary_textView.setText(R.string.lb_not_set);
+                frequency_reference_stationary_textView.setText(R.string.lb_not_set);
             }
             originalData.put(ValueCodes.FIRST_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[9])));
             originalData.put(ValueCodes.SECOND_TABLE_NUMBER, Integer.parseInt(Converters.getDecimalValue(data[10])));
@@ -370,7 +372,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
             storeRate = Integer.parseInt(store_rate_minutes_stationary_textView.getText().toString());
         int referenceFrequency = stationary_reference_frequency_switch.isChecked() ?
                 Converters.getFrequencyNumber(frequency_reference_stationary_textView.getText().toString()) : 0;
-        int referenceFrequencyStoreRate = stationary_reference_frequency_switch.isChecked() ? Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString()) : 0;
+        int referenceFrequencyStoreRate = stationary_reference_frequency_switch.isChecked() ? Integer.parseInt(reference_frequency_store_rate_stationary_textView.getText().toString()) : 255;
 
         return (int) originalData.get(ValueCodes.FIRST_TABLE_NUMBER) != firstTableNumber || (int) originalData.get(ValueCodes.SECOND_TABLE_NUMBER) != secondTableNumber
                 || (int) originalData.get(ValueCodes.THIRD_TABLE_NUMBER) != thirdTableNumber || (int) originalData.get(ValueCodes.ANTENNA_NUMBER) != antennaNumber

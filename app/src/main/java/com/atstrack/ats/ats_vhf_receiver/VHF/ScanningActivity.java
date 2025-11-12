@@ -84,9 +84,6 @@ public class ScanningActivity extends BaseActivity {
             intent.putExtra(ValueCodes.VALUE, defaultData);
             startActivity(intent);
         }
-        parameter = ValueCodes.DETECTION_TYPE;
-        menu_scan_linearLayout.setVisibility(View.VISIBLE);
-        warning_message_linearLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -115,6 +112,7 @@ public class ScanningActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
+                Log.i(TAG, "Parameter: " + parameter);
                 if (parameter.equals(ValueCodes.DETECTION_TYPE))
                     TransferBleData.readDetectionFilter();
             }
@@ -145,6 +143,20 @@ public class ScanningActivity extends BaseActivity {
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        menu_scan_linearLayout.setVisibility(View.VISIBLE);
+        warning_message_linearLayout.setVisibility(View.GONE);
+        if (isDetectionFilterEmpty) {
+            parameter = ValueCodes.DETECTION_TYPE;
+            TransferBleData.readDetectionFilter();
+        } else if (areTablesEmpty) {
+            parameter = ValueCodes.TABLES;
+            TransferBleData.readTables();
+        }
     }
 
     @Override

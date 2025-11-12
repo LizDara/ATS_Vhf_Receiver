@@ -7,7 +7,7 @@
     android:background="@color/slate_300">
 
     <include
-        layout="@layout/main_toolbar" />
+        layout="@layout/ats_toolbar" />
 
     <LinearLayout
         android:layout_width="match_parent"

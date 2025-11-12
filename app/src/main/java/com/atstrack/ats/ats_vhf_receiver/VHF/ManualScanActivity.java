@@ -399,10 +399,11 @@ public class ManualScanActivity extends ScanBaseActivity {
                 break;
             case "E0": // Non Coded
                 int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
+                int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
                 if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
-                    logScanNonCodedFixed(data, signalStrength);
+                    logScanNonCodedFixed(data[0], period, signalStrength);
                 else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
-                    logScanNonCodedVariable(data, signalStrength);
+                    scanNonCodedVariable(period, signalStrength);
                 break;
         }
     }
@@ -448,16 +449,9 @@ public class ManualScanActivity extends ScanBaseActivity {
         scanCoded(code, signalStrength, mortality);
     }
 
-    private void logScanNonCodedFixed(byte[] data, int signalStrength) {
-        int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
-        int pulseRate = 60000 / period;
-        int type = Integer.parseInt(Converters.getHexValue(data[0]).replace("E", ""));
-        scanNonCodedFixed(period, pulseRate, signalStrength, type);
-    }
-
-    private void logScanNonCodedVariable(byte[] data, int signalStrength) {
-        int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
-        scanNonCodedVariable(period, signalStrength);
+    private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
+        int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
+        scanNonCodedFixed(period, signalStrength, type);
     }
 
     private void logGps(byte[] data) {

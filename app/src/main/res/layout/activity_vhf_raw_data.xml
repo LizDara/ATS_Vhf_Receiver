@@ -8,7 +8,7 @@
     tools:context=".VHF.RawDataActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"

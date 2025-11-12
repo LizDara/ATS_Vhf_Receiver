@@ -392,7 +392,7 @@ public class ValueDefaultsActivity extends BaseActivity {
             antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             value_spinner.setAdapter(antennasAdapter);
 
-            int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[2])) & 15;
+            int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
             if (antennaNumber <= 4 && antennaNumber > 0)
                 value_spinner.setSelection(antennaNumber - 1);
             else

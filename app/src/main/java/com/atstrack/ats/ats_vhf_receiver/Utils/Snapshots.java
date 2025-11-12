@@ -81,12 +81,13 @@ public class Snapshots implements Parcelable {
      */
     private void setFileName(boolean isRaw) {
         Calendar time = Calendar.getInstance();
-        fileName = "D_" + (((time.get(Calendar.MONTH) + 1) < 10) ? "0" + (time.get(Calendar.MONTH) + 1) : time.get(Calendar.MONTH) + 1)
-                + "_" + ((time.get(Calendar.DAY_OF_MONTH) < 10) ? "0" + time.get(Calendar.DAY_OF_MONTH) : time.get(Calendar.DAY_OF_MONTH))
-                + "_" + time.get(Calendar.YEAR)
-                + "_" + ((time.get(Calendar.HOUR_OF_DAY) < 10) ? "0" + time.get(Calendar.HOUR_OF_DAY) : time.get(Calendar.HOUR_OF_DAY))
-                + "_" + ((time.get(Calendar.MINUTE) < 10) ? "0" + time.get(Calendar.MINUTE) : time.get(Calendar.MINUTE))
-                + "_" + ((time.get(Calendar.SECOND) < 10) ? "0" + time.get(Calendar.SECOND) : time.get(Calendar.SECOND)) + (isRaw ? "Raw" : "") + ".txt";
+        String month = ((time.get(Calendar.MONTH) + 1) < 10) ? "0" + (time.get(Calendar.MONTH) + 1) : String.valueOf(time.get(Calendar.MONTH) + 1);
+        String day = (time.get(Calendar.DAY_OF_MONTH) < 10) ? "0" + time.get(Calendar.DAY_OF_MONTH) : String.valueOf(time.get(Calendar.DAY_OF_MONTH));
+        String hour = (time.get(Calendar.HOUR_OF_DAY) < 10) ? "0" + time.get(Calendar.HOUR_OF_DAY) : String.valueOf(time.get(Calendar.HOUR_OF_DAY));
+        String minute = (time.get(Calendar.MINUTE) < 10) ? "0" + time.get(Calendar.MINUTE) : String.valueOf(time.get(Calendar.MINUTE));
+        String second = (time.get(Calendar.SECOND) < 10) ? "0" + time.get(Calendar.SECOND) : String.valueOf(time.get(Calendar.SECOND));
+        fileName = "D" + ReceiverInformation.getReceiverInformation().getSerialNumber() + "_" + month + day + (time.get(Calendar.YEAR) - 2000)
+                + hour + minute + second + (isRaw ? "Raw" : "") + ".txt";
     }
 
     /**
@@ -103,7 +104,6 @@ public class Snapshots implements Parcelable {
         }
         catch (Exception e) {
             Log.i("Snapshot", "Error Process Snapshot Raw" + e.getLocalizedMessage());
-            //setFileName(getFileName() + "||repeated_pages");
             error = true;
         }
     }
@@ -122,7 +122,6 @@ public class Snapshots implements Parcelable {
             }
         } catch (Exception e) {
             Log.i("Snapshot", "Error Process Snapshot");
-            //setFileName(getFileName() + "||repeated_pages");
             error = true;
         }
     }

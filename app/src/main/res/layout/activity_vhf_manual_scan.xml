@@ -9,7 +9,7 @@
     tools:context=".VHF.ManualScanActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <include
         layout="@layout/manual_current_settings"/>

@@ -8,7 +8,7 @@
     tools:context=".VHF.ValueDetectionFilterActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <include
         layout="@layout/pulse_rate_types"/>

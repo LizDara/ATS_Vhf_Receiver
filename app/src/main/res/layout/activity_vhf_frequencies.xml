@@ -8,7 +8,7 @@
     tools:context=".VHF.FrequenciesActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <include
         layout="@layout/frequencies_overview"/>

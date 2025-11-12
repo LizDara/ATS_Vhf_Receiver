@@ -56,10 +56,12 @@ import butterknife.OnClick;
 
 public class ScanDevicesActivity extends AppCompatActivity {
 
-    @BindView(R.id.main_toolbar)
-    Toolbar main_toolbar;
-    @BindView(R.id.main_title_toolbar)
-    TextView main_title_toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.state_view)
+    View state_view;
+    @BindView(R.id.title_toolbar)
+    TextView title_toolbar;
     @BindView(R.id.searching_progressBar)
     ProgressBar searching_progressBar;
     @BindView(R.id.searching_devices_linearLayout)
@@ -68,10 +70,10 @@ public class ScanDevicesActivity extends AppCompatActivity {
     TextView devices_subtitle_textView;
     @BindView(R.id.searching_message_textView)
     TextView searching_message_textView;
-    @BindView(R.id.devices_scrollView)
-    ScrollView devices_scrollView;
-    @BindView(R.id.device_recyclerView)
-    RecyclerView device_recyclerView;
+    @BindView(R.id.items_scrollView)
+    ScrollView items_scrollView;
+    @BindView(R.id.item_recyclerView)
+    RecyclerView item_recyclerView;
     @BindView(R.id.connecting_device_linearLayout)
     LinearLayout connecting_device_linearLayout;
     @BindView(R.id.selected_device_scrollView)
@@ -108,12 +110,15 @@ public class ScanDevicesActivity extends AppCompatActivity {
             };
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
+                    if (mLeDeviceListAdapter.getSelectedDevice().getName().contains("br"))
+                        showBluetoothReceiverMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action) && mConnected) {
                     mConnected = false;
                     showDisconnectionMessage();
@@ -155,7 +160,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
                     connectionTimeout.cancel();
                     connectionTimeout.purge();
                     if (device.getName().contains("vr")) {
-                        connectVhfReceiver();
+                        showVhfReceiverMenu();
                     } else if (device.getName().contains("ar")) {
                         Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.Acoustic.MenuActivity.class);
                         intent.putExtra(ValueCodes.VALUE, receiverInformation.getStatusData());
@@ -193,7 +198,10 @@ public class ScanDevicesActivity extends AppCompatActivity {
         BluetoothDevice device = mLeDeviceListAdapter.getSelectedDevice();
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         receiverInformation.changeInformation(device.getName().substring(0, 7), device.getAddress(), "0%");
-        connectingToDevice();
+        if (device.getName().contains("br"))
+            connectingToBluetoothReceiver();
+        else
+            connectingToDevice();
 
         connectionTimeout.schedule(new TimerTask() { //create timer for connection timeout
             @Override
@@ -217,12 +225,13 @@ public class ScanDevicesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan_devices);
         ButterKnife.bind(this);
 
-        setSupportActionBar(main_toolbar);
+        setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
+        state_view.setVisibility(View.GONE);
         setToolbarTitle(type);
         mLeDeviceListAdapter = new LeDeviceListAdapter(this, connect_button, devices_subtitle_textView, searching_message_textView); // Initializes list view adapter.
         mLeDeviceListAdapter.setDeviceType(type);
@@ -286,16 +295,19 @@ public class ScanDevicesActivity extends AppCompatActivity {
     private void setToolbarTitle(String type) {
         switch (type) {
             case "ATSvr":
-                main_title_toolbar.setText(R.string.select_vhf_receiver);
+                title_toolbar.setText(R.string.select_vhf_receiver);
                 break;
             case "ATSar":
-                main_title_toolbar.setText(R.string.select_acoustic_receiver);
+                title_toolbar.setText(R.string.select_acoustic_receiver);
                 break;
             case "ATSwl":
-                main_title_toolbar.setText(R.string.select_wildlink);
+                title_toolbar.setText(R.string.select_wildlink);
+                break;
+            case "ATSbr":
+                title_toolbar.setText(R.string.select_bluetooth_beacon);
                 break;
             default:
-                main_title_toolbar.setText("SELECT DEVICE");
+                title_toolbar.setText("SELECT DEVICE");
                 break;
         }
     }
@@ -314,8 +326,8 @@ public class ScanDevicesActivity extends AppCompatActivity {
 
             new Handler().postDelayed(() -> {
                 if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
-                    device_recyclerView.setAdapter(mLeDeviceListAdapter);
-                    device_recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    item_recyclerView.setAdapter(mLeDeviceListAdapter);
+                    item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
                     setDevicesFound();
                 } else { // Unable to find any devices within range
                     mBluetoothLeScanner.stopScan(mLeScanCallback);
@@ -336,7 +348,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         searching_message_textView.setText(R.string.lb_message_searching);
         searching_progressBar.setVisibility(View.VISIBLE);
         connected_imageView.setVisibility(View.GONE);
-        devices_scrollView.setVisibility(View.INVISIBLE);
+        items_scrollView.setVisibility(View.INVISIBLE);
         connect_button.setEnabled(false);
         connect_button.setAlpha((float) 0.6);
     }
@@ -345,7 +357,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         devices_subtitle_textView.setText("Found " + mLeDeviceListAdapter.getItemCount() + " Devices");
         searching_message_textView.setText(R.string.lb_select_device);
         searching_progressBar.setVisibility(View.GONE);
-        devices_scrollView.setVisibility(View.VISIBLE);
+        items_scrollView.setVisibility(View.VISIBLE);
         selected_device_scrollView.setVisibility(View.GONE);
         searching_progressBar.setVisibility(View.GONE);
         cancel_button.setVisibility(View.GONE);
@@ -370,7 +382,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         cancel_button.setVisibility(View.VISIBLE);
         connect_button.setEnabled(false);
         connect_button.setAlpha((float) 0.6);
-        devices_scrollView.setVisibility(View.GONE);
+        items_scrollView.setVisibility(View.GONE);
         connecting_device_linearLayout.setVisibility(View.VISIBLE);
     }
 
@@ -388,6 +400,14 @@ public class ScanDevicesActivity extends AppCompatActivity {
     private void connectingToDevice() {
         setConnectingDevice();
         parameter = ValueCodes.SCAN_STATUS;
+        leServiceConnection = LeServiceConnection.getInstance();
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
+        mRegisterReceiver();
+    }
+
+    private void connectingToBluetoothReceiver() {
+        setConnectingDevice();
         leServiceConnection = LeServiceConnection.getInstance();
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
@@ -457,7 +477,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
     }
 
     @SuppressLint("MissingPermission")
-    private void connectVhfReceiver() {
+    private void showVhfReceiverMenu() {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         receiverInformation.changeDeviceBattery(Converters.getPercentBatteryVhfReceiver(mLeDeviceListAdapter.getScanRecord()));
         Intent intent = new Intent(this, MenuActivity.class);
@@ -481,6 +501,13 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 intent.putExtra(ValueCodes.FIRST_TIME, true);
         }
         intent.putExtra(ValueCodes.VALUE, receiverInformation.getStatusData());
+        startActivity(intent);
+        finish();
+    }
+
+    private void showBluetoothReceiverMenu() {
+        Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver.MenuActivity.class);
+        intent.putExtra(ValueCodes.VALUE, ReceiverInformation.getReceiverInformation().getStatusData());
         startActivity(intent);
         finish();
     }

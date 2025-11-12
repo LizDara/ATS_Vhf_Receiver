@@ -8,7 +8,7 @@
     tools:context=".VHF.TablesActivity">
 
     <include
-        layout="@layout/vhf_toolbar"/>
+        layout="@layout/ats_toolbar"/>
 
     <TextView
         style="@style/subtitle"

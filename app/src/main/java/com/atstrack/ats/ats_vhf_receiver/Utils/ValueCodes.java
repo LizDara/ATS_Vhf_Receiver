@@ -4,6 +4,14 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ACOUSTIC";
     public static final String VHF = "VHF";
+    public static final String BLUETOOTH_RECEIVER = "BLUETOOTH_RECEIVER";
+
+    //Values
+    public static final String WIDTH = "width";
+    public static final String HEIGHT = "height";
+    public static final String VALUE = "value";
+    public static final String VERSION = "version";
+    public static final String PARAMETER = "parameter";
 
     //Codes
     public static final int CANCELLED = 1000;
@@ -13,6 +21,16 @@ public class ValueCodes {
     public static final int REQUEST_CODE_SIGN_IN = 1;
     public static final int REQUEST_CODE_OPEN_STORAGE = 3;
 
+    //Periods
+    public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;
+    public static final int WAITING_PERIOD = 180;
+    public static final int MESSAGE_PERIOD = 1300;
+    public static final int DOWNLOAD_PERIOD = 280;
+    public static final int SCAN_PERIOD = 2000;
+    public static final int BRANDING_PERIOD = 2000;
+    public static final int CONNECT_TIMEOUT = 3500;
+
+    /* ----------------- VHF DEVICE ---------------- */
     //Defaults
     public static final int TABLE_NUMBER_CODE = 1001;
     public static final int TABLES_NUMBER_CODE = 1002;
@@ -35,10 +53,6 @@ public class ValueCodes {
     public static final int DATA_CALCULATION_TYPE_CODE = 1019;
 
     //Values
-    public static final String WIDTH = "width";
-    public static final String HEIGHT = "height";
-    public static final String VALUE = "value";
-    public static final String VERSION = "version";
     public static final String STATUS = "status";
     public static final String SCANNING = "scanning";
     public static final String DEFAULT_SETTING = "defaults";
@@ -47,7 +61,6 @@ public class ValueCodes {
     public static final String FIRST_TIME = "firstTime";
     public static final String TITLE = "title";
     public static final String POSITION = "position";
-    public static final String PARAMETER = "parameter";
     public static final String TYPE = "type";
     public static final String TOTAL = "total";
     public static final String IS_FILE = "isFile";
@@ -55,40 +68,20 @@ public class ValueCodes {
     public static final String IS_TEMPERATURE = "isTemperature";
 
     //Parameters
-    public static final String OTA_BEGIN = "begin";
     public static final String MTU = "mtu";
     public static final String UPDATE = "update";
-    public static final String OTA_END_WRITTEN = "endWritten";
     public static final String FINISH = "finish";
     public static final String OTA_END = "end";
-    public static final String SAVE = "save";
     public static final String MOBILE_DEFAULTS = "mobile";
     public static final String TABLES = "tables";
     public static final String START_LOG = "startLog";
     public static final String CONTINUE_LOG = "continueLog";
-    public static final String START_SCAN = "startScan";
-    public static final String STOP_SCAN = "stopScan";
-    public static final String HOLD = "hold";
-    public static final String ADD_FREQUENCY = "addFrequency";
-    public static final String DELETE_FREQUENCY = "deleteFrequency";
-    public static final String DECREASE = "decrease";
-    public static final String INCREASE = "increase";
-    public static final String MERGE = "merge";
-    public static final String RECORD = "record";
-    public static final String LEFT = "left";
-    public static final String RIGHT = "right";
     public static final String TABLE = "table";
     public static final String TEST = "test";
     public static final String DOWNLOAD = "download";
     public static final String DELETE_RESPONSE = "response";
-    public static final String DELETE = "delete";
-    public static final String PAGES_NUMBER = "pagesNumber";
-    public static final String READY_DOWNLOAD = "ready";
-    public static final String PAGE_OK = "pageOk";
-    public static final String PAGE_BAD = "pageBad";
     public static final String STATIONARY_DEFAULTS = "stationary";
     public static final String SCAN_STATUS = "scanStatus";
-    public static final String BOARD_STATUS = "boardStatus";
     public static final String AUDIO = "audio";
     public static final String BACKGROUND = "background";
     public static final String DETECTION_TYPE = "detectionType";
@@ -126,12 +119,9 @@ public class ValueCodes {
     public static final String COEFFICIENT_C = "coefficientC";
     public static final String COEFFICIENT_D = "coefficientD";
 
-    //Periods
-    public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;
-    public static final int WAITING_PERIOD = 180;
-    public static final int MESSAGE_PERIOD = 1300;
-    public static final int DOWNLOAD_PERIOD = 280;
-    public static final int SCAN_PERIOD = 2000;
-    public static final int BRANDING_PERIOD = 2000;
-    public static final int CONNECT_TIMEOUT = 3500;
+    /* ----------------- ACOUSTIC DEVICE ---------------- */
+    public static final String HEALTH = "health";
+
+    /* ----------------- BLUETOOTH RECEIVER DEVICE ---------------- */
+    public static final String TAGS = "tags";
 }

@@ -131,7 +131,8 @@ public class ScanBaseActivity extends BaseActivity {
         }
     }
 
-    protected void scanNonCodedFixed(int period, int pulseRate, int signalStrength, int type) {
+    protected void scanNonCodedFixed(int period, int signalStrength, int type) {
+        int pulseRate = 60000 / period;
         int position = getPositionNumber(type, 4);
         if (position > 0) {
             refreshNonCodedPosition(position, signalStrength, period, pulseRate);

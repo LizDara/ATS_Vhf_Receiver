@@ -25,6 +25,7 @@
     <string name="select_vhf_receiver">SELECT VHF RECEIVER</string>
     <string name="select_acoustic_receiver">SELECT ACOUSTIC RECEIVER</string>
     <string name="select_bluetooth_tag">SELECT BLUETOOTH TAG</string>
+    <string name="select_bluetooth_beacon">SELECT BLUETOOTH BEACON</string>
     <string name="select_wildlink">SELECT WILDLINK</string>
     <string name="lb_bridge">ATS BRIDGE</string>
     <string name="lb_searching_devices">Searching For Devices ...</string>
@@ -60,7 +61,7 @@
         <item>View Beacon Tags Directly</item>
     </string-array>
 
-    <!--VHF RECEIVER-->
+    <!-- - - - - - VHF RECEIVER - - - - - -->
     <!--HOME-->
     <string name="lb_start_scanning">Start Scanning</string>
     <string name="lb_connecting_device">Connecting ...</string>
@@ -944,7 +945,26 @@
     <string name="lb_dismiss">Dismiss</string>
     <string name="lb_update_now">Update Now</string>
 
-    <!--FIRMWARE UPDATE-->
+    <!-- - - - - - BLUETOOTH RECEIVER - - - - - -->
+    <!--HOME-->
+    <string name="bluetooth_beacon">BLUETOOTH BEACON</string>
+    <string name="lb_detect_tags">Detect Tags</string>
+    
+    <!--TAGS-->
+    <string name="tag_detection">TAG DETECTION</string>
+    <string name="lb_disable">Disable</string>
+    <string name="lb_enable">Enable</string>
+    <string name="lb_location_disabled">Location Data (Disabled)</string>
+    <string name="lb_location_enabled">Location Data (Enabled)</string>
+    <string name="lb_location_unknown">Location: Unknown</string>
+    <string name="lb_detected_tags">Detected Tags:</string>
+    <string name="lb_export_data">Export Data</string>
+    <string name="lb_rssi">RSSI (dBm): </string>
+    <string name="lb_time_since">Time Since (secs): </string>
+    <string name="lb_temperature_c">Temperature (C): </string>
+    <string name="lb_voltage">Voltage (mV): </string>
+
+    <!-- - - - - - FIRMWARE UPDATE - - - - - -->
     <string name="firmware_update">Firmware Update</string>
     <string name="lb_select_firmware">Select Firmware Version</string>
     <string name="lb_firmware_file">The latest version of the firmware file will be downloaded before installing.</string>

@@ -7,12 +7,10 @@ public class ReceiverInformation {
     private int deviceBattery;
     private String serialNumber;
     private boolean mSDCardInserted;
-    private String deviceStatus;
     private byte[] statusData;
 
     private ReceiverInformation() {
         serialNumber = "Unknown";
-        deviceStatus = serialNumber;
         deviceAddress = "Unknown";
         deviceBattery = 0;
         statusData = null;
@@ -29,7 +27,6 @@ public class ReceiverInformation {
         this.deviceAddress = deviceAddress;
         this.deviceBattery = Integer.parseInt(deviceBattery.replace("%", ""));
         this.serialNumber = serialNumber;
-        deviceStatus = serialNumber;
     }
 
     public void changeSDCard(boolean inserted) {
@@ -54,14 +51,6 @@ public class ReceiverInformation {
 
     public boolean isSDCardInserted() {
         return mSDCardInserted;
-    }
-
-    public String getDeviceStatus() {
-        return deviceStatus;
-    }
-
-    public void setDeviceStatus(String mDeviceStatus) {
-        this.deviceStatus = mDeviceStatus;
     }
 
     public byte[] getStatusData() {

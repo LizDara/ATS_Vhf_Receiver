@@ -9,7 +9,7 @@
     tools:context=".FirmwareUpdateActivity">
 
     <include
-        layout="@layout/main_toolbar" />
+        layout="@layout/ats_toolbar" />
 
     <LinearLayout
         android:id="@+id/firmware_versions_linearLayout"

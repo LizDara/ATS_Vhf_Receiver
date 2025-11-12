@@ -498,17 +498,17 @@ public class ManageDataActivity extends BaseActivity {
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
         rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
-        if (finalPageNumber == 0) { // No data to download
-            setVisibility("menu");
-            Message.showMessage(this, "Message", "No data to download.");
-            parameter = "";
-        } else {
+        downloading = finalPageNumber > 0;
+        if (downloading) {
             download_percent_textView.setVisibility(View.VISIBLE);
             download_percent_textView.setText(" - 0%");
-            downloading = true;
             initDownloading();
             setVisibility("downloading");
             loadDownloading();
+        } else { // No data to download
+            setVisibility("menu");
+            Message.showMessage(this, "Message", "No data to download.");
+            parameter = "";
         }
         setStartDownload();
     }
@@ -556,7 +556,7 @@ public class ManageDataActivity extends BaseActivity {
                                             packetNumber++;
                                         }
                                     }
-                                    int percent = ((int) (((float) pageNumber / (float) finalPageNumber) * 100));
+                                    int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
                                     download_percent_textView.setText(" - " + percent + "%");
                                     isOk = true;
                                 } else {

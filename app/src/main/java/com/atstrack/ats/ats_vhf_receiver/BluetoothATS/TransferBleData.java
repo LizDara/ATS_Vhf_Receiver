@@ -25,7 +25,7 @@ public class TransferBleData {
     }
 
     /**
-     * Enables notification for receive the data.
+     * Enable notification for receive the data.
      */
     public static void notificationLog() {
         Log.i("TRANSFER-BLE", "Notification Log");
@@ -234,6 +234,15 @@ public class TransferBleData {
     public static boolean writeResponse(byte[] data) {
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsVhfReceiverUuids.UUID_SERVICE_STORED_DATA, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_STUDY_DATA, data);
+    }
+
+    /**
+     * Enable notification for receive bluetooth tags.
+     */
+    public static void receiveTags() {
+        Log.i("TRANSFER-BLE", "Notification Log BLUETOOTH TAGS");
+        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(
+                AtsVhfReceiverUuids.UUID_SERVICE_TAG, AtsVhfReceiverUuids.UUID_CHARACTERISTIC_TAG, true);
     }
 
     public static boolean writeOTA(byte[] data) {

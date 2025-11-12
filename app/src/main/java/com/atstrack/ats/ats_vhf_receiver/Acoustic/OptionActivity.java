@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,7 +40,7 @@ public class OptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acoustic_option);
         ButterKnife.bind(this);
-        ActivitySetting.setAcousticToolbar(this, getString(R.string.acoustic_receiver));
+        ActivitySetting.setToolbar(this, getString(R.string.acoustic_receiver), ValueCodes.ACOUSTIC);
     }
 
     @Override

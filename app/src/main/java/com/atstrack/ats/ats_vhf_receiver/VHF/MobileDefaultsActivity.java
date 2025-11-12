@@ -95,12 +95,12 @@ public class MobileDefaultsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
+        originalData = new HashMap<>();
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
-        originalData = new HashMap<>();
     }
 
     private void initializeCallback() {

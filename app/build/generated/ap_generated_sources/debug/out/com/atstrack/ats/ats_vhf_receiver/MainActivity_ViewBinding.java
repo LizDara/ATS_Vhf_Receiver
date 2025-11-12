@@ -26,8 +26,9 @@ public class MainActivity_ViewBinding implements Unbinder {
   public MainActivity_ViewBinding(MainActivity target, View source) {
     this.target = target;
 
-    target.main_toolbar = Utils.findRequiredViewAsType(source, R.id.main_toolbar, "field 'main_toolbar'", Toolbar.class);
-    target.main_title_toolbar = Utils.findRequiredViewAsType(source, R.id.main_title_toolbar, "field 'main_title_toolbar'", TextView.class);
+    target.toolbar = Utils.findRequiredViewAsType(source, R.id.toolbar, "field 'toolbar'", Toolbar.class);
+    target.state_view = Utils.findRequiredView(source, R.id.state_view, "field 'state_view'");
+    target.title_toolbar = Utils.findRequiredViewAsType(source, R.id.title_toolbar, "field 'title_toolbar'", TextView.class);
     target.version_textView = Utils.findRequiredViewAsType(source, R.id.version_textView, "field 'version_textView'", TextView.class);
     target.splash_screen_constraintLayout = Utils.findRequiredViewAsType(source, R.id.splash_screen_constraintLayout, "field 'splash_screen_constraintLayout'", ConstraintLayout.class);
     target.bridge_app_linearLayout = Utils.findRequiredViewAsType(source, R.id.bridge_app_linearLayout, "field 'bridge_app_linearLayout'", LinearLayout.class);
@@ -44,8 +45,9 @@ public class MainActivity_ViewBinding implements Unbinder {
     if (target == null) throw new IllegalStateException("Bindings already cleared.");
     this.target = null;
 
-    target.main_toolbar = null;
-    target.main_title_toolbar = null;
+    target.toolbar = null;
+    target.state_view = null;
+    target.title_toolbar = null;
     target.version_textView = null;
     target.splash_screen_constraintLayout = null;
     target.bridge_app_linearLayout = null;

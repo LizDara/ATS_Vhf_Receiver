@@ -435,7 +435,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
             stationary_reference_frequency_switch.setChecked(frequency != 0);
             stationary_reference_frequency_switch.setEnabled(false);
             frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-            reference_frequency_store_rate_stationary_textView.setText(Converters.getDecimalValue(data[8]));
+            reference_frequency_store_rate_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getDecimalValue(data[8]));
         } else {
             Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
         }
@@ -453,18 +453,19 @@ public class StationaryScanActivity extends ScanBaseActivity {
             case "F0":
                 logScanHeader(data);
                 break;
-            case "F1":
+            case "F1": //Coded
             case "F2": //Consolidated
-                logScanCoded(data); //Coded
+                logScanCoded(data);
                 break;
             case "E1":
             case "E2":
             case "EA": //Non Coded
                 int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
+                int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
                 if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
-                    logScanNonCodedFixed(data, signalStrength);
+                    logScanNonCodedFixed(data[0], period, signalStrength);
                 else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
-                    logScanNonCodedVariable(data, signalStrength);
+                    scanNonCodedVariable(period, signalStrength);
                 break;
         }
     }
@@ -508,16 +509,9 @@ public class StationaryScanActivity extends ScanBaseActivity {
         scanCoded(code, signalStrength, mortality);
     }
 
-    private void logScanNonCodedFixed(byte[] data, int signalStrength) {
-        int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-        int pulseRate = 60000 / period;
-        int type = Integer.parseInt(Converters.getHexValue(data[0]).replace("E", ""));
-        scanNonCodedFixed(period, pulseRate, signalStrength, type);
-    }
-
-    private void logScanNonCodedVariable(byte[] data, int signalStrength) {
-        int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-        scanNonCodedVariable(period, signalStrength);
+    private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
+        int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
+        scanNonCodedFixed(period, signalStrength, type);
     }
 
     @Override

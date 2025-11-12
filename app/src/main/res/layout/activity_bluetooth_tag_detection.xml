@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/slate_300"
+    android:orientation="vertical"
+    tools:context=".BluetoothReceiver.TagDetectionActivity">
+
+    <include
+        layout="@layout/ats_toolbar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="16sp"
+        android:padding="16sp"
+        android:background="@color/catskill_white">
+
+        <ImageView
+            android:id="@+id/location_data_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_gps_off"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8sp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/location_data_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_location_disabled"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/coordinates_textView"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_location_unknown"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/location_data_button"
+            style="@style/button_tertiary_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lb_enable" />
+
+    </LinearLayout>
+
+    <TextView
+        style="@style/body_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:text="@string/lb_detected_tags"
+        android:textStyle="bold" />
+
+    <include
+        layout="@layout/item_list"/>
+
+    <Button
+        android:id="@+id/export_data_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/lb_export_data"
+        android:layout_margin="16sp"
+        style="@style/button_primary"/>
+
+</LinearLayout>

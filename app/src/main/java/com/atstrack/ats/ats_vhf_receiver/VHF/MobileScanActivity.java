@@ -35,6 +35,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
@@ -49,10 +50,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
 import static com.atstrack.ats.ats_vhf_receiver.R.color.mountain_meadow;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_delete;
 import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_primary;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease_light;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase_light;
 
 public class MobileScanActivity extends ScanBaseActivity {
 
@@ -122,16 +119,12 @@ public class MobileScanActivity extends ScanBaseActivity {
     private Handler handlerMessage;
     private TableMergeListAdapter tableMergeListAdapter;
     private boolean previousScanning;
-    private boolean isHold;
-    private boolean isRecord; //This can change during scanning
+    private boolean isHold; // This can change during scanning
+    private boolean isRecord; // This can change during scanning
     private int frequencyRange;
-    private int newFrequency;
-    private int selectedTable;
-    private int autoRecord; //This is the default record
-    private int gps;
     private final byte[] audioOption = {(byte) 0x5A, 0, 0};
     private DialogFragment audioOptions;
-    private byte[] aerialDefaults;
+    private MobileDefaults mobileDefaults;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -139,45 +132,44 @@ public class MobileScanActivity extends ScanBaseActivity {
                     return;
                 int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                 if (ValueCodes.RESULT_OK == result.getResultCode()) {
-                    newFrequency = value;
                     new Handler().postDelayed(() -> {
-                        setNewFrequency();
+                        setNewFrequency(value);
                     }, ValueCodes.WAITING_PERIOD);
-                    return;
                 } else if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     frequency_table_number_aerial_textView.setText(String.valueOf(value));
-                    parameter = ValueCodes.TABLE_NUMBER;
+                    setTemporary(ValueCodes.TABLE_NUMBER_CODE);
                 } else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) { // Gets the modified scan rate
                     scan_rate_seconds_aerial_textView.setText(String.valueOf(value * 0.1));
-                    parameter = ValueCodes.SCAN_RATE;
+                    setTemporary(ValueCodes.SCAN_RATE_MOBILE_CODE);
                 }
-                setTemporary();
             });
 
-    private void setTemporary() {
-        byte[] b = new byte[]{(byte) 0x6F, aerialDefaults[1], aerialDefaults[2], aerialDefaults[3]};
-        switch (parameter) {
-            case ValueCodes.TABLE_NUMBER:
+    private void setTemporary(int type) {
+        int info = (mobileDefaults.gpsOn ? 1 : 0) << 7;
+        info = info | ((mobileDefaults.autoRecordOn ? 1 : 0) << 6);
+        byte[] b = new byte[]{(byte) 0x6F, (byte) mobileDefaults.tableNumber, (byte) info, (byte) ((int) (mobileDefaults.scanRate * 10))};
+        switch (type) {
+            case ValueCodes.TABLE_NUMBER_CODE:
                 b[1] = (byte) Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
-                selectedTable = Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
+                mobileDefaults.tableNumber = Integer.parseInt(frequency_table_number_aerial_textView.getText().toString());
                 break;
-            case ValueCodes.SCAN_RATE:
+            case ValueCodes.SCAN_RATE_MOBILE_CODE:
                 b[3] = (byte) (Float.parseFloat(scan_rate_seconds_aerial_textView.getText().toString()) * 10);
+                mobileDefaults.scanRate = Double.parseDouble(scan_rate_seconds_aerial_textView.getText().toString());
                 break;
-            case ValueCodes.GPS:
-                b[2] = gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 128)
-                        : (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) - 128);
-                gps = gps_switch.isChecked() ? 1 : 0;
+            case ValueCodes.GPS_CODE:
+                b[2] = gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(b[2]) + 128))
+                        : (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) - 128);
+                mobileDefaults.gpsOn = gps_switch.isChecked();
                 break;
-            case ValueCodes.AUTO_RECORD:
-                b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) + 64)
-                        : (byte) (Integer.parseInt(Converters.getDecimalValue(aerialDefaults[2])) - 64);
-                autoRecord = aerial_auto_record_switch.isChecked() ? 1 : 0;
+            case ValueCodes.AUTO_RECORD_CODE:
+                b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) + 64)
+                        : (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) - 64);
+                mobileDefaults.autoRecordOn = aerial_auto_record_switch.isChecked();
                 break;
         }
         boolean result = TransferBleData.writeDefaults(true, b);
-        if (result) parameter = "";
-        else downloadData(aerialDefaults);
+        if (!result) downloadData(mobileDefaults.originalBytes);
         gps_switch.setEnabled(true);
         aerial_auto_record_switch.setEnabled(true);
     }
@@ -185,13 +177,13 @@ public class MobileScanActivity extends ScanBaseActivity {
     private void setStartScan() {
         byte[] b = setCalendar();
         b[0] = (byte) 0x82;
-        b[7] = (byte) selectedTable;
+        b[7] = (byte) mobileDefaults.tableNumber;
         isScanning = TransferBleData.writeStartScan(ValueCodes.MOBILE_DEFAULTS, b);
         if (isScanning) {
             removeHold();
-            isRecord = autoRecord == 1;
+            isRecord = mobileDefaults.autoRecordOn;
             if (isRecord) setRecord(); else removeRecord();
-            if (gps == 1) setGpsSearching(); else setGpsOff();
+            if (mobileDefaults.gpsOn) setGpsSearching(); else setGpsOff();
             setVisibility("scanning");
         }
     }
@@ -224,12 +216,11 @@ public class MobileScanActivity extends ScanBaseActivity {
     /**
      * Writes a value for add a frequency in the table.
      */
-    private void setNewFrequency() {
+    private void setNewFrequency(int newFrequency) {
         byte[] b = new byte[] {(byte) 0x5D, (byte) ((newFrequency - baseFrequency) / 256),
                 (byte) ((newFrequency - baseFrequency) % 256)};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            newFrequency = 0;
             manageMessage(R.string.lb_frequency_added);
         }
     }
@@ -260,25 +251,6 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     private void setDecreaseOrIncrease(boolean isDecrease) {
         boolean result = TransferBleData.writeDecreaseIncrease(isDecrease);
-        if (result) {
-            if (isDecrease) {
-                if (newFrequency == baseFrequency) {
-                    decrease_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease_light));
-                    decrease_imageView.setEnabled(false);
-                } else if (newFrequency == frequencyRange - 1) {
-                    increase_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase));
-                    increase_imageView.setEnabled(true);
-                }
-            } else {
-                if (newFrequency == baseFrequency + 1) {
-                    decrease_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease));
-                    decrease_imageView.setEnabled(true);
-                } else if (newFrequency == frequencyRange) {
-                    increase_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase_light));
-                    increase_imageView.setEnabled(false);
-                }
-            }
-        }
     }
 
     private void setRecordScan() {
@@ -311,7 +283,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     public void onClickFrequencyTableNumber(View v) {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLE_NUMBER_CODE);
-        intent.putExtra(ValueCodes.VALUE, aerialDefaults);
+        intent.putExtra(ValueCodes.VALUE, mobileDefaults.tableNumber);
         launcher.launch(intent);
     }
 
@@ -319,7 +291,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     public void onClickScanRateSeconds(View v) {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
-        intent.putExtra(ValueCodes.VALUE, aerialDefaults);
+        intent.putExtra(ValueCodes.VALUE, mobileDefaults.scanRate);
         launcher.launch(intent);
     }
 
@@ -327,7 +299,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
         if (parameter.isEmpty()) {
             gps_switch.setEnabled(false);
-            setTemporary();
+            setTemporary(ValueCodes.GPS_CODE);
         }
     }
 
@@ -335,7 +307,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     public void onCheckedChangedAutoRecord(CompoundButton button, boolean isChecked) {
         if (parameter.isEmpty()) {
             aerial_auto_record_switch.setEnabled(false);
-            setTemporary();
+            setTemporary(ValueCodes.AUTO_RECORD_CODE);
         }
     }
 
@@ -352,14 +324,16 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     @OnClick(R.id.decrease_imageView)
     public void onClickDecrease(View v) {
-        newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) - 1;
-        setDecreaseOrIncrease(true);
+        int currentFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString());
+        if (currentFrequency > baseFrequency)
+            setDecreaseOrIncrease(true);
     }
 
     @OnClick(R.id.increase_imageView)
     public void onClickIncrease(View v) {
-        newFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString()) + 1;
-        setDecreaseOrIncrease(false);
+        int currentFrequency = Converters.getFrequencyNumber(frequency_aerial_textView.getText().toString());
+        if (currentFrequency < frequencyRange)
+            setDecreaseOrIncrease(false);
     }
 
     @OnClick(R.id.edit_table_textView)
@@ -372,7 +346,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     @OnClick(R.id.add_frequency_scan_button)
     public void onClickAddFrequencyScan(View v) {
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
-        intent.putExtra(ValueCodes.TITLE, "Add a Frequency to Table");
+        intent.putExtra(ValueCodes.TITLE, getString(R.string.lb_add_frequency_scan));
         intent.putExtra(ValueCodes.POSITION, -1);
         intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
         intent.putExtra(ValueCodes.RANGE, range);
@@ -442,26 +416,25 @@ public class MobileScanActivity extends ScanBaseActivity {
         initializeCallback();
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         isHold = false;
-        newFrequency = 0;
         handlerMessage = new Handler();
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
         if (isScanning) { // The device is already scanning
             previousScanning = true;
             parameter = ValueCodes.CONTINUE_LOG;
 
+            mobileDefaults = new MobileDefaults();
             int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
                     + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
             int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
                     + Integer.parseInt(Converters.getDecimalValue(data[8]));
-            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[15])) >> 6 & 1;
-            gps = Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1;
-            isRecord = autoRecord == 1;
+            mobileDefaults.autoRecordOn = isRecord = (Integer.parseInt(Converters.getDecimalValue(data[15])) >> 6 & 1) == 1;
+            mobileDefaults.gpsOn = (Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1;
             isHold = Converters.getHexValue(data[1]).equals("81");
             frequency_aerial_textView.setText(Converters.getFrequency(currentFrequency));
             table_index_aerial_textView.setText(String.valueOf(currentIndex));
             if (isHold) setHold(); else removeHold();
             if (isRecord) setRecord(); else removeRecord();
-            if (gps == 1) setGpsSearching(); else setGpsOff();
+            if (mobileDefaults.gpsOn) setGpsSearching(); else setGpsOff();
             scanState(data);
             setVisibility("scanning");
         } else { // Gets aerial defaults data
@@ -475,7 +448,6 @@ public class MobileScanActivity extends ScanBaseActivity {
         receiverCallback = new ReceiverCallback() {
             @Override
             public void onGattDisconnected() {
-                parameter = "";
                 Message.showDisconnectionMessage(mContext);
             }
 
@@ -605,20 +577,16 @@ public class MobileScanActivity extends ScanBaseActivity {
      * Displays the tables on the screen.
      */
     private void downloadTables(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7A")) {
-            ArrayList<Integer> frequencies = new ArrayList<>();
-            ArrayList<Integer> tables = new ArrayList<>();
-            for (int i = 1; i <= 12; i++) {
-                if (data[i] != 0 && !Converters.getHexValue(data[i]).equals("FF")) {
-                    frequencies.add(Integer.parseInt(Converters.getDecimalValue(data[i])));
-                    tables.add(i);
-                }
+        ArrayList<Integer> frequencies = new ArrayList<>();
+        ArrayList<Integer> tables = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            if (data[i] != 0 && !Converters.getHexValue(data[i]).equals("FF")) {
+                frequencies.add(Integer.parseInt(Converters.getDecimalValue(data[i])));
+                tables.add(i);
             }
-            tableMergeListAdapter = new TableMergeListAdapter(this, tables, frequencies, merge_tables_button);
-            tables_merge_listView.setAdapter(tableMergeListAdapter);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
         }
+        tableMergeListAdapter = new TableMergeListAdapter(this, tables, frequencies, merge_tables_button);
+        tables_merge_listView.setAdapter(tableMergeListAdapter);
     }
 
     private void changeAllCheckBox() {
@@ -634,23 +602,19 @@ public class MobileScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        aerialDefaults = data;
-        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        if (selectedTable == 0) { // There are no tables with frequencies to scan
+        mobileDefaults = new MobileDefaults(data);
+        if (mobileDefaults.tableNumber == 0) { // There are no tables with frequencies to scan
             frequency_table_number_aerial_textView.setText(R.string.lb_none);
             start_aerial_button.setEnabled(false);
             start_aerial_button.setAlpha((float) 0.6);
         } else { // Shows the table to be scanned
-            frequency_table_number_aerial_textView.setText(Converters.getDecimalValue(data[1]));
+            frequency_table_number_aerial_textView.setText(String.valueOf(mobileDefaults.tableNumber));
             start_aerial_button.setEnabled(true);
             start_aerial_button.setAlpha((float) 1);
         }
-        double scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
-        scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
-        gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-        gps_switch.setChecked(gps == 1);
-        autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-        aerial_auto_record_switch.setChecked(autoRecord == 1);
+        scan_rate_seconds_aerial_textView.setText(String.valueOf(mobileDefaults.scanRate));
+        gps_switch.setChecked(mobileDefaults.gpsOn);
+        aerial_auto_record_switch.setChecked(mobileDefaults.autoRecordOn);
     }
 
     private void setHold() {

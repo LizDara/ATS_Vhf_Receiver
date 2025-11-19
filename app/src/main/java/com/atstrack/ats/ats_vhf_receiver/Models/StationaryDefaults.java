@@ -16,14 +16,14 @@ public class StationaryDefaults {
     public int referenceStoreRate;
 
     public StationaryDefaults(int baseFrequency, byte[] data) {
-        firstTableNumber = Integer.parseInt(Converters.getHexValue(data[9]));
-        secondTableNumber = Integer.parseInt(Converters.getHexValue(data[10]));
-        thirdTableNumber = Integer.parseInt(Converters.getHexValue(data[11]));
-        scanRate = Integer.parseInt(Converters.getHexValue(data[3]));
-        scanTimeout = Integer.parseInt(Converters.getHexValue(data[4]));
-        antennaNumber = Integer.parseInt(Converters.getHexValue(data[1]));
+        firstTableNumber = Integer.parseInt(Converters.getDecimalValue(data[9]));
+        secondTableNumber = Integer.parseInt(Converters.getDecimalValue(data[10]));
+        thirdTableNumber = Integer.parseInt(Converters.getDecimalValue(data[11]));
+        scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        scanTimeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
+        antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
         dataTransferOn = data[2] != 0;
-        storeRate = Integer.parseInt(Converters.getHexValue(data[5]));
+        storeRate = Integer.parseInt(Converters.getDecimalValue(data[5]));
         referenceFrequencyOn = (!Converters.getHexValue(data[6]).equals("FF") || !Converters.getHexValue(data[7]).equals("FF"))
                 && (!Converters.getHexValue(data[6]).equals("00") || !Converters.getHexValue(data[7]).equals("00"));
         referenceFrequency = referenceFrequencyOn ? (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +

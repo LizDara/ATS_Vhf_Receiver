@@ -122,13 +122,9 @@ public class DetectionFilterActivity extends BaseActivity {
                 break;
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
-        if (result) {
-            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
-            SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
-            sharedPreferencesEdit.putInt(ValueCodes.DETECTION_TYPE, Integer.parseInt(Converters.getDecimalValue(b[1])));
-            sharedPreferencesEdit.apply();
+        if (result)
             Message.showMessage(this, 0);
-        } else
+        else
             Message.showMessage(this, 2);
     }
 

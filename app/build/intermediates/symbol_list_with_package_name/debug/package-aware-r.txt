@@ -1571,6 +1571,7 @@ id pulse_rate_1_textView
 id pulse_rate_2_textView
 id pulse_rate_editText
 id pulse_rate_linearLayout
+id pulse_rate_textView
 id pulse_rate_tolerance_spinner
 id pulse_rate_tolerance_textView
 id pulse_rate_type_imageView

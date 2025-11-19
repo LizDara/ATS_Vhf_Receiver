@@ -69,7 +69,6 @@ public class ScanBaseActivity extends BaseActivity {
     }
 
     protected void setNotificationLogScanning() {
-        parameter = ValueCodes.START_LOG;
         TransferBleData.notificationLog();
     }
 

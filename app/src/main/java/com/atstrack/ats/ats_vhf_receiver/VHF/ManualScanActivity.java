@@ -191,7 +191,7 @@ public class ManualScanActivity extends ScanBaseActivity {
     @OnClick({R.id.enter_new_frequency_button, R.id.edit_frequency_button})
     public void onClickEnterNewFrequency(View v) {
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
-        intent.putExtra(ValueCodes.TITLE, "Change Frequency");
+        intent.putExtra(ValueCodes.TITLE, getString(R.string.lb_change_frequency));
         intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
         intent.putExtra(ValueCodes.RANGE, range);
         launcher.launch(intent);

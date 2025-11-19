@@ -52,12 +52,7 @@ public class MenuActivity extends BaseActivity {
         b[0] = (byte) 0x47;
         b[1] = detectionType;
         boolean result = TransferBleData.writeDetectionFilter(b);
-        if (result) {
-            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
-            SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
-            sharedPreferencesEdit.putInt(ValueCodes.DETECTION_TYPE, Integer.parseInt(Converters.getDecimalValue(b[1])));
-            sharedPreferencesEdit.apply();
-        } else {
+        if (!result) {
             detectionType = 0;
             detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);
         }

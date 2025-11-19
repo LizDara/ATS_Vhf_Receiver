@@ -294,8 +294,8 @@ public class StationaryDefaultsActivity extends BaseActivity {
             frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables);
             number_of_antennas_stationary_textView.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
             stationary_external_data_transfer_switch.setChecked(stationaryDefaults.dataTransferOn);
-            scan_rate_seconds_stationary_textView.setText(stationaryDefaults.scanRate);
-            scan_timeout_seconds_stationary_textView.setText(stationaryDefaults.scanTimeout);
+            scan_rate_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanRate));
+            scan_timeout_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanTimeout));
             store_rate_minutes_stationary_textView.setText(stationaryDefaults.storeRate == 0 ? getString(R.string.lb_continuous_store) : String.valueOf(stationaryDefaults.storeRate));
             frequency_reference_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : "No Reference Frequency");
             reference_frequency_store_rate_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");

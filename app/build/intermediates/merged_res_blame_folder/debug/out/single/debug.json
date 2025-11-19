@@ -40,20 +40,20 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_enter_coefficient.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_thumb_switch.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\thumb_switch.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-hdpi_vhf_receiver.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-hdpi\\vhf_receiver.png"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_disconnected.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\disconnected.xml"
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_thumb_switch.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\thumb_switch.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_manage_data.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_manage_data.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_disconnected.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\disconnected.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_gps_option.xml.flat",
@@ -184,12 +184,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_gps_valid.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xxhdpi_device.png.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xxhdpi\\device.png"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_frequency_select_item.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_select_item.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xxhdpi_device.png.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xxhdpi\\device.png"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_fragment_view_detection_filter.xml.flat",
@@ -272,12 +272,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\deleting_data_receiver.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_details.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_details.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_audio.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_audio.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_details.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_details.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_number.xml.flat",
@@ -320,12 +320,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\tag_item.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_secondary_light.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_secondary_light.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_ic_bluetooth_tag.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\ic_bluetooth_tag.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_secondary_light.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_secondary_light.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_ic_back.xml.flat",

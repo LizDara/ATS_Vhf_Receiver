@@ -52,6 +52,8 @@ public class ValueCodes {
     public static final int MAX_PULSE_RATE_CODE = 1018;
     public static final int MIN_PULSE_RATE_CODE = 1019;
     public static final int DATA_CALCULATION_TYPE_CODE = 1020;
+    public static final int GPS_CODE = 1021;
+    public static final int AUTO_RECORD_CODE = 1022;
 
     //Values
     public static final String STATUS = "status";
@@ -75,7 +77,6 @@ public class ValueCodes {
     public static final String OTA_END = "end";
     public static final String MOBILE_DEFAULTS = "mobile";
     public static final String TABLES = "tables";
-    public static final String START_LOG = "startLog";
     public static final String CONTINUE_LOG = "continueLog";
     public static final String TABLE = "table";
     public static final String TEST = "test";
@@ -88,9 +89,6 @@ public class ValueCodes {
 
     //Original Data
     public static final String TABLE_NUMBER = "TableNumber";
-    public static final String GPS = "Gps";
-    public static final String AUTO_RECORD = "AutoRecord";
-    public static final String SCAN_RATE = "ScanRate";
     public static final String FIRST_TABLE_NUMBER = "FirstTableNumber";
     public static final String SECOND_TABLE_NUMBER = "SecondTableNumber";
     public static final String THIRD_TABLE_NUMBER = "ThirdTableNumber";

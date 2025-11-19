@@ -4,9 +4,6 @@
     <!--DISCONNECT RECEIVER-->
     <string name="disconnect_receiver">Receiver Disconnected</string>
 
-    <!--LOW POWER MODE-->
-    <string name="low_power_mode">Receiver is in Low Power mode</string>
-
     <!--BRIDGE APP-->
     <string name="bridge_app">BRIDGE APP</string>
     <string name="lb_device_selection">Device Selection</string>
@@ -65,12 +62,10 @@
     <!--HOME-->
     <string name="lb_start_scanning">Start Scanning</string>
     <string name="lb_connecting_device">Connecting ...</string>
-    <string name="lb_connected">Connected</string>
     <string name="lb_battery">Battery</string>
     <string name="lb_sd_card">SD Card</string>
     <string name="lb_inserted">Inserted</string>
     <string name="lb_disconnect">Disconnect</string>
-    <string name="lb_receiver_disconnected">Receiver Disconnected</string>
 
     <!--START SCANNING-->
     <string name="lb_manual_scan">Manual Scan</string>
@@ -82,7 +77,6 @@
     <string name="lb_go_detection">Go to Detection Filter Settings</string>
     <string name="lb_warning_no_defaults">Warning: Receiver default settings not complete. Please complete settings to be able to scan.</string>
     <string name="lb_go_settings">Go to Receiver Settings</string>
-    <string name="lb_go_to_scan">Go to Scan</string>
 
     <!--MANUAL SCAN-->
     <string name="manual_scanning">Manual Scanning</string>
@@ -92,8 +86,6 @@
     <string name="lb_set_frequency">Edit Starting Frequency</string>
     <string name="lb_start_manual_scan">Start Manual Scan</string>
     <string name="lb_change_frequency">Change Frequency</string>
-    <string name="lb_enter_frequency">Enter Frequency</string>
-    <string name="lb_ready_to_scan">Ready to Scan</string>
     <string name="lb_manual_scanning">Manual Scanning ...</string>
     <string name="lb_saving_targets">Saving targets ...</string>
     <string name="lb_edit_frequency">Edit Frequency</string>
@@ -107,7 +99,6 @@
     <string name="lb_id_audio">ID Audio</string>
     <string name="lb_latitude">Latitude</string>
     <string name="lb_longitude">Longitude</string>
-    <string name="lb_auto_recording">Auto-recording</string>
     <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
     <string name="lb_select_ids_audio">Select IDs for Audio</string>
     <string name="lb_single">Single</string>
@@ -118,16 +109,11 @@
 
     <!--AERIAL SCAN-->
     <string name="aerial_scanning">Mobile Scanning</string>
-    <string name="lb_scan_defaults">Scan With Default Settings</string>
-    <string name="lb_scan_temporary">Scan With Temporary Settings</string>
     <string name="lb_scan_settings">Scan Settings</string>
     <string name="lb_scan_time_seconds">Scan Time (Seconds)</string>
     <string name="lb_scan_rate">Scan Rate</string>
-    <string name="lb_selected_frequency">Selected Frequency Table</string>
     <string name="lb_number_antennas">Number of Antennas</string>
-    <string name="lb_gps">GPS</string>
     <string name="lb_auto_record">Auto Record</string>
-    <string name="lb_edit_settings">Edit Settings</string>
     <string name="lb_start_aerial_scan">Start Mobile Scan</string>
     <string name="lb_aerial_scanning">Mobile Scanning ...</string>
     <string name="lb_searching_gps">GPS: Searching</string>
@@ -136,18 +122,10 @@
     <string name="lb_failed_gps">GPS: Failed</string>
     <string name="lb_frequency">Frequency</string>
     <string name="lb_table_total">Table Total</string>
-    <string name="lb_table_index">Table Index</string>
     <string name="lb_current_index">Current Index</string>
     <string name="lb_edit_table"><u>Edit Table</u></string>
-    <string name="lb_scan_time">Scan Time</string>
-    <string name="lb_recording">Recording Data ...</string>
-    <string name="lb_data_recorded">Data Recorded Successfully</string>
-    <string name="lb_scan_feed">Scan Feed</string>
     <string name="lb_hold">Hold Frequency</string>
     <string name="lb_release">Release Frequency</string>
-    <string name="lb_on">ON</string>
-    <string name="lb_off">OFF</string>
-    <string name="lb_stop_scanning">Stop Scanning</string>
     <string name="lb_stop_recording">Stop Recording</string>
     <string name="lb_view_detection_filter"><u>View Detection Filter Settings</u></string>
     <string name="lb_non_coded_detection">Non Coded Detection Filter</string>
@@ -168,8 +146,6 @@
     <string name="lb_external_data_transfer">External Data Transfer</string>
     <string name="lb_reference_frequency">Reference Frequency</string>
     <string name="lb_reference_frequency_value">Reference Frequency Value</string>
-    <string name="lb_timeout">Timeout (seconds)</string>
-    <string name="lb_start_stationary_scan">Start Stationary Scan</string>
     <string name="lb_stationary_scanning">Stationary Scanning ...</string>
     <string name="lb_current_antenna">Antenna #</string>
     <string name="lb_scan_details">Scan Details</string>
@@ -186,18 +162,6 @@
     <string name="edit_frequency_tables">Edit Frequency Tables</string>
     <string name="lb_select_table">Select a Table</string>
     <string name="lb_load_table_from_file">Load From File</string>
-    <string name="lb_table1">Table 1</string>
-    <string name="lb_table2">Table 2</string>
-    <string name="lb_table3">Table 3</string>
-    <string name="lb_table4">Table 4</string>
-    <string name="lb_table5">Table 5</string>
-    <string name="lb_table6">Table 6</string>
-    <string name="lb_table7">Table 7</string>
-    <string name="lb_table8">Table 8</string>
-    <string name="lb_table9">Table 9</string>
-    <string name="lb_table10">Table 10</string>
-    <string name="lb_table11">Table 11</string>
-    <string name="lb_table12">Table 12</string>
     <string name="lb_empty_table">0 frequencies</string>
     <string name="lb_all_frequencies">All Frequencies</string>
     <string name="lb_delete_frequencies">Delete Frequencies</string>
@@ -233,9 +197,7 @@
     <!--STATIONARY DEFAULTS-->
     <string name="stationary_defaults">Stationary Default Settings</string>
     <string name="tables_scan">Frequency Tables to Scan</string>
-    <string name="temporary_tables_scan">Temporary Frequency Tables to Scan</string>
     <string name="store_rate">Store Rate</string>
-    <string name="temporary_store_rate">Temporary Store Rate</string>
     <string name="lb_stationary_settings">Stationary Settings</string>
     <string name="lb_scan_tables">Scan Tables</string>
     <string name="lb_scan_timeout">Timeout (Seconds)</string>
@@ -268,7 +230,6 @@
     <string name="lb_continue">Continue</string>
     <string name="lb_transmitter_detection">Transmitter Detection Filter Options</string>
     <string name="lb_pulse_rate_type">Pulse Rate Type</string>
-    <string name="lb_choose_one">Choose one now to setup the detection filters.</string>
     <string name="lb_matches_for_valid_pattern">Matches for Valid Pattern</string>
     <string name="lb_max_pulse_rate">Max Pulse Rate (ppm)</string>
     <string name="lb_min_pulse_rate">Min Pulse Rate (ppm)</string>
@@ -284,11 +245,7 @@
     <string name="lb_pr4_tolerance">Period 4 Tolerance (ms)</string>
     <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
     <string name="lb_temperature">Temperature</string>
-    <string name="lb_select_type">Select Type:</string>
     <string name="lb_number_matches">Number of Matches</string>
-    <string name="lb_eiler_coded">Eiler Coded</string>
-    <string name="lb_eiler_special_coded">Eiler Special Coded</string>
-    <string name="lb_non_coded">Non Coded</string>
     <string name="lb_data_calculation_types">Data Calculation Types</string>
 
     <!--CLONE RECEIVER-->
@@ -302,7 +259,6 @@
 
     <!--MANAGE RECEIVER DATA-->
     <string name="manage_receiver_data">Manage Receiver Data</string>
-    <string name="lb_view_data">View Data in Memory</string>
     <string name="lb_download_data">Download Data in Memory</string>
     <string name="lb_erase_data">Delete Receiver Data in Memory</string>
     <string name="lb_delete_receiver_data">Delete Receiver Data</string>
@@ -342,26 +298,8 @@
     <string name="lb_bytes_stored">Bytes Stored:</string>
     <string name="lb_memory_used_percent">Memory Used (%):</string>
     <string name="lb_frequency_tables">Frequency Tables:</string>
-    <string name="lb_first_table">Table 1:</string>
-    <string name="lb_second_table">Table 2:</string>
-    <string name="lb_third_table">Table 3:</string>
-    <string name="lb_fourth_table">Table 4:</string>
-    <string name="lb_fifth_table">Table 5:</string>
-    <string name="lb_sixth_table">Table 6:</string>
-    <string name="lb_seventh_table">Table 7:</string>
-    <string name="lb_eighth_table">Table 8:</string>
-    <string name="lb_ninth_table">Table 9:</string>
-    <string name="lb_tenth_table">Table 10:</string>
-    <string name="lb_eleventh_table">Table 11:</string>
-    <string name="lb_twelfth_table">Table 12:</string>
     <string name="lb_up_to_date">Up to Date</string>
     <string name="lb_update_receiver">Update Receiver</string>
-
-    <!--RECEIVER UPDATE-->
-    <string name="receiver_update">Receiver Update</string>
-    <string name="lb_updating_receiver">Updating Receiver</string>
-    <string name="lb_cancel_update">Cancel Update</string>
-    <string name="lb_receiver_is_up">Receiver is up to date</string>
 
     <string-array name="antennas">
         <item>1</item>
@@ -974,4 +912,5 @@
     <string name="lb_installing_firmware">Installing Firmware</string>
     <string name="lb_installation_complete">Installation Complete</string>
     <string name="lb_return_device_screen">Return to Device Screen</string>
+    <string name="lb_cancel_update">Cancel Update</string>
 </resources>

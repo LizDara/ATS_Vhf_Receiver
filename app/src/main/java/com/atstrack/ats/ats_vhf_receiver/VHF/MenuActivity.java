@@ -24,7 +24,7 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class MenuActivity extends BaseActivity {
@@ -48,7 +48,6 @@ public class MenuActivity extends BaseActivity {
     private DialogFragment detectionFilter;
 
     private void setDetectionFilter() {
-        parameter = "";
         byte[] b = new byte[11];
         b[0] = (byte) 0x47;
         b[1] = detectionType;
@@ -176,11 +175,8 @@ public class MenuActivity extends BaseActivity {
             getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
                 @Override
                 public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                    parameter = bundle.getString(ValueCodes.PARAMETER);
-                    if (parameter != null && parameter.equals(ValueCodes.DETECTION_TYPE)) {
-                        detectionType = bundle.getByte(ValueCodes.VALUE);
-                        setDetectionFilter();
-                    }
+                    detectionType = bundle.getByte(ValueCodes.VALUE);
+                    setDetectionFilter();
                 }
             });
             detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);

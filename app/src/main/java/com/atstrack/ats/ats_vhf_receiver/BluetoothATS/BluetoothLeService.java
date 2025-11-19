@@ -176,15 +176,20 @@ public class BluetoothLeService extends Service {
                 return false;
             }
         }
-        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        if (device == null) {
-            Log.w(TAG, "Device not found.  Unable to connect.");
-            return false;
+        try {
+            final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+            if (device == null) {
+                Log.w(TAG, "Device not found.  Unable to connect.");
+                return false;
+            }
+            // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
+            mBluetoothGatt = device.connectGatt(this, false, mGattCallback, BluetoothDevice.TRANSPORT_LE);
+            Log.d(TAG, "Trying to create a new connection.");
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback, BluetoothDevice.TRANSPORT_LE);
-        Log.d(TAG, "Trying to create a new connection.");
-        return true;
+        return false;
     }
 
     /**

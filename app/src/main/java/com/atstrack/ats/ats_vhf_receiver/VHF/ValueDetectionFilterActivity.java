@@ -3,7 +3,6 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
@@ -234,51 +232,72 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         initializeCallback();
         type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
         switch (type) {
-            case ValueCodes.PULSE_RATE_TYPE_CODE:
+            case ValueCodes.PULSE_RATE_TYPE_CODE: // Get the pulse rate type
                 setVisibility("pulseRateTypes");
+                byte detectionType = getIntent().getByteExtra(ValueCodes.VALUE, (byte) 0);
+                downloadPulseRateType(detectionType);
                 break;
-            case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE:
+            case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE: // Get the matches for valid pattern
                 setVisibility("matches");
+                int matches = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadMatchesForValidPattern(matches);
                 break;
-            case ValueCodes.MAX_PULSE_RATE_CODE:
+            case ValueCodes.MAX_PULSE_RATE_CODE: // Get the max pulse rate
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.max_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_max_pulse_rate);
+                int max = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadMaxMinPulseRate(max);
                 break;
-            case ValueCodes.MIN_PULSE_RATE_CODE:
+            case ValueCodes.MIN_PULSE_RATE_CODE: // Get the min pulse rate
                 setVisibility("maxMin");
                 title_toolbar.setText(R.string.min_pulse_rate);
                 max_min_pulse_rate_textView.setText(R.string.lb_min_pulse_rate);
+                int min = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadMaxMinPulseRate(min);
                 break;
-            case ValueCodes.DATA_CALCULATION_TYPE_CODE:
+            case ValueCodes.DATA_CALCULATION_TYPE_CODE: // Get data calculation types
                 setVisibility("calculation");
+                int calculation = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadDataCalculation(calculation);
                 break;
-            case ValueCodes.PULSE_RATE_1_CODE:
+            case ValueCodes.PULSE_RATE_1_CODE: // Get the pulse rate 1
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_1);
                 pulse_rate_textView.setText(R.string.lb_pr1);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
+                int pr1 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_1, 0);
+                int pr1Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_1, 0);
+                downloadPulseRate(pr1, pr1Tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_2_CODE:
+            case ValueCodes.PULSE_RATE_2_CODE: // Get the pulse rate 2
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_2);
                 pulse_rate_textView.setText(R.string.lb_pr2);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
+                int pr2 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
+                int pr2Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
+                downloadPulseRate(pr2, pr2Tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_3_CODE:
+            case ValueCodes.PULSE_RATE_3_CODE: // Get the pulse rate 3
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_3);
                 pulse_rate_textView.setText(R.string.lb_pr3);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
+                int pr3 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
+                int pr3Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
+                downloadPulseRate(pr3, pr3Tolerance);
                 break;
-            case ValueCodes.PULSE_RATE_4_CODE:
+            case ValueCodes.PULSE_RATE_4_CODE: // Get the pulse rate 4
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_4);
                 pulse_rate_textView.setText(R.string.lb_pr4);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
+                int pr4 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
+                int pr4Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
+                downloadPulseRate(pr4, pr4Tolerance);
                 break;
         }
-        parameter = ValueCodes.DETECTION_TYPE;
     }
 
     private void initializeCallback() {
@@ -290,8 +309,6 @@ public class ValueDetectionFilterActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.DETECTION_TYPE))
-                    TransferBleData.readDetectionFilter();
             }
 
             @Override
@@ -301,38 +318,6 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                     setBatteryPercent(packet);
                 else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
                     setSdCardStatus(packet);
-                else if (Converters.getHexValue(packet[0]).equals("67")) {
-                    switch (type) {
-                        case ValueCodes.PULSE_RATE_TYPE_CODE: // Gets the pulse rate type
-                            downloadPulseRateType(packet);
-                            break;
-                        case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE: // Gets the matches for valid pattern
-                            downloadMatchesForValidPattern(packet);
-                            break;
-                        case ValueCodes.MAX_PULSE_RATE_CODE: // Gets the max pulse rate
-                            downloadMaxPulseRate(packet);
-                            break;
-                        case ValueCodes.MIN_PULSE_RATE_CODE: // Gets the min pulse rate
-                            downloadMinPulseRate(packet);
-                            break;
-                        case ValueCodes.DATA_CALCULATION_TYPE_CODE: // Gets data calculation types
-                            downloadDataCalculation(packet);
-                        case ValueCodes.PULSE_RATE_1_CODE: // Gets the pulse rate 1
-                            downloadPulseRate1(packet);
-                            break;
-                        case ValueCodes.PULSE_RATE_2_CODE: // Gets the pulse rate 2
-                            downloadPulseRate2(packet);
-                            break;
-                        case ValueCodes.PULSE_RATE_3_CODE: // Gets the pulse rate 3
-                            downloadPulseRate3(packet);
-                            break;
-                        case ValueCodes.PULSE_RATE_4_CODE: // Gets the pulse rate 4
-                            downloadPulseRate4(packet);
-                            break;
-                    }
-                } else {
-                    Message.showMessage((Activity) mContext, "Package found: " + Converters.getHexValue(packet) + ". Package expected: 0x67 ...");
-                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -413,137 +398,65 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         }
     }
 
-    /**
-     * With the received packet, gets pulse rate type and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadPulseRateType(byte[] data) {
+    private void downloadPulseRateType(byte detectionType) {
         setVisibility("pulseRateTypes");
-        if (Converters.getHexValue(data[1]).equals("09")) {
+        if (Converters.getHexValue(detectionType).equals("09")) {
             coded_imageView.setVisibility(View.VISIBLE);
             value = ValueCodes.CODED_CODE;
-        } else if (Converters.getHexValue(data[1]).equals("08")) {
+        } else if (Converters.getHexValue(detectionType).equals("08")) {
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
             value = ValueCodes.FIXED_PULSE_RATE_CODE;
-        } else if (Converters.getHexValue(data[1]).equals("07")) {
+        } else if (Converters.getHexValue(detectionType).equals("07")) {
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
             value = ValueCodes.VARIABLE_PULSE_RATE_CODE;
         }
     }
 
-    /**
-     * With the received packet, gets matches for valid pattern and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadMatchesForValidPattern(byte[] data) {
-        switch (Converters.getDecimalValue(data[2])) {
-            case "2":
+    private void downloadMatchesForValidPattern(int matches) {
+        switch (matches) {
+            case 2:
                 two_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "3":
+            case 3:
                 three_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "4":
+            case 4:
                 four_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "5":
+            case 5:
                 five_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "6":
+            case 6:
                 six_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "7":
+            case 7:
                 seven_imageView.setVisibility(View.VISIBLE);
                 break;
-            case "8":
+            case 8:
                 eight_imageView.setVisibility(View.VISIBLE);
                 break;
         }
-        value = Integer.parseInt(Converters.getDecimalValue(data[2]));
+        value = matches;
     }
 
-    /**
-     * With the received packet, gets max pulse rate and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadMaxPulseRate(byte[] data) {
-        int maxPulse = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        max_min_pulse_rate_editText.setText(String.valueOf(maxPulse));
-        double period = (maxPulse == 0) ? 0 : (double) 60000 / maxPulse;
+    private void downloadMaxMinPulseRate(int maxMin) {
+        max_min_pulse_rate_editText.setText(String.valueOf(maxMin));
+        double period = (maxMin == 0) ? 0 : (double) 60000 / maxMin;
         period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
-        value = maxPulse;
+        value = maxMin;
     }
 
-    /**
-     * With the received packet, gets min pulse rate and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadMinPulseRate(byte[] data) {
-        int minPulse = Integer.parseInt(Converters.getDecimalValue(data[5]));
-        max_min_pulse_rate_editText.setText(String.valueOf(minPulse));
-        double period = (minPulse == 0) ? 0 : (double) 60000 / minPulse;
-        period_pulse_rate_textView.setText(String.format("%.2f ms (period)", period));
-        value = minPulse;
+    private void downloadDataCalculation(int calculation) {
+        if (calculation == 0)
+            none_imageView.setVisibility(View.VISIBLE);
+        else if (calculation == 6)
+            temperature_imageView.setVisibility(View.VISIBLE);
+        value = calculation;
     }
 
-    /**
-     * With the received packet, gets data calculation types and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadDataCalculation(byte[] data) {
-        switch (Converters.getHexValue(data[11])) {
-            case "00":
-                none_imageView.setVisibility(View.VISIBLE);
-                value = 0;
-                break;
-            case "06":
-                temperature_imageView.setVisibility(View.VISIBLE);
-                value = 6;
-                break;
-        }
-    }
-
-    /**
-     * With the received packet, gets pulse rate 1 and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadPulseRate1(byte[] data) {
-        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        pulse_rate_editText.setText(Converters.getDecimalValue(data[3]));
-        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
-        value = (Integer.parseInt(Converters.getDecimalValue(data[3])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[4]));
-    }
-
-    /**
-     * With the received packet, gets pulse rate 2 and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadPulseRate2(byte[] data) {
-        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[6]));
-        pulse_rate_editText.setText(Converters.getDecimalValue(data[5]));
-        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
-        value = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-    }
-
-    /**
-     * With the received packet, gets pulse rate 3 and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadPulseRate3(byte[] data) {
-        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[8]));
-        pulse_rate_editText.setText(Converters.getDecimalValue(data[7]));
-        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
-        value = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[8]));
-    }
-
-    /**
-     * With the received packet, gets pulse rate 4 and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadPulseRate4(byte[] data) {
-        int pulseRateTolerance = Integer.parseInt(Converters.getDecimalValue(data[10]));
-        pulse_rate_editText.setText(Converters.getDecimalValue(data[9]));
-        pulse_rate_tolerance_spinner.setSelection(pulseRateTolerance - 4);
-        value = (Integer.parseInt(Converters.getDecimalValue(data[9])) * 100) + Integer.parseInt(Converters.getDecimalValue(data[10]));
+    private void downloadPulseRate(int pr, int prTolerance) {
+        pulse_rate_editText.setText(String.valueOf(pr));
+        pulse_rate_tolerance_spinner.setSelection(prTolerance - 4);
+        value = (pr * 100) + prTolerance;
     }
 }

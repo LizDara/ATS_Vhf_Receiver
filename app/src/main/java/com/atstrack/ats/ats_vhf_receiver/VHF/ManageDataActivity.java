@@ -177,7 +177,6 @@ public class ManageDataActivity extends BaseActivity {
 
     @OnClick(R.id.begin_download_button)
     public void onClickBeginDownload(View v) {
-        parameter = ValueCodes.DOWNLOAD;
         setNotification();
     }
 
@@ -185,7 +184,6 @@ public class ManageDataActivity extends BaseActivity {
     public void onClickCancelDownload(View v) {
         downloading = false;
         setVisibility("begin");
-        parameter = "";
     }
 
     @OnClick(R.id.return_button)
@@ -195,7 +193,6 @@ public class ManageDataActivity extends BaseActivity {
 
     @OnClick(R.id.delete_receiver_button)
     public void onClickDeleteReceiver(View v) {
-        parameter = ValueCodes.DELETE_RESPONSE;
         setResponseErase();
     }
 
@@ -235,29 +232,29 @@ public class ManageDataActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else {
-                    switch (parameter) {
-                        case ValueCodes.DOWNLOAD:
-                            // Get raw data in pages, each page contains 2048 bytes.
-                            // 9 packets of 230 bytes
-                            if (packet.length > 4)
-                                downloadData(packet);
-                            else if (isTransmissionDone(packet))
-                                downloadData(packet);
-                            else if (packet.length == 4)// Get pages total number
-                                readData(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "52": // Get memory used and byte stored
+                        downloadTest(packet);
+                        break;
+                    case "DD": // Get delete or download response
+                        if (isTransmissionDone(packet)) {
+                            successfulResponse(packet);
                             break;
-                        case ValueCodes.TEST: // Get memory used and byte stored
-                            downloadTest(packet);
-                            break;
-                        case ValueCodes.DELETE_RESPONSE: // Response about erase data
-                            deleteResponse(packet);
-                            break;
-                    }
+                        }
+                    default:
+                        // Get raw data in pages, each page contains 2048 bytes.
+                        // 9 packets of 230 bytes
+                        if (packet.length > 4)
+                            downloadData(packet);
+                        else if (packet.length == 4)// Get pages total number
+                            readData(packet);
+                        break;
                 }
             }
         };
@@ -290,7 +287,6 @@ public class ManageDataActivity extends BaseActivity {
     }
 
     private void showDisconnectionMessage() {
-        parameter = "";
         if (downloading) {
             if (rawDataCollector.byteIndex == 0) {
                 for (byte[] packet : packets)
@@ -380,30 +376,31 @@ public class ManageDataActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadTest(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("52")) {
-            parameter = "";
-            int numberPage = findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
-            int lastPage = findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
-            memory_used_percent_textView.setText(((int) (((float) numberPage / (float) lastPage) * 100)) + "%");
-            memory_used_progressBar.setProgress((int) ((((float) numberPage / (float) lastPage)) * 100));
-            bytes_stored_textView.setText("Memory Used (" + (numberPage * 2048) + " bytes stored)");
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x89 ...");
-        }
+        parameter = "";
+        int numberPage = findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
+        int lastPage = findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
+        memory_used_percent_textView.setText(((int) (((float) numberPage / (float) lastPage) * 100)) + "%");
+        memory_used_progressBar.setProgress((int) ((((float) numberPage / (float) lastPage)) * 100));
+        bytes_stored_textView.setText("Memory Used (" + (numberPage * 2048) + " bytes stored)");
     }
 
     /**
      * Displays a message indicating whether the writing was successful.
      * @param data This packet indicates the writing status.
      */
-    private void deleteResponse(byte[] data) {
-        if (Converters.getHexValue(data).equals("DD 00 BB EE ")) {
-            parameter = ValueCodes.TEST;
-            TransferBleData.readDataInfo();
-            setVisibility("deleted");
+    private void successfulResponse(byte[] data) {
+        if (downloading) {
+            loadProcessing();
+            new Handler().postDelayed(() -> {
+                checkPackets();
+            }, ValueCodes.DOWNLOAD_PERIOD);
         } else {
-            parameter = "";
-            Message.showMessage(this, "Erase Data", "Not Completed.");
+            if (Converters.getHexValue(data).equals("DD 00 BB EE ")) {
+                TransferBleData.readDataInfo();
+                setVisibility("deleted");
+            } else {
+                Message.showMessage(this, "Erase Data", "Not Completed.");
+            }
         }
     }
 
@@ -508,7 +505,6 @@ public class ManageDataActivity extends BaseActivity {
         } else { // No data to download
             setVisibility("menu");
             Message.showMessage(this, "Message", "No data to download.");
-            parameter = "";
         }
         setStartDownload();
     }
@@ -582,8 +578,6 @@ public class ManageDataActivity extends BaseActivity {
     }
 
     private void checkPackets() {
-        parameter = "";
-
         for (byte[] packet : packets) {
             byte[] newPacket;
             int extraNumbers = 2;

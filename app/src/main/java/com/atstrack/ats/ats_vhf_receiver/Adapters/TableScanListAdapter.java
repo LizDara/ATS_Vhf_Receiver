@@ -66,7 +66,7 @@ public class TableScanListAdapter extends BaseAdapter {
     @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        view = inflater.inflate(R.layout.frequency_select_information, parent, false);
+        view = inflater.inflate(R.layout.frequency_select_item, parent, false);
         view.setElevation(4);
 
         CheckBox frequencyNumber = view.findViewById(R.id.frequency_number_checkBox);

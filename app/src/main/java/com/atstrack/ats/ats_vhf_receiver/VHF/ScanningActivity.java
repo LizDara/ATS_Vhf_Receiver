@@ -112,7 +112,6 @@ public class ScanningActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                Log.i(TAG, "Parameter: " + parameter);
                 if (parameter.equals(ValueCodes.DETECTION_TYPE))
                     TransferBleData.readDetectionFilter();
             }
@@ -120,25 +119,25 @@ public class ScanningActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else {
-                    switch (parameter) {
-                        case ValueCodes.DETECTION_TYPE:
-                            downloadDetectionType(packet);
-                            break;
-                        case ValueCodes.TABLES: // Gets the number of frequencies from each table
-                            downloadTables(packet);
-                            break;
-                        case ValueCodes.MOBILE_DEFAULTS:
-                            downloadMobileDefaults(packet);
-                            break;
-                        case ValueCodes.STATIONARY_DEFAULTS:
-                            downloadStationaryDefaults(packet);
-                            break;
-                    }
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "67": // Get tx type
+                        downloadDetectionType(packet);
+                        break;
+                    case "7A": // Get the number of frequencies from each table
+                        downloadTables(packet);
+                        break;
+                    case "6D": // Get mobile defaults
+                        downloadMobileDefaults(packet);
+                        break;
+                    case "6C": // Get stationary defaults
+                        downloadStationaryDefaults(packet);
+                        break;
                 }
             }
         };
@@ -176,18 +175,13 @@ public class ScanningActivity extends BaseActivity {
     }
 
     private void downloadDetectionType(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("67")) {
-            detectionData = data;
-            isDetectionFilterEmpty = false;
-            if (!Converters.getHexValue(data[1]).equals("09")) {
-                isDetectionFilterEmpty = data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 0
-                        && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0;
-            }
-            parameter = ValueCodes.TABLES;
-            TransferBleData.readTables();
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
+        detectionData = data;
+        isDetectionFilterEmpty = false;
+        if (!Converters.getHexValue(data[1]).equals("09")) {
+            isDetectionFilterEmpty = data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 0
+                    && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0;
         }
+        TransferBleData.readTables();
     }
 
     /**
@@ -195,52 +189,40 @@ public class ScanningActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadTables(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7A")) {
-            tablesData = data;
-            areTablesEmpty = data[1] == 0 && data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0
-                    && data[7] == 0 && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0 && data[12] == 0;
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
-        }
+        tablesData = data;
+        areTablesEmpty = data[1] == 0 && data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0
+                && data[7] == 0 && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0 && data[12] == 0;
     }
 
     private void downloadMobileDefaults(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6D")) {
-            defaultData = data;
-            isDefaultEmpty = Converters.isDefaultEmpty(data);
-            if (isDetectionFilterEmpty) {
-                showNoDetectionFilter();
-            } else if (areTablesEmpty) {
-                showNoTables();
-            } else if (isDefaultEmpty) {
-                showNoDefaultsSetting();
-            } else {
-                Intent intent = new Intent(this, MobileScanActivity.class);
-                intent.putExtra(ValueCodes.VALUE, data);
-                startActivity(intent);
-            }
+        defaultData = data;
+        isDefaultEmpty = Converters.isDefaultEmpty(data);
+        if (isDetectionFilterEmpty) {
+            showNoDetectionFilter();
+        } else if (areTablesEmpty) {
+            showNoTables();
+        } else if (isDefaultEmpty) {
+            showNoDefaultsSetting();
         } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6D ...");
+            Intent intent = new Intent(this, MobileScanActivity.class);
+            intent.putExtra(ValueCodes.VALUE, data);
+            startActivity(intent);
         }
     }
 
     private void downloadStationaryDefaults(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            defaultData = data;
-            isDefaultEmpty = Converters.isDefaultEmpty(data);
-            if (isDetectionFilterEmpty) {
-                showNoDetectionFilter();
-            } else if (areTablesEmpty) {
-                showNoTables();
-            } else if (isDefaultEmpty) {
-                showNoDefaultsSetting();
-            } else {
-                Intent intent = new Intent(this, StationaryScanActivity.class);
-                intent.putExtra(ValueCodes.VALUE, data);
-                startActivity(intent);
-            }
+        defaultData = data;
+        isDefaultEmpty = Converters.isDefaultEmpty(data);
+        if (isDetectionFilterEmpty) {
+            showNoDetectionFilter();
+        } else if (areTablesEmpty) {
+            showNoTables();
+        } else if (isDefaultEmpty) {
+            showNoDefaultsSetting();
         } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
+            Intent intent = new Intent(this, StationaryScanActivity.class);
+            intent.putExtra(ValueCodes.VALUE, data);
+            startActivity(intent);
         }
     }
 

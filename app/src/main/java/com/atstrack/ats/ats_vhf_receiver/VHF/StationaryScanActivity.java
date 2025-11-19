@@ -2,6 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -17,18 +18,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class StationaryScanActivity extends ScanBaseActivity {
 
@@ -119,7 +119,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
                     }
                 }
                 setTemporary();
-            });*/
+            });
 
     private void onClickTemporary() {
         byte[] b = new byte[]{(byte) 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -161,7 +161,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
 
         if (result) parameter = "";
         stationary_reference_frequency_switch.setEnabled(true);
-    }
+    }*/
 
     private void setStartScan() {
         byte[] b = setCalendar();
@@ -182,13 +182,10 @@ public class StationaryScanActivity extends ScanBaseActivity {
             setVisibility("overview");
             animationDrawable.stop();
             if (previousScanning) {
-                parameter = ValueCodes.STATIONARY_DEFAULTS;
                 new Handler().postDelayed(() -> {
                     TransferBleData.readDefaults(false);
                 }, ValueCodes.WAITING_PERIOD);
                 previousScanning = false;
-            } else {
-                parameter = "";
             }
         }
     }
@@ -272,7 +269,6 @@ public class StationaryScanActivity extends ScanBaseActivity {
 
     @OnClick(R.id.start_stationary_button)
     public void onClickStartStationary(View v) {
-        parameter = ValueCodes.START_LOG;
         setNotificationLog();
         setStartScan();
     }
@@ -334,15 +330,16 @@ public class StationaryScanActivity extends ScanBaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                switch (parameter) {
-                    case ValueCodes.STATIONARY_DEFAULTS: // Gets stationary defaults data
-                        downloadData(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
                         break;
-                    case ValueCodes.START_LOG: // Receives the data
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "6C": // Gets stationary defaults data
+                        downloadData(packet);
+                    default: // Receives the scan data
                         setCurrentLog(packet);
                         break;
                 }
@@ -399,46 +396,42 @@ public class StationaryScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            parameter = "";
-            firstTable = Integer.parseInt(Converters.getDecimalValue(data[9]));
-            secondTable = Integer.parseInt(Converters.getDecimalValue(data[10]));
-            thirdTable = Integer.parseInt(Converters.getDecimalValue(data[11]));
-            String tables = "";
-            for (int i = 9; i < data.length; i++) {
-                if (data[i] != 0 && !Converters.getDecimalValue(data[i]).equals("FF "))
-                    tables += Converters.getDecimalValue(data[i]) + ", ";
-            }
-            if (tables.isEmpty()) { // There are no tables with frequencies to scan
-                frequency_table_number_stationary_textView.setText(R.string.lb_none);
-                start_stationary_button.setEnabled(false);
-                start_stationary_button.setAlpha((float) 0.6);
-            } else { // Shows the table to be scanned
-                frequency_table_number_stationary_textView.setText(tables.substring(0, tables.length() - 2));
-                start_stationary_button.setEnabled(true);
-                start_stationary_button.setAlpha((float) 1);
-            }
-            antennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            number_of_antennas_stationary_textView.setText((antennas == 0) ? "None" : String.valueOf(antennas));
-            stationary_external_data_transfer_switch.setChecked(data[2] != 0);
-            stationary_external_data_transfer_switch.setEnabled(false);
-            scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
-            scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
-            if (Converters.getHexValue(data[5]).equals("00"))
-                store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
-            else
-                store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
-            int frequency = 0;
-            if (!Converters.getDecimalValue(data[6]).equals("0") && !Converters.getDecimalValue(data[7]).equals("0"))
-                frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
-                        Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
-            stationary_reference_frequency_switch.setChecked(frequency != 0);
-            stationary_reference_frequency_switch.setEnabled(false);
-            frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
-            reference_frequency_store_rate_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getDecimalValue(data[8]));
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
+        firstTable = Integer.parseInt(Converters.getDecimalValue(data[9]));
+        secondTable = Integer.parseInt(Converters.getDecimalValue(data[10]));
+        thirdTable = Integer.parseInt(Converters.getDecimalValue(data[11]));
+        String tables = "";
+        for (int i = 9; i < data.length; i++) {
+            if (data[i] != 0 && !Converters.getDecimalValue(data[i]).equals("FF "))
+                tables += Converters.getDecimalValue(data[i]) + ", ";
         }
+        if (tables.isEmpty()) { // There are no tables with frequencies to scan
+            frequency_table_number_stationary_textView.setText(R.string.lb_none);
+            start_stationary_button.setEnabled(false);
+            start_stationary_button.setAlpha((float) 0.6);
+        } else { // Shows the table to be scanned
+            frequency_table_number_stationary_textView.setText(tables.substring(0, tables.length() - 2));
+            start_stationary_button.setEnabled(true);
+            start_stationary_button.setAlpha((float) 1);
+        }
+        antennas = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        number_of_antennas_stationary_textView.setText((antennas == 0) ? "None" : String.valueOf(antennas));
+        stationary_external_data_transfer_switch.setChecked(data[2] != 0);
+        stationary_external_data_transfer_switch.setEnabled(false);
+        scan_rate_seconds_stationary_textView.setText(Converters.getDecimalValue(data[3]));
+        scan_timeout_seconds_stationary_textView.setText(Converters.getDecimalValue(data[4]));
+        if (Converters.getHexValue(data[5]).equals("00"))
+            store_rate_minutes_stationary_textView.setText(R.string.lb_continuous_store);
+        else
+            store_rate_minutes_stationary_textView.setText(Converters.getDecimalValue(data[5]));
+        int frequency = 0;
+        if ((!Converters.getHexValue(data[6]).equals("FF") || !Converters.getHexValue(data[7]).equals("FF"))
+                && (!Converters.getHexValue(data[6]).equals("00") || !Converters.getHexValue(data[7]).equals("00")))
+            frequency = (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
+                    Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency;
+        stationary_reference_frequency_switch.setChecked(frequency != 0);
+        stationary_reference_frequency_switch.setEnabled(false);
+        frequency_reference_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getFrequency(frequency));
+        reference_frequency_store_rate_stationary_textView.setText((frequency == 0) ? "No Reference Frequency" : Converters.getDecimalValue(data[8]));
     }
 
     /**
@@ -474,6 +467,9 @@ public class StationaryScanActivity extends ScanBaseActivity {
         int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
         max_index_stationary_textView.setText("Table Index (" + maxIndex + " Total)");
         detectionType = data[18];
+        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        item_recyclerView.setAdapter(scanDetailListAdapter);
+        item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
         int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
         updateVisibility(visibility);
 

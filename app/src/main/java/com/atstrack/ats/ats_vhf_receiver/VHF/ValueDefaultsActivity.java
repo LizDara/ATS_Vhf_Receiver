@@ -156,16 +156,16 @@ public class ValueDefaultsActivity extends BaseActivity {
     public void onClickSaveChanges(View v) {
         Intent intent = new Intent();
         int value = 0;
-        if (parameter.equals(ValueCodes.MOBILE_DEFAULTS) && type == ValueCodes.SCAN_RATE_SECONDS_CODE) // Sends the scan rate value for aerial
+        if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) // Send the mobile scan rate value
             value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
-        else if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS) && type == ValueCodes.SCAN_RATE_SECONDS_CODE) // Sends the scan rate value for stationary
+        else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        else if (type == ValueCodes.TABLE_NUMBER_CODE) // Sends the frequency table number
+        else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
             value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
                     Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
-        else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Sends the number of antennas
+        else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
             value = value_spinner.getSelectedItemPosition() + 1;
-        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Sends scan timeout value
+        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
             value = Integer.parseInt(value_spinner.getSelectedItem().toString());
         else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
             value = value_spinner.getSelectedItemPosition();
@@ -194,14 +194,47 @@ public class ValueDefaultsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = getIntent().getStringExtra(ValueCodes.PARAMETER);
         type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
-        if (type == ValueCodes.STORE_RATE_CODE)
-            setVisibility("storeRate");
-        else if (type == ValueCodes.TABLES_NUMBER_CODE)
-            setVisibility("tables");
-        else
-            setVisibility("");
+        switch (type) {
+            case ValueCodes.STORE_RATE_CODE: // Get the store rate
+                setVisibility("storeRate");
+                int storeRate = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadStoreRate(storeRate);
+                break;
+            case ValueCodes.TABLE_NUMBER_CODE: // Get the frequency table number
+                setVisibility("");
+                parameter = ValueCodes.TABLES;
+                break;
+            case ValueCodes.TABLES_NUMBER_CODE: // Get the frequency tables number
+                setVisibility("tables");
+                parameter = ValueCodes.TABLES;
+                break;
+            case ValueCodes.SCAN_RATE_MOBILE_CODE: // Get the scan rate mobile
+                setVisibility("");
+                double scanRateMobile = getIntent().getDoubleExtra(ValueCodes.VALUE, 0);
+                downloadScanRate((int)(scanRateMobile * 10));
+                break;
+            case ValueCodes.SCAN_RATE_STATIONARY_CODE: // Get the scan rate mobile
+                setVisibility("");
+                int scanRateStationary = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadScanRate(scanRateStationary);
+                break;
+            case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Get number of antennas
+                setVisibility("");
+                int antenna = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadAntennas(antenna);
+                break;
+            case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Get the scan timeout seconds
+                setVisibility("");
+                int timeout = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadTimeout(timeout);
+                break;
+            case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Get the reference frequency store rate
+                setVisibility("");
+                int referenceStoreRate = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                downloadReferenceFrequencyStoreRate(referenceStoreRate);
+                break;
+        }
     }
 
     private void initializeCallback() {
@@ -213,49 +246,23 @@ public class ValueDefaultsActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                switch (parameter) {
-                    case ValueCodes.MOBILE_DEFAULTS:  // Gets aerial defaults data
-                        TransferBleData.readDefaults(true);
-                        break;
-                    case ValueCodes.STATIONARY_DEFAULTS:  // Gets stationary defaults data
-                        TransferBleData.readDefaults(false);
-                        break;
-                    case ValueCodes.TABLES:
-                        TransferBleData.readTables();
-                        break;
-                }
+                if (parameter.equals(ValueCodes.TABLES)) // Get tables
+                    TransferBleData.readTables();
             }
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (Converters.getHexValue(packet[0]).equals("6C") || Converters.getHexValue(packet[0]).equals("6D")
-                        || Converters.getHexValue(packet[0]).equals("7A")) {
-                    switch (type) {
-                        case ValueCodes.TABLE_NUMBER_CODE: // Gets the frequency table number
-                        case ValueCodes.TABLES_NUMBER_CODE:
-                            downloadTable(packet);
-                            break;
-                        case ValueCodes.SCAN_RATE_SECONDS_CODE: // Gets the scan rate seconds
-                            downloadScanRate(packet);
-                            break;
-                        case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Gets number of antennas
-                            downloadAntennas(packet);
-                            break;
-                        case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Gets the scan timeout seconds
-                            downloadTimeout(packet);
-                            break;
-                        case ValueCodes.STORE_RATE_CODE: // Gets the store rate
-                            downloadStoreRate(packet);
-                            break;
-                        case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Gets the reference frequency store rate
-                            downloadReferenceFrequencyStoreRate(packet);
-                            break;
-                    }
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "7A": // Get the frequency table number
+                        downloadTable(packet);
+                        break;
                 }
             }
         };
@@ -300,176 +307,121 @@ public class ValueDefaultsActivity extends BaseActivity {
         }
     }
 
-    /**
-     * With the received packet, gets frequency table number and display on the screen.
-     * @param data The received packet.
-     */
     private void downloadTable(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7A")) {
-            if (type == ValueCodes.TABLES_NUMBER_CODE) {
-                ArrayList<Integer> tables = new ArrayList<>();
-                int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);
-                if (table != 0 && table <= 12)
-                    tables.add(table);
-                table = getIntent().getIntExtra(ValueCodes.SECOND_TABLE_NUMBER, 0);
-                if (table != 0 && table <= 12)
-                    tables.add(table);
-                table = getIntent().getIntExtra(ValueCodes.THIRD_TABLE_NUMBER, 0);
-                if (table != 0 && table <= 12)
-                    tables.add(table);
-                option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
-                tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
-                tables_merge_listView.setAdapter(tableScanListAdapter);
-            } else {
-                int table = getIntent().getIntExtra("table", 0);
-                List<String> tables = new ArrayList<>();
-                int position = 0;
-                for (int i = 1; i <= 12; i++) {
-                    if (data[i] > 0) {
-                        tables.add("Table " + i);
-                        if (table == i) position = tables.size() - 1;
-                    }
+        if (type == ValueCodes.TABLES_NUMBER_CODE) {
+            ArrayList<Integer> tables = new ArrayList<>();
+            int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);
+            if (table != 0 && table <= 12)
+                tables.add(table);
+            table = getIntent().getIntExtra(ValueCodes.SECOND_TABLE_NUMBER, 0);
+            if (table != 0 && table <= 12)
+                tables.add(table);
+            table = getIntent().getIntExtra(ValueCodes.THIRD_TABLE_NUMBER, 0);
+            if (table != 0 && table <= 12)
+                tables.add(table);
+            option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
+            tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
+            tables_merge_listView.setAdapter(tableScanListAdapter);
+        } else {
+            int table = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+            List<String> tables = new ArrayList<>();
+            int position = 0;
+            for (int i = 1; i <= 12; i++) {
+                if (data[i] > 0) {
+                    tables.add("Table " + i);
+                    if (table == i) position = tables.size() - 1;
                 }
-                if (tables.isEmpty())
-                    tables.add("None");
-                ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
-                tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                value_spinner.setAdapter(tablesAdapter);
-                value_spinner.setSelection(position);
             }
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
+            if (tables.isEmpty())
+                tables.add("None");
+            ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
+            tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            value_spinner.setAdapter(tablesAdapter);
+            value_spinner.setSelection(position);
         }
     }
 
-    /**
-     * With the received packet, gets scan rate value and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadScanRate(byte[] data) {
-        if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) {
-            if (Converters.getHexValue(data[0]).equals("6D")) {
-                ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
-                scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                value_spinner.setAdapter(scanRateAdapter);
+    private void downloadScanRate(int scanRate) {
+        if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) { // Mobile scan rate
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
+            scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            value_spinner.setAdapter(scanRateAdapter);
 
-                int index = 0;
-                for (int i = 0; i < 49; i++) {
-                    String item = value_spinner.getItemAtPosition(i).toString().replace(".", "");
-                    if (item.equals(Converters.getDecimalValue(data[3]))) {
-                        index = i;
-                        break;
-                    }
+            int index = 0;
+            for (int i = 0; i < 49; i++) {
+                String item = value_spinner.getItemAtPosition(i).toString().replace(".", "");
+                if (item.equals(String.valueOf(scanRate))) {
+                    index = i;
+                    break;
                 }
-                value_spinner.setSelection(index);
-            } else {
-                Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6D ...");
             }
-        } else {
-            if (Converters.getHexValue(data[0]).equals("6C")) {
-                ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateStationary, android.R.layout.simple_spinner_item);
-                scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                value_spinner.setAdapter(scanRateAdapter);
+            value_spinner.setSelection(index);
+        } else { // Stationary scan rate
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateStationary, android.R.layout.simple_spinner_item);
+            scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            value_spinner.setAdapter(scanRateAdapter);
 
-                int scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                if (scanRate <= 255)
-                    value_spinner.setSelection(scanRate - 3);
-                else
-                    value_spinner.setSelection(0);
-            } else {
-                Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
-            }
-        }
-    }
-
-    /**
-     * With the received packet, gets number of antennas and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadAntennas(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(this, R.array.antennas, android.R.layout.simple_spinner_item);
-            antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            value_spinner.setAdapter(antennasAdapter);
-
-            int antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            if (antennaNumber <= 4 && antennaNumber > 0)
-                value_spinner.setSelection(antennaNumber - 1);
+            if (scanRate <= 255)
+                value_spinner.setSelection(scanRate - 3);
             else
                 value_spinner.setSelection(0);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
         }
     }
 
-    /**
-     * With the received packet, gets scan timeout value and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadTimeout(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
-            timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            value_spinner.setAdapter(timeoutAdapter);
+    private void downloadAntennas(int antenna) {
+        ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(this, R.array.antennas, android.R.layout.simple_spinner_item);
+        antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        value_spinner.setAdapter(antennasAdapter);
 
-            int timeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
-            if (timeout <= 200)
-                value_spinner.setSelection(timeout - 3);
-            else
-                value_spinner.setSelection(0);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
-        }
+        if (antenna <= 4 && antenna > 0)
+            value_spinner.setSelection(antenna - 1);
+        else
+            value_spinner.setSelection(0);
     }
 
-    /**
-     * With the received packet, gets store rate value and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadStoreRate(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            switch (Converters.getDecimalValue(data[5])) {
-                case "0":
-                    continuous_store_imageView.setVisibility(View.VISIBLE);
-                    break;
-                case "5":
-                    five_minutes_imageView.setVisibility(View.VISIBLE);
-                    break;
-                case "10":
-                    ten_minutes_imageView.setVisibility(View.VISIBLE);
-                    break;
-                case "20":
-                    fifteen_minutes_imageView.setVisibility(View.VISIBLE);
-                    break;
-                case "30":
-                    thirty_minutes_imageView.setVisibility(View.VISIBLE);
-                    break;
-                case "60":
-                    sixty_minutes_imageView.setVisibility(View.VISIBLE);
-                    break;
-            }
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
-        }
+    private void downloadTimeout(int timeout) {
+        ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
+        timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        value_spinner.setAdapter(timeoutAdapter);
+
+        if (timeout <= 200)
+            value_spinner.setSelection(timeout - 3);
+        else
+            value_spinner.setSelection(0);
     }
 
-    /**
-     * With the received packet, gets reference frequency store rate value and display on the screen.
-     * @param data The received packet.
-     */
-    private void downloadReferenceFrequencyStoreRate(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6C")) {
-            ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(this, R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
-            storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            value_spinner.setAdapter(storeRateAdapter);
-
-            int referenceFrequencyStoreRate = Integer.parseInt(Converters.getDecimalValue(data[8]));
-            if (referenceFrequencyStoreRate <= 24)
-                value_spinner.setSelection(referenceFrequencyStoreRate);
-            else
-                value_spinner.setSelection(0);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6C ...");
+    private void downloadStoreRate(int storeRate) {
+        switch (storeRate) {
+            case 0:
+                continuous_store_imageView.setVisibility(View.VISIBLE);
+                break;
+            case 5:
+                five_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case 10:
+                ten_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case 20:
+                fifteen_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case 30:
+                thirty_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
+            case 60:
+                sixty_minutes_imageView.setVisibility(View.VISIBLE);
+                break;
         }
+        this.storeRate = storeRate;
+    }
+
+    private void downloadReferenceFrequencyStoreRate(int storeRate) {
+        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(this, R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
+        storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        value_spinner.setAdapter(storeRateAdapter);
+
+        if (storeRate <= 24)
+            value_spinner.setSelection(storeRate);
+        else
+            value_spinner.setSelection(0);
     }
 }

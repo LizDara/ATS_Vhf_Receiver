@@ -48,7 +48,6 @@ public class DetectionFilter extends DialogFragment {
                 detectionType = (byte) 0x07;
 
             Bundle bundle = new Bundle();
-            bundle.putString(ValueCodes.PARAMETER, ValueCodes.DETECTION_TYPE);
             bundle.putByte(ValueCodes.VALUE, detectionType);
             getParentFragmentManager().setFragmentResult(ValueCodes.VALUE, bundle);
             dismiss();

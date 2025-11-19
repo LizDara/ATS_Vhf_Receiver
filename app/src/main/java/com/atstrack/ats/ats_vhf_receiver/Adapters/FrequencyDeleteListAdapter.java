@@ -2,7 +2,6 @@ package com.atstrack.ats.ats_vhf_receiver.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +66,7 @@ public class FrequencyDeleteListAdapter extends BaseAdapter {
     @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        view = inflater.inflate(R.layout.frequency_select_information, parent, false);
+        view = inflater.inflate(R.layout.frequency_select_item, parent, false);
         view.setElevation(4);
 
         CheckBox frequencyNumber = view.findViewById(R.id.frequency_number_checkBox);

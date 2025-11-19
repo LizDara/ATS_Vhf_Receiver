@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentResultListener;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import butterknife.BindView;
 import butterknife.OnCheckedChanged;
@@ -28,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -145,7 +147,7 @@ public class MobileScanActivity extends ScanBaseActivity {
                 } else if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     frequency_table_number_aerial_textView.setText(String.valueOf(value));
                     parameter = ValueCodes.TABLE_NUMBER;
-                } else if (ValueCodes.SCAN_RATE_SECONDS_CODE == result.getResultCode()) { // Gets the modified scan rate
+                } else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) { // Gets the modified scan rate
                     scan_rate_seconds_aerial_textView.setText(String.valueOf(value * 0.1));
                     parameter = ValueCodes.SCAN_RATE;
                 }
@@ -200,13 +202,10 @@ public class MobileScanActivity extends ScanBaseActivity {
             clear();
             isScanning = false;
             if (previousScanning) {
-                parameter = ValueCodes.MOBILE_DEFAULTS;
                 new Handler().postDelayed(() -> {
                     TransferBleData.readDefaults(true);
                 }, ValueCodes.WAITING_PERIOD);
                 previousScanning = false;
-            } else {
-                parameter = "";
             }
             setVisibility("overview");
             animationDrawable.stop();
@@ -311,17 +310,16 @@ public class MobileScanActivity extends ScanBaseActivity {
     @OnClick(R.id.frequency_table_number_aerial_linearLayout)
     public void onClickFrequencyTableNumber(View v) {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLE_NUMBER_CODE);
-        intent.putExtra(ValueCodes.TABLE, Integer.parseInt(frequency_table_number_aerial_textView.getText().toString()));
+        intent.putExtra(ValueCodes.VALUE, aerialDefaults);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.scan_rate_seconds_aerial_linearLayout)
     public void onClickScanRateSeconds(View v) {
         Intent intent = new Intent(this, ValueDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE_DEFAULTS);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_SECONDS_CODE);
+        intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
+        intent.putExtra(ValueCodes.VALUE, aerialDefaults);
         launcher.launch(intent);
     }
 
@@ -343,7 +341,6 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     @OnClick(R.id.start_aerial_button)
     public void onClickStartAerial(View v) {
-        parameter = ValueCodes.START_LOG;
         setNotificationLog();
         setStartScan();
     }
@@ -496,22 +493,23 @@ public class MobileScanActivity extends ScanBaseActivity {
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, parameter + ": " + Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (Converters.getHexValue(packet[0]).equals("7A"))
-                    downloadTables(packet);
-                else {
-                    switch (parameter) {
-                        case ValueCodes.MOBILE_DEFAULTS: // Gets aerial defaults data
-                            downloadData(packet);
-                            break;
-                        case ValueCodes.START_LOG: // Receives the data
-                            setCurrentLog(packet);
-                            break;
-                    }
+                Log.i(TAG, Converters.getHexValue(packet));
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "7A": // Get tables
+                        downloadTables(packet);
+                        break;
+                    case "6D": // Get aerial defaults data
+                        downloadData(packet);
+                        break;
+                    default: // Receive the data
+                        setCurrentLog(packet);
+                        break;
                 }
             }
         };
@@ -636,28 +634,23 @@ public class MobileScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("6D")) {
-            aerialDefaults = data;
-            selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            if (selectedTable == 0) { // There are no tables with frequencies to scan
-                frequency_table_number_aerial_textView.setText(R.string.lb_none);
-                start_aerial_button.setEnabled(false);
-                start_aerial_button.setAlpha((float) 0.6);
-            } else { // Shows the table to be scanned
-                frequency_table_number_aerial_textView.setText(Converters.getDecimalValue(data[1]));
-                start_aerial_button.setEnabled(true);
-                start_aerial_button.setAlpha((float) 1);
-            }
-            double scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
-            scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
-            gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
-            gps_switch.setChecked(gps == 1);
-            autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
-            aerial_auto_record_switch.setChecked(autoRecord == 1);
-            parameter = "";
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x6D ...");
+        aerialDefaults = data;
+        selectedTable = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        if (selectedTable == 0) { // There are no tables with frequencies to scan
+            frequency_table_number_aerial_textView.setText(R.string.lb_none);
+            start_aerial_button.setEnabled(false);
+            start_aerial_button.setAlpha((float) 0.6);
+        } else { // Shows the table to be scanned
+            frequency_table_number_aerial_textView.setText(Converters.getDecimalValue(data[1]));
+            start_aerial_button.setEnabled(true);
+            start_aerial_button.setAlpha((float) 1);
         }
+        double scanRate = Integer.parseInt(Converters.getDecimalValue(data[3])) * 0.1;
+        scan_rate_seconds_aerial_textView.setText(String.valueOf(scanRate));
+        gps = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 7 & 1;
+        gps_switch.setChecked(gps == 1);
+        autoRecord = Integer.parseInt(Converters.getDecimalValue(data[2])) >> 6 & 1;
+        aerial_auto_record_switch.setChecked(autoRecord == 1);
     }
 
     private void setHold() {
@@ -754,9 +747,11 @@ public class MobileScanActivity extends ScanBaseActivity {
         max_index_aerial_textView.setText("Table Index (" + maxIndex + " Total)");
         table_total_aerial_textView.setText(String.valueOf(maxIndex));
         detectionType = data[18];
+        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        item_recyclerView.setAdapter(scanDetailListAdapter);
+        item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
         int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
         updateVisibility(visibility);
-
         if (!Converters.getHexValue(detectionType).equals("09")) {
             initializeDetectionFilter(data);
         } else {

@@ -64,7 +64,7 @@ public class TableListAdapter extends BaseAdapter {
     @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        view = inflater.inflate(R.layout.table_information, parent, false);
+        view = inflater.inflate(R.layout.table_item, parent, false);
         view.setElevation(4);
 
         LinearLayout table = view.findViewById(R.id.table_linearLayout);

@@ -39,7 +39,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ManualScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
@@ -269,11 +269,10 @@ public class ScanDevicesActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
-            if (mConnected) {
+            if (mConnected)
                 unregisterReceiver(mGattUpdateReceiver);
-            } else if (leServiceConnection != null && !leServiceConnection.existConnection()) {
+            else if (leServiceConnection != null && !leServiceConnection.existConnection())
                 scanLeDevice(false);
-            }
         }
         super.onPause();
     }

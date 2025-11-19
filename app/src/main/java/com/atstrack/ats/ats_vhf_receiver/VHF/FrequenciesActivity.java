@@ -131,7 +131,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     private void readCoefficients() {
         TransferBleData.notificationLog();
         new Handler().postDelayed(() -> {
-            parameter = ValueCodes.FREQUENCY_COEFFICIENTS;
             sendIndex();
         }, ValueCodes.WAITING_PERIOD);
     }
@@ -142,7 +141,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     private void addTemperatureFrequency() {
-        parameter = "";
         int frequency = Integer.parseInt(frequency_temperature_button.getText().toString());
         int coefficientA = Integer.parseInt(coefficient_a_button.getText().toString().replace("-", "")); //985
         int coefficientB = Integer.parseInt(coefficient_b_button.getText().toString().replace("-", "")); //-6121
@@ -165,7 +163,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     private void setTable() {
-        parameter = "";
         Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         int YY = currentDate.get(Calendar.YEAR);
         int MM = currentDate.get(Calendar.MONTH);
@@ -348,7 +345,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
             @Override
             public void onGattDiscovered() {
-                Log.i(TAG, "Parameter: "+parameter);
                 if (parameter.equals(ValueCodes.TABLE)) // Get the frequencies from a table
                     TransferBleData.readFrequencies(number);
             }
@@ -360,9 +356,9 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                     setBatteryPercent(packet);
                 else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
                     setSdCardStatus(packet);
-                else if (parameter.equals(ValueCodes.TABLE)) // Gets the frequencies from a table
+                else if (Integer.parseInt(Converters.getDecimalValue(packet[0])) == number) // Get the frequencies from a table
                     downloadData(packet);
-                else if (parameter.equals(ValueCodes.FREQUENCY_COEFFICIENTS))
+                else if (Converters.getHexValue(packet[0]).equals("7D")) // Get coefficients
                     downloadCoefficients(packet);
             }
         };
@@ -440,62 +436,53 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Integer.parseInt(Converters.getDecimalValue(data[0])) == number) {
-            parameter = "";
-            originalTable = new int[originalTotalFrequencies];
-            ArrayList<Integer> frequencies = new ArrayList<>();
-            int index = 10;
-            int i = 0;
-            while (i < originalTable.length) {
-                int frequency = (Integer.parseInt(Converters.getDecimalValue(data[index])) * 256) +
-                        Integer.parseInt(Converters.getDecimalValue(data[index + 1]));
-                originalTable[i] = baseFrequency + frequency;
-                frequencies.add(originalTable[i]);
-                i++;
-                index += 2;
-            }
-            frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher, isTemperature, this);
-            frequencies_recyclerView.setAdapter(frequencyListAdapter);
-            frequencies_recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
-            frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x" + number + " ...");
+        parameter = "";
+        originalTable = new int[originalTotalFrequencies];
+        ArrayList<Integer> frequencies = new ArrayList<>();
+        int index = 10;
+        int i = 0;
+        while (i < originalTable.length) {
+            int frequency = (Integer.parseInt(Converters.getDecimalValue(data[index])) * 256) +
+                    Integer.parseInt(Converters.getDecimalValue(data[index + 1]));
+            originalTable[i] = baseFrequency + frequency;
+            frequencies.add(originalTable[i]);
+            i++;
+            index += 2;
         }
+        frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher, isTemperature, this);
+        frequencies_recyclerView.setAdapter(frequencyListAdapter);
+        frequencies_recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        frequencyDeleteListAdapter = new FrequencyDeleteListAdapter(this, frequencies, all_frequencies_checkBox, delete_selected_frequencies_button);
+        frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
     }
 
     private void downloadCoefficients(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7D")) {
-            parameter = "";
-            title_toolbar.setText(R.string.lb_edit_frequency);
-            frequency_temperature_button.setText(String.valueOf(frequencyListAdapter.getFrequency(temperaturePosition)));
+        title_toolbar.setText(R.string.lb_edit_frequency);
+        frequency_temperature_button.setText(String.valueOf(frequencyListAdapter.getFrequency(temperaturePosition)));
 
-            if (!Converters.areCoefficientsEmpty(data)) {
-                int coefficientA = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-                int coefficientB = (Integer.parseInt(Converters.getDecimalValue(data[8])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[9]));
-                int constant = (Integer.parseInt(Converters.getDecimalValue(data[11])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[12]));
-                coefficient_a_button.setText(Converters.getHexValue(data[4]).equals("80") ? "-" + coefficientA : String.valueOf(coefficientA));
-                coefficient_b_button.setText(Converters.getHexValue(data[7]).equals("80") ? "-" + coefficientB : String.valueOf(coefficientB));
-                constant_button.setText(Converters.getHexValue(data[10]).equals("80") ? "-" + constant : String.valueOf(constant));
-                save_frequency_button.setEnabled(true);
-                save_frequency_button.setAlpha(1);
-            } else {
-                coefficient_a_button.setText("0");
-                coefficient_b_button.setText("0");
-                constant_button.setText("0");
-                save_frequency_button.setEnabled(false);
-                save_frequency_button.setAlpha((float) 0.6);
-            }
-            setVisibility("temperature");
-
-            coefficients = new HashMap<>();
-            coefficients.put(ValueCodes.FREQUENCY_COEFFICIENTS, frequency_temperature_button.getText().toString());
-            coefficients.put(ValueCodes.COEFFICIENT_A, coefficient_a_button.getText().toString());
-            coefficients.put(ValueCodes.COEFFICIENT_B, coefficient_b_button.getText().toString());
-            coefficients.put(ValueCodes.COEFFICIENT_C, constant_button.getText().toString());
+        if (!Converters.areCoefficientsEmpty(data)) {
+            int coefficientA = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+            int coefficientB = (Integer.parseInt(Converters.getDecimalValue(data[8])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[9]));
+            int constant = (Integer.parseInt(Converters.getDecimalValue(data[11])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[12]));
+            coefficient_a_button.setText(Converters.getHexValue(data[4]).equals("80") ? "-" + coefficientA : String.valueOf(coefficientA));
+            coefficient_b_button.setText(Converters.getHexValue(data[7]).equals("80") ? "-" + coefficientB : String.valueOf(coefficientB));
+            constant_button.setText(Converters.getHexValue(data[10]).equals("80") ? "-" + constant : String.valueOf(constant));
+            save_frequency_button.setEnabled(true);
+            save_frequency_button.setAlpha(1);
         } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7D ...");
+            coefficient_a_button.setText("0");
+            coefficient_b_button.setText("0");
+            constant_button.setText("0");
+            save_frequency_button.setEnabled(false);
+            save_frequency_button.setAlpha((float) 0.6);
         }
+        setVisibility("temperature");
+
+        coefficients = new HashMap<>();
+        coefficients.put(ValueCodes.FREQUENCY_COEFFICIENTS, frequency_temperature_button.getText().toString());
+        coefficients.put(ValueCodes.COEFFICIENT_A, coefficient_a_button.getText().toString());
+        coefficients.put(ValueCodes.COEFFICIENT_B, coefficient_b_button.getText().toString());
+        coefficients.put(ValueCodes.COEFFICIENT_C, constant_button.getText().toString());
     }
 
     private void changeSelectedFrequency(int frequency, int position) {

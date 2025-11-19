@@ -34,7 +34,7 @@ public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.MyViewHo
     @NonNull
     @Override
     public TagListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.tag_information, parent, false);
+        View view = inflater.inflate(R.layout.tag_item, parent, false);
         view.setElevation(4);
         return new TagListAdapter.MyViewHolder(view);
     }

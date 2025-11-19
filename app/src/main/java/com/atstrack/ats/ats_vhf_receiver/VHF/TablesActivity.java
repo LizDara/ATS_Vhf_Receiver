@@ -86,14 +86,20 @@ public class TablesActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (parameter.equals(ValueCodes.TABLES)) // Gets the number of frequencies from each table
-                    downloadData(packet);
-                else if (parameter.equals(ValueCodes.DETECTION_TYPE))
-                    downloadDetectionFilter(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "7A": // Get the number of frequencies from each table
+                        downloadData(packet);
+                        break;
+                    case "67": // Get tx type
+                        downloadDetectionFilter(packet);
+                        break;
+                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -182,7 +188,6 @@ public class TablesActivity extends BaseActivity {
                     tables[tableNumber - 1][i] = frequenciesList.get(i);
                 message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded." + ValueCodes.CR + ValueCodes.LF;
 
-                parameter = "";
                 tableListAdapter.setFrequenciesFile(tables);
                 tableListAdapter.notifyDataSetChanged();
 
@@ -227,23 +232,14 @@ public class TablesActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7A")) {
-            tableListAdapter = new TableListAdapter(this, data);
-            tables_listView.setAdapter(tableListAdapter);
-            parameter = ValueCodes.DETECTION_TYPE;
-            TransferBleData.readDetectionFilter();
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x7A ...");
-        }
+        parameter = "";
+        tableListAdapter = new TableListAdapter(this, data);
+        tables_listView.setAdapter(tableListAdapter);
+        TransferBleData.readDetectionFilter();
     }
 
     private void downloadDetectionFilter(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("67")) {
-            parameter = ValueCodes.TABLES;
-            boolean isTemperature = Converters.getHexValue(data[1]).equals("07") && Converters.getHexValue(data[11]).equals("06");
-            tableListAdapter.setTemperature(isTemperature);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
-        }
+        boolean isTemperature = Converters.getHexValue(data[1]).equals("07") && Converters.getHexValue(data[11]).equals("06");
+        tableListAdapter.setTemperature(isTemperature);
     }
 }

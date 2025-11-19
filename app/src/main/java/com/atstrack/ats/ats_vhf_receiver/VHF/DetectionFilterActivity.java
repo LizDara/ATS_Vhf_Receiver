@@ -18,14 +18,12 @@ import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class DetectionFilterActivity extends BaseActivity {
 
@@ -58,7 +56,7 @@ public class DetectionFilterActivity extends BaseActivity {
 
     private final static String TAG = DetectionFilterActivity.class.getSimpleName();
 
-    private Map<String, Object> originalData;
+    private DetectionFilter detectionFilter;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -84,14 +82,10 @@ public class DetectionFilterActivity extends BaseActivity {
                         min_pulse_rate_textView.setText(String.valueOf(value));
                         break;
                     case ValueCodes.DATA_CALCULATION_TYPE_CODE:
-                        switch (value) {
-                            case 0:
-                                optional_data_textView.setText(R.string.lb_none);
-                                break;
-                            case 6:
-                                optional_data_textView.setText(R.string.lb_temperature);
-                                break;
-                        }
+                        if (value == 0)
+                            optional_data_textView.setText(R.string.lb_none);
+                        else if (value == 6)
+                            optional_data_textView.setText(R.string.lb_temperature);
                         break;
                     case ValueCodes.PULSE_RATE_1_CODE:
                         pr1_textView.setText(String.valueOf(value / 100));
@@ -142,6 +136,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickPulseRateType(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_TYPE_CODE);
+        intent.putExtra(ValueCodes.VALUE, detectionFilter.detectionType);
         launcher.launch(intent);
     }
 
@@ -149,6 +144,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickMatchesValidPattern(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE);
+        intent.putExtra(ValueCodes.VALUE, detectionFilter.matches);
         launcher.launch(intent);
     }
 
@@ -156,6 +152,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickMaxPulseRate(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.MAX_PULSE_RATE_CODE);
+        intent.putExtra(ValueCodes.VALUE, detectionFilter.maxPulseRate);
         launcher.launch(intent);
     }
 
@@ -163,6 +160,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickMinPulseRate(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.MIN_PULSE_RATE_CODE);
+        intent.putExtra(ValueCodes.VALUE, detectionFilter.minPulseRate);
         launcher.launch(intent);
     }
 
@@ -170,6 +168,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickOptionalDataCalculations(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.DATA_CALCULATION_TYPE_CODE);
+        intent.putExtra(ValueCodes.VALUE, detectionFilter.optionalData);
         launcher.launch(intent);
     }
 
@@ -177,6 +176,8 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickPR1(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_1_CODE);
+        intent.putExtra(ValueCodes.PULSE_RATE_1, detectionFilter.pulseRate1);
+        intent.putExtra(ValueCodes.PULSE_RATE_TOLERANCE_1, detectionFilter.pulseRateTolerance1);
         launcher.launch(intent);
     }
 
@@ -184,6 +185,8 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickPR2(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_2_CODE);
+        intent.putExtra(ValueCodes.PULSE_RATE_2, detectionFilter.pulseRate2);
+        intent.putExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, detectionFilter.pulseRateTolerance2);
         launcher.launch(intent);
     }
 
@@ -201,7 +204,6 @@ public class DetectionFilterActivity extends BaseActivity {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
-        originalData = new HashMap<>();
     }
 
     private void initializeCallback() {
@@ -220,12 +222,17 @@ public class DetectionFilterActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (parameter.equals(ValueCodes.DETECTION_TYPE)) //  Gets the tx type
-                    downloadData(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "67": //  Gets the tx type
+                        downloadData(packet);
+                        break;
+                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -284,70 +291,29 @@ public class DetectionFilterActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("67")) {
-            parameter = "";
-            int pulseRateType = Integer.parseInt(Converters.getDecimalValue(data[1]));
-            int matches = Integer.parseInt(Converters.getDecimalValue(data[2]));
-            int pulseRate1 = 0;
-            int pulseRate2 = 0;
-            int pulseRate3 = 0;
-            int pulseRate4 = 0;
-            int pulseRateTolerance1 = 0;
-            int pulseRateTolerance2 = 0;
-            int pulseRateTolerance3 = 0;
-            int pulseRateTolerance4 = 0;
-            int maxPulseRate = 0;
-            int minPulseRate = 0;
-            int optionalData = 0;
-            switch (Converters.getHexValue(data[1])) {
-                case "09":
-                    setVisibility("Coded");
-                    break;
-                case "08":
-                    setVisibility("Fixed");
+        parameter = "";
+        detectionFilter = new DetectionFilter(data);
+        switch (Converters.getHexValue(data[1])) {
+            case "09":
+                setVisibility("Coded");
+                break;
+            case "08":
+                setVisibility("Fixed");
 
-                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    pr1_textView.setText(Converters.getDecimalValue(data[3]));
-                    pr1_tolerance_textView.setText(Converters.getDecimalValue(data[4]));
-                    pr2_textView.setText(Converters.getDecimalValue(data[5]));
-                    pr2_tolerance_textView.setText(Converters.getDecimalValue(data[6]));
+                matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
+                pr1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
+                pr1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
+                pr2_textView.setText(String.valueOf(detectionFilter.pulseRate2));
+                pr2_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
+                break;
+            case "07":
+                setVisibility("Variable");
 
-                    pulseRate1 = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                    pulseRateTolerance1 = Integer.parseInt(Converters.getDecimalValue(data[4]));
-                    pulseRate2 = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                    pulseRateTolerance2 = Integer.parseInt(Converters.getDecimalValue(data[6]));
-                    pulseRate3 = Integer.parseInt(Converters.getDecimalValue(data[7]));
-                    pulseRateTolerance3 = Integer.parseInt(Converters.getDecimalValue(data[8]));
-                    pulseRate4 = Integer.parseInt(Converters.getDecimalValue(data[9]));
-                    pulseRateTolerance4 = Integer.parseInt(Converters.getDecimalValue(data[10]));
-                    break;
-                case "07":
-                    setVisibility("Variable");
-
-                    maxPulseRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                    minPulseRate = Integer.parseInt(Converters.getDecimalValue(data[5]));
-                    optionalData = Integer.parseInt(Converters.getDecimalValue(data[11]));
-                    matches_for_valid_pattern_textView.setText(Converters.getDecimalValue(data[2]));
-                    max_pulse_rate_textView.setText(String.valueOf(maxPulseRate));
-                    min_pulse_rate_textView.setText(String.valueOf(minPulseRate));
-                    optional_data_textView.setText(Converters.getHexValue(data[11]).equals("06") ? R.string.lb_temperature : R.string.lb_none);
-                    break;
-            }
-            originalData.put(ValueCodes.PULSE_RATE_TYPE, pulseRateType);
-            originalData.put(ValueCodes.MATCHES, matches);
-            originalData.put(ValueCodes.PULSE_RATE_1, pulseRate1);
-            originalData.put(ValueCodes.PULSE_RATE_2, pulseRate2);
-            originalData.put(ValueCodes.PULSE_RATE_3, pulseRate3);
-            originalData.put(ValueCodes.PULSE_RATE_4, pulseRate4);
-            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_1, pulseRateTolerance1);
-            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_2, pulseRateTolerance2);
-            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_3, pulseRateTolerance3);
-            originalData.put(ValueCodes.PULSE_RATE_TOLERANCE_4, pulseRateTolerance4);
-            originalData.put(ValueCodes.MAX_PULSE_RATE, maxPulseRate);
-            originalData.put(ValueCodes.MIN_PULSE_RATE, minPulseRate);
-            originalData.put(ValueCodes.DATA_CALCULATION, optionalData);
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x67 ...");
+                matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
+                max_pulse_rate_textView.setText(String.valueOf(detectionFilter.maxPulseRate));
+                min_pulse_rate_textView.setText(String.valueOf(detectionFilter.minPulseRate));
+                optional_data_textView.setText(detectionFilter.optionalData == 6 ? R.string.lb_temperature : R.string.lb_none);
+                break;
         }
     }
 
@@ -388,13 +354,13 @@ public class DetectionFilterActivity extends BaseActivity {
                 pulseRateType = (byte) 0x09;
                 break;
         }
-        return (int) originalData.get(ValueCodes.PULSE_RATE_TYPE) != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
-                || (int) originalData.get(ValueCodes.MATCHES) != matches || (int) originalData.get(ValueCodes.PULSE_RATE_1) != pulseRate1
-                || (int) originalData.get(ValueCodes.PULSE_RATE_2) != pulseRate2 || (int) originalData.get(ValueCodes.PULSE_RATE_3) != pulseRate3
-                || (int) originalData.get(ValueCodes.PULSE_RATE_4) != pulseRate4 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_1) != pulseRateTolerance1
-                || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_2) != pulseRateTolerance2 || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_3) != pulseRateTolerance3
-                || (int) originalData.get(ValueCodes.PULSE_RATE_TOLERANCE_4) != pulseRateTolerance4 || (int) originalData.get(ValueCodes.MAX_PULSE_RATE) != maxPulseRate
-                || (int) originalData.get(ValueCodes.MIN_PULSE_RATE) != minPulseRate || (int) originalData.get(ValueCodes.DATA_CALCULATION) != optionalData;
+        return detectionFilter.detectionType != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
+                || detectionFilter.matches != matches || detectionFilter.pulseRate1 != pulseRate1
+                || detectionFilter.pulseRate2 != pulseRate2 || detectionFilter.pulseRate3 != pulseRate3
+                || detectionFilter.pulseRate4 != pulseRate4 || detectionFilter.pulseRateTolerance1 != pulseRateTolerance1
+                || detectionFilter.pulseRateTolerance2 != pulseRateTolerance2 || detectionFilter.pulseRateTolerance3 != pulseRateTolerance3
+                || detectionFilter.pulseRateTolerance4 != pulseRateTolerance4 || detectionFilter.maxPulseRate != maxPulseRate
+                || detectionFilter.minPulseRate != minPulseRate || detectionFilter.optionalData != optionalData;
     }
 
     private boolean isDataCorrect() {

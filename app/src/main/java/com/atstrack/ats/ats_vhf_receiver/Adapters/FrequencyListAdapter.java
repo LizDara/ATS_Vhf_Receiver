@@ -53,7 +53,7 @@ public class FrequencyListAdapter extends RecyclerView.Adapter<FrequencyListAdap
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.frequency_information, parent, false);
+        View view = inflater.inflate(R.layout.frequency_item, parent, false);
         view.setElevation(4);
         return new MyViewHolder(view);
     }

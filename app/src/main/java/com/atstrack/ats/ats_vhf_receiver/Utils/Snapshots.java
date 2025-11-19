@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
+
 import java.util.Calendar;
 
 public class Snapshots implements Parcelable {

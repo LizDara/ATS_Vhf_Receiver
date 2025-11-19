@@ -1,94 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16sp">
 
     <LinearLayout
-        android:id="@+id/scan_details_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16sp">
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="8sp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/code_period_textView"
+            style="@style/body_small"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingBottom="8sp">
+            android:textColor="@color/limed_spruce"
+            android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/code_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_code"
-                android:textColor="@color/limed_spruce"
-                android:visibility="visible" />
+        <TextView
+            style="@style/body_small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/lb_detections"
+            android:textColor="@color/limed_spruce" />
 
-            <TextView
-                android:id="@+id/period_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_period"
-                android:textColor="@color/limed_spruce"
-                android:visibility="visible" />
+        <TextView
+            android:id="@+id/mortality_pulse_rate_textView"
+            style="@style/body_small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/limed_spruce"
+            android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/detections_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_detections"
-                android:textColor="@color/limed_spruce" />
-
-            <TextView
-                android:id="@+id/pulse_rate_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_pulse_rate"
-                android:textColor="@color/limed_spruce"
-                android:visibility="visible" />
-
-            <TextView
-                android:id="@+id/mortality_textView"
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_mortality"
-                android:textColor="@color/limed_spruce" />
-
-            <TextView
-                style="@style/body_small"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_signal_strength"
-                android:textColor="@color/limed_spruce" />
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/line_view"
-            android:layout_width="match_parent"
-            android:layout_height="1sp"
-            android:background="@color/light_gray"
-            tools:ignore="SmallSp" />
+        <TextView
+            style="@style/body_small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/lb_signal_strength"
+            android:textColor="@color/limed_spruce" />
 
     </LinearLayout>
 
-</ScrollView>
+    <View
+        android:id="@+id/line_view"
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:background="@color/light_gray"
+        tools:ignore="SmallSp" />
+
+    <include
+        layout="@layout/item_list" />
+
+</LinearLayout>

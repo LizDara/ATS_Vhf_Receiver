@@ -2,9 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
-import static java.lang.Math.min;
 import static java.lang.Math.pow;
-import static java.lang.Math.round;
 
 import android.util.Log;
 
@@ -182,7 +180,7 @@ public class Converters {
             return " Fixed PR,";
         if (type.equals("V"))
             return " Variable PR,";
-        return "None";
+        return "None,";
     }
 
     /**

@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentResultListener;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import butterknife.BindView;
 import butterknife.OnCheckedChanged;
@@ -24,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
@@ -105,7 +107,6 @@ public class ManualScanActivity extends ScanBaseActivity {
         b[9] = (byte) (gps_switch.isChecked() ? 0x80 : 0x0);
         isScanning = TransferBleData.writeStartScan("MANUAL", b);
         if (isScanning) {
-            clear();
             frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
             if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
             gps_scanning_switch.setChecked(gps_switch.isChecked());
@@ -121,7 +122,6 @@ public class ManualScanActivity extends ScanBaseActivity {
             isScanning = false;
             animationDrawable.stop();
             setVisibility("overview");
-            parameter = "";
         }
     }
 
@@ -199,7 +199,6 @@ public class ManualScanActivity extends ScanBaseActivity {
 
     @OnClick(R.id.start_manual_button)
     public void onClickStartManual(View v) {
-        parameter = ValueCodes.START_LOG;
         setNotificationLog();
         setStartScan();
     }
@@ -295,12 +294,17 @@ public class ManualScanActivity extends ScanBaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (parameter.equals(ValueCodes.START_LOG)) // Receives the data
-                    setCurrentLog(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    default: // Receives the data
+                        setCurrentLog(packet);
+                        break;
+                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -414,6 +418,9 @@ public class ManualScanActivity extends ScanBaseActivity {
         frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
         frequency_manual_textView.setText(Converters.getFrequency(frequency));
         detectionType = data[18];
+        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        item_recyclerView.setAdapter(scanDetailListAdapter);
+        item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
         int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
         updateVisibility(visibility);
 

@@ -94,12 +94,17 @@ public class DiagnosticsActivity extends BaseActivity {
             @Override
             public void onGattDataAvailable(byte[] packet) {
                 Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
-                    downloadData(packet);
+                switch (Converters.getHexValue(packet[0])) {
+                    case "88": // Battery
+                        setBatteryPercent(packet);
+                        break;
+                    case "56": // Sd Card
+                        setSdCardStatus(packet);
+                        break;
+                    case "89": // Gets BLE device data
+                        downloadData(packet);
+                        break;
+                }
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -132,38 +137,34 @@ public class DiagnosticsActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("89")) {
-            parameter = "";
-            int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[23])) * 1000;
-            String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-";
-            int frequencyRange = ((Integer.parseInt(Converters.getDecimalValue(data[23])) +
-                    Integer.parseInt(Converters.getDecimalValue(data[24]))) * 1000) - 1;
-            range += String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
-            range_textView.setText(range);
+        parameter = "";
+        int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[23])) * 1000;
+        String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-";
+        int frequencyRange = ((Integer.parseInt(Converters.getDecimalValue(data[23])) +
+                Integer.parseInt(Converters.getDecimalValue(data[24]))) * 1000) - 1;
+        range += String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
+        range_textView.setText(range);
 
-            battery_textView.setText(Converters.getDecimalValue(data[1]));
-            int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
-            int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
-            bytes_stored_test_textView.setText(String.valueOf(numberPage * 2048));
-            memory_used_textView.setText(String.valueOf((int) (((float) numberPage / (float) lastPage) * 100)));
+        battery_textView.setText(Converters.getDecimalValue(data[1]));
+        int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
+        int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
+        bytes_stored_test_textView.setText(String.valueOf(numberPage * 2048));
+        memory_used_textView.setText(String.valueOf((int) (((float) numberPage / (float) lastPage) * 100)));
 
-            frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
-            for (int i = 3; i <= 14; i++) { // Only shows tables that have frequencies
-                if (Integer.parseInt(Converters.getDecimalValue(data[i])) > 0) {
-                    View table = getLayoutInflater().inflate(R.layout.frequency_tables, null);
-                    TextView number_of_table_textView = table.findViewById(R.id.number_of_table_textView);
-                    TextView frequencies_table_textView = table.findViewById(R.id.frequencies_table_textView);
-                    number_of_table_textView.setText("Table " + (i - 2) + ":");
-                    frequencies_table_textView.setText(Converters.getDecimalValue(data[i]));
-                    frequencies_table_linearLayout.addView(table);
-                }
+        frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
+        for (int i = 3; i <= 14; i++) { // Only shows tables that have frequencies
+            if (Integer.parseInt(Converters.getDecimalValue(data[i])) > 0) {
+                View table = getLayoutInflater().inflate(R.layout.frequency_tables, null);
+                TextView number_of_table_textView = table.findViewById(R.id.number_of_table_textView);
+                TextView frequencies_table_textView = table.findViewById(R.id.frequencies_table_textView);
+                number_of_table_textView.setText("Table " + (i - 2) + ":");
+                frequencies_table_textView.setText(Converters.getDecimalValue(data[i]));
+                frequencies_table_linearLayout.addView(table);
             }
-            tx_type_textView.setText(Converters.getHexValue(data[25]).equals("09") ? "Coded" : "Non coded");
-            software_version_textView.setText(Converters.getDecimalValue(data[26]));
-            hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
-        } else {
-            Message.showMessage(this, "Package found: " + Converters.getHexValue(data) + ". Package expected: 0x89 ...");
         }
+        tx_type_textView.setText(Converters.getHexValue(data[25]).equals("09") ? "Coded" : "Non coded");
+        software_version_textView.setText(Converters.getDecimalValue(data[26]));
+        hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
     }
 
     /**

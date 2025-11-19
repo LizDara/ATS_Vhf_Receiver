@@ -125,7 +125,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.device_information, parent, false);
+        View view = inflater.inflate(R.layout.information_item, parent, false);
         view.setElevation(4);
         return new MyViewHolder(view);
     }

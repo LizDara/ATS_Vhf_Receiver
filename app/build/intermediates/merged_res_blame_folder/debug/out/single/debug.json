@@ -16,10 +16,6 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\stationary_current_settings.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_tag_information.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\tag_information.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_stationary_defaults.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_stationary_defaults.xml"
     },
@@ -44,20 +40,20 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_enter_coefficient.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-hdpi_vhf_receiver.png.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-hdpi\\vhf_receiver.png"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_thumb_switch.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\thumb_switch.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_manage_data.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_manage_data.xml"
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-hdpi_vhf_receiver.png.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-hdpi\\vhf_receiver.png"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_disconnected.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\disconnected.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_manage_data.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_manage_data.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_gps_option.xml.flat",
@@ -192,6 +188,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xxhdpi\\device.png"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_frequency_select_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_select_item.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_fragment_view_detection_filter.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\fragment_view_detection_filter.xml"
     },
@@ -214,6 +214,10 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xhdpi_bluetooth_tag.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xhdpi\\bluetooth_tag.png"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_table_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\table_item.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_device_battery.xml.flat",
@@ -268,12 +272,12 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\deleting_data_receiver.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_audio.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_audio.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_details.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_details.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_audio.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_audio.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_number.xml.flat",
@@ -312,6 +316,10 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_diagnostics.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_tag_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\tag_item.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_button_secondary_light.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\button_secondary_light.xml"
     },
@@ -340,8 +348,16 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_no_sd_card.xml"
     },
     {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_frequency_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_item.xml"
+    },
+    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_ic_check.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_check.xml"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_scan_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\scan_item.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-mdpi_device.png.flat",
@@ -378,10 +394,6 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\mipmap-mdpi_ic_launcher_round.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png"
-    },
-    {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_device_information.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\device_information.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_ic_delete.xml.flat",
@@ -536,10 +548,6 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable\\background_branding.xml"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_table_information.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\table_information.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable_ic_circle.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\template\\res\\drawable\\ic_circle.xml"
     },
@@ -610,10 +618,6 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_vhf_enter_frequency.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\activity_vhf_enter_frequency.xml"
-    },
-    {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_frequency_information.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_information.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_activity_bluetooth_menu.xml.flat",
@@ -708,10 +712,6 @@
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-mdpi\\beacon_tags.png"
     },
     {
-        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_frequency_select_information.xml.flat",
-        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\frequency_select_information.xml"
-    },
-    {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_merge_tables_scan.xml.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\merge_tables_scan.xml"
     },
@@ -730,6 +730,10 @@
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\drawable-xhdpi_acoustic_receiver.png.flat",
         "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\drawable-xhdpi\\acoustic_receiver.png"
+    },
+    {
+        "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_information_item.xml.flat",
+        "source": "D:\\ATS_VHF_Receiver\\app\\src\\main\\res\\layout\\information_item.xml"
     },
     {
         "merged": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\merged_res\\debug\\layout_low_power_message.xml.flat",

@@ -65,6 +65,7 @@ public class TablesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
+        tableListAdapter = new TableListAdapter(this);
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
@@ -139,7 +140,10 @@ public class TablesActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        TransferBleData.readTables();
+        if (!tableListAdapter.isFile()) {
+            Log.i(TAG, "ON RESUME AND READ TABLES");
+            TransferBleData.readTables();
+        }
     }
 
     /**
@@ -180,6 +184,7 @@ public class TablesActivity extends BaseActivity {
                         frequenciesList = new LinkedList<>();
                     } else {
                         frequenciesList.add(Integer.parseInt(line));
+                        Log.i(TAG, "FREQ: " + line);
                     }
                 } //Last table in the file
                 tableListAdapter.setFrequenciesNumber(tableNumber, (byte) frequenciesList.size());
@@ -187,6 +192,7 @@ public class TablesActivity extends BaseActivity {
                 for (int i = 0; i < frequenciesList.size(); i++)
                     tables[tableNumber - 1][i] = frequenciesList.get(i);
                 message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded." + ValueCodes.CR + ValueCodes.LF;
+                tableListAdapter.setFile(true);
 
                 tableListAdapter.setFrequenciesFile(tables);
                 tableListAdapter.notifyDataSetChanged();
@@ -232,8 +238,7 @@ public class TablesActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadData(byte[] data) {
-        parameter = "";
-        tableListAdapter = new TableListAdapter(this, data);
+        tableListAdapter.setData(data);
         tables_listView.setAdapter(tableListAdapter);
         TransferBleData.readDetectionFilter();
     }

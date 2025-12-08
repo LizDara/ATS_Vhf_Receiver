@@ -170,7 +170,7 @@ public class BluetoothLeService extends Service {
             Log.d(TAG,"Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 broadcastUpdate(ACTION_GATT_CONNECTED);
-                Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
+                //Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 return true;
             } else {
                 return false;

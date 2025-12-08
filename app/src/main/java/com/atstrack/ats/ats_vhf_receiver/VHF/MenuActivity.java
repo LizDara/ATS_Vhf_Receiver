@@ -52,6 +52,7 @@ public class MenuActivity extends BaseActivity {
         b[0] = (byte) 0x47;
         b[1] = detectionType;
         boolean result = TransferBleData.writeDetectionFilter(b);
+        Log.i(TAG, Converters.getHexValue(b));
         if (!result) {
             detectionType = 0;
             detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);
@@ -147,7 +148,7 @@ public class MenuActivity extends BaseActivity {
                     receiverInformation.changeSDCard(Converters.getHexValue(packet[1]).equals("80"));
                     setSdCard(receiverInformation);
                 } else if (Converters.getHexValue(packet[0]).equals("88")) { // Battery
-                    receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getHexValue(packet[1])));
+                    receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(packet[1])));
                     setBattery(receiverInformation);
                 }
             }

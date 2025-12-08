@@ -183,7 +183,7 @@ public class ManageDataActivity extends BaseActivity {
     @OnClick(R.id.cancel_download_button)
     public void onClickCancelDownload(View v) {
         downloading = false;
-        setVisibility("begin");
+        showPrintDialog("Do you want to save the downloaded bytes?", 3);
     }
 
     @OnClick(R.id.return_button)
@@ -656,6 +656,15 @@ public class ManageDataActivity extends BaseActivity {
             case 1: // Ask if you want to save file to the cloud
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     showPrintDialog("Do you want to send the file to the cloud?", 2);
+                });
+                break;
+            case 3: // Cancel download. Save the download bytes
+                builder.setPositiveButton("OK", (dialog, which) -> {
+                    packetNumber = 1;
+                    checkPackets();
+                });
+                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                    setVisibility("begin");
                 });
                 break;
         }

@@ -18,24 +18,36 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 public class TableListAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
-    private final byte[] tables;
-    private final int baseFrequency;
-    private final int range;
+    private byte[] tables;
+    private int baseFrequency;
+    private int range;
     private int[][] frequencies;
     private boolean isTemperature;
+    private boolean isFile;
 
-    public TableListAdapter(Context context, byte[] tables) {
+    public TableListAdapter(Context context) {
         this.context = context;
-        this.tables = tables;
         inflater = LayoutInflater.from(context);
         frequencies = new int[12][];
+        isFile = false;
+    }
 
+    public void setData(byte[] tables) {
+        this.tables = tables;
         baseFrequency = Integer.parseInt(Converters.getDecimalValue(tables[13]));
         range = Integer.parseInt(Converters.getDecimalValue(tables[14]));
     }
 
     public void setTemperature(boolean temperature) {
         isTemperature = temperature;
+    }
+
+    public void setFile(boolean file) {
+        isFile = file;
+    }
+
+    public boolean isFile() {
+        return isFile;
     }
 
     public void setFrequenciesFile(int[][] frequencies) {
@@ -84,6 +96,7 @@ public class TableListAdapter extends BaseAdapter {
             if (frequencies[position] != null)
                 intent.putExtra(ValueCodes.FREQUENCIES, frequencies[position]);
             context.startActivity(intent);
+            isFile = false;
         });
 
         return view;

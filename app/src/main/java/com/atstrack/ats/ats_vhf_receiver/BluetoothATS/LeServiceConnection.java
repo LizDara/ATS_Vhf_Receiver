@@ -14,7 +14,9 @@ public class LeServiceConnection {
     private boolean connected;
     private ServiceConnection serviceConnection;
 
-    private LeServiceConnection() {}
+    private LeServiceConnection() {
+        connected = false;
+    }
 
     public static LeServiceConnection getInstance() {
         if (leServiceConnection == null)
@@ -37,12 +39,12 @@ public class LeServiceConnection {
     }
 
     private void initialize() {
-        Log.i("LESERVICECONNECTION", "INITIALIZE SERVICE CONNECTION");
         serviceConnection = new ServiceConnection() { // Code to manage Service lifecycle.
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder service) {
                 bluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
                 if (bluetoothLeService.initialize()) {
+                    Log.i("LESERVICECONNECTION", "SERVICE INITIALIZED");
                     ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
                     // Automatically connects to the device upon successful start-up initialization.
                     connected = bluetoothLeService.connect(receiverInformation.getDeviceAddress());

@@ -23,7 +23,8 @@ public class Message {
 
         new Handler().postDelayed(() -> {
             dialog.dismiss();
-            leServiceConnection.close();
+            if (leServiceConnection.existConnection())
+                leServiceConnection.close();
             Intent intent = new Intent(context, MainActivity.class);
             context.startActivity(intent);
             ((Activity) context).finish();

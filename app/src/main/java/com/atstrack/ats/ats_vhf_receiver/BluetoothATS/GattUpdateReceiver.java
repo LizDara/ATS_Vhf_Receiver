@@ -24,7 +24,7 @@ public class GattUpdateReceiver {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                     receiverCallback.onGattDisconnected();
-                } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                } else if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     receiverCallback.onGattDiscovered();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);

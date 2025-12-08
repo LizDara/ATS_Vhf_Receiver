@@ -301,6 +301,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
             reference_frequency_store_rate_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");
             stationary_reference_frequency_switch.setChecked(stationaryDefaults.referenceFrequencyOn);
         } else {
+            stationaryDefaults = new StationaryDefaults();
             frequency_table_number_stationary_textView.setText(R.string.lb_not_set);
             number_of_antennas_stationary_textView.setText(R.string.lb_not_set);
             stationary_external_data_transfer_switch.setChecked(true);

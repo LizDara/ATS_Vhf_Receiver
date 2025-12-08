@@ -4,10 +4,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 public class MobileDefaults {
     public byte[] originalBytes;
-    public int tableNumber;
-    public double scanRate;
-    public boolean gpsOn;
-    public boolean autoRecordOn;
+    public int tableNumber = 255;
+    public double scanRate = 255;
+    public boolean gpsOn = true;
+    public boolean autoRecordOn = true;
 
     public MobileDefaults() {}
 

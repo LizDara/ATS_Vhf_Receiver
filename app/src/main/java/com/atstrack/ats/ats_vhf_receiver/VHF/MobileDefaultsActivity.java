@@ -160,6 +160,7 @@ public class MobileDefaultsActivity extends BaseActivity {
             aerial_auto_record_switch.setChecked(mobileDefaults.autoRecordOn);
             scan_rate_seconds_aerial_textView.setText(String.valueOf(mobileDefaults.scanRate));
         } else {
+            mobileDefaults = new MobileDefaults();
             frequency_table_number_aerial_textView.setText(R.string.lb_not_set);
             scan_rate_seconds_aerial_textView.setText(R.string.lb_not_set);
             gps_switch.setChecked(true);

@@ -3,17 +3,19 @@ package com.atstrack.ats.ats_vhf_receiver.Models;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 public class StationaryDefaults {
-    public int firstTableNumber;
-    public int secondTableNumber;
-    public int thirdTableNumber;
-    public int scanRate;
-    public int scanTimeout;
-    public int antennaNumber;
-    public boolean dataTransferOn;
-    public int storeRate;
-    public boolean referenceFrequencyOn;
-    public int referenceFrequency;
-    public int referenceStoreRate;
+    public int firstTableNumber = 255;
+    public int secondTableNumber = 255;
+    public int thirdTableNumber = 255;
+    public int scanRate = 255;
+    public int scanTimeout = 255;
+    public int antennaNumber = 255;
+    public boolean dataTransferOn = true;
+    public int storeRate = 255;
+    public boolean referenceFrequencyOn = true;
+    public int referenceFrequency = 255;
+    public int referenceStoreRate = 255;
+
+    public StationaryDefaults() {}
 
     public StationaryDefaults(int baseFrequency, byte[] data) {
         firstTableNumber = Integer.parseInt(Converters.getDecimalValue(data[9]));

@@ -138,6 +138,13 @@ public class Converters {
         return total;
     }
 
+    public static String getAsciiValue(int start, int end, byte[] data) {
+        String value = "";
+        for (int i = start; i < end; i++)
+            value += (char) data[i];
+        return value;
+    }
+
     public static String getFrequency(int frequency) {
         return String.valueOf(frequency).substring(0, 3) + "." + String.valueOf(frequency).substring(3);
     }
@@ -174,12 +181,14 @@ public class Converters {
     }
 
     public static String getDetectionFilter(String type) {
-        if (type.equals("C"))
-            return " Coded,";
-        if (type.equals("F"))
-            return " Fixed PR,";
-        if (type.equals("V"))
-            return " Variable PR,";
+        switch (type) {
+            case "C":
+                return " Coded,";
+            case "F":
+                return " Fixed PR,";
+            case "V":
+                return " Variable PR,";
+        }
         return "None,";
     }
 
@@ -194,17 +203,17 @@ public class Converters {
     }
 
     public static int getDeviceType(String name, boolean isLogo) {
-        if (name.contains("vr") || name.contains("VHF")) {
+        if (name.contains(ValueCodes.VHF) || name.contains("VHF")) {
             return isLogo ? R.drawable.vhf_receiver : R.drawable.ic_vhf_receiver;
-        } else if (name.contains("ar") || name.contains("Acoustic"))
+        } else if (name.contains(ValueCodes.ACOUSTIC) || name.contains("Acoustic"))
             return isLogo ? R.drawable.acoustic_receiver : R.drawable.ic_acoustic_receiver;
-        else if (name.contains("wl") || name.contains("Wildlink"))
+        else if (name.contains(ValueCodes.WILDLINK) || name.contains("Wildlink"))
             return isLogo ? R.drawable.wildlink_receiver : R.drawable.ic_wildlink_receiver;
         else if (name.contains("Tags"))
             return isLogo ? R.drawable.bluetooth_tag : R.drawable.ic_bluetooth_tag;
-        else if (name.contains("br") || name.contains("Bluetooth Receiver"))
+        else if (name.contains(ValueCodes.BLUETOOTH_RECEIVER) || name.contains("Bluetooth Receiver"))
             return isLogo ? R.drawable.bluetooth_receiver : R.drawable.ic_bluetooth_tag;
-        else if (name.contains("bt") || name.contains("Beacon"))
+        else if (name.contains(ValueCodes.BEACON) || name.contains("Beacon"))
             return isLogo ? R.drawable.beacon_tags : R.drawable.ic_bluetooth_tag;
         return 0;
     }

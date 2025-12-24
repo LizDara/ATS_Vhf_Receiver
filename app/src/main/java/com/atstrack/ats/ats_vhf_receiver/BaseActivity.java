@@ -54,9 +54,9 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
         else
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
         if(showToolbar && deviceCategory.equals(ValueCodes.VHF))
             ActivitySetting.setReceiverStatus(this);
     }
@@ -64,7 +64,11 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        try {
+            unregisterReceiver(gattUpdateReceiver.mGattUpdateReceiver);
+        } catch (Exception ex) {
+            Log.i(TAG, "Failed to unregister receiver");
+        }
     }
 
     @Override

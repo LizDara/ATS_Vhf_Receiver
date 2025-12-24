@@ -12,15 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.atstrack.ats.ats_vhf_receiver.Models.TagDetail;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 import java.util.ArrayList;
 
 public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.MyViewHolder> {
 
     private final LayoutInflater inflater;
-    private ArrayList<byte[]> tags;
+    private ArrayList<TagDetail> tags;
 
     public TagListAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -28,7 +28,15 @@ public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.MyViewHo
     }
 
     public void addTag(byte[] data) {
-        tags.add(data);
+        tags.add(new TagDetail(data));
+    }
+
+    public void setTag(int position, byte[] data) {
+        tags.get(position).updateData(data);
+    }
+
+    public TagDetail getTag(int position) {
+        return tags.get(position);
     }
 
     @NonNull
@@ -41,7 +49,10 @@ public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull TagListAdapter.MyViewHolder holder, int position) {
-        holder.detections_tag_textView.setText(Converters.getHexValue(tags.get(position)));
+        holder.tag_textView.setText(tags.get(position).code);
+        holder.detections_tag_textView.setText("Detections: " + tags.get(position).detections);
+        holder.rssi_textView.setText(tags.get(position).rssi);
+        holder.temperature_c_textView.setText(tags.get(position).temperature);
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(32, 16, 32, 16);
         holder.tags_linearLayout.setLayoutParams(params);

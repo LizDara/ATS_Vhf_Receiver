@@ -15,22 +15,23 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.atstrack.ats.ats_vhf_receiver.Utils.AtsVhfReceiverUuids;
+import com.atstrack.ats.ats_vhf_receiver.Utils.AtsUuids;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 
 import java.util.Calendar;
 import java.util.UUID;
+
+import androidx.annotation.NonNull;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
 public class BluetoothLeService extends Service {
-
     private final static String TAG = BluetoothLeService.class.getSimpleName();
 
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGatt mBluetoothGatt;
-    private String action;
     private boolean otaUpdate = false;
 
     public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -38,8 +39,6 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
-
-    public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     // Implements callback methods for GATT events that the app cares about.  For example, connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -71,23 +70,23 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS) + ":" + Calendar.getInstance().get(Calendar.MINUTE)
                     + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND));
-            if (characteristic.getUuid().equals(AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x00)
+            if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x00)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED); //OTA Begin written
-            else if (characteristic.getUuid().equals(AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x03)
+            else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x03)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED); //OTA End written
-            else if (characteristic.getUuid().equals(AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x04)
+            else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x04)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED); //OTA End written
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS)
-                broadcastUpdate(action, characteristic);
+                broadcastUpdate(characteristic);
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            broadcastUpdate(characteristic);
         }
 
         @Override
@@ -97,7 +96,6 @@ public class BluetoothLeService extends Service {
                 Log.i("OTA", "onMtuChanged mtu: " + mtu);
                 otaUpdate = false;
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-
             }
         }
     };
@@ -107,8 +105,8 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
-        final Intent intent = new Intent(action);
+    private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
+        final Intent intent = new Intent(BluetoothLeService.ACTION_DATA_AVAILABLE);
         final byte[] data = characteristic.getValue();
         if (data != null && data.length > 0) {
             intent.putExtra(EXTRA_DATA, data);
@@ -238,8 +236,6 @@ public class BluetoothLeService extends Service {
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(characteristics);
         @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
-        if (result)
-            action = ACTION_DATA_AVAILABLE;
         return result;
     }
 
@@ -278,10 +274,31 @@ public class BluetoothLeService extends Service {
         }
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(characteristics);
-        BluetoothGattDescriptor desc = myGatChar.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+        BluetoothGattDescriptor desc = myGatChar.getDescriptor(AtsUuids.CLIENT_CHARACTERISTIC_CONFIG);
         desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(desc);
         mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
+    }
+
+    @SuppressLint("MissingPermission")
+    public boolean setCharacteristicNotificationTag() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return false;
+        }
+        boolean written = false;
+        BluetoothGattService myGatService = mBluetoothGatt.getService(AtsUuids.UUID_SERVICE_TAG);
+        BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(AtsUuids.UUID_CHARACTERISTIC_TAG);
+        if (myGatChar != null) {
+            if (!mBluetoothGatt.setCharacteristicNotification(myGatChar, true))
+                return false;
+            BluetoothGattDescriptor desc = myGatChar.getDescriptor(AtsUuids.CLIENT_CHARACTERISTIC_CONFIG);
+            if (desc != null) {
+                desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                written = mBluetoothGatt.writeDescriptor(desc);
+            }
+        }
+        return written;
     }
 
     public boolean writeOTA(byte[] data) {
@@ -289,20 +306,20 @@ public class BluetoothLeService extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return false;
         }
-        BluetoothGattService myGatService = mBluetoothGatt.getService(AtsVhfReceiverUuids.UUID_SERVICE_SILICON_LABS_OTA);
-        BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(AtsVhfReceiverUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL);
+        BluetoothGattService myGatService = mBluetoothGatt.getService(AtsUuids.UUID_SERVICE_SILICON_LABS_OTA);
+        BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL);
         myGatChar.setWriteType(data.length == 1 ? BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT : BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         myGatChar.setValue(data);
         @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.writeCharacteristic(myGatChar);
         return result;
     }
 
-    public boolean requestMtu(int mtu) {
+    public boolean requestMtu(int mtu, boolean isOta) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return false;
         }
-        otaUpdate = true;
+        otaUpdate = isOta;
         @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.requestMtu(mtu);
         return result;
     }

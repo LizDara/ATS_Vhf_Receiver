@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -96,13 +97,13 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
     }
 
     private String getType(String name) {
-        if (name.contains("vr"))
+        if (name.contains(ValueCodes.VHF))
             return "VHF Receiver";
-        else if (name.contains("ar"))
+        else if (name.contains(ValueCodes.ACOUSTIC))
             return "Acoustic Receiver";
-        else if (name.contains("wl"))
+        else if (name.contains(ValueCodes.WILDLINK))
             return "Wildlink Receiver";
-        else if (name.contains("bt"))
+        else if (name.contains(ValueCodes.BEACON))
             return "Bluetooth Tag";
         return "Unknown";
     }
@@ -138,7 +139,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
             holder.device_number_textView.setText(serialNumber + " " + getType(device));
             holder.device_type_linearLayout.setBackground(ContextCompat.getDrawable(context, Converters.getDeviceType(device, false)));
             holder.device_type_imageView.setBackgroundResource(Converters.getDeviceType(device, true));
-            if (device.contains("vr")) {
+            if (device.contains(ValueCodes.VHF)) {
                 String detectionFilter = Converters.getDetectionFilter(device.substring(15, 16));
                 String status = Converters.getStatusVhfReceiver(device);
                 int percent = Converters.getPercentBatteryVhfReceiver(mScanRecords.get(position));
@@ -154,7 +155,7 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
                     holder.status_footer_linearLayout.setVisibility(View.VISIBLE);
                 else
                     holder.status_footer_linearLayout.setVisibility(View.GONE);
-            } else if (device.contains("ar")) {
+            } else if (device.contains(ValueCodes.ACOUSTIC)) {
                 holder.device_status_textView.setText("Extra Details"); // Mas adelante se agregara mas info sobre acoustic receivers
                 holder.percent_battery_textView.setText("0%");
                 holder.battery_imageView.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_light_battery));

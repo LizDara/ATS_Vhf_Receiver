@@ -72,15 +72,15 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
 
     ActivityResultLauncher<Intent> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
-                    if (result.getResultCode() == -1) {
-                        if (this.deniedPermissions.isEmpty())
-                            initialize(ValueCodes.MESSAGE_PERIOD);
-                        else
-                            showAlert();
-                    } else {
-                        this.deniedPermissions += "\n- Nearby devices";
+                if (result.getResultCode() == -1) {
+                    if (this.deniedPermissions.isEmpty())
+                        initialize(ValueCodes.MESSAGE_PERIOD);
+                    else
                         showAlert();
-                    }
+                } else {
+                    this.deniedPermissions += "\n- Nearby devices";
+                    showAlert();
+                }
             });
 
     /*@OnClick(R.id.switch_dark_mode)
@@ -201,15 +201,15 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         }
         String type = "";
         if (categoryListAdapter.getTypes()[position].contains("VHF"))
-            type = "ATSvr";
+            type = ValueCodes.VHF;
         else if (categoryListAdapter.getTypes()[position].contains("Acoustic"))
-            type = "ATSar";
+            type = ValueCodes.ACOUSTIC;
         else if (categoryListAdapter.getTypes()[position].contains("Wildlink"))
-            type = "ATSwl";
+            type = ValueCodes.WILDLINK;
         else if (categoryListAdapter.getTypes()[position].contains("Bluetooth Receiver"))
-            type = "ATSbr";
+            type = ValueCodes.BLUETOOTH_RECEIVER;
         else if (categoryListAdapter.getTypes()[position].contains("Beacon"))
-            type = "ATSbt";
+            type = ValueCodes.BEACON;
         Intent intent = new Intent(this, ScanDevicesActivity.class);
         intent.putExtra(ValueCodes.TYPE, type);
         startActivity(intent);

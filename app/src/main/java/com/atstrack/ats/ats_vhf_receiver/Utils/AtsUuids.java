@@ -2,7 +2,7 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 import java.util.UUID;
 
-public class AtsVhfReceiverUuids {
+public class AtsUuids {
     public static final UUID
     //UUID_SERVICE_GENERIC_ACCESS = UUID.fromString("1800"),
     //UUID_SERVICE_DEVICE_INFORMATION = UUID.fromString("180A"),
@@ -15,6 +15,7 @@ public class AtsVhfReceiverUuids {
     //UUID_CHARACTERISTIC_DEVICE_NAME = UUID.fromString("2A00"),
     //UUID_CHARACTERISTIC_APPEARANCE = UUID.fromString("2A01"),
     //UUID_CHARACTERISTIC_MANUFACTURER_NAME_STRING = UUID.fromString("2A29"),
+    CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"),
     UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL = UUID.fromString("F7BF3564-FB6D-4E53-88A4-5E37E0326063"),
     UUID_CHARACTERISTIC_FACTORY_SETUP = UUID.fromString("8154c808-e3da-4f4e-aea5-c0d2d37425ba"),
     UUID_CHARACTERISTIC_DIAG_INFO = UUID.fromString("42d03a17-ebe1-4072-97a5-393f4a0515d7"),

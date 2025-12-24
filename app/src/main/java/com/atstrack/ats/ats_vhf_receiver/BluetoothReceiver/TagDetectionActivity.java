@@ -1,6 +1,8 @@
 package com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +18,7 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -43,11 +46,11 @@ public class TagDetectionActivity extends BaseActivity {
 
     @OnClick(R.id.location_data_button)
     public void onClickLocation(View v) {
-        location_data_imageView.setBackground(ContextCompat.getDrawable(this, enable ? R.drawable.ic_gps_off : R.drawable.ic_gps_valid));
-        location_data_textView.setText(enable ? R.string.lb_location_disabled : R.string.lb_location_enabled);
-        coordinates_textView.setText(enable ? getString(R.string.lb_location_unknown) : "00.000000, -00.000000");
-        location_data_button.setText(enable ? R.string.lb_enable : R.string.lb_disable);
         enable = !enable;
+        location_data_imageView.setBackground(ContextCompat.getDrawable(this, enable ? R.drawable.ic_gps_valid : R.drawable.ic_gps_off));
+        location_data_textView.setText(enable ? R.string.lb_location_enabled : R.string.lb_location_disabled);
+        coordinates_textView.setText(enable ? "00.000000, -00.000000" : getString(R.string.lb_location_unknown));
+        location_data_button.setText(enable ? R.string.lb_disable : R.string.lb_enable);
     }
 
     @Override
@@ -59,7 +62,6 @@ public class TagDetectionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         initializeCallback();
-        parameter = ValueCodes.TAGS;
         enable = false;
         tagListAdapter = new TagListAdapter(this);
         LinearLayoutManager manager = new LinearLayoutManager(this);
@@ -78,14 +80,13 @@ public class TagDetectionActivity extends BaseActivity {
 
             @Override
             public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TAGS))
-                    TransferBleData.receiveTags();
+                TransferBleData.receiveTags();
             }
 
             @Override
             public void onGattDataAvailable(byte[] packet) {
-                if (parameter.equals(ValueCodes.TAGS))
-                    setDetectionTagsData(packet);
+                Log.i(TAG, Converters.getHexValue(packet));
+                setDetectionTagsData(packet);
             }
         };
         gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
@@ -101,7 +102,15 @@ public class TagDetectionActivity extends BaseActivity {
     }
 
     private void setDetectionTagsData(byte[] data) {
-        tagListAdapter.addTag(data);
+        int position = -1;
+        for (int i = 0; i < tagListAdapter.getItemCount(); i++) {
+            if (tagListAdapter.getTag(i).code.equals(Converters.getAsciiValue(6, 14, data)))
+                position = i;
+        }
+        if (position == -1)
+            tagListAdapter.addTag(data);
+        else
+            tagListAdapter.setTag(position, data);
         tagListAdapter.notifyDataSetChanged();
     }
 }

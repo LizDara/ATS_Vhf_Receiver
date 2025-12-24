@@ -2,9 +2,11 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 
 public class ValueCodes {
     //Device Category
-    public static final String ACOUSTIC = "ACOUSTIC";
-    public static final String VHF = "VHF";
-    public static final String BLUETOOTH_RECEIVER = "BLUETOOTH_RECEIVER";
+    public static final String ACOUSTIC = "ATSar";
+    public static final String VHF = "ATSvr";
+    public static final String BLUETOOTH_RECEIVER = "UART"; //ATSbr
+    public static final String WILDLINK = "ATSwl";
+    public static final String BEACON = "ATSbt";
 
     //Values
     public static final String WIDTH = "width";

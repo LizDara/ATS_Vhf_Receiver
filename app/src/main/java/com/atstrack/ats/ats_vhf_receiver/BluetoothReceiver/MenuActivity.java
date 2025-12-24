@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
@@ -51,7 +52,9 @@ public class MenuActivity extends BaseActivity {
             }
 
             @Override
-            public void onGattDiscovered() {}
+            public void onGattDiscovered() {
+                TransferBleData.requestMtu(247, false);
+            }
 
             @Override
             public void onGattDataAvailable(byte[] packet) {}

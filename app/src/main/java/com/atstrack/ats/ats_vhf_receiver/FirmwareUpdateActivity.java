@@ -77,7 +77,7 @@ public class FirmwareUpdateActivity extends BaseActivity {
     }
 
     private void requestMTU() {
-        boolean result = TransferBleData.requestMtu(MTU + 3);
+        boolean result = TransferBleData.requestMtu(MTU + 3, true);
         if (result)
             parameter = ValueCodes.UPDATE;
     }

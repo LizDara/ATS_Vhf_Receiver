@@ -117,13 +117,13 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 final String action = intent.getAction();
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
-                    if (mLeDeviceListAdapter.getSelectedDevice().getName().contains("br"))
-                        showBluetoothReceiverMenu();
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action) && mConnected) {
                     mConnected = false;
                     showDisconnectionMessage();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (parameter.equals(ValueCodes.SCAN_STATUS))
+                    if (mLeDeviceListAdapter.getSelectedDevice().getName().contains(ValueCodes.BLUETOOTH_RECEIVER))
+                        showBluetoothReceiverMenu();
+                    else if (parameter.equals(ValueCodes.SCAN_STATUS))
                         getScanStatus();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
@@ -159,9 +159,9 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 if (!cancel && mConnected && receiverInformation.getStatusData() != null && readBoardStatus) {
                     connectionTimeout.cancel();
                     connectionTimeout.purge();
-                    if (device.getName().contains("vr")) {
+                    if (device.getName().contains(ValueCodes.VHF)) {
                         showVhfReceiverMenu();
-                    } else if (device.getName().contains("ar")) {
+                    } else if (device.getName().contains(ValueCodes.ACOUSTIC)) {
                         Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.Acoustic.MenuActivity.class);
                         intent.putExtra(ValueCodes.VALUE, receiverInformation.getStatusData());
                         startActivity(intent);
@@ -198,7 +198,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         BluetoothDevice device = mLeDeviceListAdapter.getSelectedDevice();
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         receiverInformation.changeInformation(device.getName().substring(0, 7), device.getAddress(), "0%");
-        if (device.getName().contains("br"))
+        if (device.getName().contains(ValueCodes.BLUETOOTH_RECEIVER))
             connectingToBluetoothReceiver();
         else
             connectingToDevice();
@@ -280,6 +280,11 @@ public class ScanDevicesActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(mGattUpdateReceiver);
+        } catch (Exception ex) {
+            Log.i(TAG, "Failed to unregister receiver");
+        }
     }
 
     @Override
@@ -505,8 +510,9 @@ public class ScanDevicesActivity extends AppCompatActivity {
     }
 
     private void showBluetoothReceiverMenu() {
+        connectionTimeout.cancel();
+        connectionTimeout.purge();
         Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver.MenuActivity.class);
-        intent.putExtra(ValueCodes.VALUE, ReceiverInformation.getReceiverInformation().getStatusData());
         startActivity(intent);
         finish();
     }
@@ -518,8 +524,9 @@ public class ScanDevicesActivity extends AppCompatActivity {
 
     private void mRegisterReceiver() {
         if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter(), 2);
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
         else
-            registerReceiver(mGattUpdateReceiver, TransferBleData.makeFirstGattUpdateIntentFilter());
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
+        Log.i(TAG, "REGISTER TO BLUETOOTH RECEIVER ...");
     }
 }

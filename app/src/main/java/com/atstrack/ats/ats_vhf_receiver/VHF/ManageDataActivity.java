@@ -3,10 +3,10 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,14 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.Models.Data;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
+import com.atstrack.ats.ats_vhf_receiver.Models.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -94,14 +93,13 @@ public class ManageDataActivity extends BaseActivity {
     ProgressBar third_step_progressBar;
     @BindView(R.id.download_percent_textView)
     TextView download_percent_textView;
+    @BindView(R.id.process_percent_textView)
+    TextView process_percent_textView;
 
     private final static String TAG = ManageDataActivity.class.getSimpleName();
 
-    File root;
-    String fileName = "";
+    private File root;
     private ArrayList<byte[]> packets;
-    private ArrayList<Snapshots> snapshotArray;
-    private Snapshots rawDataCollector;
     private Handler receiveHandler;
     private DriveServiceHelper driveServiceHelper;
     private int finalPageNumber;
@@ -111,9 +109,13 @@ public class ManageDataActivity extends BaseActivity {
     private boolean error;
     private boolean downloading;
     private ArrayList<byte[]> pagePackets;
+    private Data rawData;
+    private Data processedData;
+    private Data logData;
+    private ArrayList<Data> dataList;
 
     private void setNotification() {
-        TransferBleData.downloadResponse();
+        TransferBleData.downloadResponse(true);
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
@@ -126,7 +128,10 @@ public class ManageDataActivity extends BaseActivity {
         error = false;
         packets = new ArrayList<>();
         pagePackets = new ArrayList<>();
-        snapshotArray = new ArrayList<>(); // The list that stores the raw and processed data
+        rawData = new Data(ValueCodes.RAW_FILE);
+        processedData = new Data(ValueCodes.PROCESSED_FILE);
+        logData = new Data(ValueCodes.LOG_FILE);
+        dataList = new ArrayList<>();
     }
 
     private void setStartDownload() {
@@ -141,7 +146,7 @@ public class ManageDataActivity extends BaseActivity {
     }
 
     private void setResponseErase() {
-        TransferBleData.downloadResponse();
+        TransferBleData.downloadResponse(true);
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
@@ -183,10 +188,11 @@ public class ManageDataActivity extends BaseActivity {
     @OnClick(R.id.cancel_download_button)
     public void onClickCancelDownload(View v) {
         downloading = false;
+        TransferBleData.downloadResponse(false);
         showPrintDialog("Do you want to save the downloaded bytes?", 3);
     }
 
-    @OnClick(R.id.return_button)
+    @OnClick(R.id.return_textView)
     public void onClickReturn(View v) {
         setVisibility("menu");
     }
@@ -209,56 +215,10 @@ public class ManageDataActivity extends BaseActivity {
         title = getString(R.string.manage_receiver_data);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         parameter = ValueCodes.TEST;
         downloading = false;
         receiveHandler = new Handler();
         setVisibility("menu");
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                showDisconnectionMessage();
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TEST)) // Get memory used and byte stored
-                    TransferBleData.readDataInfo();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "52": // Get memory used and byte stored
-                        downloadTest(packet);
-                        break;
-                    case "DD": // Get delete or download response
-                        if (isTransmissionDone(packet)) {
-                            successfulResponse(packet);
-                            break;
-                        }
-                    default:
-                        // Get raw data in pages, each page contains 2048 bytes.
-                        // 9 packets of 230 bytes
-                        if (packet.length > 4)
-                            downloadData(packet);
-                        else if (packet.length == 4)// Get pages total number
-                            readData(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -286,16 +246,51 @@ public class ManageDataActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showDisconnectionMessage() {
+    @Override
+    protected void gattDisconnected() {
         if (downloading) {
-            if (rawDataCollector.byteIndex == 0) {
-                for (byte[] packet : packets)
-                    rawDataCollector.processSnapshotRaw(packet);
-            }
-            root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
-            Converters.printSnapshotFiles(root, snapshotArray);
+            downloading = false;
+            saveRawData();
         }
-        Message.showDisconnectionMessage(this);
+        super.gattDisconnected();
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.TEST))
+            TransferBleData.readDataInfo();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        switch (Converters.getHexValue(data[0])) {
+            case "52": // Get memory used and byte stored
+                if (data.length < 230) {
+                    downloadTest(data);
+                    break;
+                }
+            case "DD": // Get delete or download response
+                if (isTransmissionDone(data)) {
+                    successfulResponse(data);
+                    break;
+                }
+            case "AA": // Error packet
+                if (data.length == 5 && isErrorPacket(data)) { // Show an error when the packet contains 5 bytes and stops downloading
+                    error = true;
+                    downloading = false;
+                    setVisibility("menu");
+                    TransferBleData.downloadResponse(false);
+                    Message.showMessage(getParent(), "Error", "Download error (Packet error).");
+                    break;
+                }
+            default: // Get raw data in pages, each page contains 2048 bytes. 9 packets of 230 bytes
+                if (data.length > 4)
+                    downloadRawData(data);
+                else if (data.length == 4)// Get pages total number
+                    downloadPagesTotalNumber(data);
+                break;
+        }
     }
 
     private void setVisibility(String value) {
@@ -391,7 +386,7 @@ public class ManageDataActivity extends BaseActivity {
     private void successfulResponse(byte[] data) {
         if (downloading) {
             loadProcessing();
-            new Handler().postDelayed(() -> {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 checkPackets();
             }, ValueCodes.DOWNLOAD_PERIOD);
         } else {
@@ -491,22 +486,23 @@ public class ManageDataActivity extends BaseActivity {
         return packetNumber;
     }
 
-    private void readData(byte[] packet) {
+    private void downloadPagesTotalNumber(byte[] packet) {
         finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
-        rawDataCollector = new Snapshots(finalPageNumber * Snapshots.BYTES_PER_PAGE); // size is defined
         downloading = finalPageNumber > 0;
         if (downloading) {
             download_percent_textView.setVisibility(View.VISIBLE);
+            process_percent_textView.setVisibility(View.VISIBLE);
             download_percent_textView.setText(" - 0%");
+            process_percent_textView.setText("");
             initDownloading();
             setVisibility("downloading");
             loadDownloading();
+            setStartDownload();
         } else { // No data to download
             setVisibility("menu");
             Message.showMessage(this, "Message", "No data to download.");
         }
-        setStartDownload();
     }
 
     private boolean isErrorPacket(byte[] packet) {
@@ -521,13 +517,8 @@ public class ManageDataActivity extends BaseActivity {
      * With the received packet, gets the raw data.
      * @param packet The received packet.
      */
-    private void downloadData(byte[] packet) {
-        if (packet.length == 4 && downloading) {
-            loadProcessing();
-            new Handler().postDelayed(() -> {
-                checkPackets();
-            }, ValueCodes.DOWNLOAD_PERIOD);
-        } else if (downloading) {
+    private void downloadRawData(byte[] packet) {
+        if (downloading) {
             if (pagePackets.isEmpty()) {
                 receiveHandler.postDelayed(() -> {
                     boolean isOk = false;
@@ -555,22 +546,24 @@ public class ManageDataActivity extends BaseActivity {
                                     int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
                                     download_percent_textView.setText(" - " + percent + "%");
                                     isOk = true;
+                                    leServiceConnection.getBluetoothLeService().downloadLogs += "Page " + pageNumber + " downloaded successfully." + ValueCodes.CR + ValueCodes.LF;
                                 } else {
-                                    Log.i(TAG, "No se encontraron los 9 paquetes");
+                                    leServiceConnection.getBluetoothLeService().downloadLogs += "The 9 packages were not found." + ValueCodes.CR + ValueCodes.LF;
                                     pageNumber--;
                                 }
                             } else {
-                                Log.i(TAG, "Numero de pagina que llego es " + number + ", numero esperado: " + pageNumber);
+                                leServiceConnection.getBluetoothLeService().downloadLogs += "Page number " + (number + 1) + " was received, expected number is " + (pageNumber + 1) + ValueCodes.CR + ValueCodes.LF;
                             }
                         } else {
-                            Log.i(TAG, "Ultimo paquete no es 9");
+                            leServiceConnection.getBluetoothLeService().downloadLogs += "The last package received is not 9" + ValueCodes.CR + ValueCodes.LF;
                         }
                     } else {
-                        Log.i(TAG, "Llegaron " + pagePackets.size() + " paquetes");
+                        leServiceConnection.getBluetoothLeService().downloadLogs += "Only " + pagePackets.size() + " packages arrived, 9 were expected." + ValueCodes.CR + ValueCodes.LF;
                     }
                     packetNumber = 1;
                     pagePackets = new ArrayList<>();
-                    setResponsePage(isOk);
+                    if (downloading)
+                        setResponsePage(isOk);
                 }, ValueCodes.DOWNLOAD_PERIOD);
             }
             pagePackets.add(packet);
@@ -578,52 +571,49 @@ public class ManageDataActivity extends BaseActivity {
     }
 
     private void checkPackets() {
-        for (byte[] packet : packets) {
-            byte[] newPacket;
-            int extraNumbers = 2;
-            if (packet.length == 5 && isErrorPacket(packet)) { //Shows an error when the packet contains 5 bytes and stops downloading
-                setVisibility("menu");
-                Message.showMessage(this, "Error", "Download error (Packet error).");
-                downloading = false;
-                error = true;
-                return;
-            } else { // Copy the downloaded package
-                if (packetNumber % 9 == 0)
-                    extraNumbers = 6;
-                newPacket = new byte[packet.length - extraNumbers];
-                System.arraycopy(packet, 0, newPacket, 0, packet.length - extraNumbers);
-                rawDataCollector.processSnapshotRaw(newPacket);
-                packetNumber++;
-            }
-        }
-        if (!error) {
-            snapshotArray.add(rawDataCollector);
-            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
-            int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
-            String processData = Converters.getPackageProcessed(rawDataCollector.getSnapshot(), baseFrequency);
-            byte[] data = Converters.convertToUTF8(processData);
-            Snapshots processDataCollector = new Snapshots(data.length);
-            processDataCollector.processSnapshot(data);
-            snapshotArray.add(processDataCollector);
+        process_percent_textView.setText(" - 0%");
+        fillRawData();
+        process_percent_textView.setText(" - 1%");
+        new Thread(() -> {
+            if (!error) {
+                dataList.add(rawData);
+                String processData = Converters.getPackageProcessed(rawData.packets, process_percent_textView, this, false);
+                byte[] data = Converters.convertToUTF8(processData);
+                runOnUiThread(() -> {
+                    process_percent_textView.setText(" - 100%");
+                    processedData.packets.add(data);
+                    dataList.add(processedData);
 
-            loadPreparing();
-            new Handler().postDelayed(() -> {
-                saveFiles();
-            }, ValueCodes.DOWNLOAD_PERIOD);
+                    loadPreparing();
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        saveFiles();
+                    }, ValueCodes.DOWNLOAD_PERIOD);
+                });
+            }
+        }).start();
+    }
+
+    private void fillRawData() {
+        Snapshots snapshot = new Snapshots();
+        for (byte[] packet : packets) {
+            snapshot.processSnapshot(packet);
+            if (snapshot.isFilled()) {
+                rawData.packets.add(snapshot.getSnapshot());
+                snapshot = new Snapshots();
+            }
         }
     }
 
     private void saveFiles() {
         root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
-        fileName = snapshotArray.get(snapshotArray.size() - 1).getFileName();
-        boolean result = Converters.printSnapshotFiles(root, snapshotArray);
+        boolean result = Converters.printDataFiles(root, dataList);
 
         downloaded();
         if (result) {
             String message = "Download finished: " + (Snapshots.BYTES_PER_PAGE * pageNumber) + " byte(s) downloaded.";
             if (error) {
-                message += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + packets.size() + ". Expected: " + (finalPageNumber * 9);
-                if (packets.size() != totalPackagesNumber)
+                message += " No data found in bytes downloaded. No file was generated. Total Number of Packages: " + rawData.packets.size() + ". Expected: " + (finalPageNumber * 9);
+                if (rawData.packets.size() != totalPackagesNumber)
                     message += ". Timeout.";
                 else if (Snapshots.BYTES_PER_PAGE * pageNumber == Snapshots.BYTES_PER_PAGE * finalPageNumber)
                     message += ". Not successfully.";
@@ -633,7 +623,13 @@ public class ManageDataActivity extends BaseActivity {
             }
         }
         downloading = false;
-        setVisibility("downloaded");
+    }
+
+    private void saveRawData() {
+        fillRawData();
+        dataList.add(rawData);
+        root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+        Converters.printDataFiles(root, dataList);
     }
 
     /**
@@ -655,13 +651,17 @@ public class ManageDataActivity extends BaseActivity {
                 break;
             case 1: // Ask if you want to save file to the cloud
                 builder.setPositiveButton("OK", (dialog, which) -> {
+                    setVisibility("downloaded");
                     showPrintDialog("Do you want to send the file to the cloud?", 2);
                 });
                 break;
             case 3: // Cancel download. Save the download bytes
                 builder.setPositiveButton("OK", (dialog, which) -> {
-                    packetNumber = 1;
-                    checkPackets();
+                    byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
+                    logData.packets.add(data);
+                    dataList.add(logData);
+                    saveRawData();
+                    setVisibility("menu");
                 });
                 builder.setNegativeButton("Cancel", (dialog, which) -> {
                     setVisibility("begin");
@@ -708,7 +708,7 @@ public class ManageDataActivity extends BaseActivity {
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
 
-        driveServiceHelper.createFile(root.getAbsolutePath(), fileName).addOnSuccessListener(s -> {
+        driveServiceHelper.createFile(root.getAbsolutePath(), dataList.get(1).fileName).addOnSuccessListener(s -> {
             progressDialog.dismiss();
             Toast.makeText(getApplicationContext(), "Uploaded successfully.", Toast.LENGTH_LONG).show();
         }).addOnFailureListener(e -> {

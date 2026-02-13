@@ -9,7 +9,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
@@ -101,12 +99,11 @@ public class MenuActivity extends BaseActivity {
         showToolbar = false;
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         menu_imageView.setVisibility(View.GONE);
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         boolean firstTime = getIntent().getBooleanExtra(ValueCodes.FIRST_TIME, false);
         if (firstTime) { // Check the detection type
-            String status = getIntent().getStringExtra(ValueCodes.STATUS);
-            switch (status) {
+            switch (receiverInformation.getDeviceName().substring(15, 16)) {
                 case "F":
                     detectionType = 0x08;
                     break;
@@ -119,41 +116,9 @@ public class MenuActivity extends BaseActivity {
             }
             checkDetectionType();
         }
-        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         vhf_name_textView.setText("Receiver " + receiverInformation.getSerialNumber());
         setBattery(receiverInformation);
         setSdCard(receiverInformation);
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                try {
-                    unbindService(leServiceConnection.getServiceConnection());
-                } catch (Exception ex) {
-                    Log.i(TAG, ex.getLocalizedMessage());
-                }
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-                if (Converters.getHexValue(packet[0]).equals("56")) { // Sd Card
-                    receiverInformation.changeSDCard(Converters.getHexValue(packet[1]).equals("80"));
-                    setSdCard(receiverInformation);
-                } else if (Converters.getHexValue(packet[0]).equals("88")) { // Battery
-                    receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(packet[1])));
-                    setBattery(receiverInformation);
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -162,6 +127,28 @@ public class MenuActivity extends BaseActivity {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         setSdCard(receiverInformation);
         setBattery(receiverInformation);
+    }
+
+    @Override
+    protected void gattDisconnected() {
+        try {
+            unbindService(leServiceConnection.getServiceConnection());
+        } catch (Exception ex) {
+            Log.w(TAG, ex.getLocalizedMessage());
+        }
+        super.gattDisconnected();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        if (Converters.getHexValue(data[0]).equals("56")) { // Sd Card
+            receiverInformation.changeSDCard(Converters.getHexValue(data[1]).equals("80"));
+            setSdCard(receiverInformation);
+        } else if (Converters.getHexValue(data[0]).equals("88")) { // Battery
+            receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(data[1])));
+            setBattery(receiverInformation);
+        }
     }
 
     private void checkDetectionType() {

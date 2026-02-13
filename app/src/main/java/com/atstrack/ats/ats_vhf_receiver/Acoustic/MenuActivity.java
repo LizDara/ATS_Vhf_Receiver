@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentResultListener;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.VersionResponse;
 import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
@@ -21,7 +20,6 @@ import com.atstrack.ats.ats_vhf_receiver.Fragments.FirmwareUpdate;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
@@ -74,40 +72,26 @@ public class MenuActivity extends BaseActivity {
         showToolbar = false;
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
-        parameter = ValueCodes.HEALTH;
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         acoustic_name_textView.setText(receiverInformation.getSerialNumber() + " Acoustic Receiver");
 
-        byte[] healthBeaconData = getIntent().getByteArrayExtra(ValueCodes.VALUE);
-        if (healthBeaconData != null)
-            setHealthBeaconData(healthBeaconData);
-        else
-            Message.showMessage(this, "Package 0x70 not found.");
         updateAvailable();
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                unbindService(leServiceConnection.getServiceConnection());
-                Message.showDisconnectionMessage(mContext);
-            }
+    @Override
+    protected void gattDisconnected() {
+        unbindService(leServiceConnection.getServiceConnection());
+        super.gattDisconnected();
+    }
 
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.HEALTH))
-                    TransferBleData.notificationLog();
-            }
+    @Override
+    protected void discoverCharacteristic() {
+        TransferBleData.notificationLog();
+    }
 
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                if (parameter.equals(ValueCodes.HEALTH))
-                    setHealthBeaconData(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
+    @Override
+    protected void downloadData(byte[] data) {
+        setHealthBeaconData(data);
     }
 
     private void setHealthBeaconData(byte[] data) {

@@ -130,13 +130,14 @@
     <string name="lb_view_detection_filter"><u>View Detection Filter Settings</u></string>
     <string name="lb_non_coded_detection">Non Coded Detection Filter</string>
     <string name="lb_filter_type">Filter Type</string>
+    <string name="lb_edit_default_settings"><u>Edit Default Settings</u></string>
 
     <!--EDIT TABLE SCAN-->
     <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
     <string name="lb_delete_frequency_scan">Delete Current Frequency From Table</string>
     <string name="lb_merge_table_scan">Merge Table Into Table</string>
     <string name="lb_merge_tables">Merge Table</string>
-    <string name="lb_select_table_merge">Select table to merge into scan table</string>
+    <string name="lb_select_table_merge">Select a table to merge into scan table</string>
     <string name="lb_frequency_deleted">Frequency Deleted</string>
     <string name="lb_tables_merged">Table Merged</string>
 
@@ -151,7 +152,7 @@
     <string name="lb_scan_details">Scan Details</string>
 
     <!--RECEIVER CONFIGURATION-->
-    <string name="receiver_configuration">Receiver Configuration</string>
+    <string name="receiver_configuration">Configure Receiver</string>
     <string name="lb_edit_frequency_tables">Edit Frequency Tables</string>
     <string name="lb_edit_receiver_defaults">Edit Receiver Defaults</string>
     <string name="lb_set_transmitter_type">Set Detection Filter</string>
@@ -182,6 +183,9 @@
     <string name="lb_enter_coefficient_b">Enter Coef-b Digits</string>
     <string name="lb_enter_constant">Enter Constant Digits</string>
     <string name="lb_save">Save</string>
+    <string name="lb_cant_empty_table">Can\'t Empty Table</string>
+    <string name="lb_table_empty_message">This table cannot be emptied while it is selected as a scan table in the default settings, please remove from there first.</string>
+    <string name="lb_edit_defaults">Edit Default Settings</string>
 
     <!--EDIT RECEIVER DEFAULTS-->
     <string name="edit_receiver_defaults">Edit Receiver Defaults</string>
@@ -192,7 +196,7 @@
     <string name="aerial_defaults">Mobile Default Settings</string>
     <string name="lb_aerial_settings">Mobile Settings</string>
     <string name="lb_scan_table">Scan Table</string>
-    <string name="lb_set_value">Set value</string>
+    <string name="lb_select_value">Select Value</string>
 
     <!--STATIONARY DEFAULTS-->
     <string name="stationary_defaults">Stationary Default Settings</string>
@@ -271,7 +275,7 @@
     <string name="lb_cancel_download">Cancel Download</string>
     <string name="lb_download_complete">Download Complete</string>
     <string name="lb_open_file">Open File Location</string>
-    <string name="lb_return">Return to Main Menu</string>
+    <string name="lb_return"><u>Return to Main Menu</u></string>
     <string name="lb_delete_all">Are you sure you want to delete all data blocks in memory?</string>
     <string name="lb_deleting">Deleting Memory ...</string>
     <string name="lb_return_screen">Return to Data Screen</string>
@@ -290,7 +294,7 @@
     <string name="lb_file_converted">File Converted</string>
 
     <!--TEST RECEIVER-->
-    <string name="receiver_diagnostics">Receiver Diagnostics</string>
+    <string name="receiver_diagnostics">Run Receiver Diagnostics</string>
     <string name="lb_running_diagnostics">Running Diagnostics ...</string>
     <string name="lb_diagnostics_complete">Diagnostics Complete</string>
     <string name="lb_frequency_range">Frequency Range:</string>

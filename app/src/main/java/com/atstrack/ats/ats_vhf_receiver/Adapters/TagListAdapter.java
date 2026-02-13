@@ -53,6 +53,7 @@ public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.MyViewHo
         holder.detections_tag_textView.setText("Detections: " + tags.get(position).detections);
         holder.rssi_textView.setText(tags.get(position).rssi);
         holder.temperature_c_textView.setText(tags.get(position).temperature);
+        holder.voltage_textView.setText(tags.get(position).voltage);
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(32, 16, 32, 16);
         holder.tags_linearLayout.setLayoutParams(params);

@@ -4,7 +4,6 @@ import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -13,12 +12,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import butterknife.BindView;
@@ -30,8 +24,6 @@ public class EnterCoefficientActivity extends BaseActivity {
     TextView coefficient_textView;
     @BindView(R.id.save_coefficient_button)
     Button save_coefficient_button;
-
-    private final static String TAG = EnterCoefficientActivity.class.getSimpleName();
 
     private int position;
 
@@ -102,7 +94,6 @@ public class EnterCoefficientActivity extends BaseActivity {
         title = getIntent().getStringExtra(ValueCodes.TYPE);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
         if (type.equals(getString(R.string.lb_coefficient_a))) {
             coefficient_textView.setText(R.string.lb_enter_coefficient_a);
@@ -114,30 +105,6 @@ public class EnterCoefficientActivity extends BaseActivity {
             coefficient_textView.setText(R.string.lb_enter_constant);
             position = -4;
         }
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                TransferBleData.notificationLog();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override

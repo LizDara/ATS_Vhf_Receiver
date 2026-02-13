@@ -46,6 +46,7 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryScanActivity;
 
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -121,66 +122,38 @@ public class ScanDevicesActivity extends AppCompatActivity {
                     mConnected = false;
                     showDisconnectionMessage();
                 } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                    if (mLeDeviceListAdapter.getSelectedDevice().getName().contains(ValueCodes.BLUETOOTH_RECEIVER))
-                        showBluetoothReceiverMenu();
-                    else if (parameter.equals(ValueCodes.SCAN_STATUS))
-                        getScanStatus();
+                    if (parameter.equals(ValueCodes.SCAN_STATUS))
+                        getDeviceStatus();
+                    setDeviceConnected();
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
-                    Log.i(TAG, Converters.getHexValue(packet));
-                    if (Converters.getHexValue(packet[0]).equals("50")) // Checks if the BLE device is scanning
-                        downloadScanning(packet);
-                    else if (Converters.getHexValue(packet[0]).equals("41")) // Get board state
+                    Log.i(TAG, Converters.getHexValue(packet) + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
+                    if (Converters.getHexValue(packet[0]).equals("41")) // Get board state
                         downloadBoardState(packet);
-                    else if (Converters.getHexValue(packet[0]).equals("78"))
-                        downloadHealthBeaconData(packet);
+                    else if (Converters.getHexValue(packet[0]).equals("50")) // Check if the BLE device is scanning
+                        downloadScanStatus(packet);
                 }
             } catch (Exception e) {
-                if (!cancel && leServiceConnection.existConnection() && mConnected) {
+                if (!cancel && leServiceConnection.existConnection() && mConnected && mLeDeviceListAdapter.getSelectedDevice().getName().contains(ValueCodes.VHF)) {
                     parameter = "";
-                    getScanStatus();
+                    getDeviceStatus();
+                    Log.w(TAG, e.getLocalizedMessage());
                 }
             }
         }
     };
 
     /**
-     * Requests a read for board state.
-     */
-    @SuppressLint("MissingPermission")
-    private void getBoardState() {
-        boolean result = TransferBleData.readBoardState();
-        if (result && !cancel) {
-            BluetoothDevice device = mLeDeviceListAdapter.getSelectedDevice();
-            ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-            setDeviceConnected();
-            new Handler().postDelayed(() -> { // After connecting display the main menu of device
-                if (!cancel && mConnected && receiverInformation.getStatusData() != null && readBoardStatus) {
-                    connectionTimeout.cancel();
-                    connectionTimeout.purge();
-                    if (device.getName().contains(ValueCodes.VHF)) {
-                        showVhfReceiverMenu();
-                    } else if (device.getName().contains(ValueCodes.ACOUSTIC)) {
-                        Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.Acoustic.MenuActivity.class);
-                        intent.putExtra(ValueCodes.VALUE, receiverInformation.getStatusData());
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            }, ValueCodes.MESSAGE_PERIOD);
-        }
-    }
-
-    /**
      * Requests a read for scan state.
      */
-    private void getScanStatus() {
+    private void getDeviceStatus() {
         parameter = "";
         TransferBleData.notificationLog();
         if (!cancel && mConnected) {
             new Handler().postDelayed(() -> {
-                getBoardState();
+                TransferBleData.readBoardState();
+                Log.i(TAG, "SEND READ BOARD " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
             }, ValueCodes.WAITING_PERIOD);
         }
     }
@@ -197,16 +170,33 @@ public class ScanDevicesActivity extends AppCompatActivity {
         mBluetoothLeScanner.stopScan(mLeScanCallback);
         BluetoothDevice device = mLeDeviceListAdapter.getSelectedDevice();
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.changeInformation(device.getName().substring(0, 7), device.getAddress(), "0%");
-        if (device.getName().contains(ValueCodes.BLUETOOTH_RECEIVER))
-            connectingToBluetoothReceiver();
-        else
-            connectingToDevice();
+        receiverInformation.setInformation(device.getName(), device.getAddress(), "0%");
+        Log.i(TAG, "CONNECT DEVICE " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
+
+        setConnectingDevice();
+        leServiceConnection = LeServiceConnection.getInstance();
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
+        mRegisterReceiver();
+
+        if (device.getName().contains(ValueCodes.VHF))
+            parameter = ValueCodes.SCAN_STATUS;
 
         connectionTimeout.schedule(new TimerTask() { //create timer for connection timeout
             @Override
             public void run() {
-                showDisconnectionMessage(); //Connection timeout, make sure you write mac address correct and ble device is discoverable
+                Log.i(TAG, "SCAN TIMEOUT " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
+                if (!cancel && mConnected && !device.getName().contains(ValueCodes.VHF)) {
+                    connectionTimeout.cancel();
+                    connectionTimeout.purge();
+                    if (device.getName().contains(ValueCodes.ACOUSTIC)) {
+                        showAcousticReceiverMenu();
+                    } else if (device.getName().contains(ValueCodes.BLUETOOTH_RECEIVER)) {
+                        showBluetoothReceiverMenu();
+                    }
+                } else {
+                    showDisconnectionMessage(); //Connection timeout, make sure you write mac address correct and ble device is discoverable
+                }
             }
         }, ValueCodes.CONNECT_TIMEOUT);
     }
@@ -240,23 +230,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
         mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
-    private void initializeParameters() {
-        mConnected = cancel = false;
-        parameter = "";
-        connectionTimeout = new Timer();
-    }
-
-    private void cancelConnection() {
-        cancel = true;
-        mConnected = false;
-        readBoardStatus = false;
-        parameter = "";
-        unbindService(leServiceConnection.getServiceConnection());
-        if (leServiceConnection.existConnection()) leServiceConnection.close();
-        unregisterReceiver(mGattUpdateReceiver);
-    }
-
-    @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
         super.onResume();
@@ -283,7 +256,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
         try {
             unregisterReceiver(mGattUpdateReceiver);
         } catch (Exception ex) {
-            Log.i(TAG, "Failed to unregister receiver");
+            Log.w(TAG, "Failed to unregister receiver");
         }
     }
 
@@ -316,32 +289,20 @@ public class ScanDevicesActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Method for scanning and displaying available BLE devices.
-     * @param enable If true, enable to scan available devices.
-     */
-    @SuppressLint("MissingPermission")
-    private void scanLeDevice(final boolean enable) {
-        mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
-        if (enable) {
-            mLeDeviceListAdapter.clear();
-            setSearchingDevices();
-            mBluetoothLeScanner.startScan(mLeScanCallback);
+    private void initializeParameters() {
+        mConnected = cancel = false;
+        parameter = "";
+        connectionTimeout = new Timer();
+    }
 
-            new Handler().postDelayed(() -> {
-                if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
-                    item_recyclerView.setAdapter(mLeDeviceListAdapter);
-                    item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    setDevicesFound();
-                } else { // Unable to find any devices within range
-                    mBluetoothLeScanner.stopScan(mLeScanCallback);
-                    setNoDevicesFound();
-                }
-                invalidateOptionsMenu();
-            }, ValueCodes.SCAN_PERIOD);
-        } else {
-            mBluetoothLeScanner.stopScan(mLeScanCallback);
-        }
+    private void cancelConnection() {
+        cancel = true;
+        mConnected = false;
+        readBoardStatus = false;
+        parameter = "";
+        unbindService(leServiceConnection.getServiceConnection());
+        if (leServiceConnection.existConnection()) leServiceConnection.close();
+        unregisterReceiver(mGattUpdateReceiver);
     }
 
     private void setSearchingDevices() {
@@ -399,23 +360,31 @@ public class ScanDevicesActivity extends AppCompatActivity {
     }
 
     /**
-     * Tries to connect to the selected BLE device or shows a connection error.
+     * Method for scanning and displaying available BLE devices.
+     * @param enable If true, enable to scan available devices.
      */
-    private void connectingToDevice() {
-        setConnectingDevice();
-        parameter = ValueCodes.SCAN_STATUS;
-        leServiceConnection = LeServiceConnection.getInstance();
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
-        mRegisterReceiver();
-    }
+    @SuppressLint("MissingPermission")
+    private void scanLeDevice(final boolean enable) {
+        mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        if (enable) {
+            mLeDeviceListAdapter.clear();
+            setSearchingDevices();
+            mBluetoothLeScanner.startScan(mLeScanCallback);
 
-    private void connectingToBluetoothReceiver() {
-        setConnectingDevice();
-        leServiceConnection = LeServiceConnection.getInstance();
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
-        mRegisterReceiver();
+            new Handler().postDelayed(() -> {
+                if (mLeDeviceListAdapter.getItemCount() > 0) { // Available devices were found to display
+                    item_recyclerView.setAdapter(mLeDeviceListAdapter);
+                    item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    setDevicesFound();
+                } else { // Unable to find any devices within range
+                    mBluetoothLeScanner.stopScan(mLeScanCallback);
+                    setNoDevicesFound();
+                }
+                invalidateOptionsMenu();
+            }, ValueCodes.SCAN_PERIOD);
+        } else {
+            mBluetoothLeScanner.stopScan(mLeScanCallback);
+        }
     }
 
     /**
@@ -438,7 +407,7 @@ public class ScanDevicesActivity extends AppCompatActivity {
                     if (leServiceConnection.existConnection())
                         leServiceConnection.close();
                     finish();
-                }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD); // The message disappears after a pre-defined period and will search for other available BLE devices again
+                }, ValueCodes.MESSAGE_PERIOD); // The message disappears after a pre-defined period and will search for other available BLE devices again
             }
         });
     }
@@ -447,45 +416,39 @@ public class ScanDevicesActivity extends AppCompatActivity {
      * With the received packet, get state of board.
      * @param data The received packet.
      */
-    @SuppressLint("MissingPermission")
     private void downloadBoardState(byte[] data) {
         SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
         SharedPreferences.Editor sharedPreferencesEdit = sharedPreferences.edit();
         sharedPreferencesEdit.putString(ValueCodes.VERSION, "1.0.0");
-        if (mLeDeviceListAdapter.getSelectedDevice().getName().contains("vr")) {
-            ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-            receiverInformation.changeSDCard(Converters.getHexValue(data[7]).equals("01"));
-            int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[2]));
-            int range = Integer.parseInt(Converters.getDecimalValue(data[3]));
-            sharedPreferencesEdit.putInt(ValueCodes.BASE_FREQUENCY, baseFrequency);
-            sharedPreferencesEdit.putInt(ValueCodes.RANGE, range);
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            sharedPreferencesEdit.putInt(ValueCodes.WIDTH, metrics.widthPixels);
-            sharedPreferencesEdit.putInt(ValueCodes.HEIGHT, metrics.heightPixels);
-        }
-        readBoardStatus = true;
+        int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[2]));
+        int range = Integer.parseInt(Converters.getDecimalValue(data[3]));
+        sharedPreferencesEdit.putInt(ValueCodes.BASE_FREQUENCY, baseFrequency);
+        sharedPreferencesEdit.putInt(ValueCodes.RANGE, range);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        sharedPreferencesEdit.putInt(ValueCodes.WIDTH, metrics.widthPixels);
+        sharedPreferencesEdit.putInt(ValueCodes.HEIGHT, metrics.heightPixels);
+        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        receiverInformation.changeSDCard(Converters.getHexValue(data[7]).equals("01"));
         sharedPreferencesEdit.apply();
+        readBoardStatus = true;
     }
 
     /**
      * With the received packet, get state of scan.
      * @param data The received packet.
      */
-    @SuppressLint("MissingPermission")
-    private void downloadScanning(byte[] data) {
-        if (mLeDeviceListAdapter.getSelectedDevice().getName().contains("vr")) {
-            ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-            receiverInformation.setStatusData(data);
+    private void downloadScanStatus(byte[] data) {
+        if (readBoardStatus) {
+            connectionTimeout.cancel();
+            connectionTimeout.purge();
+            showVhfReceiverMenu(data);
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private void showVhfReceiverMenu() {
-        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.changeDeviceBattery(Converters.getPercentBatteryVhfReceiver(mLeDeviceListAdapter.getScanRecord()));
+    private void showVhfReceiverMenu(byte[] data) {
         Intent intent = new Intent(this, MenuActivity.class);
-        switch (Converters.getHexValue(receiverInformation.getStatusData()[1])) {
+        switch (Converters.getHexValue(data[1])) {
             case "82": // The BLE device is in aerial scanning
             case "81":
             case "80":
@@ -501,25 +464,23 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 intent.putExtra(ValueCodes.SCANNING, true);
                 break;
             default:
-                intent.putExtra(ValueCodes.STATUS, mLeDeviceListAdapter.getSelectedDevice().getName().substring(15, 16));
                 intent.putExtra(ValueCodes.FIRST_TIME, true);
         }
-        intent.putExtra(ValueCodes.VALUE, receiverInformation.getStatusData());
+        intent.putExtra(ValueCodes.VALUE, data);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showAcousticReceiverMenu() {
+        Intent intent = new Intent(getBaseContext(), com.atstrack.ats.ats_vhf_receiver.Acoustic.MenuActivity.class);
         startActivity(intent);
         finish();
     }
 
     private void showBluetoothReceiverMenu() {
-        connectionTimeout.cancel();
-        connectionTimeout.purge();
         Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver.MenuActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    private void downloadHealthBeaconData(byte[] data) {
-        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.setStatusData(data);
     }
 
     private void mRegisterReceiver() {
@@ -527,6 +488,5 @@ public class ScanDevicesActivity extends AppCompatActivity {
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
         else
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
-        Log.i(TAG, "REGISTER TO BLUETOOTH RECEIVER ...");
     }
 }

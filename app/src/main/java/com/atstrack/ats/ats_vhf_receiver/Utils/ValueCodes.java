@@ -4,7 +4,7 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ATSar";
     public static final String VHF = "ATSvr";
-    public static final String BLUETOOTH_RECEIVER = "UART"; //ATSbr
+    public static final String BLUETOOTH_RECEIVER = "ATSbr"; //UART
     public static final String WILDLINK = "ATSwl";
     public static final String BEACON = "ATSbt";
 
@@ -21,16 +21,19 @@ public class ValueCodes {
     public final static char CR = (char) 0x0D;
     public final static char LF = (char) 0x0A;
     public static final int REQUEST_CODE_SIGN_IN = 1;
-    public static final int REQUEST_CODE_OPEN_STORAGE = 3;
+    public static final int REQUEST_CODE_OPEN_STORAGE = 2;
+    public static final int RAW_FILE = 3;
+    public static final int PROCESSED_FILE = 4;
+    public static final int BLUETOOTH_FILE = 5;
+    public static final int LOG_FILE = 6;
 
     //Periods
-    public static final int DISCONNECTION_MESSAGE_PERIOD = 1000;
     public static final int WAITING_PERIOD = 180;
     public static final int MESSAGE_PERIOD = 1000;
-    public static final int DOWNLOAD_PERIOD = 280;
+    public static final int DOWNLOAD_PERIOD = 200; //280
     public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
-    public static final int CONNECT_TIMEOUT = 3500;
+    public static final int CONNECT_TIMEOUT = 3000;
 
     /* ----------------- VHF DEVICE ---------------- */
     //Defaults
@@ -77,17 +80,17 @@ public class ValueCodes {
     public static final String UPDATE = "update";
     public static final String FINISH = "finish";
     public static final String OTA_END = "end";
-    public static final String MOBILE_DEFAULTS = "mobile";
     public static final String TABLES = "tables";
     public static final String CONTINUE_LOG = "continueLog";
     public static final String TABLE = "table";
     public static final String TEST = "test";
-    public static final String STATIONARY_DEFAULTS = "stationary";
     public static final String SCAN_STATUS = "scanStatus";
     public static final String AUDIO = "audio";
     public static final String BACKGROUND = "background";
     public static final String DETECTION_TYPE = "detectionType";
-    public static final String FREQUENCY_COEFFICIENTS = "frequencyCoefficients";
+    public static final String MOBILE = "mobile";
+    public static final String STATIONARY = "stationary";
+    public static final String MANUAL = "manual";
 
     //Original Data
     public static final String TABLE_NUMBER = "TableNumber";
@@ -100,14 +103,8 @@ public class ValueCodes {
     public static final String PULSE_RATE_TOLERANCE_1 = "PulseRateTolerance1";
     public static final String PULSE_RATE_TOLERANCE_2 = "PulseRateTolerance2";
     public static final String DATA_CALCULATION = "DataCalculation";
-    public static final String COEFFICIENT_A = "coefficientA";
-    public static final String COEFFICIENT_B = "coefficientB";
-    public static final String COEFFICIENT_C = "coefficientC";
-    public static final String COEFFICIENT_D = "coefficientD";
 
     /* ----------------- ACOUSTIC DEVICE ---------------- */
-    public static final String HEALTH = "health";
 
     /* ----------------- BLUETOOTH RECEIVER DEVICE ---------------- */
-    public static final String TAGS = "tags";
 }

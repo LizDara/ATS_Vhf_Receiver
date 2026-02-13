@@ -1,15 +1,15 @@
-#Wed Dec 24 13:47:35 BOT 2025
-base.0=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.10=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
-base.2=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
-base.3=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
-base.4=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
-base.5=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
-base.6=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
-base.7=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
-base.8=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
-base.9=D\:\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\9\\classes.dex
+#Fri Feb 13 14:53:01 BOT 2026
+base.0=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.10=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+base.2=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
+base.3=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
+base.4=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
+base.5=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
+base.6=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+base.7=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\5\\classes.dex
+base.8=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
+base.9=D\:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\9\\classes.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.10=classes2.dex

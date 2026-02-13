@@ -7,11 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
@@ -22,8 +19,6 @@ public class MenuActivity extends BaseActivity {
 
     @BindView(R.id.receiver_name_textView)
     TextView receiver_name_textView;
-
-    private final static String TAG = MenuActivity.class.getSimpleName();
 
     @OnClick(R.id.detect_tags_button)
     public void onClickDetectTags(View v) {
@@ -39,27 +34,13 @@ public class MenuActivity extends BaseActivity {
         title = getString(R.string.bluetooth_beacon);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         receiver_name_textView.setText(receiverInformation.getSerialNumber() + " Bluetooth Receiver");
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                TransferBleData.requestMtu(247, false);
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {}
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
+    @Override
+    protected void discoverCharacteristic() {
+        TransferBleData.requestMtu(247, false);
     }
 
     @Override

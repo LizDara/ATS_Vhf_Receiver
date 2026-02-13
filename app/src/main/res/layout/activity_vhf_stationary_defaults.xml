@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".VHF.StationaryDefaultsActivity">
 
@@ -35,13 +36,13 @@
 
     </ScrollView>
 
-    <!--Button
-        android:id="@+id/go_scan_button"
+    <Button
+        android:id="@+id/save_changes_stationary_button"
         style="@style/button_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_go_to_scan" /-->
+        android:text="@string/lb_save_changes" />
 
     <include
         layout="@layout/receiver_status"/>

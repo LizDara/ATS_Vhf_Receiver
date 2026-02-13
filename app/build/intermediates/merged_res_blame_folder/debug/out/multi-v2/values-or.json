@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-or\\values-or.xml",
+            "outputFile": "D:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-or\\values-or.xml",
             "map": [
                 {
                     "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\914116008979e77bc79da871871e9f31\\transformed\\appcompat-1.4.1\\res\\values-or\\values-or.xml",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\9c84058cc8145496fa61d3ab15374b21\\transformed\\jetified-play-services-base-18.0.1\\res\\values-or\\values.xml",
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\07dd62e5c6684f4761e080785c8f95da\\transformed\\jetified-play-services-base-18.1.0\\res\\values-or\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",

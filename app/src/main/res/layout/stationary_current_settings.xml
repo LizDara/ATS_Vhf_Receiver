@@ -31,6 +31,17 @@
 
     </ScrollView>
 
+    <TextView
+        android:id="@+id/edit_stationary_default_textView"
+        style="@style/button_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="16sp"
+        android:gravity="end"
+        android:text="@string/lb_edit_default_settings"
+        android:textColor="@color/limed_spruce" />
+
     <Button
         android:id="@+id/start_stationary_button"
         style="@style/button_primary"

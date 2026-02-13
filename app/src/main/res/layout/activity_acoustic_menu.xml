@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/slate_300"
+    android:fitsSystemWindows="true"
     tools:context=".Acoustic.MenuActivity">
 
     <LinearLayout

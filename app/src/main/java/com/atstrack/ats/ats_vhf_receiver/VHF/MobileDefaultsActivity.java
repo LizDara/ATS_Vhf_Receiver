@@ -5,23 +5,23 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.SwitchCompat;
 
 import butterknife.BindView;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class MobileDefaultsActivity extends BaseActivity {
@@ -34,8 +34,8 @@ public class MobileDefaultsActivity extends BaseActivity {
     SwitchCompat gps_switch;
     @BindView(R.id.aerial_auto_record_switch)
     SwitchCompat aerial_auto_record_switch;
-
-    private final static String TAG = MobileDefaultsActivity.class.getSimpleName();
+    @BindView(R.id.save_changes_aerial_button)
+    Button save_changes_aerial_button;
 
     private MobileDefaults mobileDefaults;
 
@@ -48,6 +48,9 @@ public class MobileDefaultsActivity extends BaseActivity {
                     frequency_table_number_aerial_textView.setText(String.valueOf(value));
                 else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) // Get the modified scan rate
                     scan_rate_seconds_aerial_textView.setText(String.valueOf(value * 0.1));
+                boolean changed = existChanges();
+                save_changes_aerial_button.setEnabled(changed);
+                save_changes_aerial_button.setAlpha(changed ? (float) 1 : (float) 0.6);
             });
 
     /**
@@ -62,9 +65,7 @@ public class MobileDefaultsActivity extends BaseActivity {
         byte[] b = new byte[] {(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
         boolean result = TransferBleData.writeDefaults(true, b);
         if (result)
-            Message.showMessage(this, 0);
-        else
-            Message.showMessage(this, 2);
+            finish();
     }
 
     @OnClick(R.id.frequency_table_number_aerial_linearLayout)
@@ -83,6 +84,30 @@ public class MobileDefaultsActivity extends BaseActivity {
         launcher.launch(intent);
     }
 
+    @OnCheckedChanged(R.id.gps_switch)
+    public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
+        boolean changed = existChanges();
+        save_changes_aerial_button.setEnabled(changed);
+        save_changes_aerial_button.setAlpha(changed ? (float) 1 : (float) 0.6);
+    }
+
+    @OnCheckedChanged(R.id.aerial_auto_record_switch)
+    public void onCheckedChangedAutoRecord(CompoundButton button, boolean isChecked) {
+        boolean changed = existChanges();
+        save_changes_aerial_button.setEnabled(changed);
+        save_changes_aerial_button.setAlpha(changed ? (float) 1 : (float) 0.6);
+    }
+
+    @OnClick(R.id.save_changes_aerial_button)
+    public void onClickSaveChanges(View v) {
+        if (!existNotSet()) {
+            if (existChanges())
+                setMobileDefaults();
+        } else {
+            Message.showMessage(this, "Complete all fields.");
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_vhf_mobile_defaults;
@@ -91,7 +116,6 @@ public class MobileDefaultsActivity extends BaseActivity {
         title = getString(R.string.aerial_defaults);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
@@ -99,72 +123,40 @@ public class MobileDefaultsActivity extends BaseActivity {
         }
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) // Gets aerial defaults data
-                    TransferBleData.readDefaults(true);
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "6D": // Gets aerial defaults data
-                        downloadData(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (!existNotSet()) {
-                if (existChanges())
-                    setMobileDefaults();
-                else
-                    finish();
-            } else {
-                Message.showMessage(this, "Complete all fields.");
-            }
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * With the received packet, gets aerial defaults data.
-     * @param data The received packet.
-     */
-    private void downloadData(byte[] data) {
-        if (!Converters.isDefaultEmpty(data)) {
-            mobileDefaults = new MobileDefaults(data);
-            frequency_table_number_aerial_textView.setText(
-                    (mobileDefaults.tableNumber == 0) ? "None" : Converters.getDecimalValue(data[1]));
-            gps_switch.setChecked(mobileDefaults.gpsOn);
-            aerial_auto_record_switch.setChecked(mobileDefaults.autoRecordOn);
-            scan_rate_seconds_aerial_textView.setText(String.valueOf(mobileDefaults.scanRate));
-        } else {
-            mobileDefaults = new MobileDefaults();
-            frequency_table_number_aerial_textView.setText(R.string.lb_not_set);
-            scan_rate_seconds_aerial_textView.setText(R.string.lb_not_set);
-            gps_switch.setChecked(true);
-            aerial_auto_record_switch.setChecked(true);
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.MOBILE))
+            TransferBleData.readDefaults(true);
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("6D")) {
+            if (!Converters.isDefaultEmpty(data)) {
+                mobileDefaults = new MobileDefaults(data);
+                frequency_table_number_aerial_textView.setText(
+                        (mobileDefaults.tableNumber == 0) ? "None" : Converters.getDecimalValue(data[1]));
+                scan_rate_seconds_aerial_textView.setText(String.valueOf(mobileDefaults.scanRate));
+                gps_switch.setChecked(mobileDefaults.gpsOn);
+                aerial_auto_record_switch.setChecked(mobileDefaults.autoRecordOn);
+            } else {
+                mobileDefaults = new MobileDefaults();
+                frequency_table_number_aerial_textView.setText(R.string.lb_not_set);
+                scan_rate_seconds_aerial_textView.setText(R.string.lb_not_set);
+                gps_switch.setChecked(true);
+                aerial_auto_record_switch.setChecked(true);
+            }
+            save_changes_aerial_button.setEnabled(false);
+            save_changes_aerial_button.setAlpha((float) 0.6);
         }
     }
 

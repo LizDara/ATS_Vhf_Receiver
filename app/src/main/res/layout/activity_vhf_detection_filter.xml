@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/slate_300"
+    android:fitsSystemWindows="true"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@color/slate_300"
-    tools:context=".VHF.DetectionFilterActivity"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    tools:context=".VHF.DetectionFilterActivity">
 
     <include
         layout="@layout/ats_toolbar"/>
@@ -502,6 +503,14 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <Button
+        android:id="@+id/save_changes_detection_button"
+        style="@style/button_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_save_changes" />
 
     <include
         layout="@layout/receiver_status"/>

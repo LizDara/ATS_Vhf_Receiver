@@ -20,12 +20,10 @@ import android.widget.ListView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.api.client.util.IOUtils;
 
@@ -64,46 +62,12 @@ public class TablesActivity extends BaseActivity {
         title = getString(R.string.edit_frequency_tables);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         tableListAdapter = new TableListAdapter(this);
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "7A": // Get the number of frequencies from each table
-                        downloadData(packet);
-                        break;
-                    case "67": // Get tx type
-                        downloadDetectionFilter(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -140,9 +104,16 @@ public class TablesActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!tableListAdapter.isFile()) {
-            Log.i(TAG, "ON RESUME AND READ TABLES");
+        if (!tableListAdapter.isFile())
             TransferBleData.readTables();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("7A")) {
+            downloadTables(data);
+        } else if (Converters.getHexValue(data[0]).equals("67")) {
+            downloadDetectionFilter(data);
         }
     }
 
@@ -237,7 +208,7 @@ public class TablesActivity extends BaseActivity {
      * With the received packet, gets the number of frequencies from each table and display on the screen.
      * @param data The received packet.
      */
-    private void downloadData(byte[] data) {
+    private void downloadTables(byte[] data) {
         tableListAdapter.setData(data);
         tables_listView.setAdapter(tableListAdapter);
         TransferBleData.readDetectionFilter();

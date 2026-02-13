@@ -18,6 +18,16 @@
     <include
         layout="@layout/aerial_settings" />
 
+    <TextView
+        android:id="@+id/edit_mobile_default_textView"
+        style="@style/button_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:gravity="end"
+        android:text="@string/lb_edit_default_settings"
+        android:textColor="@color/limed_spruce" />
+
     <Space
         android:layout_width="wrap_content"
         android:layout_height="0dp"

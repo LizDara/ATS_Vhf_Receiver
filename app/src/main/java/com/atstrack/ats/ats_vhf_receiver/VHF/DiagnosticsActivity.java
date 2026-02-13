@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,13 +17,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class DiagnosticsActivity extends BaseActivity {
@@ -52,8 +48,6 @@ public class DiagnosticsActivity extends BaseActivity {
     @BindView(R.id.frequencies_table_linearLayout)
     LinearLayout frequencies_table_linearLayout;
 
-    private final static String TAG = DiagnosticsActivity.class.getSimpleName();
-
     private Handler mHandlerTest;
     private AlertDialog dialog;
 
@@ -71,43 +65,9 @@ public class DiagnosticsActivity extends BaseActivity {
         title = getString(R.string.receiver_diagnostics);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         parameter = ValueCodes.TEST;
         mHandlerTest = new Handler();
         runningTest(); // Loading the test
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                dialog.dismiss();
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TEST)) // Gets BLE device data
-                    TransferBleData.readDiagnostic();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "89": // Gets BLE device data
-                        downloadData(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -117,6 +77,47 @@ public class DiagnosticsActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.TEST))
+            TransferBleData.readDiagnostic();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        if (Converters.getHexValue(data[0]).equals("89")) { // Get device diagnostic
+            parameter = "";
+            int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[23])) * 1000;
+            String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-";
+            int frequencyRange = ((Integer.parseInt(Converters.getDecimalValue(data[23])) +
+                    Integer.parseInt(Converters.getDecimalValue(data[24]))) * 1000) - 1;
+            range += String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
+            range_textView.setText(range);
+
+            battery_textView.setText(Converters.getDecimalValue(data[1]));
+            int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
+            int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
+            bytes_stored_test_textView.setText(String.valueOf(numberPage * 2048));
+            memory_used_textView.setText(String.valueOf((int) (((float) numberPage / (float) lastPage) * 100)));
+
+            frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
+            for (int i = 3; i <= 14; i++) { // Only shows tables that have frequencies
+                if (Integer.parseInt(Converters.getDecimalValue(data[i])) > 0) {
+                    View table = getLayoutInflater().inflate(R.layout.frequency_tables, null);
+                    TextView number_of_table_textView = table.findViewById(R.id.number_of_table_textView);
+                    TextView frequencies_table_textView = table.findViewById(R.id.frequencies_table_textView);
+                    number_of_table_textView.setText("Table " + (i - 2) + ":");
+                    frequencies_table_textView.setText(Converters.getDecimalValue(data[i]));
+                    frequencies_table_linearLayout.addView(table);
+                }
+            }
+            tx_type_textView.setText(Converters.getHexValue(data[25]).equals("09") ? "Coded" : "Non coded");
+            software_version_textView.setText(Converters.getDecimalValue(data[26]));
+            hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
+        }
     }
 
     /**
@@ -130,41 +131,6 @@ public class DiagnosticsActivity extends BaseActivity {
         pageNumber = (Integer.parseInt(Converters.getDecimalValue(packet[2])) << 16) | pageNumber;
         pageNumber = (Integer.parseInt(Converters.getDecimalValue(packet[3])) << 24) | pageNumber;
         return pageNumber;
-    }
-
-    /**
-     * With the received packet, gets BLE device data.
-     * @param data The received packet.
-     */
-    private void downloadData(byte[] data) {
-        parameter = "";
-        int baseFrequency = Integer.parseInt(Converters.getDecimalValue(data[23])) * 1000;
-        String range = String.valueOf(baseFrequency).substring(0, 3) + "." + String.valueOf(baseFrequency).substring(3) + "-";
-        int frequencyRange = ((Integer.parseInt(Converters.getDecimalValue(data[23])) +
-                Integer.parseInt(Converters.getDecimalValue(data[24]))) * 1000) - 1;
-        range += String.valueOf(frequencyRange).substring(0, 3) + "." + String.valueOf(frequencyRange).substring(3);
-        range_textView.setText(range);
-
-        battery_textView.setText(Converters.getDecimalValue(data[1]));
-        int numberPage = findPageNumber(new byte[]{data[18], data[17], data[16], data[15]});
-        int lastPage = findPageNumber(new byte[]{data[22], data[21], data[20], data[19]});
-        bytes_stored_test_textView.setText(String.valueOf(numberPage * 2048));
-        memory_used_textView.setText(String.valueOf((int) (((float) numberPage / (float) lastPage) * 100)));
-
-        frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
-        for (int i = 3; i <= 14; i++) { // Only shows tables that have frequencies
-            if (Integer.parseInt(Converters.getDecimalValue(data[i])) > 0) {
-                View table = getLayoutInflater().inflate(R.layout.frequency_tables, null);
-                TextView number_of_table_textView = table.findViewById(R.id.number_of_table_textView);
-                TextView frequencies_table_textView = table.findViewById(R.id.frequencies_table_textView);
-                number_of_table_textView.setText("Table " + (i - 2) + ":");
-                frequencies_table_textView.setText(Converters.getDecimalValue(data[i]));
-                frequencies_table_linearLayout.addView(table);
-            }
-        }
-        tx_type_textView.setText(Converters.getHexValue(data[25]).equals("09") ? "Coded" : "Non coded");
-        software_version_textView.setText(Converters.getDecimalValue(data[26]));
-        hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
     }
 
     /**
@@ -190,6 +156,6 @@ public class DiagnosticsActivity extends BaseActivity {
                 loading_linearLayout.setVisibility(View.GONE);
                 test_complete_scrollView.setVisibility(View.VISIBLE);
             }, ValueCodes.MESSAGE_PERIOD);
-        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
+        }, ValueCodes.MESSAGE_PERIOD);
     }
 }

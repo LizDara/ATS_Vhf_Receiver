@@ -6,9 +6,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,13 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class DetectionFilterActivity extends BaseActivity {
@@ -53,8 +49,6 @@ public class DetectionFilterActivity extends BaseActivity {
     TextView pr2_textView;
     @BindView(R.id.pr2_tolerance_textView)
     TextView pr2_tolerance_textView;
-
-    private final static String TAG = DetectionFilterActivity.class.getSimpleName();
 
     private DetectionFilter detectionFilter;
 
@@ -123,9 +117,7 @@ public class DetectionFilterActivity extends BaseActivity {
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
         if (result)
-            Message.showMessage(this, 0);
-        else
-            Message.showMessage(this, 2);
+            finish();
     }
 
     @OnClick(R.id.pulse_rate_type_linearLayout)
@@ -186,6 +178,16 @@ public class DetectionFilterActivity extends BaseActivity {
         launcher.launch(intent);
     }
 
+    @OnClick(R.id.save_changes_detection_button)
+    public void onClickSaveChanges(View v) {
+        if (checkChanges()) {
+            if (isDataCorrect())
+                setDetectionFilter();
+            else
+                Message.showMessage(this, 1);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_vhf_detection_filter;
@@ -194,7 +196,6 @@ public class DetectionFilterActivity extends BaseActivity {
         title = getString(R.string.set_transmitter_type);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         if (parameter.isEmpty()) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
@@ -202,52 +203,49 @@ public class DetectionFilterActivity extends BaseActivity {
         }
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.DETECTION_TYPE)) // Gets the tx type information
-                    TransferBleData.readDetectionFilter();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "67": //  Gets the tx type
-                        downloadData(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (checkChanges()) {
-                if (isDataCorrect())
-                    setDetectionFilter();
-                else
-                    Message.showMessage(this, 1);
-            } else {
-                finish();
-            }
-            return true;
+            finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.DETECTION_TYPE))
+            TransferBleData.readDetectionFilter();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        if (Converters.getHexValue(data[0]).equals("67")) { // Detection Filter
+            parameter = "";
+            detectionFilter = new DetectionFilter(data);
+            switch (Converters.getHexValue(data[1])) {
+                case "09":
+                    setVisibility("Coded");
+                    break;
+                case "08":
+                    setVisibility("Fixed");
+
+                    matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
+                    pr1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
+                    pr1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
+                    pr2_textView.setText(String.valueOf(detectionFilter.pulseRate2));
+                    pr2_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
+                    break;
+                case "07":
+                    setVisibility("Variable");
+
+                    matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
+                    max_pulse_rate_textView.setText(String.valueOf(detectionFilter.maxPulseRate));
+                    min_pulse_rate_textView.setText(String.valueOf(detectionFilter.minPulseRate));
+                    optional_data_textView.setText(detectionFilter.optionalData == 6 ? R.string.lb_temperature : R.string.lb_none);
+                    break;
+            }
+        }
     }
 
     private void setVisibility(String value) {
@@ -278,37 +276,6 @@ public class DetectionFilterActivity extends BaseActivity {
                 max_pulse_rate_textView.setText("0");
                 min_pulse_rate_textView.setText("0");
                 optional_data_textView.setText(getString(R.string.lb_none));
-                break;
-        }
-    }
-
-    /**
-     * With the received packet, gets tx type data.
-     * @param data The received packet.
-     */
-    private void downloadData(byte[] data) {
-        parameter = "";
-        detectionFilter = new DetectionFilter(data);
-        switch (Converters.getHexValue(data[1])) {
-            case "09":
-                setVisibility("Coded");
-                break;
-            case "08":
-                setVisibility("Fixed");
-
-                matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
-                pr1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
-                pr1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
-                pr2_textView.setText(String.valueOf(detectionFilter.pulseRate2));
-                pr2_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
-                break;
-            case "07":
-                setVisibility("Variable");
-
-                matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
-                max_pulse_rate_textView.setText(String.valueOf(detectionFilter.maxPulseRate));
-                min_pulse_rate_textView.setText(String.valueOf(detectionFilter.minPulseRate));
-                optional_data_textView.setText(detectionFilter.optionalData == 6 ? R.string.lb_temperature : R.string.lb_none);
                 break;
         }
     }

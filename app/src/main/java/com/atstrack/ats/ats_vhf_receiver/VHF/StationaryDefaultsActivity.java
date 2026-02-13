@@ -11,22 +11,19 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class StationaryDefaultsActivity extends BaseActivity {
@@ -43,8 +40,6 @@ public class StationaryDefaultsActivity extends BaseActivity {
     TextView store_rate_minutes_stationary_textView;
     @BindView(R.id.frequency_reference_stationary_textView)
     TextView frequency_reference_stationary_textView;
-    @BindView(R.id.store_rate_stationary_imageView)
-    ImageView store_rate_stationary_imageView;
     @BindView(R.id.reference_frequency_store_rate_stationary_textView)
     TextView reference_frequency_store_rate_stationary_textView;
     @BindView(R.id.store_rate_stationary_linearLayout)
@@ -57,8 +52,12 @@ public class StationaryDefaultsActivity extends BaseActivity {
     LinearLayout reference_frequency_stationary_linearLayout;
     @BindView(R.id.reference_frequency_store_rate_stationary_linearLayout)
     LinearLayout reference_frequency_store_rate_stationary_linearLayout;
-
-    private final static String TAG = StationaryDefaultsActivity.class.getSimpleName();
+    @BindView(R.id.external_reference_default_linearLayout)
+    LinearLayout external_reference_default_linearLayout;
+    @BindView(R.id.external_reference_scan_linearLayout)
+    LinearLayout external_reference_scan_linearLayout;
+    @BindView(R.id.save_changes_stationary_button)
+    Button save_changes_stationary_button;
 
     private StationaryDefaults stationaryDefaults;
     private int baseFrequency;
@@ -97,6 +96,9 @@ public class StationaryDefaultsActivity extends BaseActivity {
                             break;
                     }
                 }
+                boolean changed = existChanges();
+                save_changes_stationary_button.setEnabled(changed);
+                save_changes_stationary_button.setAlpha(changed ? (float) 1 : (float) 0.6);
             });
 
     /**
@@ -126,9 +128,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
                 (byte) firstTableNumber, (byte) secondTableNumber, (byte) thirdTableNumber};
         boolean result = TransferBleData.writeDefaults(false, b);
         if (result)
-            Message.showMessage(this, 0);
-        else
-            Message.showMessage(this, 2);
+            finish();
     }
 
     @OnClick(R.id.frequency_table_number_stationary_linearLayout)
@@ -205,6 +205,20 @@ public class StationaryDefaultsActivity extends BaseActivity {
         launcher.launch(intent);
     }
 
+    @OnClick(R.id.save_changes_stationary_button)
+    public void onClickSaveChanges(View v) {
+        if (!existNotSet()) {
+            if (existChanges()) {
+                if (isDataCorrect())
+                    setStationaryDefaults();
+                else
+                    Message.showMessage(this, 1);
+            }
+        } else {
+            Message.showMessage(this, "Complete all fields.");
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_vhf_stationary_defaults;
@@ -213,7 +227,6 @@ public class StationaryDefaultsActivity extends BaseActivity {
         title = getString(R.string.stationary_defaults);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
         baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
         range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
@@ -224,91 +237,57 @@ public class StationaryDefaultsActivity extends BaseActivity {
         }
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.STATIONARY_DEFAULTS)) // Gets stationary defaults data
-                    TransferBleData.readDefaults(false);
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "6C": // Get stationary defaults data
-                        downloadData(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (!existNotSet()) {
-                if (existChanges()) {
-                    if (isDataCorrect())
-                        setStationaryDefaults();
-                    else
-                        Message.showMessage(this, 1);
-                } else {
-                    finish();
-                }
-            } else {
-                Message.showMessage(this, "Complete all fields.");
-            }
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * With the received packet, gets stationary defaults data.
-     * @param data The received packet.
-     */
-    private void downloadData(byte[] data) {
-        parameter = "";
-        if (!Converters.isDefaultEmpty(data)) {
-            stationaryDefaults = new StationaryDefaults(baseFrequency, data);
-            String tables = "";
-            if (stationaryDefaults.firstTableNumber != 0)
-                tables += stationaryDefaults.firstTableNumber;
-            if (stationaryDefaults.secondTableNumber != 0)
-                tables += ", " + stationaryDefaults.secondTableNumber;
-            if (stationaryDefaults.thirdTableNumber != 0)
-                tables += ", " + stationaryDefaults.thirdTableNumber;
-            frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables);
-            number_of_antennas_stationary_textView.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
-            stationary_external_data_transfer_switch.setChecked(stationaryDefaults.dataTransferOn);
-            scan_rate_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanRate));
-            scan_timeout_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanTimeout));
-            store_rate_minutes_stationary_textView.setText(stationaryDefaults.storeRate == 0 ? getString(R.string.lb_continuous_store) : String.valueOf(stationaryDefaults.storeRate));
-            frequency_reference_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : "No Reference Frequency");
-            reference_frequency_store_rate_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");
-            stationary_reference_frequency_switch.setChecked(stationaryDefaults.referenceFrequencyOn);
-        } else {
-            stationaryDefaults = new StationaryDefaults();
-            frequency_table_number_stationary_textView.setText(R.string.lb_not_set);
-            number_of_antennas_stationary_textView.setText(R.string.lb_not_set);
-            stationary_external_data_transfer_switch.setChecked(true);
-            scan_rate_seconds_stationary_textView.setText(R.string.lb_not_set);
-            scan_timeout_seconds_stationary_textView.setText(R.string.lb_not_set);
-            store_rate_minutes_stationary_textView.setText(R.string.lb_not_set);
-            frequency_reference_stationary_textView.setText(R.string.lb_not_set);
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.STATIONARY))
+            TransferBleData.readDefaults(false);
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("6C")) {
+            parameter = "";
+            external_reference_default_linearLayout.setVisibility(View.VISIBLE);
+            external_reference_scan_linearLayout.setVisibility(View.GONE);
+            if (!Converters.isDefaultEmpty(data)) {
+                stationaryDefaults = new StationaryDefaults(baseFrequency, data);
+                String tables = "";
+                if (stationaryDefaults.firstTableNumber != 0)
+                    tables += stationaryDefaults.firstTableNumber;
+                if (stationaryDefaults.secondTableNumber != 0)
+                    tables += ", " + stationaryDefaults.secondTableNumber;
+                if (stationaryDefaults.thirdTableNumber != 0)
+                    tables += ", " + stationaryDefaults.thirdTableNumber;
+                frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables);
+                number_of_antennas_stationary_textView.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
+                stationary_external_data_transfer_switch.setChecked(stationaryDefaults.dataTransferOn);
+                scan_rate_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanRate));
+                scan_timeout_seconds_stationary_textView.setText(String.valueOf(stationaryDefaults.scanTimeout));
+                store_rate_minutes_stationary_textView.setText(stationaryDefaults.storeRate == 0 ? getString(R.string.lb_continuous_store) : String.valueOf(stationaryDefaults.storeRate));
+                frequency_reference_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : "No Reference Frequency");
+                reference_frequency_store_rate_stationary_textView.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");
+                stationary_reference_frequency_switch.setChecked(stationaryDefaults.referenceFrequencyOn);
+            } else {
+                stationaryDefaults = new StationaryDefaults();
+                frequency_table_number_stationary_textView.setText(R.string.lb_not_set);
+                number_of_antennas_stationary_textView.setText(R.string.lb_not_set);
+                stationary_external_data_transfer_switch.setChecked(true);
+                scan_rate_seconds_stationary_textView.setText(R.string.lb_not_set);
+                scan_timeout_seconds_stationary_textView.setText(R.string.lb_not_set);
+                store_rate_minutes_stationary_textView.setText(R.string.lb_not_set);
+                frequency_reference_stationary_textView.setText(R.string.lb_not_set);
+            }
+            save_changes_stationary_button.setEnabled(false);
+            save_changes_stationary_button.setAlpha((float) 0.6);
         }
     }
 

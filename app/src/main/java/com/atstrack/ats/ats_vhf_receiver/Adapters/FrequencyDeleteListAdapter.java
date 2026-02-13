@@ -39,6 +39,10 @@ public class FrequencyDeleteListAdapter extends BaseAdapter {
             selected.set(i, isChecked);
     }
 
+    public void setStateSelected(int index, boolean isChecked) {
+        selected.set(index, isChecked);
+    }
+
     public boolean isSelected(int index) {
         return selected.get(index);
     }

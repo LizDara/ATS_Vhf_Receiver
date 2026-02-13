@@ -2,22 +2,27 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import butterknife.BindView;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,19 +30,20 @@ import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyDeleteListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.EmptyTable;
+import com.atstrack.ats.ats_vhf_receiver.Models.Coefficients;
+import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
+import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
 import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class FrequenciesActivity extends BaseActivity implements OnAdapterClickListener {
@@ -73,21 +79,20 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     @BindView(R.id.save_frequency_button)
     Button save_frequency_button;
 
-    final private String TAG = FrequenciesActivity.class.getSimpleName();
-
     private Handler handlerMessage;
     private FrequencyListAdapter frequencyListAdapter;
     private FrequencyDeleteListAdapter frequencyDeleteListAdapter;
     private int[] originalTable;
-    private int number;
+    private int tableNumber;
     private int originalTotalFrequencies;
     private int baseFrequency;
     private int range;
     private boolean isFile;
     private boolean isTemperature;
     private boolean saveCoefficients;
-    private int temperaturePosition;
-    private Map<String, String> coefficients;
+    private MobileDefaults mobileDefaults;
+    private StationaryDefaults stationaryDefaults;
+    private Coefficients coefficients;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -128,7 +133,8 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 }
             });
 
-    private void readCoefficients() {
+    private void readCoefficients(int position) {
+        coefficients = new Coefficients(position, frequencyListAdapter.getFrequency(position));
         TransferBleData.notificationLog();
         new Handler().postDelayed(() -> {
             sendIndex();
@@ -136,8 +142,8 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     private void sendIndex() {
-        byte[] b = new byte[] {(byte) 0x7D, (byte) (temperaturePosition + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        TransferBleData.writeFrequencies(number, b);
+        byte[] b = new byte[] {(byte) 0x7D, (byte) (coefficients.position + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        TransferBleData.writeFrequencies(tableNumber, b);
     }
 
     private void addTemperatureFrequency() {
@@ -149,14 +155,14 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         byte formatA = coefficient_a_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatB = coefficient_b_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatC = constant_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
-        byte[] b = new byte[] { 0x7D, (byte) (temperaturePosition == -1 ? (frequencyListAdapter.getItemCount() + 1) : (temperaturePosition + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
+        byte[] b = new byte[] { 0x7D, (byte) (coefficients.position == -1 ? (frequencyListAdapter.getItemCount() + 1) : (coefficients.position + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
                 (byte) (coefficientA / 256), (byte) (coefficientA % 256), formatB, (byte) (coefficientB / 256), (byte) (coefficientB % 256), formatC,
                 (byte) (constant / 256), (byte) (constant % 256), 0, 0, 0};
-        boolean result = TransferBleData.writeFrequencies(number, b);
+        boolean result = TransferBleData.writeFrequencies(tableNumber, b);
         if (result) {
             saveCoefficients = true;
-            if (temperaturePosition != -1)
-                changeSelectedFrequency(frequency, temperaturePosition);
+            if (coefficients.position != -1)
+                changeSelectedFrequency(frequency, coefficients.position);
             else
                 addFrequency(frequency);
         }
@@ -177,7 +183,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         b[4] = (byte) hh;
         b[5] = (byte) mm;
         b[6] = (byte) ss;
-        b[7] = (byte) number;//frequency number table
+        b[7] = (byte) tableNumber;//frequency number table
         b[8] = (byte) frequencyListAdapter.getItemCount();//Number of frequencies in the table
         b[9] = (byte) (baseFrequency / 1000);//base frequency
         if (!isTemperature) {
@@ -193,7 +199,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         } else {
             b[0] = (byte) 0x7F;
         }
-        boolean result = TransferBleData.writeFrequencies(number, b);
+        boolean result = TransferBleData.writeFrequencies(tableNumber, b);
         if (result)
             Message.showMessage(this, 0);
         else
@@ -216,13 +222,9 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             if (isTemperature) {
                 setVisibility("temperature");
                 title_toolbar.setText(R.string.lb_add_frequency);
+                coefficients = new Coefficients();
                 frequency_temperature_button.setText("");
-                coefficient_a_button.setText("0");
-                coefficient_b_button.setText("0");
-                constant_button.setText("0");
-                temperaturePosition = -1;
-                save_frequency_button.setEnabled(false);
-                save_frequency_button.setAlpha((float) 0.6);
+                initializeCoefficients();
             } else {
                 Intent intent = new Intent(this, EnterFrequencyActivity.class);
                 intent.putExtra(ValueCodes.TITLE, "Add Frequency");
@@ -238,12 +240,12 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     @OnClick(R.id.delete_selected_frequencies_button)
     public void onClickDeleteSelectedFrequencies(View v) {
-        deleteFrequencies();
+        TransferBleData.readDefaults(true);
     }
 
-    @OnClick(R.id.all_frequencies_checkBox)
-    public void onClickAllFrequencies(View v) {
-        changeAllCheckBox(all_frequencies_checkBox.isChecked());
+    @OnCheckedChanged(R.id.all_frequencies_checkBox)
+    public void onCheckedChangeAllFrequencies(CompoundButton button, boolean isChecked) {
+        changeAllCheckBox(isChecked);
     }
 
     @OnClick(R.id.frequency_temperature_button)
@@ -252,7 +254,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 : "Edit Frequency " + frequency_temperature_button.getText();
         Intent intent = new Intent(this, EnterFrequencyActivity.class);
         intent.putExtra(ValueCodes.TITLE, title);
-        intent.putExtra(ValueCodes.POSITION, temperaturePosition);
+        intent.putExtra(ValueCodes.POSITION, coefficients.position);
         intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
         intent.putExtra(ValueCodes.RANGE, range);
         launcher.launch(intent);
@@ -281,7 +283,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     @OnClick(R.id.save_frequency_button)
     public void onClickSaveFrequency(View v) {
-        if (temperaturePosition != -1) {
+        if (coefficients.position != -1) {
             if (existChangesInCoefficients()) {
                 addTemperatureFrequency();
             }
@@ -295,12 +297,11 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         contentViewId = R.layout.activity_vhf_frequencies;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        number = getIntent().getIntExtra(ValueCodes.TABLE_NUMBER, 0);
+        tableNumber = getIntent().getIntExtra(ValueCodes.TABLE_NUMBER, 0);
         originalTotalFrequencies = getIntent().getIntExtra(ValueCodes.TOTAL, 0);
-        title = "Table " + number + " (" + originalTotalFrequencies + " Frequencies)";
+        title = "Table " + tableNumber + " (" + originalTotalFrequencies + " Frequencies)";
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         handlerMessage = new Handler();
         baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0) * 1000;
         range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
@@ -336,35 +337,6 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         }
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TABLE)) // Get the frequencies from a table
-                    TransferBleData.readFrequencies(number);
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-                else if (Integer.parseInt(Converters.getDecimalValue(packet[0])) == number) // Get the frequencies from a table
-                    downloadData(packet);
-                else if (Converters.getHexValue(packet[0]).equals("7D")) // Get coefficients
-                    downloadCoefficients(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
@@ -376,7 +348,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                     finish();
             } else if (delete_frequencies_linearLayout.getVisibility() == View.VISIBLE ||
                     edit_temperature_frequency_linearLayout.getVisibility() == View.VISIBLE) {
-                title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getItemCount() + " Frequencies)");
+                title_toolbar.setText("Table " + tableNumber + " (" + frequencyListAdapter.getItemCount() + " Frequencies)");
                 if (frequencyListAdapter.getItemCount() > 0) {
                     setVisibility("overview");
                     changeAllCheckBox(false);
@@ -390,8 +362,26 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     @Override
     public void onAdapterItemClickListener(int position) {
-        temperaturePosition = position;
-        readCoefficients();
+        readCoefficients(position);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.TABLE))
+            TransferBleData.readFrequencies(tableNumber);
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        if (Integer.parseInt(Converters.getDecimalValue(data[0])) == tableNumber) // Get the frequencies from a table
+            downloadFrequencies(data);
+        else if (Converters.getHexValue(data[0]).equals("7D")) // Get coefficients
+            downloadCoefficients(data);
+        else if (Converters.getHexValue(data[0]).equals("6D")) // Get Mobile defaults
+            downloadMobileDefaults(data);
+        else if (Converters.getHexValue(data[0]).equals("6C")) // Get Stationary defaults
+            downloadStationaryDefaults(data);
     }
 
     /**
@@ -435,7 +425,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
      * With the received packet, gets the frequencies from the table and display on the screen.
      * @param data The received packet.
      */
-    private void downloadData(byte[] data) {
+    private void downloadFrequencies(byte[] data) {
         parameter = "";
         originalTable = new int[originalTotalFrequencies];
         ArrayList<Integer> frequencies = new ArrayList<>();
@@ -458,31 +448,77 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     private void downloadCoefficients(byte[] data) {
         title_toolbar.setText(R.string.lb_edit_frequency);
-        frequency_temperature_button.setText(String.valueOf(frequencyListAdapter.getFrequency(temperaturePosition)));
+        frequency_temperature_button.setText(String.valueOf(coefficients.frequency));
 
         if (!Converters.areCoefficientsEmpty(data)) {
-            int coefficientA = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-            int coefficientB = (Integer.parseInt(Converters.getDecimalValue(data[8])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[9]));
-            int constant = (Integer.parseInt(Converters.getDecimalValue(data[11])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[12]));
-            coefficient_a_button.setText(Converters.getHexValue(data[4]).equals("80") ? "-" + coefficientA : String.valueOf(coefficientA));
-            coefficient_b_button.setText(Converters.getHexValue(data[7]).equals("80") ? "-" + coefficientB : String.valueOf(coefficientB));
-            constant_button.setText(Converters.getHexValue(data[10]).equals("80") ? "-" + constant : String.valueOf(constant));
+            coefficients.setData(data);
+            coefficient_a_button.setText(coefficients.isCoefficientANegative ? "-" + coefficients.coefficientA : String.valueOf(coefficients.coefficientA));
+            coefficient_b_button.setText(coefficients.isCoefficientBNegative ? "-" + coefficients.coefficientB : String.valueOf(coefficients.coefficientB));
+            constant_button.setText(coefficients.isConstantNegative ? "-" + coefficients.constant : String.valueOf(coefficients.constant));
             save_frequency_button.setEnabled(true);
             save_frequency_button.setAlpha(1);
         } else {
-            coefficient_a_button.setText("0");
-            coefficient_b_button.setText("0");
-            constant_button.setText("0");
-            save_frequency_button.setEnabled(false);
-            save_frequency_button.setAlpha((float) 0.6);
+            initializeCoefficients();
         }
         setVisibility("temperature");
+    }
 
-        coefficients = new HashMap<>();
-        coefficients.put(ValueCodes.FREQUENCY_COEFFICIENTS, frequency_temperature_button.getText().toString());
-        coefficients.put(ValueCodes.COEFFICIENT_A, coefficient_a_button.getText().toString());
-        coefficients.put(ValueCodes.COEFFICIENT_B, coefficient_b_button.getText().toString());
-        coefficients.put(ValueCodes.COEFFICIENT_C, constant_button.getText().toString());
+    private void initializeCoefficients() {
+        coefficient_a_button.setText("0");
+        coefficient_b_button.setText("0");
+        constant_button.setText("0");
+        save_frequency_button.setEnabled(false);
+        save_frequency_button.setAlpha((float) 0.6);
+    }
+
+    private void downloadMobileDefaults(byte[] data) {
+        if (!Converters.isDefaultEmpty(data))
+            mobileDefaults = new MobileDefaults(data);
+        else
+            mobileDefaults = new MobileDefaults();
+        TransferBleData.readDefaults(false);
+    }
+
+    private void downloadStationaryDefaults(byte[] data) {
+        if (!Converters.isDefaultEmpty(data))
+            stationaryDefaults = new StationaryDefaults(baseFrequency, data);
+        else
+            stationaryDefaults = new StationaryDefaults();
+        checkScanTable();
+    }
+
+    private void checkScanTable() {
+        boolean showMessage = true;
+        if (all_frequencies_checkBox.isChecked()) {
+            if (tableNumber == mobileDefaults.tableNumber || tableNumber == stationaryDefaults.firstTableNumber
+                    || tableNumber == stationaryDefaults.secondTableNumber || tableNumber == stationaryDefaults.thirdTableNumber) {
+                frequencyDeleteListAdapter.setStateSelected(0, false);
+                showMessage = false;
+                DialogFragment emptyTable = EmptyTable.newInstance();
+                Context context = this;
+
+                getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                        boolean editDefaults = bundle.getBoolean(ValueCodes.VALUE);
+                        if (editDefaults) {
+                            Intent intent;
+                            if (tableNumber == mobileDefaults.tableNumber) {
+                                intent = new Intent(context, MobileDefaultsActivity.class);
+                                intent.putExtra(ValueCodes.VALUE, mobileDefaults.originalBytes);
+                            } else {
+                                intent = new Intent(context, StationaryDefaultsActivity.class);
+                                intent.putExtra(ValueCodes.VALUE, stationaryDefaults.originalBytes);
+                            }
+                            context.startActivity(intent);
+                        }
+                    }
+                });
+                emptyTable.show(getSupportFragmentManager(), DetectionFilter.TAG);
+            }
+        }
+        deleteFrequencies(showMessage);
+        all_frequencies_checkBox.setChecked(false);
     }
 
     private void changeSelectedFrequency(int frequency, int position) {
@@ -514,7 +550,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         }
     }
 
-    private void deleteFrequencies() {
+    private void deleteFrequencies(boolean showMessage) {
         int index = 0;
         while (index < frequencyDeleteListAdapter.getCount()) {
             if (frequencyDeleteListAdapter.isSelected(index))
@@ -525,7 +561,8 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         frequencyListAdapter.notifyDataSetChanged();
         frequencyDeleteListAdapter.notifyDataSetChanged();
 
-        manageMessage(R.string.lb_frequencies_deleted, frequencyListAdapter.getItemCount() == 0);
+        if (showMessage)
+            manageMessage(R.string.lb_frequencies_deleted, frequencyListAdapter.getItemCount() == 0);
     }
 
     private void manageMessage(int idStringMessage, boolean isEmpty) {
@@ -543,7 +580,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 setVisibility("none");
             else
                 setVisibility("overview");
-            title_toolbar.setText("Table " + number + " (" + frequencyListAdapter.getItemCount() + " Frequencies)");
+            title_toolbar.setText("Table " + tableNumber + " (" + frequencyListAdapter.getItemCount() + " Frequencies)");
         }, ValueCodes.MESSAGE_PERIOD);
     }
 
@@ -559,10 +596,10 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     private boolean existChangesInCoefficients() {
-        return !coefficients.get(ValueCodes.FREQUENCY_COEFFICIENTS).equals(frequency_temperature_button.getText().toString())
-                || !coefficients.get(ValueCodes.COEFFICIENT_A).equals(coefficient_a_button.getText().toString())
-                || !coefficients.get(ValueCodes.COEFFICIENT_B).equals(coefficient_b_button.getText().toString())
-                || !coefficients.get(ValueCodes.COEFFICIENT_C).equals(constant_button.getText().toString());
+        return coefficients.frequency != Integer.parseInt(frequency_temperature_button.getText().toString())
+                || (coefficients.coefficientA * (coefficients.isCoefficientANegative ? -1 : 1)) != Integer.parseInt(coefficient_a_button.getText().toString())
+                || (coefficients.coefficientB * (coefficients.isCoefficientBNegative ? -1 : 1)) != Integer.parseInt(coefficient_b_button.getText().toString())
+                || (coefficients.constant * (coefficients.isConstantNegative ? -1 : 1)) != Integer.parseInt(constant_button.getText().toString());
     }
 
     private boolean isDataCorrect() {

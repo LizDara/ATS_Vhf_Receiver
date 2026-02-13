@@ -74,6 +74,13 @@
             android:text="@string/lb_processing_data"
             android:textColor="@color/slate_gray" />
 
+        <TextView
+            android:id="@+id/process_percent_textView"
+            style="@style/body_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"

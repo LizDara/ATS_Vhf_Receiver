@@ -17,11 +17,10 @@ import android.util.Log;
 
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Calendar;
 import java.util.UUID;
-
-import androidx.annotation.NonNull;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -33,6 +32,8 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGatt mBluetoothGatt;
     private boolean otaUpdate = false;
+
+    public String downloadLogs = "";
 
     public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
@@ -46,20 +47,21 @@ public class BluetoothLeService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
-            Log.i(TAG, "NEW STATE: " + newState);
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onConnectionStateChange: new state = " + newState + ", status = " + status + ValueCodes.CR + ValueCodes.LF;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 broadcastUpdate(intentAction);
-                Log.i(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
+                Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.d(TAG, "DEVICE DISCONNECTED, STATUS = " + status);
                 intentAction = ACTION_GATT_DISCONNECTED;
-                Log.i(TAG, "DISCONNECTED: " + status);
                 broadcastUpdate(intentAction);
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onServicesDiscovered: status = " + status + ValueCodes.CR + ValueCodes.LF;
             if (status == BluetoothGatt.GATT_SUCCESS)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             else
@@ -68,8 +70,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.i(TAG, "SUCCESS WRITE: " + (status == BluetoothGatt.GATT_SUCCESS) + ":" + Calendar.getInstance().get(Calendar.MINUTE)
-                    + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND));
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onCharacteristicWrite: status = " + status + ", char = " + characteristic.getUuid().toString() + ValueCodes.CR + ValueCodes.LF;
             if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x00)
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED); //OTA Begin written
             else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue()[0] == 0x03)
@@ -80,20 +81,24 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onCharacteristicRead: status = " + status + ", char = " + characteristic.getUuid().toString() + ValueCodes.CR + ValueCodes.LF;
+            downloadLogs += Converters.getHexValue(characteristic.getValue()) + ValueCodes.CR + ValueCodes.LF;
             if (status == BluetoothGatt.GATT_SUCCESS)
                 broadcastUpdate(characteristic);
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onCharacteristicChanged: char = " + characteristic.getUuid().toString() + ValueCodes.CR + ValueCodes.LF;
+            downloadLogs += Converters.getHexValue(characteristic.getValue()) + ValueCodes.CR + ValueCodes.LF;
             broadcastUpdate(characteristic);
         }
 
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - onMtuChanged: mtu = " + mtu + ", status = " + status + ValueCodes.CR + ValueCodes.LF;
             super.onMtuChanged(gatt, mtu, status);
             if (otaUpdate && status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i("OTA", "onMtuChanged mtu: " + mtu);
                 otaUpdate = false;
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             }
@@ -182,6 +187,7 @@ public class BluetoothLeService extends Service {
             }
             // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
             mBluetoothGatt = device.connectGatt(this, false, mGattCallback, BluetoothDevice.TRANSPORT_LE);
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - connect: Trying to create a new connection" + ValueCodes.CR + ValueCodes.LF;
             Log.d(TAG, "Trying to create a new connection.");
             return true;
         } catch (Exception ex) {
@@ -198,12 +204,12 @@ public class BluetoothLeService extends Service {
      */
     @SuppressLint("MissingPermission")
     public void disconnect() {
-        Log.i(TAG, "DISCONNECTION PROGRAMMATICALLY");
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG,"BluetoothAdapter not initialized");
             return;
         }
         mBluetoothGatt.disconnect();
+        downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - disconnect: The app disconnected an existing connection or cancel a pending connection" + ValueCodes.CR + ValueCodes.LF;
         mBluetoothAdapter = null;
         mBluetoothGatt = null;
     }
@@ -228,7 +234,7 @@ public class BluetoothLeService extends Service {
      * @param service UUID to act on.
      * @param characteristics  UUID to act on.
      */
-    public boolean readCharacteristicDiagnostic(UUID service, UUID characteristics) {
+    public boolean readCharacteristic(UUID service, UUID characteristics) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w( TAG,"BluetoothAdapter not initialized");
             return false;
@@ -236,6 +242,7 @@ public class BluetoothLeService extends Service {
         BluetoothGattService myGatService = mBluetoothGatt.getService(service);
         BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(characteristics);
         @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.readCharacteristic(myGatChar);
+        downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - readCharacteristic: The app requests a reading to char " + characteristics.toString() + ", result = " + result + ValueCodes.CR + ValueCodes.LF;
         return result;
     }
 
@@ -255,6 +262,7 @@ public class BluetoothLeService extends Service {
             BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(characteristics);
             myGatChar.setValue(data);
             @SuppressLint("MissingPermission") boolean result = mBluetoothGatt.writeCharacteristic(myGatChar);
+            downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - writeCharacteristic: The app writes a value { " + Converters.getHexValue(data) + "} to char " + characteristics.toString() + ", result = " + result + ValueCodes.CR + ValueCodes.LF;
             return result;
         }
         return false;
@@ -267,7 +275,7 @@ public class BluetoothLeService extends Service {
      * @param enabled If true, enable notification.  False otherwise.
      */
     @SuppressLint("MissingPermission")
-    public void setCharacteristicNotificationRead(UUID service, UUID characteristics, boolean enabled) {
+    public void setCharacteristicNotification(UUID service, UUID characteristics, boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
@@ -277,28 +285,8 @@ public class BluetoothLeService extends Service {
         BluetoothGattDescriptor desc = myGatChar.getDescriptor(AtsUuids.CLIENT_CHARACTERISTIC_CONFIG);
         desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(desc);
-        mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
-    }
-
-    @SuppressLint("MissingPermission")
-    public boolean setCharacteristicNotificationTag() {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
-            return false;
-        }
-        boolean written = false;
-        BluetoothGattService myGatService = mBluetoothGatt.getService(AtsUuids.UUID_SERVICE_TAG);
-        BluetoothGattCharacteristic myGatChar = myGatService.getCharacteristic(AtsUuids.UUID_CHARACTERISTIC_TAG);
-        if (myGatChar != null) {
-            if (!mBluetoothGatt.setCharacteristicNotification(myGatChar, true))
-                return false;
-            BluetoothGattDescriptor desc = myGatChar.getDescriptor(AtsUuids.CLIENT_CHARACTERISTIC_CONFIG);
-            if (desc != null) {
-                desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                written = mBluetoothGatt.writeDescriptor(desc);
-            }
-        }
-        return written;
+        boolean result = mBluetoothGatt.setCharacteristicNotification(myGatChar, enabled);
+        downloadLogs += Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":" + Calendar.getInstance().get(Calendar.SECOND) + "." + Calendar.getInstance().get(Calendar.MILLISECOND) +  " - setCharacteristicNotification: The app enables or disables notification on a give char " + characteristics.toString() + ", enabled = " + enabled + ", result = " + result + ValueCodes.CR + ValueCodes.LF;
     }
 
     public boolean writeOTA(byte[] data) {

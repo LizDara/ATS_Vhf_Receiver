@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-en-rXC\\values-en-rXC.xml",
+            "outputFile": "D:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-en-rXC\\values-en-rXC.xml",
             "map": [
                 {
                     "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\914116008979e77bc79da871871e9f31\\transformed\\appcompat-1.4.1\\res\\values-en-rXC\\values-en-rXC.xml",

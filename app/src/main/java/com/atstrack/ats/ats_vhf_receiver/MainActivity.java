@@ -38,6 +38,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnAdapterClickListener {

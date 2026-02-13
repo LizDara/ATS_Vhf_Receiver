@@ -22,7 +22,7 @@ public class FirmwareUpdate extends DialogFragment {
     /**
      * Use this factory method to create a new instance of this fragment using the provided parameters.
      *
-     * @return A new instance of fragment AudioOptions.
+     * @return A new instance of fragment FirmwareUpdate.
      */
     public static FirmwareUpdate newInstance() {
         return new FirmwareUpdate();

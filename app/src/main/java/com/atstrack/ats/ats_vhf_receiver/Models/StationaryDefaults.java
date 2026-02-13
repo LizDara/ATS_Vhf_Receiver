@@ -14,6 +14,7 @@ public class StationaryDefaults {
     public boolean referenceFrequencyOn = true;
     public int referenceFrequency = 255;
     public int referenceStoreRate = 255;
+    public byte[] originalBytes;
 
     public StationaryDefaults() {}
 
@@ -31,5 +32,6 @@ public class StationaryDefaults {
         referenceFrequency = referenceFrequencyOn ? (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
                 Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency : 0;
         referenceStoreRate = referenceFrequencyOn ? Integer.parseInt(Converters.getDecimalValue(data[8])) : 0;
+        originalBytes = data;
     }
 }

@@ -5,7 +5,6 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -13,12 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class ScanningActivity extends BaseActivity {
@@ -31,8 +27,6 @@ public class ScanningActivity extends BaseActivity {
     TextView warning_message_textView;
     @BindView(R.id.go_button)
     Button go_button;
-
-    private final static String TAG = ScanningActivity.class.getSimpleName();
 
     private boolean isDetectionFilterEmpty;
     private boolean areTablesEmpty;
@@ -54,13 +48,13 @@ public class ScanningActivity extends BaseActivity {
 
     @OnClick(R.id.start_aerial_scan_button)
     public void onClickStartAerialScan(View v) {
-        parameter = ValueCodes.MOBILE_DEFAULTS;
+        parameter = ValueCodes.MOBILE;
         TransferBleData.readDefaults(true);
     }
 
     @OnClick(R.id.start_stationary_scan_button)
     public void onClickStartStationaryScan(View v) {
-        parameter = ValueCodes.STATIONARY_DEFAULTS;
+        parameter = ValueCodes.STATIONARY;
         TransferBleData.readDefaults(false);
     }
 
@@ -76,7 +70,7 @@ public class ScanningActivity extends BaseActivity {
             intent.putExtra(ValueCodes.VALUE, tablesData);
             startActivity(intent);
         } else if (go_button.getText().toString().equals(getString(R.string.lb_go_settings))) {
-            if (parameter.equals(ValueCodes.MOBILE_DEFAULTS)) {
+            if (parameter.equals(ValueCodes.MOBILE)) {
                 intent = new Intent(this, MobileDefaultsActivity.class);
             } else {
                 intent = new Intent(this, StationaryDefaultsActivity.class);
@@ -94,54 +88,12 @@ public class ScanningActivity extends BaseActivity {
         title = getString(R.string.lb_start_scanning);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
         isDetectionFilterEmpty = false;
         areTablesEmpty = false;
         isDefaultEmpty = false;
         menu_scan_linearLayout.setVisibility(View.VISIBLE);
         warning_message_linearLayout.setVisibility(View.GONE);
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.DETECTION_TYPE))
-                    TransferBleData.readDetectionFilter();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "67": // Get tx type
-                        downloadDetectionType(packet);
-                        break;
-                    case "7A": // Get the number of frequencies from each table
-                        downloadTables(packet);
-                        break;
-                    case "6D": // Get mobile defaults
-                        downloadMobileDefaults(packet);
-                        break;
-                    case "6C": // Get stationary defaults
-                        downloadStationaryDefaults(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -172,6 +124,31 @@ public class ScanningActivity extends BaseActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.DETECTION_TYPE))
+            TransferBleData.readDetectionFilter();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        switch (Converters.getHexValue(data[0])) {
+            case "67": // Get tx type
+                downloadDetectionType(data);
+                break;
+            case "7A": // Get the number of frequencies from each table
+                downloadTables(data);
+                break;
+            case "6D": // Get mobile defaults
+                downloadMobileDefaults(data);
+                break;
+            case "6C": // Get stationary defaults
+                downloadStationaryDefaults(data);
+                break;
+        }
     }
 
     private void downloadDetectionType(byte[] data) {

@@ -48,13 +48,16 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BluetoothReceiver.MenuActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BluetoothReceiver.TagDetectionActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".VHF.EnterCoefficientActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ScanDevicesActivity"
             android:exported="false"

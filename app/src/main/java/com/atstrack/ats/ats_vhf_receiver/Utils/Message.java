@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -22,13 +23,17 @@ public class Message {
         LeServiceConnection leServiceConnection = LeServiceConnection.getInstance();
 
         new Handler().postDelayed(() -> {
-            dialog.dismiss();
-            if (leServiceConnection.existConnection())
-                leServiceConnection.close();
-            Intent intent = new Intent(context, MainActivity.class);
-            context.startActivity(intent);
-            ((Activity) context).finish();
-        }, ValueCodes.DISCONNECTION_MESSAGE_PERIOD);
+            try {
+                dialog.dismiss();
+                if (leServiceConnection.existConnection())
+                    leServiceConnection.close();
+                Intent intent = new Intent(context, MainActivity.class);
+                context.startActivity(intent);
+                ((Activity) context).finish();
+            } catch (Exception ex) {
+                Log.i("Message", ex.getLocalizedMessage());
+            }
+        }, ValueCodes.MESSAGE_PERIOD);
     }
 
     public static void showMessage(Activity context, int status) {

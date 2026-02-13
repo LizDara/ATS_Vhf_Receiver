@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".BluetoothReceiver.TagDetectionActivity">
 
@@ -22,7 +23,7 @@
             android:id="@+id/location_data_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_gps_off"
+            android:background="@drawable/ic_gps_valid"
             tools:ignore="ContentDescription" />
 
         <LinearLayout
@@ -38,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_location_disabled"
+                android:text="@string/lb_location_enabled"
                 android:textColor="@color/black" />
 
             <TextView
@@ -56,7 +57,7 @@
             style="@style/button_tertiary_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lb_enable" />
+            android:text="@string/lb_disable" />
 
     </LinearLayout>
 

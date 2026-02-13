@@ -6,7 +6,17 @@ public class TagDetail {
     public String code;
     public String rssi;
     public String temperature;
+    public String voltage;
     public int detections;
+    public double latitude;
+    public double longitude;
+
+    public TagDetail(byte[] data, double latitude, double longitude) {
+        setValues(data);
+        this.latitude = latitude;
+        this.longitude = longitude;
+        detections = 1;
+    }
 
     public TagDetail(byte[] data) {
         setValues(data);
@@ -22,5 +32,6 @@ public class TagDetail {
         code = Converters.getAsciiValue(6, 14, data);
         rssi = Converters.getAsciiValue(24, 28, data);
         temperature = Converters.getAsciiValue(40, 44, data);
+        voltage = Converters.getAsciiValue(54, 58, data);
     }
 }

@@ -42,6 +42,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/timeout_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -86,6 +87,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/scan_time_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -130,7 +132,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/store_rate_stationary_imageView"
+            android:id="@+id/store_rate_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -175,6 +177,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/scan_tables_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -219,6 +222,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/antennas_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -231,68 +235,144 @@
         android:background="@color/light_gray" />
 
     <LinearLayout
+        android:id="@+id/external_reference_default_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16sp">
+        android:orientation="vertical">
 
-        <TextView
-            style="@style/body_small"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/lb_external_data_transfer"
-            android:textColor="@color/limed_spruce" />
+            android:orientation="horizontal"
+            android:padding="16sp">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_external_data_transfer"
+                android:textColor="@color/limed_spruce" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/stationary_external_data_transfer_switch"
-            android:layout_width="wrap_content"
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/stationary_external_data_transfer_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumb="@drawable/thumb_switch"
+                app:track="@drawable/track_switch" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:thumb="@drawable/thumb_switch"
-            app:track="@drawable/track_switch" />
+            android:orientation="horizontal"
+            android:padding="16sp">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_reference_frequency"
+                android:textColor="@color/limed_spruce" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/stationary_reference_frequency_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumb="@drawable/thumb_switch"
+                app:track="@drawable/track_switch" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray" />
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray" />
 
     <LinearLayout
+        android:id="@+id/external_reference_scan_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16sp">
+        android:orientation="vertical">
 
-        <TextView
-            style="@style/body_small"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/lb_reference_frequency"
-            android:textColor="@color/limed_spruce" />
+            android:layout_weight="1"
+            android:padding="16sp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_external_data_transfer"
+                android:textColor="@color/limed_spruce" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/stationary_reference_frequency_switch"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/stationary_external_data_transfer_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:thumb="@drawable/thumb_switch"
-            app:track="@drawable/track_switch" />
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:padding="16sp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_reference_frequency"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/stationary_reference_frequency_textView"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray" />
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray" />
 
     <LinearLayout
         android:id="@+id/reference_frequency_stationary_linearLayout"
@@ -327,6 +407,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/reference_frequency_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />
@@ -371,6 +452,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/reference_store_rate_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />

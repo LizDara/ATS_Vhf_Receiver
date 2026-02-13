@@ -5,7 +5,6 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,12 +17,9 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
@@ -61,8 +57,6 @@ public class ValueDefaultsActivity extends BaseActivity {
     ListView tables_merge_listView;
     @BindView(R.id.merge_tables_button)
     Button merge_tables_button;
-
-    private final static String TAG = ValueDefaultsActivity.class.getSimpleName();
 
     private TableScanListAdapter tableScanListAdapter;
     private int type;
@@ -152,54 +146,20 @@ public class ValueDefaultsActivity extends BaseActivity {
         storeRate = 120;
     }
 
-    @OnClick(R.id.save_changes_input_value_button)
-    public void onClickSaveChanges(View v) {
-        Intent intent = new Intent();
-        int value = 0;
-        if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) // Send the mobile scan rate value
-            value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
-        else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
-            value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
-            value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
-                    Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
-        else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
-            value = value_spinner.getSelectedItemPosition() + 1;
-        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
-            value = Integer.parseInt(value_spinner.getSelectedItem().toString());
-        else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
-            value = value_spinner.getSelectedItemPosition();
-        intent.putExtra(ValueCodes.VALUE, value);
-        setResult(type, intent);
-        finish();
-    }
-
-    @OnClick(R.id.merge_tables_button)
-    public void onClickSaveTables(View v) {
-        Intent intent = new Intent();
-        int[] tables = new int[tableScanListAdapter.getCountSelected()];
-        for (int i = 0; i < tableScanListAdapter.getCountSelected(); i++)
-            tables[i] = tableScanListAdapter.getSelected(i);
-        intent.putExtra(ValueCodes.VALUE, tables);
-        setResult(type, intent);
-        finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_vhf_value_defaults;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.lb_set_value);
+        title = getString(R.string.lb_select_value);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
         switch (type) {
             case ValueCodes.STORE_RATE_CODE: // Get the store rate
                 setVisibility("storeRate");
                 int storeRate = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-                downloadStoreRate(storeRate);
+                setStoreRate(storeRate);
                 break;
             case ValueCodes.TABLE_NUMBER_CODE: // Get the frequency table number
                 setVisibility("");
@@ -212,77 +172,109 @@ public class ValueDefaultsActivity extends BaseActivity {
             case ValueCodes.SCAN_RATE_MOBILE_CODE: // Get the scan rate mobile
                 setVisibility("");
                 double scanRateMobile = getIntent().getDoubleExtra(ValueCodes.VALUE, 0);
-                downloadScanRate((int)(scanRateMobile * 10));
+                setScanRate((int)(scanRateMobile * 10));
                 break;
             case ValueCodes.SCAN_RATE_STATIONARY_CODE: // Get the scan rate mobile
                 setVisibility("");
                 int scanRateStationary = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-                downloadScanRate(scanRateStationary);
+                setScanRate(scanRateStationary);
                 break;
             case ValueCodes.NUMBER_OF_ANTENNAS_CODE: // Get number of antennas
                 setVisibility("");
                 int antenna = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-                downloadAntennas(antenna);
+                setAntennas(antenna);
                 break;
             case ValueCodes.SCAN_TIMEOUT_SECONDS_CODE: // Get the scan timeout seconds
                 setVisibility("");
                 int timeout = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-                downloadTimeout(timeout);
+                setTimeout(timeout);
                 break;
             case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Get the reference frequency store rate
                 setVisibility("");
                 int referenceStoreRate = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-                downloadReferenceFrequencyStoreRate(referenceStoreRate);
+                setReferenceFrequencyStoreRate(referenceStoreRate);
                 break;
         }
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.TABLES)) // Get tables
-                    TransferBleData.readTables();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    case "7A": // Get the frequency table number
-                        downloadTable(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            if (type == ValueCodes.STORE_RATE_CODE) {
-                Intent intent = new Intent();
-                intent.putExtra(ValueCodes.VALUE, storeRate);
-                setResult(type, intent);
+            Intent intent = new Intent();
+            if (type == ValueCodes.TABLES_NUMBER_CODE) {
+                int[] tables = new int[tableScanListAdapter.getCountSelected()];
+                for (int i = 0; i < tableScanListAdapter.getCountSelected(); i++)
+                    tables[i] = tableScanListAdapter.getSelected(i);
+                intent.putExtra(ValueCodes.VALUE, tables);
             } else {
-                setResult(ValueCodes.CANCELLED);
+                int value = 0;
+                if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) // Send the mobile scan rate value
+                    value = (int) (Float.parseFloat(value_spinner.getSelectedItem().toString()) * 10);
+                else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
+                    value = Integer.parseInt(value_spinner.getSelectedItem().toString());
+                else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
+                    value = (value_spinner.getSelectedItem().toString().equals("None")) ? 0 :
+                            Integer.parseInt(value_spinner.getSelectedItem().toString().replace("Table ", ""));
+                else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
+                    value = value_spinner.getSelectedItemPosition() + 1;
+                else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
+                    value = Integer.parseInt(value_spinner.getSelectedItem().toString());
+                else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
+                    value = value_spinner.getSelectedItemPosition();
+                else if (type == ValueCodes.STORE_RATE_CODE) {
+                    value = storeRate;
+                }
+                intent.putExtra(ValueCodes.VALUE, value);
             }
+            setResult(type, intent);
             finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.TABLES))
+            TransferBleData.readTables();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        super.downloadData(data);
+        if (Converters.getHexValue(data[0]).equals("7A")) { // Get frequency table number
+            if (type == ValueCodes.TABLES_NUMBER_CODE) {
+                ArrayList<Integer> tables = new ArrayList<>();
+                int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);
+                if (table != 0 && table <= 12)
+                    tables.add(table);
+                table = getIntent().getIntExtra(ValueCodes.SECOND_TABLE_NUMBER, 0);
+                if (table != 0 && table <= 12)
+                    tables.add(table);
+                table = getIntent().getIntExtra(ValueCodes.THIRD_TABLE_NUMBER, 0);
+                if (table != 0 && table <= 12)
+                    tables.add(table);
+                option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
+                tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
+                tables_merge_listView.setAdapter(tableScanListAdapter);
+            } else {
+                int table = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                List<String> tables = new ArrayList<>();
+                int position = 0;
+                for (int i = 1; i <= 12; i++) {
+                    if (data[i] > 0) {
+                        tables.add("Table " + i);
+                        if (table == i) position = tables.size() - 1;
+                    }
+                }
+                if (tables.isEmpty())
+                    tables.add("None");
+                ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
+                tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                value_spinner.setAdapter(tablesAdapter);
+                value_spinner.setSelection(position);
+            }
+        }
     }
 
     private void setVisibility(String value) {
@@ -297,7 +289,7 @@ public class ValueDefaultsActivity extends BaseActivity {
                 merge_tables_linearLayout.setVisibility(View.VISIBLE);
                 store_rate_linearLayout.setVisibility(View.GONE);
                 set_value_linearLayout.setVisibility(View.GONE);
-                merge_tables_button.setText(R.string.lb_save_changes);
+                merge_tables_button.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.tables_scan);
                 break;
             default:
@@ -307,41 +299,7 @@ public class ValueDefaultsActivity extends BaseActivity {
         }
     }
 
-    private void downloadTable(byte[] data) {
-        if (type == ValueCodes.TABLES_NUMBER_CODE) {
-            ArrayList<Integer> tables = new ArrayList<>();
-            int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);
-            if (table != 0 && table <= 12)
-                tables.add(table);
-            table = getIntent().getIntExtra(ValueCodes.SECOND_TABLE_NUMBER, 0);
-            if (table != 0 && table <= 12)
-                tables.add(table);
-            table = getIntent().getIntExtra(ValueCodes.THIRD_TABLE_NUMBER, 0);
-            if (table != 0 && table <= 12)
-                tables.add(table);
-            option_tables_textView.setText(tables.size() + " Selected Tables (3 Max)");
-            tableScanListAdapter = new TableScanListAdapter(this, data, tables, option_tables_textView, merge_tables_button);
-            tables_merge_listView.setAdapter(tableScanListAdapter);
-        } else {
-            int table = getIntent().getIntExtra(ValueCodes.VALUE, 0);
-            List<String> tables = new ArrayList<>();
-            int position = 0;
-            for (int i = 1; i <= 12; i++) {
-                if (data[i] > 0) {
-                    tables.add("Table " + i);
-                    if (table == i) position = tables.size() - 1;
-                }
-            }
-            if (tables.isEmpty())
-                tables.add("None");
-            ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
-            tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            value_spinner.setAdapter(tablesAdapter);
-            value_spinner.setSelection(position);
-        }
-    }
-
-    private void downloadScanRate(int scanRate) {
+    private void setScanRate(int scanRate) {
         if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) { // Mobile scan rate
             ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(this, R.array.scanRateAerial, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -368,7 +326,7 @@ public class ValueDefaultsActivity extends BaseActivity {
         }
     }
 
-    private void downloadAntennas(int antenna) {
+    private void setAntennas(int antenna) {
         ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(this, R.array.antennas, android.R.layout.simple_spinner_item);
         antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(antennasAdapter);
@@ -379,7 +337,7 @@ public class ValueDefaultsActivity extends BaseActivity {
             value_spinner.setSelection(0);
     }
 
-    private void downloadTimeout(int timeout) {
+    private void setTimeout(int timeout) {
         ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(timeoutAdapter);
@@ -390,7 +348,7 @@ public class ValueDefaultsActivity extends BaseActivity {
             value_spinner.setSelection(0);
     }
 
-    private void downloadStoreRate(int storeRate) {
+    private void setStoreRate(int storeRate) {
         switch (storeRate) {
             case 0:
                 continuous_store_imageView.setVisibility(View.VISIBLE);
@@ -414,7 +372,7 @@ public class ValueDefaultsActivity extends BaseActivity {
         this.storeRate = storeRate;
     }
 
-    private void downloadReferenceFrequencyStoreRate(int storeRate) {
+    private void setReferenceFrequencyStoreRate(int storeRate) {
         ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(this, R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
         storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         value_spinner.setAdapter(storeRateAdapter);

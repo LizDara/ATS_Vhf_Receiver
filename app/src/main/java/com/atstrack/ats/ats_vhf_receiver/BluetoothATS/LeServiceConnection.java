@@ -8,15 +8,29 @@ import android.util.Log;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 
 public class LeServiceConnection {
+    private final String TAG = LeServiceConnection.class.getSimpleName();
     private static LeServiceConnection leServiceConnection;
 
     private BluetoothLeService bluetoothLeService;
-    private boolean connected;
-    private ServiceConnection serviceConnection;
+    private final ServiceConnection serviceConnection = new ServiceConnection() { // Code to manage Service lifecycle.
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            bluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            if (bluetoothLeService.initialize()) {
+                ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+                // Automatically connects to the device upon successful start-up initialization.
+                boolean connected = bluetoothLeService.connect(receiverInformation.getDeviceAddress());
+                Log.i(TAG, "Connect to " + receiverInformation.getDeviceAddress() + ": " + connected);
+            }
+        }
 
-    private LeServiceConnection() {
-        connected = false;
-    }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bluetoothLeService = null;
+        }
+    };
+
+    private LeServiceConnection() {}
 
     public static LeServiceConnection getInstance() {
         if (leServiceConnection == null)
@@ -25,8 +39,6 @@ public class LeServiceConnection {
     }
 
     public ServiceConnection getServiceConnection() {
-        if (serviceConnection == null)
-            initialize();
         return serviceConnection;
     }
 
@@ -34,41 +46,14 @@ public class LeServiceConnection {
         return bluetoothLeService;
     }
 
-    public boolean isConnected() {
-        return connected;
-    }
-
-    private void initialize() {
-        serviceConnection = new ServiceConnection() { // Code to manage Service lifecycle.
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder service) {
-                bluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-                if (bluetoothLeService.initialize()) {
-                    Log.i("LESERVICECONNECTION", "SERVICE INITIALIZED");
-                    ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-                    // Automatically connects to the device upon successful start-up initialization.
-                    connected = bluetoothLeService.connect(receiverInformation.getDeviceAddress());
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-                connected = false;
-                bluetoothLeService = null;
-                Log.i("LE SERVICE", "DISCONNECTED");
-            }
-        };
-    }
 
     public boolean existConnection() {
         return serviceConnection != null && bluetoothLeService != null;
     }
 
     public void close() {
-        serviceConnection = null;
         bluetoothLeService.close();
         bluetoothLeService = null;
-        connected = false;
         Log.i("LE SERVICE", "CLOSE SERVICE CONNECTION");
     }
 }

@@ -2,7 +2,6 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,13 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Models.Data;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.api.client.util.IOUtils;
 
@@ -102,38 +98,41 @@ public class RawDataActivity extends BaseActivity {
         file_source_linearLayout.setVisibility(View.GONE);
         converting_raw_linearLayout.setVisibility(View.VISIBLE);
         converting_raw_progressBar.setProgress(0);
-        try {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(rawFile));
-            byte[] rawData = new byte[(int) rawFile.length()];
-            bufferedInputStream.read(rawData, 0, rawData.length);
-            bufferedInputStream.close();
+        new Thread(() -> {
+            try {
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(rawFile));
+                byte[] rawData = new byte[(int) rawFile.length()];
+                bufferedInputStream.read(rawData, 0, rawData.length);
+                bufferedInputStream.close();
+                updateProgress(20);
 
-            converting_raw_progressBar.setProgress(20);
-            SharedPreferences sharedPreferences = getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
-            int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
-            String processData = Converters.getPackageProcessed(rawData, baseFrequency);
-            byte[] data = Converters.convertToUTF8(processData);
-            ArrayList<Snapshots> snapshotArray = new ArrayList<>();
-            Snapshots processedData = new Snapshots(data.length);
-            processedData.processSnapshot(data);
-            snapshotArray.add(processedData);
-            converting_raw_progressBar.setProgress(80);
+                ArrayList<byte[]> rawList = new ArrayList<>();
+                rawList.add(rawData);
+                String processData = Converters.getPackageProcessed(rawList, converting_raw_progressBar, this, true);
+                byte[] data = Converters.convertToUTF8(processData);
 
-            //File root = externalStorageVolumes[1]; //set the directory path
-            File root = new File(uri.getPath().split(":")[0].replace("document", "storage"), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
-            String fileName = snapshotArray.get(0).getFileName();
-            boolean result = Converters.printSnapshotFiles(root, snapshotArray);
-            if (result) {
-                converting_raw_progressBar.setProgress(100);
-                converting_raw_linearLayout.setVisibility(View.GONE);
-                file_converted_linearLayout.setVisibility(View.VISIBLE);
-                new_file_name_textView.setText("File saved as " + fileName);
+                Data processedData = new Data(ValueCodes.PROCESSED_FILE);
+                processedData.packets.add(data);
+                ArrayList<Data> dataList = new ArrayList<>();
+                dataList.add(processedData);
 
-                Message.showMessage(this, 4);
+                File root = new File(uri.getPath().split(":")[0].replace("document", "storage"), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+                String fileName = dataList.get(0).fileName;
+                boolean result = Converters.printDataFiles(root, dataList);
+
+                if (result) {
+                    runOnUiThread(() -> {
+                        converting_raw_progressBar.setProgress(100);
+                        converting_raw_linearLayout.setVisibility(View.GONE);
+                        file_converted_linearLayout.setVisibility(View.VISIBLE);
+                        new_file_name_textView.setText("File saved as " + fileName);
+                        Message.showMessage(this, 4);
+                    });
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     @OnClick(R.id.cancel_conversion_button)
@@ -148,7 +147,6 @@ public class RawDataActivity extends BaseActivity {
         title = getString(R.string.convert_raw_data);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
         boolean sdCardInserted = externalStorageVolumes.length > 1;
         sd_card_raw_imageView.setBackgroundResource(sdCardInserted ? R.drawable.ic_sd_card : R.drawable.ic_sd_card_alert);
@@ -159,30 +157,6 @@ public class RawDataActivity extends BaseActivity {
 
         convert_data_button.setAlpha((float) 0.6);
         convert_data_button.setEnabled(false);
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                TransferBleData.notificationLog();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override
@@ -197,7 +171,7 @@ public class RawDataActivity extends BaseActivity {
                         if (cursor != null && cursor.moveToFirst())
                             readFile(uri);
                     } catch (Exception ex) {
-                        Log.i(TAG, "Cursor exception: " + ex);
+                        Log.e(TAG, "Cursor exception: " + ex);
                     }
                 } else if (uriString.startsWith("file://")) {
                     readFile(uri);
@@ -264,5 +238,9 @@ public class RawDataActivity extends BaseActivity {
     private boolean isExternalStorageReadable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
+    }
+
+    private void updateProgress(int value) {
+        runOnUiThread(() -> converting_raw_progressBar.setProgress(value));
     }
 }

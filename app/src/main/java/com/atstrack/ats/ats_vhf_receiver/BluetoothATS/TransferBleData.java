@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 
 import android.content.IntentFilter;
-import android.util.Log;
 
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsUuids;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -20,7 +19,7 @@ public class TransferBleData {
     }
 
     public static boolean readBoardState() {
-        return LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        return LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_BOARD_STATE);
     }
 
@@ -28,8 +27,7 @@ public class TransferBleData {
      * Enable notification for receive the data.
      */
     public static void notificationLog() {
-        Log.i("TRANSFER-BLE", "Notification Log");
-        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(
+        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotification(
                 AtsUuids.UUID_SERVICE_SCREEN, AtsUuids.UUID_CHARACTERISTIC_SEND_LOG, true);
     }
 
@@ -44,16 +42,16 @@ public class TransferBleData {
     public static void readTables() {
         UUID service = AtsUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(service, characteristic);
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(service, characteristic);
     }
 
     public static boolean writeStartScan(String type, byte[] data) {
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
-            case ValueCodes.MOBILE_DEFAULTS:
+            case ValueCodes.MOBILE:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_AERIAL;
                 break;
-            case ValueCodes.STATIONARY_DEFAULTS:
+            case ValueCodes.STATIONARY:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
                 break;
         }
@@ -65,10 +63,10 @@ public class TransferBleData {
         byte[] data = new byte[] {(byte) 0x87};
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
-            case ValueCodes.MOBILE_DEFAULTS:
+            case ValueCodes.MOBILE:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_AERIAL;
                 break;
-            case ValueCodes.STATIONARY_DEFAULTS:
+            case ValueCodes.STATIONARY:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
                 break;
         }
@@ -125,7 +123,7 @@ public class TransferBleData {
      */
     public static void readDefaults(boolean isMobile) {
         UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_AERIAL : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_SCAN, characteristic);
     }
 
@@ -133,7 +131,7 @@ public class TransferBleData {
      * Read the table number to get its frequencies.
      */
     public static void readFrequencies(int number) {
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_STORED_DATA, getTableCharacteristic(number));
     }
 
@@ -198,7 +196,7 @@ public class TransferBleData {
      * Requests a read for detection filter data.
      */
     public static void readDetectionFilter() {
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_TX_TYPE);
     }
 
@@ -206,28 +204,28 @@ public class TransferBleData {
      * Requests a read for get BLE device data.
      */
     public static void readDiagnostic() {
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DIAG_INFO);
     }
 
     public static void readDataInfo() {
-        boolean result = LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        boolean result = LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DATA_INFO);
     }
 
     /**
      * Requests a download data for the user.
      */
-    public static void downloadResponse() {
-        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(
-                AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, true);
+    public static void downloadResponse(boolean enabled) {
+        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotification(
+                AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, enabled);
     }
 
     /**
      * Requests a read for get BLE device data before download data.
      */
     public static void readPageNumber() {
-        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristicDiagnostic(
+        LeServiceConnection.getInstance().getBluetoothLeService().readCharacteristic(
                 AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA);
     }
 
@@ -239,9 +237,9 @@ public class TransferBleData {
     /**
      * Enable notification for receive bluetooth tags.
      */
-    public static void receiveTags() {
-        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotificationRead(
-                AtsUuids.UUID_SERVICE_TAG, AtsUuids.UUID_CHARACTERISTIC_TAG, true);
+    public static void receiveTags(boolean enabled) {
+        LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotification(
+                AtsUuids.UUID_SERVICE_TAG, AtsUuids.UUID_CHARACTERISTIC_TAG, enabled);
     }
 
     public static boolean writeOTA(byte[] data) {

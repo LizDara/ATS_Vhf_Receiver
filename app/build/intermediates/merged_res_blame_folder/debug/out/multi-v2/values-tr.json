@@ -1,25 +1,8 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-tr\\values-tr.xml",
+            "outputFile": "D:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-tr\\values-tr.xml",
             "map": [
-                {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\9c84058cc8145496fa61d3ab15374b21\\transformed\\jetified-play-services-base-18.0.1\\res\\values-tr\\values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "193,299,450,582,683,826,952,1075,1177,1345,1448,1601,1731,1872,2035,2093,2153",
-                        "endColumns": "105,150,131,100,142,125,122,101,167,102,152,129,140,162,57,59,75",
-                        "endOffsets": "298,449,581,682,825,951,1074,1176,1344,1447,1600,1730,1871,2034,2092,2152,2228"
-                    },
-                    "to": {
-                        "startLines": "29,30,31,32,33,34,35,36,38,39,40,41,42,43,44,45,46",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "2797,2907,3062,3198,3303,3450,3580,3707,3960,4132,4239,4396,4530,4675,4842,4904,4968",
-                        "endColumns": "109,154,135,104,146,129,126,105,171,106,156,133,144,166,61,63,79",
-                        "endOffsets": "2902,3057,3193,3298,3445,3575,3702,3808,4127,4234,4391,4525,4670,4837,4899,4963,5043"
-                    }
-                },
                 {
                     "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\b9e4376e452ce4f1a2bbb1fc4b534124\\transformed\\core-1.7.0\\res\\values-tr\\values-tr.xml",
                     "from": {
@@ -69,6 +52,23 @@
                         "startOffsets": "3813",
                         "endColumns": "146",
                         "endOffsets": "3955"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\07dd62e5c6684f4761e080785c8f95da\\transformed\\jetified-play-services-base-18.1.0\\res\\values-tr\\values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "193,299,450,582,683,826,952,1075,1177,1345,1448,1601,1731,1872,2035,2093,2153",
+                        "endColumns": "105,150,131,100,142,125,122,101,167,102,152,129,140,162,57,59,75",
+                        "endOffsets": "298,449,581,682,825,951,1074,1176,1344,1447,1600,1730,1871,2034,2092,2152,2228"
+                    },
+                    "to": {
+                        "startLines": "29,30,31,32,33,34,35,36,38,39,40,41,42,43,44,45,46",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "2797,2907,3062,3198,3303,3450,3580,3707,3960,4132,4239,4396,4530,4675,4842,4904,4968",
+                        "endColumns": "109,154,135,104,146,129,126,105,171,106,156,133,144,166,61,63,79",
+                        "endOffsets": "2902,3057,3193,3298,3445,3575,3702,3808,4127,4234,4391,4525,4670,4837,4899,4963,5043"
                     }
                 }
             ]

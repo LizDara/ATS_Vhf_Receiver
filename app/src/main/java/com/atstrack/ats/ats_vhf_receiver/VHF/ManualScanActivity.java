@@ -16,7 +16,6 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,14 +25,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Objects;
@@ -257,7 +253,6 @@ public class ManualScanActivity extends ScanBaseActivity {
         title = getString(R.string.lb_start_scanning);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         enableGpsScanning = false;
 
@@ -277,39 +272,6 @@ public class ManualScanActivity extends ScanBaseActivity {
         }
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                parameter = "";
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                if (parameter.equals(ValueCodes.CONTINUE_LOG))
-                    setNotificationLogScanning();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                switch (Converters.getHexValue(packet[0])) {
-                    case "88": // Battery
-                        setBatteryPercent(packet);
-                        break;
-                    case "56": // Sd Card
-                        setSdCardStatus(packet);
-                        break;
-                    default: // Receives the data
-                        setCurrentLog(packet);
-                        break;
-                }
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
@@ -324,6 +286,27 @@ public class ManualScanActivity extends ScanBaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void updateVisibility(int visibility) {
+        super.updateVisibility(visibility);
+        audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+        view_detection_manual_textView.setVisibility(visibility);
+    }
+
+    @Override
+    protected void discoverCharacteristic() {
+        if (parameter.equals(ValueCodes.CONTINUE_LOG))
+            setNotificationLogScanning();
+    }
+
+    @Override
+    protected void downloadData(byte[] data) {
+        if (Converters.getHexValue(data[0]).equals("44")) { // Fatal scan error
+        } else { // Get log scan
+            setCurrentLog(data);
+        }
     }
 
     private void setVisibility(String value) {
@@ -345,13 +328,6 @@ public class ManualScanActivity extends ScanBaseActivity {
                 animationDrawable.start();
                 break;
         }
-    }
-
-    @Override
-    protected void updateVisibility(int visibility) {
-        super.updateVisibility(visibility);
-        audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
-        view_detection_manual_textView.setVisibility(visibility);
     }
 
     private void setGpsOff() {
@@ -381,7 +357,7 @@ public class ManualScanActivity extends ScanBaseActivity {
     }
 
     /**
-     * With the received packet, gets the data of scanning.
+     * With the received packet, get the data of scanning.
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {

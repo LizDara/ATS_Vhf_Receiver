@@ -12,11 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.io.IOException;
@@ -157,43 +154,34 @@ public class FirmwareUpdateActivity extends BaseActivity {
         deviceCategory = ValueCodes.ACOUSTIC;
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         latestVersion = getIntent().getStringExtra(ValueCodes.VERSION);
         idFile = getIntent().getStringExtra(ValueCodes.VALUE);
         version_name_textView.setText("Firmware Version " + latestVersion);
         setVisibility("version");
     }
 
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                unbindService(leServiceConnection.getServiceConnection());
-                Message.showDisconnectionMessage(mContext);
-            }
+    @Override
+    protected void gattDisconnected() {
+        unbindService(leServiceConnection.getServiceConnection());
+        super.gattDisconnected();
+    }
 
-            @Override
-            public void onGattDiscovered() {
-                switch (parameter) {
-                    case ValueCodes.MTU:
-                        requestMTU();
-                        break;
-                    case ValueCodes.UPDATE:
-                        otaUpload();
-                        break;
-                    case ValueCodes.OTA_END:
-                        rebootTargetDevice();
-                        break;
-                    case ValueCodes.FINISH:
-                        setVisibility("completed");
-                        break;
-                }
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {}
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
+    @Override
+    protected void discoverCharacteristic() {
+        switch (parameter) {
+            case ValueCodes.MTU:
+                requestMTU();
+                break;
+            case ValueCodes.UPDATE:
+                otaUpload();
+                break;
+            case ValueCodes.OTA_END:
+                rebootTargetDevice();
+                break;
+            case ValueCodes.FINISH:
+                setVisibility("completed");
+                break;
+        }
     }
 
     private void setVisibility(String value) {

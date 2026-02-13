@@ -4,34 +4,26 @@ import butterknife.OnClick;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class EditDefaultsActivity extends BaseActivity {
 
-    private final static String TAG = EditDefaultsActivity.class.getSimpleName();
-
     @OnClick(R.id.aerial_defaults_button)
     public void onClickAerialDefaults(View v) {
         Intent intent = new Intent(this, MobileDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE_DEFAULTS);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE);
         startActivity(intent);
     }
 
     @OnClick(R.id.stationary_defaults_button)
     public void onClickStationaryDefaults(View v) {
         Intent intent = new Intent(this, StationaryDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY);
         startActivity(intent);
     }
 
@@ -42,32 +34,6 @@ public class EditDefaultsActivity extends BaseActivity {
         deviceCategory = ValueCodes.VHF;
         title = getString(R.string.edit_receiver_defaults);
         super.onCreate(savedInstanceState);
-
-        initializeCallback();
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                TransferBleData.notificationLog();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override

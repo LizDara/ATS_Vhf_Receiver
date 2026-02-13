@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -19,12 +18,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
@@ -47,8 +41,6 @@ public class EnterFrequencyActivity extends BaseActivity {
     Button save_changes_button;
     @BindView(R.id.one_button)
     Button one_button;
-
-    private final static String TAG = EnterFrequencyActivity.class.getSimpleName();
 
     private int position;
     private int baseFrequency;
@@ -120,7 +112,6 @@ public class EnterFrequencyActivity extends BaseActivity {
         title = getIntent().getStringExtra(ValueCodes.TITLE);
         super.onCreate(savedInstanceState);
 
-        initializeCallback();
         baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0);
         int range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
@@ -131,30 +122,6 @@ public class EnterFrequencyActivity extends BaseActivity {
         if (position == -1)
             save_changes_button.setText(R.string.lb_add_frequency);
         createNumberButtons(range);
-    }
-
-    private void initializeCallback() {
-        receiverCallback = new ReceiverCallback() {
-            @Override
-            public void onGattDisconnected() {
-                Message.showDisconnectionMessage(mContext);
-            }
-
-            @Override
-            public void onGattDiscovered() {
-                TransferBleData.notificationLog();
-            }
-
-            @Override
-            public void onGattDataAvailable(byte[] packet) {
-                Log.i(TAG, Converters.getHexValue(packet));
-                if (Converters.getHexValue(packet[0]).equals("88")) // Battery
-                    setBatteryPercent(packet);
-                else if (Converters.getHexValue(packet[0]).equals("56")) // Sd Card
-                    setSdCardStatus(packet);
-            }
-        };
-        gattUpdateReceiver = new GattUpdateReceiver(receiverCallback);
     }
 
     @Override

@@ -14,7 +14,7 @@
         style="@style/body_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lb_set_value"
+        android:text="@string/lb_select_value"
         android:textColor="@color/limed_spruce" />
 
     <Spinner
@@ -23,18 +23,5 @@
         android:layout_height="@dimen/input_height"
         android:layout_marginVertical="8sp"
         android:background="@color/athens_gray" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        tools:ignore="NestedWeights" />
-
-    <Button
-        android:id="@+id/save_changes_input_value_button"
-        style="@style/button_primary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/lb_save_changes" />
 
 </LinearLayout>

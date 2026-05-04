@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -42,19 +43,18 @@ public class ScanningActivity extends BaseActivity {
         } else {
             Intent intent = new Intent(this, ManualScanActivity.class);
             startActivity(intent);
-            parameter = ValueCodes.DETECTION_TYPE;
         }
     }
 
     @OnClick(R.id.start_aerial_scan_button)
     public void onClickStartAerialScan(View v) {
-        parameter = ValueCodes.MOBILE;
+        parameter = ValueCodes.MOBILE_DEFAULTS_COMMAND;
         TransferBleData.readDefaults(true);
     }
 
     @OnClick(R.id.start_stationary_scan_button)
     public void onClickStartStationaryScan(View v) {
-        parameter = ValueCodes.STATIONARY;
+        parameter = ValueCodes.STATIONARY_DEFAULTS_COMMAND;
         TransferBleData.readDefaults(false);
     }
 
@@ -70,7 +70,7 @@ public class ScanningActivity extends BaseActivity {
             intent.putExtra(ValueCodes.VALUE, tablesData);
             startActivity(intent);
         } else if (go_button.getText().toString().equals(getString(R.string.lb_go_settings))) {
-            if (parameter.equals(ValueCodes.MOBILE)) {
+            if (parameter == ValueCodes.MOBILE_DEFAULTS_COMMAND) {
                 intent = new Intent(this, MobileDefaultsActivity.class);
             } else {
                 intent = new Intent(this, StationaryDefaultsActivity.class);
@@ -88,7 +88,7 @@ public class ScanningActivity extends BaseActivity {
         title = getString(R.string.lb_start_scanning);
         super.onCreate(savedInstanceState);
 
-        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
+        parameter = getIntent().getByteExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
         isDetectionFilterEmpty = false;
         areTablesEmpty = false;
         isDefaultEmpty = false;
@@ -102,10 +102,10 @@ public class ScanningActivity extends BaseActivity {
         menu_scan_linearLayout.setVisibility(View.VISIBLE);
         warning_message_linearLayout.setVisibility(View.GONE);
         if (isDetectionFilterEmpty) {
-            parameter = ValueCodes.DETECTION_TYPE;
+            parameter = ValueCodes.DETECTION_FILTER_COMMAND;
             TransferBleData.readDetectionFilter();
         } else if (areTablesEmpty) {
-            parameter = ValueCodes.TABLES;
+            parameter = ValueCodes.TABLES_COMMAND;
             TransferBleData.readTables();
         }
     }
@@ -128,24 +128,26 @@ public class ScanningActivity extends BaseActivity {
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.DETECTION_TYPE))
+        if (parameter == ValueCodes.DETECTION_FILTER_COMMAND)
             TransferBleData.readDetectionFilter();
+        else if (parameter == ValueCodes.TABLES_COMMAND)
+            TransferBleData.readTables();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        switch (Converters.getHexValue(data[0])) {
-            case "67": // Get tx type
+        switch (data[0]) {
+            case ValueCodes.DETECTION_FILTER_COMMAND:
                 downloadDetectionType(data);
                 break;
-            case "7A": // Get the number of frequencies from each table
+            case ValueCodes.TABLES_COMMAND:
                 downloadTables(data);
                 break;
-            case "6D": // Get mobile defaults
+            case ValueCodes.MOBILE_DEFAULTS_COMMAND:
                 downloadMobileDefaults(data);
                 break;
-            case "6C": // Get stationary defaults
+            case ValueCodes.STATIONARY_DEFAULTS_COMMAND:
                 downloadStationaryDefaults(data);
                 break;
         }
@@ -154,7 +156,7 @@ public class ScanningActivity extends BaseActivity {
     private void downloadDetectionType(byte[] data) {
         detectionData = data;
         isDetectionFilterEmpty = false;
-        if (!Converters.getHexValue(data[1]).equals("09")) {
+        if (data[1] != DetectionFilter.CODED) {
             isDetectionFilterEmpty = data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 0
                     && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0;
         }

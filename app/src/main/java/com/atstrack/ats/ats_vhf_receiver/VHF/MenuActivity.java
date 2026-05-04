@@ -17,11 +17,11 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
-import com.atstrack.ats.ats_vhf_receiver.Fragments.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Services.FirmwareServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.SelectDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
@@ -44,6 +44,7 @@ public class MenuActivity extends BaseActivity {
 
     private byte detectionType;
     private DialogFragment detectionFilter;
+    private FirmwareServiceHelper firmwareServiceHelper;
 
     private void setDetectionFilter() {
         byte[] b = new byte[11];
@@ -51,9 +52,11 @@ public class MenuActivity extends BaseActivity {
         b[1] = detectionType;
         boolean result = TransferBleData.writeDetectionFilter(b);
         Log.i(TAG, Converters.getHexValue(b));
-        if (!result) {
-            detectionType = 0;
-            detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);
+        if (result) {
+            firmwareServiceHelper.updateAvailable(false);
+        } else {
+            detectionType = ValueCodes.NONE;
+            detectionFilter.show(getSupportFragmentManager(), SelectDetectionFilter.TAG);
         }
     }
 
@@ -65,7 +68,7 @@ public class MenuActivity extends BaseActivity {
     @OnClick(R.id.start_scanning_button)
     public void onClickStartScanning(View v) {
         Intent intent = new Intent(this, ScanningActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_TYPE);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_FILTER_COMMAND);
         startActivity(intent);
     }
 
@@ -99,22 +102,14 @@ public class MenuActivity extends BaseActivity {
         showToolbar = false;
         super.onCreate(savedInstanceState);
 
+        firmwareServiceHelper = new FirmwareServiceHelper(this);
         menu_imageView.setVisibility(View.GONE);
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         boolean firstTime = getIntent().getBooleanExtra(ValueCodes.FIRST_TIME, false);
-        if (firstTime) { // Check the detection type
-            switch (receiverInformation.getDeviceName().substring(15, 16)) {
-                case "F":
-                    detectionType = 0x08;
-                    break;
-                case "V":
-                    detectionType = 0x07;
-                    break;
-                case "C":
-                    detectionType = 0x09;
-                    break;
-            }
-            checkDetectionType();
+        if (firstTime) { // Check the detection type and firmware update
+            checkDetectionType(receiverInformation.getDeviceName().substring(15, 16));
+            if (detectionType != ValueCodes.NONE)
+                firmwareServiceHelper.updateAvailable(false);
         }
         vhf_name_textView.setText("Receiver " + receiverInformation.getSerialNumber());
         setBattery(receiverInformation);
@@ -142,18 +137,29 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void downloadData(byte[] data) {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        if (Converters.getHexValue(data[0]).equals("56")) { // Sd Card
-            receiverInformation.changeSDCard(Converters.getHexValue(data[1]).equals("80"));
+        if (data[0] == ValueCodes.SD_CARD_COMMAND) {
+            receiverInformation.changeSDCard(data[1] == (byte) 0x80);
             setSdCard(receiverInformation);
-        } else if (Converters.getHexValue(data[0]).equals("88")) { // Battery
-            receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(data[1])));
+        } else if (data[0] == ValueCodes.BATTERY_COMMAND) {
+            receiverInformation.changeDeviceBattery(Byte.toUnsignedInt(data[1]));
             setBattery(receiverInformation);
         }
     }
 
-    private void checkDetectionType() {
-        if (detectionType == 0) {
-            detectionFilter = DetectionFilter.newInstance();
+    private void checkDetectionType(String detection) {
+        switch (detection) {
+            case "F":
+                detectionType = DetectionFilter.FIXED;
+                break;
+            case "V":
+                detectionType = DetectionFilter.VARIABLE;
+                break;
+            case "C":
+                detectionType = DetectionFilter.CODED;
+                break;
+        }
+        if (detectionType == ValueCodes.NONE) {
+            detectionFilter = SelectDetectionFilter.newInstance();
 
             getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
                 @Override
@@ -162,7 +168,7 @@ public class MenuActivity extends BaseActivity {
                     setDetectionFilter();
                 }
             });
-            detectionFilter.show(getSupportFragmentManager(), DetectionFilter.TAG);
+            detectionFilter.show(getSupportFragmentManager(), SelectDetectionFilter.TAG);
         }
     }
 

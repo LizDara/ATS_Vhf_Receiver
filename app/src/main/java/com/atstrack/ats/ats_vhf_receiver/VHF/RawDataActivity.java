@@ -24,7 +24,7 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Models.Data;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.api.client.util.IOUtils;
 
@@ -121,12 +121,12 @@ public class RawDataActivity extends BaseActivity {
                 boolean result = Converters.printDataFiles(root, dataList);
 
                 if (result) {
+                    updateProgress(100);
                     runOnUiThread(() -> {
-                        converting_raw_progressBar.setProgress(100);
                         converting_raw_linearLayout.setVisibility(View.GONE);
                         file_converted_linearLayout.setVisibility(View.VISIBLE);
                         new_file_name_textView.setText("File saved as " + fileName);
-                        Message.showMessage(this, 4);
+                        Messages.showMessage(this, 4);
                     });
                 }
             } catch (IOException e) {

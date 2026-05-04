@@ -1,6 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -14,12 +13,14 @@ import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -71,24 +72,38 @@ public class StationaryScanActivity extends ScanBaseActivity {
     LinearLayout external_reference_default_linearLayout;
     @BindView(R.id.external_reference_scan_linearLayout)
     LinearLayout external_reference_scan_linearLayout;
+    @BindView(R.id.timeout_next_imageView)
+    ImageView timeout_next_imageView;
+    @BindView(R.id.scan_time_next_imageView)
+    ImageView scan_time_next_imageView;
+    @BindView(R.id.store_rate_next_imageView)
+    ImageView store_rate_next_imageView;
+    @BindView(R.id.scan_tables_next_imageView)
+    ImageView scan_tables_next_imageView;
+    @BindView(R.id.antennas_next_imageView)
+    ImageView antennas_next_imageView;
+    @BindView(R.id.reference_frequency_next_imageView)
+    ImageView reference_frequency_next_imageView;
+    @BindView(R.id.reference_store_rate_next_imageView)
+    ImageView reference_store_rate_next_imageView;
 
     private StationaryDefaults stationaryDefaults;
     private boolean previousScanning;
     private boolean goEditDefault;
 
     private void setStartScan() {
-        byte[] b = setCalendar();
-        b[0] = (byte) 0x83;
+        byte[] b = setCalendar(10);
+        b[0] = ValueCodes.STATIONARY_SCAN_COMMAND;
         b[7] = (byte) stationaryDefaults.firstTableNumber;
         b[8] = (byte) stationaryDefaults.secondTableNumber;
         b[9] = (byte) stationaryDefaults.thirdTableNumber;
-        isScanning = TransferBleData.writeStartScan(ValueCodes.STATIONARY, b);
+        isScanning = TransferBleData.writeStartScan(ValueCodes.STATIONARY_SCAN_COMMAND, b);
         if (isScanning)
             setVisibility("scanning");
     }
 
     private void setStopScan() {
-        boolean result = TransferBleData.writeStopScan(ValueCodes.STATIONARY);
+        boolean result = TransferBleData.writeStopScan(ValueCodes.STATIONARY_SCAN_COMMAND);
         if (result) {
             clear();
             isScanning = false;
@@ -130,16 +145,15 @@ public class StationaryScanActivity extends ScanBaseActivity {
 
         goEditDefault = false;
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
-        if (isScanning) { // The device is already scanning
+        if (isScanning && data != null) { // The device is already scanning
             previousScanning = true;
-            parameter = ValueCodes.CONTINUE_LOG;
+            parameter = ValueCodes.STATIONARY_SCAN_COMMAND;
 
-            int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
-                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
-            int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
-                    + Integer.parseInt(Converters.getDecimalValue(data[8]));
-            int currentAntenna = Integer.parseInt(Converters.getDecimalValue(data[9]));
-            detectionType = getIntent().getByteExtra(ValueCodes.DETECTION_TYPE, (byte) 0);
+            int currentFrequency = (Byte.toUnsignedInt(data[16]) * 256)
+                    + Byte.toUnsignedInt(data[17]) + baseFrequency;
+            int currentIndex = (Byte.toUnsignedInt(data[7]) * 256)
+                    + Byte.toUnsignedInt(data[8]);
+            int currentAntenna = Byte.toUnsignedInt(data[9]);
             frequency_stationary_textView.setText(Converters.getFrequency(currentFrequency));
             index_stationary_textView.setText(String.valueOf(currentIndex));
             current_antenna_stationary_textView.setText((currentAntenna == 0) ? "All" : String.valueOf(currentAntenna));
@@ -150,6 +164,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
             previousScanning = false;
             setVisibility("overview");
         }
+        setNoEditDefaults();
     }
 
     @Override
@@ -157,7 +172,7 @@ public class StationaryScanActivity extends ScanBaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
                 Intent intent = new Intent(this, ScanningActivity.class);
-                intent.putExtra(ValueCodes.PARAMETER, "");
+                intent.putExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
                 startActivity(intent);
                 finish();
             } else {
@@ -178,36 +193,40 @@ public class StationaryScanActivity extends ScanBaseActivity {
     }
 
     @Override
-    protected void updateVisibility(int visibility) {
-        super.updateVisibility(visibility);
-        view_detection_stationary_textView.setVisibility(visibility);
+    protected void updateVisibility() {
+        super.updateVisibility();
+        view_detection_stationary_textView.setVisibility(detectionType == DetectionFilter.CODED ? View.GONE : View.VISIBLE);
     }
 
     @Override
     protected void discoverCharacteristic() {
-        switch (parameter) {
-            case ValueCodes.STATIONARY: // Gets stationary defaults data
-                TransferBleData.readDefaults(false);
-                break;
-            case ValueCodes.CONTINUE_LOG:
-                setNotificationLogScanning();
-                break;
-        }
+        if (parameter == ValueCodes.STATIONARY_SCAN_COMMAND)
+            setNotificationLogScanning();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        switch (Converters.getHexValue(data[0])) {
-            case "6C": // Get stationary defaults data
+        switch (data[0]) {
+            case ValueCodes.STATIONARY_DEFAULTS_COMMAND:
                 downloadStationaryDefault(data);
                 break;
-            case "44": // Fatal Scan Error
+            case ValueCodes.FATAL_SCAN_ERROR_COMMAND:
                 break;
-            default: // Get log scan
+            default:
                 setCurrentLog(data);
                 break;
         }
+    }
+
+    private void setNoEditDefaults() {
+        timeout_next_imageView.setVisibility(View.GONE);
+        scan_time_next_imageView.setVisibility(View.GONE);
+        store_rate_next_imageView.setVisibility(View.GONE);
+        scan_tables_next_imageView.setVisibility(View.GONE);
+        antennas_next_imageView.setVisibility(View.GONE);
+        reference_frequency_next_imageView.setVisibility(View.GONE);
+        reference_store_rate_next_imageView.setVisibility(View.GONE);
     }
 
     private void downloadStationaryDefault(byte[] data) {
@@ -215,11 +234,11 @@ public class StationaryScanActivity extends ScanBaseActivity {
         external_reference_scan_linearLayout.setVisibility(View.VISIBLE);
         stationaryDefaults = new StationaryDefaults(baseFrequency, data);
         String tables = "";
-        if (stationaryDefaults.firstTableNumber != 0)
+        if (stationaryDefaults.firstTableNumber != 0 && stationaryDefaults.firstTableNumber != 255)
             tables += stationaryDefaults.firstTableNumber;
-        if (stationaryDefaults.secondTableNumber != 0)
+        if (stationaryDefaults.secondTableNumber != 0 && stationaryDefaults.secondTableNumber != 255)
             tables += ", " + stationaryDefaults.secondTableNumber;
-        if (stationaryDefaults.thirdTableNumber != 0)
+        if (stationaryDefaults.thirdTableNumber != 0 && stationaryDefaults.thirdTableNumber != 255)
             tables += ", " + stationaryDefaults.thirdTableNumber;
         frequency_table_number_stationary_textView.setText(tables.isEmpty() ? "None" : tables);
         number_of_antennas_stationary_textView.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
@@ -258,43 +277,40 @@ public class StationaryScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        switch (Converters.getHexValue(data[0])) {
-            case "50":
+        switch (data[0]) {
+            case ValueCodes.SCAN_STATE_COMMAND:
                 scanState(data);
                 break;
-            case "F0":
+            case ValueCodes.SCAN_HEADER_COMMAND:
                 logScanHeader(data);
                 break;
-            case "F1": //Coded
-            case "F2": //Consolidated
+            case ValueCodes.SCAN_FIX_CODED_COMMAND:
+            case ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND:
                 logScanCoded(data);
                 break;
-            case "E1":
-            case "E2":
-            case "EA": //Non Coded
-                int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-                int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-                if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
+            case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
+            case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
+            case ValueCodes.SCAN_DATA_VARIABLE_NON_CODED_COMMAND:
+                int signalStrength = Byte.toUnsignedInt(data[4]);
+                int period = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
+                if (detectionType == DetectionFilter.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
+                else if (detectionType == DetectionFilter.VARIABLE)
                     scanNonCodedVariable(period, signalStrength);
                 break;
         }
     }
 
     private void scanState(byte[] data) {
-        int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        int maxIndex = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
         max_index_stationary_textView.setText("Table Index (" + maxIndex + " Total)");
         detectionType = data[18];
-        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        scanDetailListAdapter = new ScanDetailListAdapter(this, detectionType == DetectionFilter.CODED);
         item_recyclerView.setAdapter(scanDetailListAdapter);
         item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
-        updateVisibility(visibility);
-
-        if (!Converters.getHexValue(detectionType).equals("09")) {
+        updateVisibility();
+        if (detectionType != DetectionFilter.CODED)
             initializeDetectionFilter(data);
-        }
     }
 
     /**
@@ -303,12 +319,12 @@ public class StationaryScanActivity extends ScanBaseActivity {
      */
     private void logScanHeader(byte[] data) {
         clear();
-        int frequency = ((Integer.parseInt(Converters.getDecimalValue(data[1])) & 63) * 256) +
-                Integer.parseInt(Converters.getDecimalValue(data[2])) + baseFrequency;
-        int index = (((Integer.parseInt(Converters.getDecimalValue(data[1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(data[3]));
-        int antennas = Integer.parseInt(Converters.getDecimalValue(data[1])) >> 7;
+        int frequency = ((Byte.toUnsignedInt(data[1]) & 63) * 256) +
+                Byte.toUnsignedInt(data[2]) + baseFrequency;
+        int index = (((Byte.toUnsignedInt(data[1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(data[3]);
+        int antennas = Byte.toUnsignedInt(data[1]) >> 7;
         if (antennas == 0) {
-            antennas = (Integer.parseInt(Converters.getDecimalValue(data[7])) >> 6) + 1;
+            antennas = (Byte.toUnsignedInt(data[7]) >> 6) + 1;
             current_antenna_stationary_textView.setText(String.valueOf(antennas));
         } else {
             current_antenna_stationary_textView.setText(R.string.lb_all);
@@ -318,9 +334,9 @@ public class StationaryScanActivity extends ScanBaseActivity {
     }
 
     private void logScanCoded(byte[] data) {
-        int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int code = Byte.toUnsignedInt(data[3]);
+        int signalStrength = Byte.toUnsignedInt(data[4]);
+        int mortality = Byte.toUnsignedInt(data[5]);
         scanCoded(code, signalStrength, mortality);
     }
 

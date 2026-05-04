@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginVertical="16sp"
     android:layout_marginHorizontal="32sp"
     android:gravity="center"
     android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:id="@+id/gps_imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_gps_off"/>
-
     <TextView
         android:id="@+id/gps_state_textView"
         style="@style/body_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8sp"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
         android:text="@string/lb_off_gps"
-        android:textColor="@color/ebony_clay"/>
+        android:textColor="@color/ebony_clay"
+        app:drawableStartCompat="@drawable/ic_gps_off" />
 
     <Space
         android:layout_width="0dp"

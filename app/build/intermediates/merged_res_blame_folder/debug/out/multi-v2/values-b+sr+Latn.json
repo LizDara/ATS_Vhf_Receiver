@@ -4,7 +4,24 @@
             "outputFile": "D:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-b+sr+Latn\\values-b+sr+Latn.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\0d7818fdd05e4d426579c5611edb47b4\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-b+sr+Latn\\values.xml",
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\47b03e312005225184c49cb9449b1ec2\\transformed\\jetified-play-services-base-18.3.0\\res\\values-b+sr+Latn\\values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "200,303,457,580,686,836,959,1067,1165,1310,1413,1569,1692,1837,1976,2040,2101",
+                        "endColumns": "102,153,122,105,149,122,107,97,144,102,155,122,144,138,63,60,75",
+                        "endOffsets": "302,456,579,685,835,958,1066,1164,1309,1412,1568,1691,1836,1975,2039,2100,2176"
+                    },
+                    "to": {
+                        "startLines": "29,30,31,32,33,34,35,36,38,39,40,41,42,43,44,45,46",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "2836,2943,3101,3228,3338,3492,3619,3731,3963,4112,4219,4379,4506,4655,4798,4866,4931",
+                        "endColumns": "106,157,126,109,153,126,111,101,148,106,159,126,148,142,67,64,79",
+                        "endOffsets": "2938,3096,3223,3333,3487,3614,3726,3828,4107,4214,4374,4501,4650,4793,4861,4926,5006"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\9c447350fecc7ae5dfbfa0b53932fc50\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-b+sr+Latn\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -21,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\b9e4376e452ce4f1a2bbb1fc4b534124\\transformed\\core-1.7.0\\res\\values-b+sr+Latn\\values-b+sr+Latn.xml",
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\49e7ac19d247264e5ea3dec22f6d785c\\transformed\\core-1.8.0\\res\\values-b+sr+Latn\\values-b+sr+Latn.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -35,23 +52,6 @@
                         "startOffsets": "5098",
                         "endColumns": "100",
                         "endOffsets": "5194"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\07dd62e5c6684f4761e080785c8f95da\\transformed\\jetified-play-services-base-18.1.0\\res\\values-b+sr+Latn\\values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "200,303,457,580,686,836,959,1067,1165,1310,1413,1569,1692,1837,1976,2040,2101",
-                        "endColumns": "102,153,122,105,149,122,107,97,144,102,155,122,144,138,63,60,75",
-                        "endOffsets": "302,456,579,685,835,958,1066,1164,1309,1412,1568,1691,1836,1975,2039,2100,2176"
-                    },
-                    "to": {
-                        "startLines": "29,30,31,32,33,34,35,36,38,39,40,41,42,43,44,45,46",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "2836,2943,3101,3228,3338,3492,3619,3731,3963,4112,4219,4379,4506,4655,4798,4866,4931",
-                        "endColumns": "106,157,126,109,153,126,111,101,148,106,159,126,148,142,67,64,79",
-                        "endOffsets": "2938,3096,3223,3333,3487,3614,3726,3828,4107,4214,4374,4501,4650,4793,4861,4926,5006"
                     }
                 },
                 {

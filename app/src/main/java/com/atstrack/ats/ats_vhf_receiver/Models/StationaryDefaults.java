@@ -1,6 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.Models;
 
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class StationaryDefaults {
     public int firstTableNumber = 255;
@@ -19,19 +19,18 @@ public class StationaryDefaults {
     public StationaryDefaults() {}
 
     public StationaryDefaults(int baseFrequency, byte[] data) {
-        firstTableNumber = Integer.parseInt(Converters.getDecimalValue(data[9]));
-        secondTableNumber = Integer.parseInt(Converters.getDecimalValue(data[10]));
-        thirdTableNumber = Integer.parseInt(Converters.getDecimalValue(data[11]));
-        scanRate = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        scanTimeout = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        antennaNumber = Integer.parseInt(Converters.getDecimalValue(data[1]));
+        firstTableNumber = Byte.toUnsignedInt(data[9]);
+        secondTableNumber = Byte.toUnsignedInt(data[10]);
+        thirdTableNumber = Byte.toUnsignedInt(data[11]);
+        scanRate = Byte.toUnsignedInt(data[3]);
+        scanTimeout = Byte.toUnsignedInt(data[4]);
+        antennaNumber = Byte.toUnsignedInt(data[1]);
         dataTransferOn = data[2] != 0;
-        storeRate = Integer.parseInt(Converters.getDecimalValue(data[5]));
-        referenceFrequencyOn = (!Converters.getHexValue(data[6]).equals("FF") || !Converters.getHexValue(data[7]).equals("FF"))
-                && (!Converters.getHexValue(data[6]).equals("00") || !Converters.getHexValue(data[7]).equals("00"));
-        referenceFrequency = referenceFrequencyOn ? (Integer.parseInt(Converters.getDecimalValue(data[6])) * 256) +
-                Integer.parseInt(Converters.getDecimalValue(data[7])) + baseFrequency : 0;
-        referenceStoreRate = referenceFrequencyOn ? Integer.parseInt(Converters.getDecimalValue(data[8])) : 0;
+        storeRate = Byte.toUnsignedInt(data[5]);
+        referenceFrequencyOn = (data[6] != ValueCodes.NULL || data[7] != ValueCodes.NULL)
+                && (data[6] != ValueCodes.NONE || data[7] != ValueCodes.NONE);
+        referenceFrequency = referenceFrequencyOn ? (Byte.toUnsignedInt(data[6]) * 256) + Byte.toUnsignedInt(data[7]) + baseFrequency : 0;
+        referenceStoreRate = referenceFrequencyOn ? Byte.toUnsignedInt(data[8]) : 0;
         originalBytes = data;
     }
 }

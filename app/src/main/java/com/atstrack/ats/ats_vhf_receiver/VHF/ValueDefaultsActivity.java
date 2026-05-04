@@ -19,7 +19,6 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.TableScanListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
@@ -163,11 +162,11 @@ public class ValueDefaultsActivity extends BaseActivity {
                 break;
             case ValueCodes.TABLE_NUMBER_CODE: // Get the frequency table number
                 setVisibility("");
-                parameter = ValueCodes.TABLES;
+                parameter = ValueCodes.TABLES_COMMAND;
                 break;
             case ValueCodes.TABLES_NUMBER_CODE: // Get the frequency tables number
                 setVisibility("tables");
-                parameter = ValueCodes.TABLES;
+                parameter = ValueCodes.TABLES_COMMAND;
                 break;
             case ValueCodes.SCAN_RATE_MOBILE_CODE: // Get the scan rate mobile
                 setVisibility("");
@@ -235,14 +234,14 @@ public class ValueDefaultsActivity extends BaseActivity {
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.TABLES))
+        if (parameter == ValueCodes.TABLES_COMMAND)
             TransferBleData.readTables();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        if (Converters.getHexValue(data[0]).equals("7A")) { // Get frequency table number
+        if (data[0] == ValueCodes.TABLES_COMMAND) { // Get frequency table number
             if (type == ValueCodes.TABLES_NUMBER_CODE) {
                 ArrayList<Integer> tables = new ArrayList<>();
                 int table = getIntent().getIntExtra(ValueCodes.FIRST_TABLE_NUMBER, 0);

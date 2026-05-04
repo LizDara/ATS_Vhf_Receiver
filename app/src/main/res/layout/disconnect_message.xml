@@ -32,4 +32,9 @@
         android:text="@string/disconnect_receiver"
         android:textColor="@color/ebony_clay" />
 
+    <TextView
+        android:id="@+id/disconnection_message_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

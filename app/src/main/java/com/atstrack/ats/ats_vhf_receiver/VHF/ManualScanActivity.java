@@ -28,16 +28,12 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Objects;
-
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_decrease_light;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.ic_increase_light;
 
 public class ManualScanActivity extends ScanBaseActivity {
 
@@ -63,8 +59,6 @@ public class ManualScanActivity extends ScanBaseActivity {
     ImageView minus_imageView;
     @BindView(R.id.plus_imageView)
     ImageView plus_imageView;
-    @BindView(R.id.gps_imageView)
-    ImageView gps_imageView;
     @BindView(R.id.gps_state_textView)
     TextView gps_state_textView;
     @BindView(R.id.view_detection_manual_textView)
@@ -79,7 +73,7 @@ public class ManualScanActivity extends ScanBaseActivity {
     private int frequencyRange;
     private int newFrequency;
     private boolean enableGpsScanning;
-    private final byte[] audioOption = {(byte) 0x5A, 0, 0};
+    private byte[] audioOption = {ValueCodes.AUDIO_ALL_COMMAND, 0, 0};
     private DialogFragment audioOptions;
 
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
@@ -96,12 +90,12 @@ public class ManualScanActivity extends ScanBaseActivity {
             });
 
     private void setStartScan() {
-        byte[] b = setCalendar();
-        b[0] = (byte) 0x86;
+        byte[] b = setCalendar(10);
+        b[0] = ValueCodes.MANUAL_SCAN_COMMAND;
         b[7] = (byte) ((newFrequency - baseFrequency) / 256);
         b[8] = (byte) ((newFrequency - baseFrequency) % 256);
         b[9] = (byte) (gps_switch.isChecked() ? 0x80 : 0x0);
-        isScanning = TransferBleData.writeStartScan("MANUAL", b);
+        isScanning = TransferBleData.writeStartScan(ValueCodes.MANUAL_SCAN_COMMAND, b);
         if (isScanning) {
             frequency_scan_manual_textView.setText(Converters.getFrequency(newFrequency));
             if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
@@ -112,7 +106,7 @@ public class ManualScanActivity extends ScanBaseActivity {
     }
 
     private void setStopScan() {
-        boolean result = TransferBleData.writeStopScan("MANUAL");
+        boolean result = TransferBleData.writeStopScan(ValueCodes.MANUAL_SCAN_COMMAND);
         if (result) {
             clear();
             isScanning = false;
@@ -136,18 +130,18 @@ public class ManualScanActivity extends ScanBaseActivity {
         if (result) {
             if (isDecrease) {
                 if (newFrequency == baseFrequency) {
-                    minus_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease_light));
+                    minus_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_decrease_light));
                     minus_imageView.setEnabled(false);
                 } else if (newFrequency == frequencyRange - 1) {
-                    plus_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase));
+                    plus_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_increase));
                     plus_imageView.setEnabled(true);
                 }
             } else {
                 if (newFrequency == baseFrequency + 1) {
-                    minus_imageView.setBackground(ContextCompat.getDrawable(this, ic_decrease));
+                    minus_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_decrease));
                     minus_imageView.setEnabled(true);
                 } else if (newFrequency == frequencyRange) {
-                    plus_imageView.setBackground(ContextCompat.getDrawable(this, ic_increase_light));
+                    plus_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_increase_light));
                     plus_imageView.setEnabled(false);
                 }
             }
@@ -156,16 +150,16 @@ public class ManualScanActivity extends ScanBaseActivity {
 
     private void setAudio() {
         byte[] b;
-        String audioDescription = "All";
-        if (Converters.getHexValue(audioOption[0]).equals("59"))
+        if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
             b = new byte[] {audioOption[0], audioOption[1], audioOption[2]};
         else
             b = new byte[] {audioOption[0], audioOption[2]};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            if (Converters.getHexValue(audioOption[0]).equals("59"))
-                audioDescription = "Single (" + Converters.getDecimalValue(audioOption[1]) + ")";
-            else if (Converters.getHexValue(audioOption[0]).equals("5B"))
+            String audioDescription = "All";
+            if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
+                audioDescription = "Single (" + Byte.toUnsignedInt(audioOption[1]) + ")";
+            else if (audioOption[0] == ValueCodes.AUDIO_NONE_COMMAND)
                 audioDescription = "None";
             id_audio_textView.setText(audioDescription);
         }
@@ -224,13 +218,9 @@ public class ManualScanActivity extends ScanBaseActivity {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                String state = bundle.getString(ValueCodes.PARAMETER);
-                if (state != null && state.equals(ValueCodes.AUDIO)) {
-                    audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
-                    audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
-                    audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
+                audioOption = bundle.getByteArray(ValueCodes.VALUE);
+                if (audioOption != null)
                     setAudio();
-                }
             }
         });
         audioOptions.show(getSupportFragmentManager(), AudioOptions.TAG);
@@ -257,15 +247,17 @@ public class ManualScanActivity extends ScanBaseActivity {
         enableGpsScanning = false;
 
         if (isScanning) { // The device is already scanning
-            parameter = ValueCodes.CONTINUE_LOG;
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
-            gps_switch.setChecked((Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1);
-            gps_scanning_switch.setChecked(gps_switch.isChecked());
-            if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
-            scanState(data);
-            setVisibility("scanning");
-            enableGpsScanning = true;
-        } else { // Gets manual defaults data
+            if (data != null) {
+                parameter = ValueCodes.MANUAL_SCAN_COMMAND;
+                gps_switch.setChecked((Byte.toUnsignedInt(data[15]) >> 7 & 1) == 1);
+                gps_scanning_switch.setChecked(gps_switch.isChecked());
+                if (gps_switch.isChecked()) setGpsSearching(); else setGpsOff();
+                scanState(data);
+                setVisibility("scanning");
+                enableGpsScanning = true;
+            }
+        } else {
             newFrequency = baseFrequency;
             frequency_manual_textView.setText(Converters.getFrequency(newFrequency));
             setVisibility("overview");
@@ -277,7 +269,7 @@ public class ManualScanActivity extends ScanBaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
                 Intent intent = new Intent(this, ScanningActivity.class);
-                intent.putExtra(ValueCodes.PARAMETER, "");
+                intent.putExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
                 startActivity(intent);
                 finish();
             } else {
@@ -289,22 +281,23 @@ public class ManualScanActivity extends ScanBaseActivity {
     }
 
     @Override
-    protected void updateVisibility(int visibility) {
-        super.updateVisibility(visibility);
+    protected void updateVisibility() {
+        super.updateVisibility();
+        int visibility = detectionType == DetectionFilter.CODED ? View.GONE : View.VISIBLE;
         audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         view_detection_manual_textView.setVisibility(visibility);
     }
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.CONTINUE_LOG))
+        if (parameter == ValueCodes.MANUAL_SCAN_COMMAND)
             setNotificationLogScanning();
     }
 
     @Override
     protected void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("44")) { // Fatal scan error
-        } else { // Get log scan
+        if (data[0] == ValueCodes.FATAL_SCAN_ERROR_COMMAND) {
+        } else {
             setCurrentLog(data);
         }
     }
@@ -331,13 +324,13 @@ public class ManualScanActivity extends ScanBaseActivity {
     }
 
     private void setGpsOff() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_off, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_off_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsSearching() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_searching, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_searching_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
         latitude_textView.setText("");
@@ -345,13 +338,13 @@ public class ManualScanActivity extends ScanBaseActivity {
     }
 
     private void setGpsFailed() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_failed, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_failed_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsValid() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_valid, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_valid_gps);
         coordinates_linearLayout.setVisibility(View.VISIBLE);
     }
@@ -361,74 +354,69 @@ public class ManualScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        switch (Converters.getHexValue(data[0])) {
-            case "50":
+        switch (data[0]) {
+            case ValueCodes.SCAN_STATE_COMMAND:
                 scanState(data);
                 break;
-            case "51":
+            case ValueCodes.SCAN_GPS_STATE_COMMAND:
                 gpsState(data);
                 break;
-            case "A1":
+            case ValueCodes.SCAN_GPS_COMMAND:
                 logGps(data);
                 break;
-            case "F0":
+            case ValueCodes.SCAN_HEADER_COMMAND:
                 logScanHeader(data);
                 break;
-            case "D0": // Coded
+            case ValueCodes.SCAN_MANUAL_CODED_COMMAND:
                 logScanCoded(data);
                 break;
-            case "E0": // Non Coded
-                int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
-                int period = (Integer.parseInt(Converters.getDecimalValue(data[4])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[5]));
-                if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
+            case ValueCodes.SCAN_MANUAL_NON_CODED_COMMAND:
+                int signalStrength = Byte.toUnsignedInt(data[3]);
+                int period = (Byte.toUnsignedInt(data[4]) * 256) + Byte.toUnsignedInt(data[5]);
+                if (detectionType == DetectionFilter.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
+                else if (detectionType == DetectionFilter.VARIABLE)
                     scanNonCodedVariable(period, signalStrength);
                 break;
         }
     }
 
     private void scanState(byte[] data) {
-        int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[10])) * 256) +
-                (Integer.parseInt(Converters.getDecimalValue(data[11]))));
+        int frequency = baseFrequency + ((Byte.toUnsignedInt(data[10]) * 256) + Byte.toUnsignedInt(data[11]));
         frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
         frequency_manual_textView.setText(Converters.getFrequency(frequency));
         detectionType = data[18];
-        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        scanDetailListAdapter = new ScanDetailListAdapter(this, detectionType == DetectionFilter.CODED);
         item_recyclerView.setAdapter(scanDetailListAdapter);
         item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
-        updateVisibility(visibility);
+        updateVisibility();
 
-        if (!Converters.getHexValue(detectionType).equals("09")) {
+        if (detectionType != DetectionFilter.CODED)
             initializeDetectionFilter(data);
-        } else {
+        else
             audioOptions = AudioOptions.newInstance();
-        }
     }
 
     private void gpsState(byte[] data) {
-        int state = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        if (state == 3) // Valid
+        if (data[1] == ValueCodes.GPS_VALID)
             setGpsValid();
-        else if (state == 2) // Failed
+        else if (data[1] == ValueCodes.GPS_FAILED)
             setGpsFailed();
-        else if (state == 1) // Searching
+        else if (data[1] == ValueCodes.GPS_SEARCHING)
             setGpsSearching();
     }
 
     private void logScanHeader(byte[] data) {
         clear();
-        int frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
-                (Integer.parseInt(Converters.getDecimalValue(data[2]))));
+        int frequency = baseFrequency + ((Byte.toUnsignedInt(data[1]) * 256) + (Byte.toUnsignedInt(data[2])));
         frequency_scan_manual_textView.setText(Converters.getFrequency(frequency));
         frequency_manual_textView.setText(Converters.getFrequency(frequency));
     }
 
     private void logScanCoded(byte[] data) {
-        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        int code = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int signalStrength = Byte.toUnsignedInt(data[3]);
+        int code = Byte.toUnsignedInt(data[4]);
+        int mortality = Byte.toUnsignedInt(data[5]);
         scanCoded(code, signalStrength, mortality);
     }
 

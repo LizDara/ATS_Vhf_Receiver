@@ -9,18 +9,20 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.Models.Data;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.Snapshots;
+import com.atstrack.ats.ats_vhf_receiver.Models.TagDetail;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.VHF.ManageDataActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Converters {
 
@@ -50,16 +52,6 @@ public class Converters {
         return new String(hexChars);
     }
 
-    public static String getDecimalValue(byte[] value) { // Gets value in decimal system
-        if (value == null)
-            return "";
-
-        String result = "";
-        for (byte b : value)
-            result += ((int) b & 0xff) + " ";
-        return result;
-    }
-
     public static String getDecimalValue(byte b) { // Gets value in decimal system for single byte
         String result = "";
         result += ((int) b & 0xff);
@@ -71,77 +63,6 @@ public class Converters {
         byte[] returnVal;
         returnVal = input.getBytes(StandardCharsets.UTF_8);
         return returnVal;
-    }
-
-    public static int hexToDecimal(String input) {
-        int total = 0;
-        int pot;
-        int multiple = 0;
-        int z;
-
-        String[] hexadecimal = input.split("");
-
-        for (int x = hexadecimal.length - 1; x >= 0; x--) {
-            z = (hexadecimal.length - x - 1);
-            pot = 1;
-            for (int y = 0; y < z; y++) {
-                pot *= 16;
-            }
-
-            String letter = hexadecimal[x];
-            switch (letter) {
-                case "0":
-                    multiple = 0;
-                    break;
-                case "1":
-                    multiple = 1;
-                    break;
-                case "2":
-                    multiple = 2;
-                    break;
-                case "3":
-                    multiple = 3;
-                    break;
-                case "4":
-                    multiple = 4;
-                    break;
-                case "5":
-                    multiple = 5;
-                    break;
-                case "6":
-                    multiple = 6;
-                    break;
-                case "7":
-                    multiple = 7;
-                    break;
-                case "8":
-                    multiple = 8;
-                    break;
-                case "9":
-                    multiple = 9;
-                    break;
-                case "A":
-                    multiple = 10;
-                    break;
-                case "B":
-                    multiple = 11;
-                    break;
-                case "C":
-                    multiple = 12;
-                    break;
-                case "D":
-                    multiple = 13;
-                    break;
-                case "E":
-                    multiple = 14;
-                    break;
-                case "F":
-                    multiple = 15;
-                    break;
-            }
-            total += (pot * multiple);
-        }
-        return total;
     }
 
     public static String getAsciiValue(int start, int end, byte[] data) {
@@ -198,29 +119,42 @@ public class Converters {
         return "None,";
     }
 
+    public static String getDetectionFilter(byte type) {
+        switch (type) {
+            case DetectionFilter.CODED:
+                return "Coded";
+            case DetectionFilter.FIXED:
+                return "Fixed Pulse Rate";
+            case DetectionFilter.VARIABLE:
+            case DetectionFilter.VARIABLE_TEMPERATURE:
+                return "Variable Pulse Rate";
+        }
+        return "";
+    }
+
     /**
      * Gets the percentage of the device's battery.
      * @param scanRecord The content of the advertisement record offered by the remote device.
      * @return Return the battery percentage.
      */
     public static int getPercentBatteryVhfReceiver(byte[] scanRecord) {
-        int firstElement = Integer.parseInt(Converters.getDecimalValue(scanRecord[0]));
-        return Integer.parseInt(Converters.getDecimalValue(scanRecord[firstElement + 5]));
+        int firstElement = Byte.toUnsignedInt(scanRecord[0]);
+        return Byte.toUnsignedInt(scanRecord[firstElement + 5]);
     }
 
     public static int getDeviceType(String name, boolean isLogo) {
         if (name.contains(ValueCodes.VHF) || name.contains("VHF")) {
-            return isLogo ? R.drawable.vhf_receiver : R.drawable.ic_vhf_receiver;
+            return isLogo ? R.drawable.ic_reptile_icon : R.drawable.ic_vhf_receiver;
         } else if (name.contains(ValueCodes.ACOUSTIC) || name.contains("Acoustic"))
-            return isLogo ? R.drawable.acoustic_receiver : R.drawable.ic_acoustic_receiver;
+            return isLogo ? R.drawable.ic_salmon_icon : R.drawable.ic_acoustic_receiver;
         else if (name.contains(ValueCodes.WILDLINK) || name.contains("Wildlink"))
-            return isLogo ? R.drawable.wildlink_receiver : R.drawable.ic_wildlink_receiver;
-        else if (name.contains("Tags"))
-            return isLogo ? R.drawable.bluetooth_tag : R.drawable.ic_bluetooth_tag;
+            return isLogo ? R.drawable.ic_deer_icon : R.drawable.ic_wildlink_receiver;
+        else if (name.contains("Bluetooth Tags"))
+            return isLogo ? R.drawable.ic_bird_icon : R.drawable.ic_bluetooth_tag;
         else if (name.contains(ValueCodes.BLUETOOTH_RECEIVER) || name.contains("Bluetooth Receiver"))
             return isLogo ? R.drawable.bluetooth_receiver : R.drawable.ic_bluetooth_tag;
         else if (name.contains(ValueCodes.BEACON) || name.contains("Beacon"))
-            return isLogo ? R.drawable.beacon_tags : R.drawable.ic_bluetooth_tag;
+            return isLogo ? R.drawable.ic_transmitter_icon : R.drawable.ic_bluetooth_tag;
         return 0;
     }
 
@@ -258,10 +192,9 @@ public class Converters {
         sign = (byte) (data[4] & 0x80);
         B1 = (float) (data[5] & 0x80);
         B2 = (float) (data[5] & 0x7F);
-        C = (float) Integer.parseInt(Converters.getDecimalValue(data[6]));
-        D = (float) Integer.parseInt(Converters.getDecimalValue(data[7]));
-        if (Converters.getHexValue(data[4]).equals("FF") && Converters.getHexValue(data[5]).equals("FF")
-                && Converters.getHexValue(data[6]).equals("FF") && Converters.getHexValue(data[7]).equals("FF"))
+        C = (float) Byte.toUnsignedInt(data[6]);
+        D = (float) Byte.toUnsignedInt(data[7]);
+        if (data[4] == ValueCodes.NULL && data[5] == ValueCodes.NULL && data[6] == ValueCodes.NULL && data[7] == ValueCodes.NULL)
             latitude = 0;
         else
             latitude = (float)((1 + ((B2 + ((C + (D / 256)) / 256)) / 128)) * (pow(2, (A * 2) + (B1 / 128) - 127)));
@@ -298,10 +231,9 @@ public class Converters {
         sign = (byte) (data[12] & 0x80);
         B1 = (float) (data[13] & 0x80);
         B2 = (float) (data[13] & 0x7F);
-        C = (float) Integer.parseInt(Converters.getDecimalValue(data[14]));
-        D = (float) Integer.parseInt(Converters.getDecimalValue(data[15]));
-        if (Converters.getHexValue(data[12]).equals("FF") && Converters.getHexValue(data[13]).equals("FF")
-                && Converters.getHexValue(data[14]).equals("FF") && Converters.getHexValue(data[15]).equals("FF"))
+        C = (float) Byte.toUnsignedInt(data[14]);
+        D = (float) Byte.toUnsignedInt(data[15]);
+        if (data[12] != ValueCodes.NULL && data[13] != ValueCodes.NULL && data[14] != ValueCodes.NULL && data[15] != ValueCodes.NULL)
             longitude = 0;
         else
             longitude = (float)((1 + ((B2 + ((C + (D / 256)) / 256)) / 128)) * (pow(2, (A * 2) + (B1 / 128) - 127)));
@@ -339,6 +271,19 @@ public class Converters {
     }
 
     /**
+     * Finds the page number of a 4-byte packet.
+     * @param packet The received packet.
+     * @return Returns the page number.
+     */
+    public static int findPageNumber(byte[] packet) {
+        int pageNumber = Byte.toUnsignedInt(packet[0]);
+        pageNumber = (Byte.toUnsignedInt(packet[1]) << 8) | pageNumber;
+        pageNumber = (Byte.toUnsignedInt(packet[2]) << 16) | pageNumber;
+        pageNumber = (Byte.toUnsignedInt(packet[3]) << 24) | pageNumber;
+        return pageNumber;
+    }
+
+    /**
      * Processes the data when the download is complete.
      *
      * @param data The raw data.
@@ -348,7 +293,7 @@ public class Converters {
      */
     public static synchronized String getPackageProcessed(ArrayList<byte[]> data, View process_percent, BaseActivity baseActivity, boolean isRawFile) {
         String text = "";
-        int index = 0;
+        byte scanType = 0;
         int baseFrequency = 0;
         int frequency = 0;
         int frequencyTableIndex = 0;
@@ -359,304 +304,304 @@ public class Converters {
         int date, secondsOffset, signalStrength, code, mort, numberDetection, periodHi, periodLo;
         Calendar baseDateTime = Calendar.getInstance();
         Calendar currentDateTime = Calendar.getInstance();
-        int percent;
+        int byteIndex = 0;
 
         for (byte[] packet : data) {
+            int index = 0;
             while (index < packet.length) {
-                String format = Converters.getHexValue(packet[index]);
+                byte format = packet[index];
                 String[] coordinates = new String[]{"0", "0"};
                 String gpsTimeStamp = "0";
-                Log.i("Converters", Converters.getHexValue(new byte[] {packet[index], packet[index+1], packet[index+2], packet[index+3], packet[index+4], packet[index+5], packet[index+6], packet[index+7]}));
                 switch (format) {
-                    case "83": // Stationary Scan Header
-                    case "82": // Mobile Scan Header
-                    case "86": // Manual Scan Header
+                    case ValueCodes.STATIONARY_SCAN_COMMAND:
+                    case ValueCodes.MOBILE_SCAN_COMMAND:
+                    case ValueCodes.MANUAL_SCAN_COMMAND:
                         int matches;
                         byte detectionType = 0;
-                        YY = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
+                        scanType = packet[index];
+                        YY = Byte.toUnsignedInt(packet[index + 6]);
                         text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
                         switch (format) {
-                            case "83": { // Stationary
-                                baseFrequency = Integer.parseInt(Converters.getDecimalValue(packet[index + 20])) * 1000;
+                            case ValueCodes.STATIONARY_SCAN_COMMAND: {
+                                baseFrequency = Byte.toUnsignedInt(packet[index + 20]) * 1000;
                                 text += "Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Interval (seconds): " + Converters.getDecimalValue(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Timeout (seconds): " + Converters.getDecimalValue(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Num of Antennas: " + (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) + 1) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Store Interval (minutes): " + (Converters.getDecimalValue(packet[index + 5]).equals("0") ? "Continuous" : Converters.getDecimalValue(packet[index + 5])) + ValueCodes.CR + ValueCodes.LF;
-                                int referenceFrequency = (Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
-                                        Integer.parseInt(Converters.getDecimalValue(packet[index + 10])) + baseFrequency;
+                                text += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : Converters.getDecimalValue(packet[index + 5])) + ValueCodes.CR + ValueCodes.LF;
+                                int referenceFrequency = (Byte.toUnsignedInt(packet[index + 9]) * 256) + Byte.toUnsignedInt(packet[index + 10]) + baseFrequency;
                                 text += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Reference Frequency Store Interval (minutes): " + (referenceFrequency == baseFrequency ? "No" : Converters.getDecimalValue(packet[index + 11])) + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 2] & (byte) 0x0F);
-                                matches = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) / 16;
+                                matches = Byte.toUnsignedInt(packet[index + 2]) / 16;
                                 String detection = "Coded";
                                 String details = "";
-                                if (Converters.getHexValue(detectionType).equals("08")) {
+                                if (detectionType == DetectionFilter.FIXED) {
                                     detection = "Non Coded Fixed Pulse Rate";
                                     details = matches + " matches required";
-                                } else if (Converters.getHexValue(detectionType).equals("07")) {
+                                } else if (detectionType == DetectionFilter.VARIABLE) {
                                     detection = "Non Coded Variable Pulse Rate";
-                                    details = matches + " matches required, " + Converters.getDecimalValue(packet[index + 7]) + " to " + Converters.getDecimalValue(packet[index + 10]) + " pulse rate range";
-                                } else if (Converters.getHexValue(detectionType).equals("06"))
+                                    details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
+                                } else if (detectionType == DetectionFilter.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
                                 index += 16;
+                                byteIndex += 16;
                                 break;
                             }
-                            case "82": { // Mobile
-                                baseFrequency = Integer.parseInt(Converters.getDecimalValue(packet[index + 5])) * 1000;
+                            case ValueCodes.MOBILE_SCAN_COMMAND: {
+                                baseFrequency = Byte.toUnsignedInt(packet[index + 5]) * 1000;
                                 text += "Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Interval (seconds): " + (Integer.parseInt(Converters.getDecimalValue(packet[index + 3])) * 0.1) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Scan Interval (seconds): " + (Byte.toUnsignedInt(packet[index + 3]) * 0.1) + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 4] & (byte) 0x0F);
-                                matches = Integer.parseInt(Converters.getDecimalValue(packet[index + 4])) / 16;
+                                matches = Byte.toUnsignedInt(packet[index + 4]) / 16;
                                 String detection = "Coded";
                                 String details = "";
-                                if (Converters.getHexValue(detectionType).equals("08")) {
+                                if (detectionType == DetectionFilter.FIXED) {
                                     detection = "Non Coded Fixed Pulse Rate";
                                     details = matches + " matches required";
-                                } else if (Converters.getHexValue(detectionType).equals("07")) {
+                                } else if (detectionType == DetectionFilter.VARIABLE) {
                                     detection = "Non Coded Variable Pulse Rate";
-                                    details = matches + " matches required, " + Converters.getDecimalValue(packet[index + 7]) + " to " + Converters.getDecimalValue(packet[index + 10]) + " pulse rate range";
-                                } else if (Converters.getHexValue(detectionType).equals("06"))
+                                    details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
+                                } else if (detectionType == DetectionFilter.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
-                                int gps = Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) >> 7 & 1;
+                                int gps = Byte.toUnsignedInt(packet[index + 2]) >> 7 & 1;
                                 text += "Gps: " + (gps == 1 ? "On" : "Off") + ValueCodes.CR + ValueCodes.LF;
                                 index += 8;
+                                byteIndex += 8;
                                 break;
                             }
-                            case "86": { // Manual
+                            case ValueCodes.MANUAL_SCAN_COMMAND: {
                                 if (process_percent != null) {
-                                    percent = (int) (((float) index / (float) packet.length) * 100);
-                                    int finalPercent = percent;
+                                    int percent = (int) (((float) byteIndex / (float) (isRawFile ? packet.length : data.size() * Snapshots.BYTES_PER_PAGE)) * 100);
                                     baseActivity.runOnUiThread(() -> {
                                         if (isRawFile)
-                                            ((ProgressBar) process_percent).setProgress(finalPercent);
+                                            ((ProgressBar) process_percent).setProgress(percent);
                                         else
-                                            ((TextView) process_percent).setText(" - " + finalPercent + "%");
+                                            ((TextView) process_percent).setText(" - " + percent + "%");
                                     });
                                 }
-                                baseFrequency = Integer.parseInt(Converters.getDecimalValue(packet[index + 15])) * 1000;
-                                text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
+                                baseFrequency = Byte.toUnsignedInt(packet[index + 15]) * 1000;
                                 text += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
-                                detectionType = (packet[index + 1] > (byte) 0x80) ? (byte) (packet[index + 1] - (byte) 0x80) : packet[index + 1];
+                                detectionType = (byte) (packet[index + 1] & (byte) 0x0F);
                                 String detection = "Coded";
-                                if (Converters.getHexValue(detectionType).equals("08"))
+                                if (detectionType == DetectionFilter.FIXED)
                                     detection = "Non Coded Fixed Pulse Rate";
-                                else if (Converters.getHexValue(detectionType).equals("07"))
+                                else if (detectionType == DetectionFilter.VARIABLE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
-                                text += "[Data]" + ValueCodes.CR + ValueCodes.LF;
-                                YY = Integer.parseInt(Converters.getDecimalValue(packet[index + 2]));
-                                MM = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                                DD = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                                hh = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                                mm = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-                                ss = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                                YY = Byte.toUnsignedInt(packet[index + 2]);
+                                MM = Byte.toUnsignedInt(packet[index + 3]);
+                                DD = Byte.toUnsignedInt(packet[index + 4]);
+                                hh = Byte.toUnsignedInt(packet[index + 5]);
+                                mm = Byte.toUnsignedInt(packet[index + 6]);
+                                ss = Byte.toUnsignedInt(packet[index + 7]);
                                 baseDateTime.set(YY + 2000, MM - 1, DD, hh, mm, ss);
                                 break;
                             }
                         }
                         text += "[Data]" + ValueCodes.CR + ValueCodes.LF;
-                        text += (Converters.getHexValue(detectionType).equals("09") ?
+                        text += (detectionType == DetectionFilter.CODED ?
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "F0": //Header
+                    case ValueCodes.SCAN_HEADER_COMMAND:
                         if (process_percent != null) {
-                            percent = (int) (((float) index / (float) packet.length) * 100);
-                            int finalPercent = percent;
+                            int percent = (int) (((float) byteIndex / (float) (isRawFile ? packet.length : data.size() * Snapshots.BYTES_PER_PAGE)) * 100);
                             baseActivity.runOnUiThread(() -> {
                                 if (isRawFile)
-                                    ((ProgressBar) process_percent).setProgress(finalPercent);
+                                    ((ProgressBar) process_percent).setProgress(percent);
                                 else
-                                    ((TextView) process_percent).setText(" - " + finalPercent + "%");
+                                    ((TextView) process_percent).setText(" - " + percent + "%");
                             });
                         }
 
-                        frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 2])));
-                        frequencyTableIndex = (((Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        if (format.equals("83")) {
-                            antenna = Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) >> 7;
+                        frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 2]));
+                        frequencyTableIndex = (((Byte.toUnsignedInt(packet[index + 1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(packet[index + 3]);
+                        if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND) {
+                            antenna = Byte.toUnsignedInt(packet[index + 1]) >> 7;
                             if (antenna == 0)
-                                antenna = (Integer.parseInt(Converters.getDecimalValue(packet[index + 7])) >> 6) + 1;
+                                antenna = (Byte.toUnsignedInt(packet[index + 7]) >> 6) + 1;
                         }
-                        date = Converters.hexToDecimal(
-                                Converters.getHexValue(packet[index + 4]) + Converters.getHexValue(packet[index + 5]) + Converters.getHexValue(packet[index + 6]));
-                        MM = date / 1000000;
-                        date = date % 1000000;
-                        DD = date / 10000;
-                        date = date % 10000;
-                        hh = date / 100;
+                        date = Byte.toUnsignedInt(packet[index + 4]) << 16 | Byte.toUnsignedInt(packet[index + 5]) << 8 | Byte.toUnsignedInt(packet[index + 6]);
                         mm = date % 100;
-                        ss = Integer.parseInt(Converters.getDecimalValue((byte) (packet[index + 7] & (byte) 0x3F)));
+                        hh = (date / 100) % 100;
+                        DD = (date / 10000) % 100;
+                        MM = date / 1000000;
+                        ss = Byte.toUnsignedInt((byte) (packet[index + 7] & (byte) 0x3F));
                         baseDateTime.set(YY + 2000, MM - 1, DD, hh, mm, ss);
                         break;
-                    case "F1": // Scan Coded
-                        secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    case ValueCodes.SCAN_FIX_CODED_COMMAND:
+                        secondsOffset = Byte.toUnsignedInt(packet[index + 1]);
+                        signalStrength = Byte.toUnsignedInt(packet[index + 4]);
+                        code = Byte.toUnsignedInt(packet[index + 3]);
+                        mort = Byte.toUnsignedInt(packet[index + 5]);
+                        numberDetection = Byte.toUnsignedInt(packet[index + 7]);
                         currentDateTime.setTime(baseDateTime.getTime());
                         currentDateTime.add(Calendar.SECOND, secondsOffset);
 
-                        if (index + 8 < packet.length && Converters.getHexValue(packet[index + 8]).equals("A1")) { // Gps
+                        if (index + 8 < packet.length && packet[index + 8] == ValueCodes.SCAN_GPS_COMMAND) {
                             byte[] gpsData = new byte[16];
                             System.arraycopy(packet, index + 8, gpsData, 0, 16);
                             coordinates = Converters.getGpsData(gpsData);
 
-                            int year = Integer.parseInt(Converters.getDecimalValue(gpsData[1]));
-                            MM = Integer.parseInt(Converters.getDecimalValue(gpsData[2]));
-                            DD = Integer.parseInt(Converters.getDecimalValue(gpsData[3]));
-                            hh = Integer.parseInt(Converters.getDecimalValue(gpsData[9]));
-                            mm = Integer.parseInt(Converters.getDecimalValue(gpsData[10]));
-                            ss = Integer.parseInt(Converters.getDecimalValue(gpsData[11]));
-                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                            int year = Byte.toUnsignedInt(gpsData[1]);
+                            MM = Byte.toUnsignedInt(gpsData[2]);
+                            DD = Byte.toUnsignedInt(gpsData[3]);
+                            hh = Byte.toUnsignedInt(gpsData[9]);
+                            mm = Byte.toUnsignedInt(gpsData[10]);
+                            ss = Byte.toUnsignedInt(gpsData[11]);
+                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss;
                             index += 16;
+                            byteIndex += 16;
                         }
 
                         text += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && format.equals("83") ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "F2": // Scan Consolidated
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        code = Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
-                        mort = (Integer.parseInt(Converters.getDecimalValue(packet[index + 6])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        numberDetection = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    case ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND:
+                        signalStrength = Byte.toUnsignedInt(packet[index + 4]);
+                        code = Byte.toUnsignedInt(packet[index + 3]);
+                        mort = (Byte.toUnsignedInt(packet[index + 6]) * 256) + Byte.toUnsignedInt(packet[index + 5]);
+                        numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " +
-                                baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && format.equals("83") ? "All" : antenna) +
+                                baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) +
                                 ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
                                 ", 0, 0, 0, " + ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "E1":
-                    case "EA": // Non Coded
-                        secondsOffset = Integer.parseInt(Converters.getDecimalValue(packet[index + 1]));
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        periodHi = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        periodLo = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-                        numberDetection = Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
+                    case ValueCodes.SCAN_DATA_VARIABLE_NON_CODED_COMMAND:
+                        secondsOffset = Byte.toUnsignedInt(packet[index + 1]);
+                        signalStrength = Byte.toUnsignedInt(packet[index + 4]);
+                        periodHi = Byte.toUnsignedInt(packet[index + 5]);
+                        periodLo = Byte.toUnsignedInt(packet[index + 6]);
+                        numberDetection = Byte.toUnsignedInt(packet[index + 7]);
                         currentDateTime.setTime(baseDateTime.getTime());
                         currentDateTime.add(Calendar.SECOND, secondsOffset);
 
-                        if (index + 8 < packet.length && Converters.getHexValue(packet[index + 8]).equals("A1")) { // Gps
+                        if (index + 8 < packet.length && packet[index + 8] == ValueCodes.SCAN_GPS_COMMAND) {
                             byte[] gpsData = new byte[16];
                             System.arraycopy(packet, index + 8, gpsData, 0, 16);
                             coordinates = Converters.getGpsData(gpsData);
 
-                            int year = Integer.parseInt(Converters.getDecimalValue(gpsData[1]));
-                            MM = Integer.parseInt(Converters.getDecimalValue(gpsData[2]));
-                            DD = Integer.parseInt(Converters.getDecimalValue(gpsData[3]));
-                            hh = Integer.parseInt(Converters.getDecimalValue(gpsData[9]));
-                            mm = Integer.parseInt(Converters.getDecimalValue(gpsData[10]));
-                            ss = Integer.parseInt(Converters.getDecimalValue(gpsData[11]));
-                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                            int year = Byte.toUnsignedInt(gpsData[1]);
+                            MM = Byte.toUnsignedInt(gpsData[2]);
+                            DD = Byte.toUnsignedInt(gpsData[3]);
+                            hh = Byte.toUnsignedInt(gpsData[9]);
+                            mm = Byte.toUnsignedInt(gpsData[10]);
+                            ss = Byte.toUnsignedInt(gpsData[11]);
+                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss;
                             index += 16;
+                            byteIndex += 16;
                         }
 
                         text += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && format.equals("83") ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "E2": // Non Coded Scan Consolidated
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 4]));
-                        periodHi = Integer.parseInt(Converters.getDecimalValue(packet[index + 5]));
-                        periodLo = Integer.parseInt(Converters.getDecimalValue(packet[index + 6]));
-                        numberDetection = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 7]));
+                    case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
+                        signalStrength = Byte.toUnsignedInt(packet[index + 4]);
+                        periodHi = Byte.toUnsignedInt(packet[index + 5]);
+                        periodLo = Byte.toUnsignedInt(packet[index + 6]);
+                        numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
-                                ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && format.equals("83") ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", 0, 0, 0, " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "D0": // Manual Coded
-                        text += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" + ValueCodes.CR + ValueCodes.LF;
-                        frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
-                        code = Integer.parseInt(Converters.getDecimalValue(packet[index + 12]));
-                        mort = Integer.parseInt(Converters.getDecimalValue(packet[index + 13]));
+                    case ValueCodes.SCAN_MANUAL_CODED_COMMAND:
+                        frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 2]));
+                        signalStrength = Byte.toUnsignedInt(packet[index + 3]);
+                        code = Byte.toUnsignedInt(packet[index + 4]);
+                        mort = Byte.toUnsignedInt(packet[index + 5]);
 
-                        if (index + 8 < packet.length && Converters.getHexValue(packet[index + 8]).equals("A1")) { // Gps
+                        if (index + 8 < packet.length && packet[index + 8] == ValueCodes.SCAN_GPS_COMMAND) { // Gps
                             byte[] gpsData = new byte[16];
                             System.arraycopy(packet, index + 8, gpsData, 0, 16);
                             coordinates = Converters.getGpsData(gpsData);
 
-                            int year = Integer.parseInt(Converters.getDecimalValue(gpsData[1]));
-                            MM = Integer.parseInt(Converters.getDecimalValue(gpsData[2]));
-                            DD = Integer.parseInt(Converters.getDecimalValue(gpsData[3]));
-                            hh = Integer.parseInt(Converters.getDecimalValue(gpsData[9]));
-                            mm = Integer.parseInt(Converters.getDecimalValue(gpsData[10]));
-                            ss = Integer.parseInt(Converters.getDecimalValue(gpsData[11]));
-                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                            int year = Byte.toUnsignedInt(gpsData[1]);
+                            MM = Byte.toUnsignedInt(gpsData[2]);
+                            DD = Byte.toUnsignedInt(gpsData[3]);
+                            hh = Byte.toUnsignedInt(gpsData[9]);
+                            mm = Byte.toUnsignedInt(gpsData[10]);
+                            ss = Byte.toUnsignedInt(gpsData[11]);
+                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss;
                             index += 16;
+                            byteIndex += 16;
                         }
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + code + ", " + mort + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "E0": // Manual Non Coded
-                        text += "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" + ValueCodes.CR + ValueCodes.LF;
-                        frequency = baseFrequency + ((Integer.parseInt(Converters.getDecimalValue(packet[index + 9])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 10])));
-                        signalStrength = Integer.parseInt(Converters.getDecimalValue(packet[index + 11]));
+                    case ValueCodes.SCAN_MANUAL_NON_CODED_COMMAND:
+                        frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) +
+                                Byte.toUnsignedInt(packet[index + 2]));
+                        signalStrength = Byte.toUnsignedInt(packet[index + 3]);
+                        periodHi = Byte.toUnsignedInt(packet[index + 4]);
+                        periodLo = Byte.toUnsignedInt(packet[index + 5]);
 
-                        if (index + 8 < packet.length && Converters.getHexValue(packet[index + 8]).equals("A1")) { // Gps
+                        if (index + 8 < packet.length && packet[index + 8] == ValueCodes.SCAN_GPS_COMMAND) {
                             byte[] gpsData = new byte[16];
                             System.arraycopy(packet, index + 8, gpsData, 0, 16);
                             coordinates = Converters.getGpsData(gpsData);
 
-                            int year = Integer.parseInt(Converters.getDecimalValue(gpsData[1]));
-                            MM = Integer.parseInt(Converters.getDecimalValue(gpsData[2]));
-                            DD = Integer.parseInt(Converters.getDecimalValue(gpsData[3]));
-                            hh = Integer.parseInt(Converters.getDecimalValue(gpsData[9]));
-                            mm = Integer.parseInt(Converters.getDecimalValue(gpsData[10]));
-                            ss = Integer.parseInt(Converters.getDecimalValue(gpsData[11]));
-                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                            int year = Byte.toUnsignedInt(gpsData[1]);
+                            MM = Byte.toUnsignedInt(gpsData[2]);
+                            DD = Byte.toUnsignedInt(gpsData[3]);
+                            hh = Byte.toUnsignedInt(gpsData[9]);
+                            mm = Byte.toUnsignedInt(gpsData[10]);
+                            ss = Byte.toUnsignedInt(gpsData[11]);
+                            gpsTimeStamp = MM + "/" + DD + "/" + year + " " + hh + ":" + mm + ":" + ss;
                             index += 16;
+                            byteIndex += 16;
                         }
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", 0, 0, 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
+                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
-                    case "87": // End Scan
-                        int scanSession = (Integer.parseInt(Converters.getDecimalValue(packet[index + 1])) * 65536) + (Integer.parseInt(Converters.getDecimalValue(packet[index + 2])) * 256) +
-                                Integer.parseInt(Converters.getDecimalValue(packet[index + 3]));
+                    case ValueCodes.SCAN_STOP_COMMAND:
+                        int scanSession = (Byte.toUnsignedInt(packet[index + 1]) * 65536) + (Byte.toUnsignedInt(packet[index + 2]) * 256) + Byte.toUnsignedInt(packet[index + 3]);
                         text += "[Footer]" + ValueCodes.CR + ValueCodes.LF;
                         text += "Session Num: " + scanSession + ValueCodes.CR + ValueCodes.LF;
-                        date = Converters.hexToDecimal(
-                                Converters.getHexValue(packet[index + 12]) + Converters.getHexValue(packet[index + 13]) + Converters.getHexValue(packet[index + 14]));
-                        MM = date / 1000000;
-                        date = date % 1000000;
-                        DD = date / 10000;
-                        date = date % 10000;
-                        hh = date / 100;
+                        date = Byte.toUnsignedInt(packet[index + 12]) << 16 | Byte.toUnsignedInt(packet[index + 13]) << 8 | Byte.toUnsignedInt(packet[index + 14]);
                         mm = date % 100;
-                        ss = Integer.parseInt(Converters.getDecimalValue(packet[index + 15]));
+                        hh = (date / 100) % 100;
+                        DD = (date / 10000) % 100;
+                        MM = date / 1000000;
+                        ss = Byte.toUnsignedInt(packet[index + 15]);
                         text += "Time Stamp: " + MM + "/" + DD + "/" + YY + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
                         if (scanSession == sessionNumber)
                             sessionNumber++;
                         index += 8;
+                        byteIndex += 8;
                         break;
                 }
                 index += 8;
+                byteIndex += 8;
             }
         }
+        return text;
+    }
+
+    public static String getTagsData(ArrayList<TagDetail> tags) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String text = "Tag Type, Tag ID, Date/Time, RSSI, Latitude, Longitude, Tag Version, Vcc (mv), Temp (C)" + ValueCodes.CR + ValueCodes.LF;
+        for (TagDetail tag : tags)
+            text += "Bluetooth, " + tag.code + ", " + simpleDateFormat.format(new Date(tag.lastTimestamp)) + ", " + tag.rssi + ", " + tag.latitude + ", " + tag.longitude + ", 1.0, " + tag.voltage + ", " + tag.temperature + ValueCodes.CR + ValueCodes.LF;
         return text;
     }
 

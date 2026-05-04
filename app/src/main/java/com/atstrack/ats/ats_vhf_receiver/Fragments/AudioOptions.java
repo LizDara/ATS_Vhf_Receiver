@@ -20,13 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import static com.atstrack.ats.ats_vhf_receiver.R.color.catskill_white;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.limed_spruce;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_tertiary;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_audio;
 
 public class AudioOptions extends DialogFragment {
     public static String TAG = AudioOptions.class.getSimpleName();
@@ -83,33 +77,33 @@ public class AudioOptions extends DialogFragment {
         Button saveChanges = view.findViewById(R.id.save_digit_button);
         close.setOnClickListener(view1 -> dismiss());
         single.setOnClickListener(v14 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
+            single.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_audio));
+            single.setTextColor(ContextCompat.getColor(view.getContext(), R.color.catskill_white));
+            all.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            all.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
+            none.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            none.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
             enterDigit.setVisibility(View.VISIBLE);
             number.setText("");
             audioOption = (byte) 0x59;
         });
         all.setOnClickListener(v15 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
+            single.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            single.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
+            all.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_audio));
+            all.setTextColor(ContextCompat.getColor(view.getContext(), R.color.catskill_white));
+            none.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            none.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
             enterDigit.setVisibility(View.GONE);
             audioOption = (byte) 0x5A;
         });
         none.setOnClickListener(v16 -> {
-            single.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            single.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            all.setBackground(ContextCompat.getDrawable(view.getContext(), button_tertiary));
-            all.setTextColor(ContextCompat.getColor(view.getContext(), limed_spruce));
-            none.setBackground(ContextCompat.getDrawable(view.getContext(), button_audio));
-            none.setTextColor(ContextCompat.getColor(view.getContext(), catskill_white));
+            single.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            single.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
+            all.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
+            all.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
+            none.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_audio));
+            none.setTextColor(ContextCompat.getColor(view.getContext(), R.color.catskill_white));
             enterDigit.setVisibility(View.GONE);
             audioOption = (byte) 0x5B;
         });
@@ -135,12 +129,9 @@ public class AudioOptions extends DialogFragment {
             }
         });
         saveChanges.setOnClickListener(view1 -> {
-            codeNumber = Converters.getHexValue(audioOption).equals("59") ? (byte) Integer.parseInt(number.getText().toString()) : 0;
+            codeNumber = audioOption == ValueCodes.AUDIO_ONE_COMMAND ? (byte) Integer.parseInt(number.getText().toString()) : 0;
             Bundle bundle = new Bundle();
-            bundle.putString(ValueCodes.PARAMETER, ValueCodes.AUDIO);
-            bundle.putByte(ValueCodes.AUDIO, audioOption);
-            bundle.putByte(ValueCodes.BACKGROUND, background.isChecked() ? (byte) 1 : 0);
-            bundle.putInt(ValueCodes.VALUE, codeNumber);
+            bundle.putByteArray(ValueCodes.VALUE, new byte[] {audioOption, (byte) codeNumber, background.isChecked() ? (byte) 1 : 0});
             getParentFragmentManager().setFragmentResult(ValueCodes.VALUE, bundle);
             dismiss();
         });

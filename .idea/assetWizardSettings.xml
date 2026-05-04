@@ -358,8 +358,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_up" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\up.svg" />
+                            <entry key="outputName" value="ic_alert" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\alert.svg" />
                           </map>
                         </option>
                       </PersistentState>

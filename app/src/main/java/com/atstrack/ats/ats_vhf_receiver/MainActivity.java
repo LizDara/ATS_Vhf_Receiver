@@ -34,11 +34,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity;
 import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
-import java.util.Calendar;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnAdapterClickListener {
@@ -196,8 +196,13 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
 
     @Override
     public void onAdapterItemClickListener(int position) {
-        if (categoryListAdapter.getTypes()[position].contains("Tags")) {
+        if (categoryListAdapter.getTypes()[position].contains("Bluetooth Tags")) {
             showBluetoothTags();
+            return;
+        }
+        if (categoryListAdapter.getTypes()[position].contains("Beacon")) {
+            Intent intent = new Intent(this, BeaconTagDetectionActivity.class);
+            startActivity(intent);
             return;
         }
         String type = "";
@@ -209,8 +214,6 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
             type = ValueCodes.WILDLINK;
         else if (categoryListAdapter.getTypes()[position].contains("Bluetooth Receiver"))
             type = ValueCodes.BLUETOOTH_RECEIVER;
-        else if (categoryListAdapter.getTypes()[position].contains("Beacon"))
-            type = ValueCodes.BEACON;
         Intent intent = new Intent(this, ScanDevicesActivity.class);
         intent.putExtra(ValueCodes.TYPE, type);
         startActivity(intent);

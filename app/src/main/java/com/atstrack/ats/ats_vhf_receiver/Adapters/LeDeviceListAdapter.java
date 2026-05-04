@@ -59,24 +59,24 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
      */
     @SuppressLint("MissingPermission")
     public void addDevice(BluetoothDevice device, byte[] scanRecord) {
-        if(device.getName() != null) {
-            if(!mLeDevices.contains(device)) {
-                Log.i("LeDeviceListAdapter", "Device: " + device.getName());
-                if (device.getName().contains(deviceType)) { // filter only ATS device
-                    mLeDevices.add(device);
-                    mScanRecords.add(scanRecord);
-                    mSelected.add(false);
-                }
-            } else {
-                Calendar currentDate = Calendar.getInstance();
-                currentDate.add(Calendar.SECOND, -2);
-                if (currentDate.after(startDate)) {
-                    int index = mLeDevices.indexOf(device);
-                    mLeDevices.set(index, device);
-                    startDate = Calendar.getInstance();
-                }
+        Log.i("LeDeviceListAdapter", "Device: " + device.getName());
+        if(!mLeDevices.contains(device)) {
+            if (device.getName().contains(deviceType)) { // filter only ATS device
+                mLeDevices.add(device);
+                mScanRecords.add(scanRecord);
+                mSelected.add(false);
+
+                notifyDataSetChanged();
             }
-        }
+        }/* else {
+            Calendar currentDate = Calendar.getInstance();
+            currentDate.add(Calendar.SECOND, -2);
+            if (currentDate.after(startDate)) {
+                int index = mLeDevices.indexOf(device);
+                mLeDevices.set(index, device);
+                startDate = Calendar.getInstance();
+            }
+        }*/
     }
 
     public void setDeviceType(String type) {
@@ -86,10 +86,6 @@ public class LeDeviceListAdapter extends RecyclerView.Adapter<LeDeviceListAdapte
 
     public BluetoothDevice getSelectedDevice() {
         return mLeDevices.get(selectedPosition);
-    }
-
-    public byte[] getScanRecord() {
-        return mScanRecords.get(selectedPosition);
     }
 
     public View getSelectedView() {

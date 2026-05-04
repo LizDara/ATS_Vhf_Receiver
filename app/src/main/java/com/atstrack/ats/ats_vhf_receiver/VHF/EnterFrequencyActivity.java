@@ -21,12 +21,6 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.tall_poppy;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_number;
-
 public class EnterFrequencyActivity extends BaseActivity {
 
     @BindView(R.id.frequency_textView)
@@ -66,14 +60,14 @@ public class EnterFrequencyActivity extends BaseActivity {
                 if (frequency > baseFrequency && frequency <= frequencyRange) {
                     save_changes_button.setEnabled(true);
                     save_changes_button.setAlpha(1);
-                    line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), ghost));
-                    edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), slate_gray));
+                    line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.ghost));
+                    edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.slate_gray));
                 }
             } else {
                 save_changes_button.setEnabled(false);
                 save_changes_button.setAlpha((float) 0.6);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), tall_poppy));
+                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
+                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
             }
         }
     };
@@ -143,7 +137,7 @@ public class EnterFrequencyActivity extends BaseActivity {
                 buttonBaseFrequency.setOnClickListener(view -> {
                     if (frequency_textView.getText().toString().isEmpty() || frequency_textView.getText().toString().length() > 6) {
                         frequency_textView.setText(String.valueOf(finalBaseNumber));
-                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), ebony_clay));
+                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.ebony_clay));
                     }
                 });
                 linearLayoutBaseFrequency.addView(buttonBaseFrequency);
@@ -163,9 +157,9 @@ public class EnterFrequencyActivity extends BaseActivity {
         buttonBaseFrequency = new Button(new ContextThemeWrapper(this, R.style.button_number_small), null, R.style.button_number_small);
         buttonBaseFrequency.setLayoutParams(newButtonParams());
         buttonBaseFrequency.setGravity(Gravity.CENTER);
-        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, button_number));
+        buttonBaseFrequency.setBackground(ContextCompat.getDrawable(this, R.drawable.button_number));
         buttonBaseFrequency.setTextSize(16);
-        buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        buttonBaseFrequency.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         buttonBaseFrequency.setText(String.valueOf(baseNumber));
     }
 

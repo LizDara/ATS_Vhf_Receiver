@@ -38,7 +38,7 @@
                 <ImageView
                     android:layout_width="@dimen/input_height"
                     android:layout_height="@dimen/input_height"
-                    android:src="@drawable/acoustic_receiver"
+                    android:src="@drawable/ic_salmon_icon"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

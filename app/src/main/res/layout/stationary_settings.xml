@@ -177,7 +177,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/scan_tables_next_imageView"
+                android:id="@+id/scan_tables_next_imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />

@@ -14,13 +14,10 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Models.ScanDetail;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import java.util.Calendar;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 
@@ -48,7 +45,7 @@ public class ScanBaseActivity extends BaseActivity {
     protected ScanDetailListAdapter scanDetailListAdapter;
 
     protected void setNotificationLog() {
-        TransferBleData.notificationLog();
+        TransferBleData.notificationLog(true);
         try {
             Thread.sleep(ValueCodes.WAITING_PERIOD);
         } catch (InterruptedException e) {
@@ -56,20 +53,8 @@ public class ScanBaseActivity extends BaseActivity {
         }
     }
 
-    protected byte[] setCalendar() {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int YY = currentDate.get(Calendar.YEAR);
-        int MM = currentDate.get(Calendar.MONTH);
-        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-        int mm =  currentDate.get(Calendar.MINUTE);
-        int ss = currentDate.get(Calendar.SECOND);
-
-        return new byte[] {0, (byte) (YY % 100), (byte) (MM + 1), (byte) DD, (byte) hh, (byte) mm, (byte) ss, 0, 0, 0};
-    }
-
     protected void setNotificationLogScanning() {
-        TransferBleData.notificationLog();
+        TransferBleData.notificationLog(true);
     }
 
     @Override
@@ -84,28 +69,21 @@ public class ScanBaseActivity extends BaseActivity {
         range = sharedPreferences.getInt(ValueCodes.RANGE, 0);
     }
 
-    protected void updateVisibility(int visibility) {
-        code_period_textView.setText(Converters.getHexValue(detectionType).equals("09") ? R.string.lb_code : R.string.lb_period);
-        mortality_pulse_rate_textView.setText(Converters.getHexValue(detectionType).equals("09") ? R.string.lb_mortality : R.string.lb_pulse_rate);
+    protected void updateVisibility() {
+        code_period_textView.setText(detectionType == DetectionFilter.CODED ? R.string.lb_code : R.string.lb_period);
+        mortality_pulse_rate_textView.setText(detectionType == DetectionFilter.CODED ? R.string.lb_mortality : R.string.lb_pulse_rate);
     }
 
     protected void initializeDetectionFilter(byte[] data) {
-        String detection = Converters.getHexValue(detectionType).equals("08") ? "Fixed Pulse Rate" : "Variable Pulse Rate";
-        String dataCalculation = "";
-        switch (Converters.getHexValue(detectionType)) {
-            case "06":
-                dataCalculation = "Yes";
-                break;
-            case "07":
-                dataCalculation = "None";
-                break;
-        }
-        String matches = Converters.getDecimalValue(data[19]);
-        String pr1 = Converters.getDecimalValue(data[20]);
-        String pr1Tolerance = Converters.getDecimalValue(data[21]);
-        String pr2 = Converters.getDecimalValue(data[22]);
-        String pr2Tolerance = Converters.getDecimalValue(data[23]);
-        viewDetectionFilter = ViewDetectionFilter.newInstance(detection, pr1, pr1Tolerance, pr2, pr2Tolerance, dataCalculation, matches);
+        DetectionFilter detectionFilter = new DetectionFilter();
+        detectionFilter.detectionType = detectionType;
+        detectionFilter.optionalData = detectionType != DetectionFilter.FIXED ? detectionType : 0;
+        detectionFilter.matches = Byte.toUnsignedInt(data[19]);
+        detectionFilter.pulseRate1 = Byte.toUnsignedInt(data[20]);
+        detectionFilter.pulseRateTolerance1 = Byte.toUnsignedInt(data[21]);
+        detectionFilter.pulseRate2 = Byte.toUnsignedInt(data[22]);
+        detectionFilter.pulseRateTolerance2 = Byte.toUnsignedInt(data[23]);
+        viewDetectionFilter = ViewDetectionFilter.newInstance(detectionFilter);
     }
 
     protected void scanCoded(int code, int signalStrength, int mortality) {
@@ -143,7 +121,7 @@ public class ScanBaseActivity extends BaseActivity {
 
     private int getPositionNumber(int number) {
         for (int i = 0; i < scanDetailListAdapter.getItemCount(); i++) {
-            int currentNumber = Converters.getHexValue(detectionType).equals("09") ? scanDetailListAdapter.getDetail(i).code : scanDetailListAdapter.getDetail(i).type;
+            int currentNumber = detectionType == DetectionFilter.CODED ? scanDetailListAdapter.getDetail(i).code : scanDetailListAdapter.getDetail(i).type;
             if (number == currentNumber)
                 return i + 1;
             else if (number < currentNumber)

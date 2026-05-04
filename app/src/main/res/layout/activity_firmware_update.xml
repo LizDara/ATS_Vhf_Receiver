@@ -95,7 +95,6 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/line_height"
-            android:progress="85"
             android:progressDrawable="@drawable/progress_bar" />
 
         <TextView
@@ -122,6 +121,6 @@
     </LinearLayout>
 
     <include
-        layout="@layout/message_complete" />
+        layout="@layout/complete_message" />
 
 </LinearLayout>

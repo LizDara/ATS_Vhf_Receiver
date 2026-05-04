@@ -31,20 +31,18 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyDeleteListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
-import com.atstrack.ats.ats_vhf_receiver.Fragments.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Fragments.SelectDetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.EmptyTable;
 import com.atstrack.ats.ats_vhf_receiver.Models.Coefficients;
 import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
 import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
 
 public class FrequenciesActivity extends BaseActivity implements OnAdapterClickListener {
 
@@ -135,15 +133,15 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     private void readCoefficients(int position) {
         coefficients = new Coefficients(position, frequencyListAdapter.getFrequency(position));
-        TransferBleData.notificationLog();
+        TransferBleData.notificationLog(true);
         new Handler().postDelayed(() -> {
             sendIndex();
         }, ValueCodes.WAITING_PERIOD);
     }
 
     private void sendIndex() {
-        byte[] b = new byte[] {(byte) 0x7D, (byte) (coefficients.position + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        TransferBleData.writeFrequencies(tableNumber, b);
+        byte[] b = new byte[] {ValueCodes.COEFFICIENTS_COMMAND, (byte) (coefficients.position + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        TransferBleData.writeFrequencies(b);
     }
 
     private void addTemperatureFrequency() {
@@ -155,10 +153,10 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         byte formatA = coefficient_a_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatB = coefficient_b_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
         byte formatC = constant_button.getText().toString().contains("-") ? (byte) 0x80 : 0;
-        byte[] b = new byte[] { 0x7D, (byte) (coefficients.position == -1 ? (frequencyListAdapter.getItemCount() + 1) : (coefficients.position + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
+        byte[] b = new byte[] {ValueCodes.COEFFICIENTS_COMMAND, (byte) (coefficients.position == -1 ? (frequencyListAdapter.getItemCount() + 1) : (coefficients.position + 1)), (byte) ((frequency - baseFrequency) / 256), (byte) ((frequency - baseFrequency) % 256), formatA,
                 (byte) (coefficientA / 256), (byte) (coefficientA % 256), formatB, (byte) (coefficientB / 256), (byte) (coefficientB % 256), formatC,
                 (byte) (constant / 256), (byte) (constant % 256), 0, 0, 0};
-        boolean result = TransferBleData.writeFrequencies(tableNumber, b);
+        boolean result = TransferBleData.writeFrequencies(b);
         if (result) {
             saveCoefficients = true;
             if (coefficients.position != -1)
@@ -169,23 +167,10 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
     }
 
     private void setTable() {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        int YY = currentDate.get(Calendar.YEAR);
-        int MM = currentDate.get(Calendar.MONTH);
-        int DD = currentDate.get(Calendar.DAY_OF_MONTH);
-        int hh = currentDate.get(Calendar.HOUR_OF_DAY);
-        int mm = currentDate.get(Calendar.MINUTE);
-        int ss = currentDate.get(Calendar.SECOND);
-        byte[] b = new byte[isTemperature ? 10 : 244];
-        b[1] = (byte) (YY - 2000);
-        b[2] = (byte) MM;
-        b[3] = (byte) DD;
-        b[4] = (byte) hh;
-        b[5] = (byte) mm;
-        b[6] = (byte) ss;
-        b[7] = (byte) tableNumber;//frequency number table
-        b[8] = (byte) frequencyListAdapter.getItemCount();//Number of frequencies in the table
-        b[9] = (byte) (baseFrequency / 1000);//base frequency
+        byte[] b = setCalendar(isTemperature ? 10 : 244);
+        b[7] = (byte) tableNumber;
+        b[8] = (byte) frequencyListAdapter.getItemCount();
+        b[9] = (byte) (baseFrequency / 1000);
         if (!isTemperature) {
             b[0] = (byte) 0x7E;
             int index = 10;
@@ -193,17 +178,17 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             while (i < frequencyListAdapter.getItemCount()) {
                 b[index] = (byte) ((frequencyListAdapter.getFrequency(i) - baseFrequency) / 256);
                 b[index + 1] = (byte) ((frequencyListAdapter.getFrequency(i) - baseFrequency) % 256);
-                i++;
                 index += 2;
+                i++;
             }
         } else {
             b[0] = (byte) 0x7F;
         }
-        boolean result = TransferBleData.writeFrequencies(tableNumber, b);
+        boolean result = TransferBleData.writeFrequencies(b);
         if (result)
-            Message.showMessage(this, 0);
+            Messages.showMessage(this, 0);
         else
-            Message.showMessage(this, 2);
+            Messages.showMessage(this, 2);
     }
 
     @OnClick(R.id.delete_frequencies_button)
@@ -234,7 +219,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                 launcher.launch(intent);
             }
         } else {
-            Message.showMessage(this, 3);
+            Messages.showMessage(this, 3);
         }
     }
 
@@ -297,7 +282,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         contentViewId = R.layout.activity_vhf_frequencies;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        tableNumber = getIntent().getIntExtra(ValueCodes.TABLE_NUMBER, 0);
+        tableNumber = getIntent().getIntExtra(ValueCodes.TABLE, 0);
         originalTotalFrequencies = getIntent().getIntExtra(ValueCodes.TOTAL, 0);
         title = "Table " + tableNumber + " (" + originalTotalFrequencies + " Frequencies)";
         super.onCreate(savedInstanceState);
@@ -309,12 +294,15 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
         isTemperature = getIntent().getBooleanExtra(ValueCodes.IS_TEMPERATURE, false);
         saveCoefficients = !isTemperature;
         if (isFile) { // Ask for the frequencies obtained from a file
-            setVisibility("overview");
             originalTable = getIntent().getIntArrayExtra(ValueCodes.FREQUENCIES);
             ArrayList<Integer> frequencies = new ArrayList<>();
-            for (int frequency : originalTable)
-                frequencies.add(frequency);
-
+            if (originalTotalFrequencies > 0) {
+                setVisibility("overview");
+                for (int frequency : originalTable)
+                    frequencies.add(frequency);
+            } else {
+                setVisibility("none");
+            }
             frequencyListAdapter = new FrequencyListAdapter(this, frequencies, baseFrequency, range, launcher, isTemperature, this);
             frequencies_recyclerView.setAdapter(frequencyListAdapter);
             frequencies_recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -322,7 +310,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
             frequencies_delete_listView.setAdapter(frequencyDeleteListAdapter);
         } else { // Ask for the frequencies from that table, the frequency base and range
             if (originalTotalFrequencies > 0) { // Ask for the frequencies from the table
-                parameter = ValueCodes.TABLE;
+                parameter = ValueCodes.TABLES_COMMAND;
                 setVisibility("overview");
             } else { // Initializes empty
                 originalTable = new int[]{};
@@ -367,20 +355,20 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.TABLE))
+        if (parameter == ValueCodes.TABLES_COMMAND)
             TransferBleData.readFrequencies(tableNumber);
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        if (Integer.parseInt(Converters.getDecimalValue(data[0])) == tableNumber) // Get the frequencies from a table
+        if (Byte.toUnsignedInt(data[0]) == tableNumber)
             downloadFrequencies(data);
-        else if (Converters.getHexValue(data[0]).equals("7D")) // Get coefficients
+        else if (data[0] == ValueCodes.COEFFICIENTS_COMMAND)
             downloadCoefficients(data);
-        else if (Converters.getHexValue(data[0]).equals("6D")) // Get Mobile defaults
+        else if (data[0] == ValueCodes.MOBILE_DEFAULTS_COMMAND)
             downloadMobileDefaults(data);
-        else if (Converters.getHexValue(data[0]).equals("6C")) // Get Stationary defaults
+        else if (data[0] == ValueCodes.STATIONARY_DEFAULTS_COMMAND)
             downloadStationaryDefaults(data);
     }
 
@@ -426,14 +414,13 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
      * @param data The received packet.
      */
     private void downloadFrequencies(byte[] data) {
-        parameter = "";
+        parameter = ValueCodes.NONE;
         originalTable = new int[originalTotalFrequencies];
         ArrayList<Integer> frequencies = new ArrayList<>();
         int index = 10;
         int i = 0;
         while (i < originalTable.length) {
-            int frequency = (Integer.parseInt(Converters.getDecimalValue(data[index])) * 256) +
-                    Integer.parseInt(Converters.getDecimalValue(data[index + 1]));
+            int frequency = (Byte.toUnsignedInt(data[index]) * 256) + Byte.toUnsignedInt(data[index + 1]);
             originalTable[i] = baseFrequency + frequency;
             frequencies.add(originalTable[i]);
             i++;
@@ -514,7 +501,7 @@ public class FrequenciesActivity extends BaseActivity implements OnAdapterClickL
                         }
                     }
                 });
-                emptyTable.show(getSupportFragmentManager(), DetectionFilter.TAG);
+                emptyTable.show(getSupportFragmentManager(), SelectDetectionFilter.TAG);
             }
         }
         deleteFrequencies(showMessage);

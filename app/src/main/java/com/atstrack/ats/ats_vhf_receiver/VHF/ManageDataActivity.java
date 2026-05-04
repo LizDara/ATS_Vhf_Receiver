@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,34 +10,27 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.DriveService.DriveServiceHelper;
+import com.atstrack.ats.ats_vhf_receiver.Services.DriveServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.Models.Data;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Models.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -61,32 +53,26 @@ public class ManageDataActivity extends BaseActivity {
     LinearLayout begin_download_linearLayout;
     @BindView(R.id.downloading_file_linearLayout)
     LinearLayout downloading_file_linearLayout;
-    @BindView(R.id.download_complete_linearLayout)
-    LinearLayout download_complete_linearLayout;
     @BindView(R.id.delete_linearLayout)
     LinearLayout delete_linearLayout;
-    @BindView(R.id.deleting_linearLayout)
-    LinearLayout deleting_linearLayout;
+    @BindView(R.id.loading_message_linearLayout)
+    LinearLayout loading_message_linearLayout;
+    @BindView(R.id.state_loading_textView)
+    TextView state_loading_textView;
     @BindView(R.id.message_complete_linearLayout)
     LinearLayout message_complete_linearLayout;
     @BindView(R.id.message_complete_textView)
     TextView message_complete_textView;
-    @BindView(R.id.return_screen_button)
-    Button return_screen_button;
-    @BindView(R.id.first_step_imageView)
-    ImageView first_step_imageView;
+    @BindView(R.id.main_complete_button)
+    Button main_complete_button;
     @BindView(R.id.first_step_textView)
     TextView first_step_textView;
     @BindView(R.id.first_step_progressBar)
     ProgressBar first_step_progressBar;
-    @BindView(R.id.second_step_imageView)
-    ImageView second_step_imageView;
     @BindView(R.id.second_step_textView)
     TextView second_step_textView;
     @BindView(R.id.second_step_progressBar)
     ProgressBar second_step_progressBar;
-    @BindView(R.id.third_step_imageView)
-    ImageView third_step_imageView;
     @BindView(R.id.third_step_textView)
     TextView third_step_textView;
     @BindView(R.id.third_step_progressBar)
@@ -95,13 +81,14 @@ public class ManageDataActivity extends BaseActivity {
     TextView download_percent_textView;
     @BindView(R.id.process_percent_textView)
     TextView process_percent_textView;
+    @BindView(R.id.return_textView)
+    TextView return_textView;
 
     private final static String TAG = ManageDataActivity.class.getSimpleName();
 
     private File root;
     private ArrayList<byte[]> packets;
     private Handler receiveHandler;
-    private DriveServiceHelper driveServiceHelper;
     private int finalPageNumber;
     private int pageNumber;
     private int totalPackagesNumber;
@@ -136,12 +123,12 @@ public class ManageDataActivity extends BaseActivity {
 
     private void setStartDownload() {
         byte[] b = new byte[]{(byte) 0x94};
-        boolean result = TransferBleData.writeResponse(b);
+        TransferBleData.writeResponse(b);
     }
 
     private void setResponsePage(boolean isOk) {
         byte[] b = new byte[]{isOk ? (byte) 0x95 : (byte) 0x96};
-        boolean result = TransferBleData.writeResponse(b);
+        TransferBleData.writeResponse(b);
         Log.i(TAG, "-------------------------------------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
     }
 
@@ -172,11 +159,7 @@ public class ManageDataActivity extends BaseActivity {
         if (!bytes_stored_textView.getText().toString().contains("(0 bytes")) {
             setVisibility("delete");
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Erase Data");
-            builder.setMessage("There is no data to delete.");
-            builder.setPositiveButton("OK", null);
-            builder.show();
+            Messages.showMessage(this, "Erase Data", "There is no data to delete.");
         }
     }
 
@@ -189,11 +172,12 @@ public class ManageDataActivity extends BaseActivity {
     public void onClickCancelDownload(View v) {
         downloading = false;
         TransferBleData.downloadResponse(false);
-        showPrintDialog("Do you want to save the downloaded bytes?", 3);
+        showPrintDialog("Download Timeout", "Do you want to save the downloaded bytes?", 3);
     }
 
     @OnClick(R.id.return_textView)
     public void onClickReturn(View v) {
+        downloading = false;
         setVisibility("menu");
     }
 
@@ -202,9 +186,10 @@ public class ManageDataActivity extends BaseActivity {
         setResponseErase();
     }
 
-    @OnClick(R.id.return_screen_button)
-    public void onClickReturnScreen(View v) {
-        setVisibility("menu");
+    @OnClick(R.id.main_complete_button)
+    public void onClickMainComplete(View v) {
+        if (!downloading)
+            setVisibility("menu");
     }
 
     @Override
@@ -215,7 +200,7 @@ public class ManageDataActivity extends BaseActivity {
         title = getString(R.string.manage_receiver_data);
         super.onCreate(savedInstanceState);
 
-        parameter = ValueCodes.TEST;
+        parameter = ValueCodes.STORAGE_COMMAND;
         downloading = false;
         receiveHandler = new Handler();
         setVisibility("menu");
@@ -225,8 +210,10 @@ public class ManageDataActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ValueCodes.REQUEST_CODE_SIGN_IN) {
-            if (resultCode == RESULT_OK)
-                handleSignInIntent(data);
+            if (resultCode == RESULT_OK) {
+                DriveServiceHelper driveServiceHelper = new DriveServiceHelper(root, dataList.get(1).fileName, this);
+                driveServiceHelper.handleSignInIntent(data);
+            }
         }
     }
 
@@ -235,11 +222,9 @@ public class ManageDataActivity extends BaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (menu_manage_receiver_linearLayout.getVisibility() == View.VISIBLE)
                 finish();
-            else if (begin_download_linearLayout.getVisibility() == View.VISIBLE)
-                setVisibility("menu");
             else if (downloading_file_linearLayout.getVisibility() == View.VISIBLE)
                 setVisibility("begin");
-            else if (download_complete_linearLayout.getVisibility() == View.VISIBLE || delete_linearLayout.getVisibility() == View.VISIBLE || message_complete_linearLayout.getVisibility() == View.VISIBLE)
+            else if (begin_download_linearLayout.getVisibility() == View.VISIBLE || delete_linearLayout.getVisibility() == View.VISIBLE || message_complete_linearLayout.getVisibility() == View.VISIBLE)
                 setVisibility("menu");
             return true;
         }
@@ -257,34 +242,37 @@ public class ManageDataActivity extends BaseActivity {
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.TEST))
+        if (parameter == ValueCodes.STORAGE_COMMAND)
             TransferBleData.readDataInfo();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        switch (Converters.getHexValue(data[0])) {
-            case "52": // Get memory used and byte stored
+        switch (data[0]) {
+            case ValueCodes.STORAGE_COMMAND:
                 if (data.length < 230) {
                     downloadTest(data);
                     break;
                 }
-            case "DD": // Get delete or download response
+            case ValueCodes.STORAGE_RESPONSE_COMMAND: // Get delete or download response
                 if (isTransmissionDone(data)) {
                     successfulResponse(data);
                     break;
+                } else if (!downloading && data.length < 230) {
+                    Messages.showMessage(this, "Erase Data", "Not Completed.");
+                    break;
                 }
-            case "AA": // Error packet
+            case ValueCodes.STORAGE_ERROR_COMMAND:
                 if (data.length == 5 && isErrorPacket(data)) { // Show an error when the packet contains 5 bytes and stops downloading
                     error = true;
                     downloading = false;
                     setVisibility("menu");
                     TransferBleData.downloadResponse(false);
-                    Message.showMessage(getParent(), "Error", "Download error (Packet error).");
+                    Messages.showMessage(getParent(), "Error", "Download error (Packet error).");
                     break;
                 }
-            default: // Get raw data in pages, each page contains 2048 bytes. 9 packets of 230 bytes
+            default: // Get raw data in pages, each page contains 2048 bytes. 9 packets of 230 bytes is a page
                 if (data.length > 4)
                     downloadRawData(data);
                 else if (data.length == 4)// Get pages total number
@@ -299,9 +287,8 @@ public class ManageDataActivity extends BaseActivity {
                 menu_manage_receiver_linearLayout.setVisibility(View.VISIBLE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.manage_receiver_data);
                 break;
@@ -309,9 +296,8 @@ public class ManageDataActivity extends BaseActivity {
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.VISIBLE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.lb_download_receiver_data);
                 break;
@@ -319,27 +305,27 @@ public class ManageDataActivity extends BaseActivity {
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.VISIBLE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.GONE);
                 break;
             case "downloaded":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.VISIBLE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.GONE);
-                message_complete_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
+                message_complete_linearLayout.setVisibility(View.VISIBLE);
+                message_complete_textView.setText(R.string.lb_download_complete);
+                main_complete_button.setText(R.string.lb_open_file);
+                return_textView.setVisibility(View.VISIBLE);
                 break;
             case "delete":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.VISIBLE);
-                deleting_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.GONE);
                 title_toolbar.setText(R.string.lb_delete_receiver_data);
                 break;
@@ -347,21 +333,21 @@ public class ManageDataActivity extends BaseActivity {
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.VISIBLE);
+                loading_message_linearLayout.setVisibility(View.VISIBLE);
                 message_complete_linearLayout.setVisibility(View.GONE);
+                state_loading_textView.setText(R.string.lb_deleting);
                 break;
             case "deleted":
                 menu_manage_receiver_linearLayout.setVisibility(View.GONE);
                 begin_download_linearLayout.setVisibility(View.GONE);
                 downloading_file_linearLayout.setVisibility(View.GONE);
-                download_complete_linearLayout.setVisibility(View.GONE);
                 delete_linearLayout.setVisibility(View.GONE);
-                deleting_linearLayout.setVisibility(View.GONE);
+                loading_message_linearLayout.setVisibility(View.GONE);
                 message_complete_linearLayout.setVisibility(View.VISIBLE);
                 message_complete_textView.setText(R.string.lb_deletion_complete);
-                return_screen_button.setText(R.string.lb_return_screen);
+                main_complete_button.setText(R.string.lb_return_screen);
+                return_textView.setVisibility(View.GONE);
                 break;
         }
     }
@@ -371,9 +357,9 @@ public class ManageDataActivity extends BaseActivity {
      * @param data The received packet.
      */
     private void downloadTest(byte[] data) {
-        parameter = "";
-        int numberPage = findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
-        int lastPage = findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
+        parameter = ValueCodes.NONE;
+        int numberPage = Converters.findPageNumber(new byte[]{data[4], data[3], data[2], data[1]});
+        int lastPage = Converters.findPageNumber(new byte[]{data[8], data[7], data[6], data[5]});
         memory_used_percent_textView.setText(((int) (((float) numberPage / (float) lastPage) * 100)) + "%");
         memory_used_progressBar.setProgress((int) ((((float) numberPage / (float) lastPage)) * 100));
         bytes_stored_textView.setText("Memory Used (" + (numberPage * 2048) + " bytes stored)");
@@ -390,65 +376,52 @@ public class ManageDataActivity extends BaseActivity {
                 checkPackets();
             }, ValueCodes.DOWNLOAD_PERIOD);
         } else {
-            if (Converters.getHexValue(data).equals("DD 00 BB EE ")) {
-                TransferBleData.readDataInfo();
-                setVisibility("deleted");
-            } else {
-                Message.showMessage(this, "Erase Data", "Not Completed.");
-            }
+            TransferBleData.readDataInfo();
+            setVisibility("deleted");
         }
     }
 
     private void initDownloading() {
-        first_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
+        first_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
         first_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
         first_step_progressBar.setVisibility(View.GONE);
-        second_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
+
+        second_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
         second_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
         second_step_progressBar.setVisibility(View.GONE);
-        third_step_imageView.setBackgroundResource(R.drawable.ic_circle_light);
+
+        third_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
         third_step_textView.setTextColor(ContextCompat.getColor(this, R.color.slate_gray));
         third_step_progressBar.setVisibility(View.GONE);
     }
 
     private void loadDownloading() {
+        first_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
         first_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-        first_step_imageView.setBackgroundResource(R.drawable.ic_circle);
         first_step_progressBar.setVisibility(View.VISIBLE);
     }
 
     private void loadProcessing() {
-        first_step_imageView.setBackgroundResource(R.drawable.circle_check);
+        first_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
         first_step_progressBar.setVisibility(View.GONE);
+
+        second_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
         second_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-        second_step_imageView.setBackgroundResource(R.drawable.ic_circle);
         second_step_progressBar.setVisibility(View.VISIBLE);
     }
 
     private void loadPreparing() {
-        second_step_imageView.setBackgroundResource(R.drawable.circle_check);
+        second_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
         second_step_progressBar.setVisibility(View.GONE);
+
+        second_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
         third_step_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-        third_step_imageView.setBackgroundResource(R.drawable.ic_circle);
         third_step_progressBar.setVisibility(View.VISIBLE);
     }
 
     private void downloaded() {
-        third_step_imageView.setBackgroundResource(R.drawable.circle_check);
+        second_step_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
         third_step_progressBar.setVisibility(View.GONE);
-    }
-
-    /**
-     * Finds the page number of a 4-byte packet.
-     * @param packet The received packet.
-     * @return Returns the page number.
-     */
-    private int findPageNumber(byte[] packet) {
-        int pageNumber = Integer.parseInt(Converters.getDecimalValue(packet[0]));
-        pageNumber = (Integer.parseInt(Converters.getDecimalValue(packet[1])) << 8) | pageNumber;
-        pageNumber = (Integer.parseInt(Converters.getDecimalValue(packet[2])) << 16) | pageNumber;
-        pageNumber = (Integer.parseInt(Converters.getDecimalValue(packet[3])) << 24) | pageNumber;
-        return pageNumber;
     }
 
     private int findPacketNumber(byte[] packet) {
@@ -487,7 +460,7 @@ public class ManageDataActivity extends BaseActivity {
     }
 
     private void downloadPagesTotalNumber(byte[] packet) {
-        finalPageNumber = findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
+        finalPageNumber = Converters.findPageNumber(new byte[] {packet[3], packet[2], packet[1], packet[0]}); // The first package indicates the total number of pages and the current page
         totalPackagesNumber = finalPageNumber * 9;
         downloading = finalPageNumber > 0;
         if (downloading) {
@@ -501,7 +474,7 @@ public class ManageDataActivity extends BaseActivity {
             setStartDownload();
         } else { // No data to download
             setVisibility("menu");
-            Message.showMessage(this, "Message", "No data to download.");
+            Messages.showMessage(this, "Message", "No data to download.");
         }
     }
 
@@ -524,7 +497,7 @@ public class ManageDataActivity extends BaseActivity {
                     boolean isOk = false;
                     if (pagePackets.size() >= 9 && downloading) {
                         if (findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
-                            int number = findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
+                            int number = Converters.findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
                             if (number == pageNumber) {
                                 pageNumber++;
                                 for (byte[] pagePacket : pagePackets) {
@@ -537,7 +510,7 @@ public class ManageDataActivity extends BaseActivity {
                                     for (byte[] pagePacket : pagePackets) {
                                         number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
                                         if (number == packetNumber - 1) {
-                                            packets.set(number - 1, pagePacket);
+                                            packets.set((number - 1) + ((pageNumber - 1) * 9), pagePacket);
                                         } else {
                                             packets.add(pagePacket);
                                             packetNumber++;
@@ -617,12 +590,11 @@ public class ManageDataActivity extends BaseActivity {
                     message += ". Timeout.";
                 else if (Snapshots.BYTES_PER_PAGE * pageNumber == Snapshots.BYTES_PER_PAGE * finalPageNumber)
                     message += ". Not successfully.";
-                Message.showMessage(this, "Finished", message);
+                Messages.showMessage(this, "Finished", message);
             } else {
-                showPrintDialog(message, 1);
+                showPrintDialog("Finished", message, 1);
             }
         }
-        downloading = false;
     }
 
     private void saveRawData() {
@@ -638,9 +610,9 @@ public class ManageDataActivity extends BaseActivity {
      * @param message   A short explanation of the status.
      * @param buttonNum Number of the type message.
      */
-    private void showPrintDialog(String message, int buttonNum) {
+    private void showPrintDialog(String title, String message, int buttonNum) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Finished");
+        builder.setTitle(title);
         builder.setMessage(message);
         switch (buttonNum) {
             case 2: // Save to the cloud
@@ -652,7 +624,7 @@ public class ManageDataActivity extends BaseActivity {
             case 1: // Ask if you want to save file to the cloud
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     setVisibility("downloaded");
-                    showPrintDialog("Do you want to send the file to the cloud?", 2);
+                    showPrintDialog("Google Drive", "Do you want to send the file to the cloud?", 2);
                 });
                 break;
             case 3: // Cancel download. Save the download bytes
@@ -680,40 +652,5 @@ public class ManageDataActivity extends BaseActivity {
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestScopes(new Scope(DriveScopes.DRIVE_FILE)).build();
         GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
         startActivityForResult(client.getSignInIntent(), ValueCodes.REQUEST_CODE_SIGN_IN);
-    }
-
-    /**
-     * Access the drive files of the logged in account.
-     * @param data Content of account information.
-     */
-    private void handleSignInIntent(Intent data) {
-        GoogleSignIn.getSignedInAccountFromIntent(data).addOnSuccessListener(googleSignInAccount -> {
-            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                    ManageDataActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
-
-            credential.setSelectedAccount(googleSignInAccount.getAccount());
-            Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("ATS Bridge").build();
-            driveServiceHelper = new DriveServiceHelper(googleDriveService);
-
-            uploadFile();
-        }).addOnFailureListener(e -> Log.i(TAG, e.toString()));
-    }
-
-    /**
-     * Saves the document in the drive account.
-     */
-    private void uploadFile() {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Uploading to Google Drive.");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-
-        driveServiceHelper.createFile(root.getAbsolutePath(), dataList.get(1).fileName).addOnSuccessListener(s -> {
-            progressDialog.dismiss();
-            Toast.makeText(getApplicationContext(), "Uploaded successfully.", Toast.LENGTH_LONG).show();
-        }).addOnFailureListener(e -> {
-            progressDialog.dismiss();
-            Toast.makeText(getApplicationContext(), "Check your Google Drive Api key", Toast.LENGTH_LONG).show();
-        });
     }
 }

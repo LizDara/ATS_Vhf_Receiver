@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -14,12 +15,18 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Models.Data;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import butterknife.ButterKnife;
 
@@ -32,8 +39,7 @@ public class BaseActivity extends AppCompatActivity {
     protected String title;
 
     protected final Context mContext = this;
-    protected int number;
-    protected String parameter = "";
+    protected byte parameter = ValueCodes.NONE;
     protected ReceiverCallback receiverCallback;
     protected GattUpdateReceiver gattUpdateReceiver;
     protected final LeServiceConnection leServiceConnection = LeServiceConnection.getInstance();
@@ -109,36 +115,59 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void setSdCardStatus(byte[] data) {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.changeSDCard(Converters.getHexValue(data[1]).equals("80"));
+        receiverInformation.changeSDCard(data[1] == (byte) 0x80);
         ActivitySetting.setSdCardStatus(this);
     }
 
     protected void setBatteryPercent(byte[] data) {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.changeDeviceBattery(Integer.parseInt(Converters.getDecimalValue(data[1])));
+        receiverInformation.changeDeviceBattery(Byte.toUnsignedInt(data[1]));
         ActivitySetting.setBatteryPercent(this);
     }
 
     protected void gattDisconnected() {
-        parameter = "";
-        Message.showDisconnectionMessage(mContext);
+        parameter = ValueCodes.NONE;
+        Messages.showDisconnectionMessage(mContext);
+        createLog();
     }
 
     protected void discoverCharacteristic() {
     }
 
     protected void downloadData(byte[] data) {
-        switch (Converters.getHexValue(data[0])) {
-            case "56": // Sd Card
+        switch (data[0]) {
+            case ValueCodes.SD_CARD_COMMAND:
                 if (data.length < 230) {
                     setSdCardStatus(data);
                     break;
                 }
-            case "88": // Battery
+            case ValueCodes.BATTERY_COMMAND:
                 if (data.length < 230) {
                     setBatteryPercent(data);
                     break;
                 }
         }
+    }
+
+    protected byte[] setCalendar(int length) {
+        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        byte[] b = new byte[length];
+        b[1] = (byte) (currentDate.get(Calendar.YEAR) % 100);
+        b[2] = (byte) (currentDate.get(Calendar.MONTH) + 1);
+        b[3] = (byte) currentDate.get(Calendar.DAY_OF_MONTH);
+        b[4] = (byte) currentDate.get(Calendar.HOUR_OF_DAY);
+        b[5] = (byte) currentDate.get(Calendar.MINUTE);
+        b[6] = (byte) currentDate.get(Calendar.SECOND);
+        return b;
+    }
+
+    protected void createLog() {
+        byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
+        Data logData = new Data(ValueCodes.LOG_FILE);
+        logData.packets.add(data);
+        ArrayList<Data> dataList = new ArrayList<>();
+        dataList.add(logData);
+        File root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+        Converters.printDataFiles(root, dataList);
     }
 }

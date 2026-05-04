@@ -4,24 +4,7 @@
             "outputFile": "D:\\Proyectos\\ATS_VHF_Receiver\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-lo\\values-lo.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\b9e4376e452ce4f1a2bbb1fc4b534124\\transformed\\core-1.7.0\\res\\values-lo\\values-lo.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "100",
-                        "endOffsets": "151"
-                    },
-                    "to": {
-                        "startLines": "48",
-                        "startColumns": "4",
-                        "startOffsets": "5108",
-                        "endColumns": "100",
-                        "endOffsets": "5204"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\07dd62e5c6684f4761e080785c8f95da\\transformed\\jetified-play-services-base-18.1.0\\res\\values-lo\\values.xml",
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\47b03e312005225184c49cb9449b1ec2\\transformed\\jetified-play-services-base-18.3.0\\res\\values-lo\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -55,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\0d7818fdd05e4d426579c5611edb47b4\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-lo\\values.xml",
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\9c447350fecc7ae5dfbfa0b53932fc50\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-lo\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -69,6 +52,23 @@
                         "startOffsets": "3788",
                         "endColumns": "131",
                         "endOffsets": "3915"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\crepo\\.gradle\\caches\\transforms-3\\49e7ac19d247264e5ea3dec22f6d785c\\transformed\\core-1.8.0\\res\\values-lo\\values-lo.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "48",
+                        "startColumns": "4",
+                        "startOffsets": "5108",
+                        "endColumns": "100",
+                        "endOffsets": "5204"
                     }
                 }
             ]

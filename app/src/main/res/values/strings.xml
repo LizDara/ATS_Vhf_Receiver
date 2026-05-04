@@ -162,7 +162,23 @@
     <!--EDIT FREQUENCY TABLES-->
     <string name="edit_frequency_tables">Edit Frequency Tables</string>
     <string name="lb_select_table">Select a Table</string>
+    <string name="lb_table_summary">Table Summary</string>
     <string name="lb_load_table_from_file">Load From File</string>
+    <string name="lb_importing_tables">Importing Tables ...</string>
+    <string name="lb_frequencies_imported">Frequencies Imported</string>
+    <string name="lb_note_push">Note: pushing frequencies to receiver will overwrite any existing ones.</string>
+    <string name="lb_push_frequencies">Push Frequencies to Receiver</string>
+    <string name="lb_pushing_frequencies">Pushing Frequencies ...</string>
+    <string name="lb_frequencies_pushed">Frequencies pushed to receiver</string>
+    <string name="lb_return_upload"><u>Return to Upload</u></string>
+    <string name="lb_cancel_upload">Cancel Upload</string>
+    <string name="lb_removed_frequencies">Removed Frequencies</string>
+    <string name="lb_removed_frequencies_message">Some frequencies were out of range and automatically removed. Tap to view removed frequencies.</string>
+    <string name="lb_error">Error</string>
+    <string name="lb_cancel_frequency_upload">Cancel Frequency Upload?</string>
+    <string name="lb_error_upload">Something went wrong when trying to upload your frequencies. Please check your file and try again.</string>
+    <string name="lb_error_push">Something went wrong when trying to push your frequencies to the receiver. Please try again.</string>
+    <string name="lb_cancel_frequencies">If you go back before frequencies are pushed to receiver the upload will be canceled.</string>
     <string name="lb_empty_table">0 frequencies</string>
     <string name="lb_all_frequencies">All Frequencies</string>
     <string name="lb_delete_frequencies">Delete Frequencies</string>
@@ -365,13 +381,6 @@
     </string-array>
 
     <string-array name="scanRateStationary">
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
         <item>10</item>
         <item>11</item>
         <item>12</item>
@@ -621,7 +630,6 @@
     </string-array>
 
     <string-array name="timeout">
-        <item>3</item>
         <item>4</item>
         <item>5</item>
         <item>6</item>
@@ -891,7 +899,7 @@
     <!--HOME-->
     <string name="bluetooth_beacon">BLUETOOTH BEACON</string>
     <string name="lb_detect_tags">Detect Tags</string>
-    
+
     <!--TAGS-->
     <string name="tag_detection">TAG DETECTION</string>
     <string name="lb_disable">Disable</string>
@@ -905,6 +913,7 @@
     <string name="lb_time_since">Time Since (secs): </string>
     <string name="lb_temperature_c">Temperature (C): </string>
     <string name="lb_voltage">Voltage (mV): </string>
+    <string name="lb_isolate_audio">Isolate Audio</string>
 
     <!-- - - - - - FIRMWARE UPDATE - - - - - -->
     <string name="firmware_update">Firmware Update</string>

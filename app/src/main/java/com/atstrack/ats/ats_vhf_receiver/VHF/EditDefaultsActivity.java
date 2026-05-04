@@ -16,14 +16,14 @@ public class EditDefaultsActivity extends BaseActivity {
     @OnClick(R.id.aerial_defaults_button)
     public void onClickAerialDefaults(View v) {
         Intent intent = new Intent(this, MobileDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE_DEFAULTS_COMMAND);
         startActivity(intent);
     }
 
     @OnClick(R.id.stationary_defaults_button)
     public void onClickStationaryDefaults(View v) {
         Intent intent = new Intent(this, StationaryDefaultsActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY);
+        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS_COMMAND);
         startActivity(intent);
     }
 

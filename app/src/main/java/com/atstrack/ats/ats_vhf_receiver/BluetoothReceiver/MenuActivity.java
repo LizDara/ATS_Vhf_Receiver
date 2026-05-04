@@ -22,7 +22,7 @@ public class MenuActivity extends BaseActivity {
 
     @OnClick(R.id.detect_tags_button)
     public void onClickDetectTags(View v) {
-        Intent intent = new Intent(this, TagDetectionActivity.class);
+        Intent intent = new Intent(this, BluetoothTagDetectionActivity.class);
         startActivity(intent);
     }
 

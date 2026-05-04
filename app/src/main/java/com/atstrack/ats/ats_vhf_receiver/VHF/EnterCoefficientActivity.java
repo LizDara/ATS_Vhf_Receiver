@@ -1,7 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -35,7 +33,7 @@ public class EnterCoefficientActivity extends BaseActivity {
                 coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
                 coefficient_textView.getText().toString().isEmpty()) {
             coefficient_textView.setText("-");
-            coefficient_textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+            coefficient_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
             save_coefficient_button.setEnabled(true);
             save_coefficient_button.setAlpha(1);
         } else {
@@ -56,7 +54,7 @@ public class EnterCoefficientActivity extends BaseActivity {
                 coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
                 coefficient_textView.getText().toString().isEmpty()) {
             coefficient_textView.setText(button.getText());
-            coefficient_textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+            coefficient_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
             save_coefficient_button.setEnabled(true);
             save_coefficient_button.setAlpha(1);
         } else if (coefficient_textView.getText().toString().length() < 7) {

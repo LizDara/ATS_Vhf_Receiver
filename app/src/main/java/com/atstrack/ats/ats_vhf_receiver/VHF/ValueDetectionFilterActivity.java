@@ -18,9 +18,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class ValueDetectionFilterActivity extends BaseActivity {
@@ -99,7 +99,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         coded_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.CODED_CODE;
+        value = DetectionFilter.CODED;
     }
 
     @OnClick(R.id.fixed_pulse_rate_linearLayout)
@@ -107,7 +107,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         coded_imageView.setVisibility(View.GONE);
         fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
         variable_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.FIXED_PULSE_RATE_CODE;
+        value = DetectionFilter.FIXED;
     }
 
     @OnClick(R.id.variable_pulse_rate_linearLayout)
@@ -115,7 +115,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         coded_imageView.setVisibility(View.GONE);
         variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
         fixed_pulse_rate_imageView.setVisibility(View.GONE);
-        value = ValueCodes.VARIABLE_PULSE_RATE_CODE;
+        value = DetectionFilter.VARIABLE;
     }
 
     @OnClick(R.id.none_linearLayout)
@@ -129,7 +129,7 @@ public class ValueDetectionFilterActivity extends BaseActivity {
     public void onClickTemperature(View v) {
         temperature_imageView.setVisibility(View.VISIBLE);
         none_imageView.setVisibility(View.GONE);
-        value = 6;
+        value = DetectionFilter.VARIABLE_TEMPERATURE;
     }
 
     @OnClick(R.id.two_linearLayout)
@@ -260,36 +260,32 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                 title_toolbar.setText(R.string.target_pulse_rate_1);
                 pulse_rate_textView.setText(R.string.lb_pr1);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr1_tolerance);
-                int pr1 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_1, 0);
-                int pr1Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_1, 0);
-                setPulseRate(pr1, pr1Tolerance);
+                int value1 = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                setPulseRate(value1 / 100, value1 % 100);
                 break;
             case ValueCodes.PULSE_RATE_2_CODE: // Get the pulse rate 2
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_2);
                 pulse_rate_textView.setText(R.string.lb_pr2);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr2_tolerance);
-                int pr2 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
-                int pr2Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
-                setPulseRate(pr2, pr2Tolerance);
+                int value2 = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                setPulseRate(value2 / 100, value2 % 100);
                 break;
             case ValueCodes.PULSE_RATE_3_CODE: // Get the pulse rate 3
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_3);
                 pulse_rate_textView.setText(R.string.lb_pr3);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr3_tolerance);
-                int pr3 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
-                int pr3Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
-                setPulseRate(pr3, pr3Tolerance);
+                int value3 = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                setPulseRate(value3 / 100, value3 % 100);
                 break;
             case ValueCodes.PULSE_RATE_4_CODE: // Get the pulse rate 4
                 setVisibility("pulseRateValues");
                 title_toolbar.setText(R.string.target_pulse_rate_4);
                 pulse_rate_textView.setText(R.string.lb_pr4);
                 pulse_rate_tolerance_textView.setText(R.string.lb_pr4_tolerance);
-                int pr4 = getIntent().getIntExtra(ValueCodes.PULSE_RATE_2, 0);
-                int pr4Tolerance = getIntent().getIntExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, 0);
-                setPulseRate(pr4, pr4Tolerance);
+                int value4 = getIntent().getIntExtra(ValueCodes.VALUE, 0);
+                setPulseRate(value4 / 100, value4 % 100);
                 break;
         }
     }
@@ -304,13 +300,13 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                 if (pulseRate > 0 && pulseRate <= 240) {
                     value = (pulseRate * 100) + tolerance;
                 } else {
-                    Message.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate or tolerance values.");
+                    Messages.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate or tolerance values.");
                     return true;
                 }
             } else if (type == ValueCodes.MAX_PULSE_RATE_CODE || type == ValueCodes.MIN_PULSE_RATE_CODE) {
                 value = Integer.parseInt(max_min_pulse_rate_editText.getText().toString());
                 if (value < 1 || value > 240) {
-                    Message.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate.");
+                    Messages.showMessage(this, "Invalid Format or Values", "Please enter valid pulse rate.");
                     return true;
                 }
             }
@@ -371,15 +367,15 @@ public class ValueDetectionFilterActivity extends BaseActivity {
 
     private void setPulseRateType(byte detectionType) {
         setVisibility("pulseRateTypes");
-        if (Converters.getHexValue(detectionType).equals("09")) {
+        if (detectionType == DetectionFilter.CODED) {
             coded_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.CODED_CODE;
-        } else if (Converters.getHexValue(detectionType).equals("08")) {
+            value = DetectionFilter.CODED;
+        } else if (detectionType == DetectionFilter.FIXED) {
             fixed_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.FIXED_PULSE_RATE_CODE;
-        } else if (Converters.getHexValue(detectionType).equals("07")) {
+            value = DetectionFilter.FIXED;
+        } else if (detectionType == DetectionFilter.VARIABLE) {
             variable_pulse_rate_imageView.setVisibility(View.VISIBLE);
-            value = ValueCodes.VARIABLE_PULSE_RATE_CODE;
+            value = DetectionFilter.VARIABLE;
         }
     }
 
@@ -418,10 +414,10 @@ public class ValueDetectionFilterActivity extends BaseActivity {
     }
 
     private void setDataCalculation(int calculation) {
-        if (calculation == 0)
-            none_imageView.setVisibility(View.VISIBLE);
-        else if (calculation == 6)
+        if (calculation == DetectionFilter.VARIABLE_TEMPERATURE)
             temperature_imageView.setVisibility(View.VISIBLE);
+        else
+            none_imageView.setVisibility(View.VISIBLE);
         value = calculation;
     }
 

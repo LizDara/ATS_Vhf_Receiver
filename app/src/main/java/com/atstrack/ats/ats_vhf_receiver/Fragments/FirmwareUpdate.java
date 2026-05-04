@@ -52,7 +52,7 @@ public class FirmwareUpdate extends DialogFragment {
         update_firmware_button.setOnClickListener(view1 -> {
             Bundle bundle = new Bundle();
             bundle.putBoolean(ValueCodes.VALUE, true);
-            getParentFragmentManager().setFragmentResult(ValueCodes.UPDATE, bundle);
+            getParentFragmentManager().setFragmentResult(ValueCodes.VALUE, bundle);
             dismiss();
         });
         return view;

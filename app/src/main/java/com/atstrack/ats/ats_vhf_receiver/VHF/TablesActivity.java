@@ -5,25 +5,34 @@ import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.OnClick;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TableListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.LoadedTable;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.api.client.util.IOUtils;
 
@@ -35,15 +44,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TablesActivity extends BaseActivity {
 
+    @BindView(R.id.title_tables_textView)
+    TextView title_tables_textView;
+    @BindView(R.id.load_from_file_button)
+    Button load_from_file_button;
+    @BindView(R.id.removed_frequencies_linearLayout)
+    LinearLayout removed_frequencies_linearLayout;
     @BindView(R.id.tables_listView)
     ListView tables_listView;
+    @BindView(R.id.options_loaded_linearLayout)
+    LinearLayout options_loaded_linearLayout;
 
     final private String TAG = TablesActivity.class.getSimpleName();
 
     private TableListAdapter tableListAdapter;
+    private List<LoadedTable> removedFrequencies;
+
+    @OnClick(R.id.removed_frequencies_linearLayout)
+    public void onClickRemovedFrequencies(View v) {
+        Messages.showLoadedFrequenciesMessage(this, getString(R.string.lb_removed_frequencies), removedFrequencies, true);
+    }
 
     @OnClick(R.id.load_from_file_button)
     public void onClickLoadTablesFromFile(View v) {
@@ -52,6 +77,57 @@ public class TablesActivity extends BaseActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setDataAndType(Uri.parse(externalFile.getPath()), "text/plain");
         startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
+    }
+
+    @OnClick(R.id.push_frequencies_button)
+    public void onClickPushFrequencies(View v) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.loading_message, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        ProgressBar loading_progressBar = view.findViewById(R.id.loading_progressBar);
+        ImageView loaded_imageView = view.findViewById(R.id.loaded_imageView);
+        TextView state_loading_textView = view.findViewById(R.id.state_loading_textView);
+        state_loading_textView.setText(R.string.lb_pushing_frequencies);
+        dialog.setView(view);
+        dialog.show();
+
+        Timer pushingTimeout = new Timer();
+        pushingTimeout.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+                Messages.showErrorMessage(getApplicationContext(), getString(R.string.lb_error), getString(R.string.lb_error_push), false, null);
+            }
+        }, (long) ValueCodes.DOWNLOAD_PERIOD * 2 * tableListAdapter.getCount());
+
+        int index = 0;
+        while (index < tableListAdapter.getCount()) {
+            while (!setTable(tableListAdapter.getLoadedTables().get(index))) {
+                try {
+                    Thread.sleep(ValueCodes.WAITING_PERIOD);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            try {
+                Thread.sleep(ValueCodes.DOWNLOAD_PERIOD);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            index++;
+        }
+        if (index == tableListAdapter.getCount()) {
+            pushingTimeout.cancel();
+            pushingTimeout.purge();
+            state_loading_textView.setText(R.string.lb_frequencies_pushed);
+            loading_progressBar.setVisibility(View.GONE);
+            loaded_imageView.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(() -> {
+                TransferBleData.readTables();
+                dialog.dismiss();
+                setVisibility("overview");
+            }, ValueCodes.MESSAGE_PERIOD);
+        }
     }
 
     @Override
@@ -63,8 +139,8 @@ public class TablesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         tableListAdapter = new TableListAdapter(this);
-        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
-        if (parameter.isEmpty()) {
+        parameter = getIntent().getByteExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
+        if (parameter == ValueCodes.NONE) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
@@ -76,17 +152,25 @@ public class TablesActivity extends BaseActivity {
             if (resultCode == RESULT_OK) { // Gets the Uri of the selected file
                 Uri uri = data.getData();
                 String uriString = uri.toString();
-                if (uriString.startsWith("content://")) {
-                    try (Cursor cursor = getBaseContext().getContentResolver().query(uri, null, null, null, null)) {
-                        if (cursor != null && cursor.moveToFirst()) {
-                            readFile(uri);
+                final Cursor[] cursorContainer = { null };
+                Messages.showLoadingMessage(this, getString(R.string.lb_importing_tables), getString(R.string.lb_frequencies_imported), () -> {
+                    if (uriString.startsWith("content://")) {
+                        try {
+                            cursorContainer[0] = getBaseContext().getContentResolver().query(uri, null, null, null, null);
+                        } catch (Exception ex) {
+                            Messages.showErrorMessage(this, getString(R.string.lb_error), getString(R.string.lb_error_push), false, null);
                         }
-                    } catch (Exception ex) {
-                        Log.i(TAG, "Cursor exception: " + ex);
                     }
-                } else if (uriString.startsWith("file://")) {
-                    readFile(uri);
-                }
+                }, () -> {
+                     if (uriString.startsWith("file://")) {
+                        readFile(uri);
+                    } else if (cursorContainer[0] != null && cursorContainer[0].moveToFirst()) {
+                        readFile(uri);
+                        cursorContainer[0].close();
+                    }
+                });
+            } else {
+                Messages.showErrorMessage(this, getString(R.string.lb_error), getString(R.string.lb_error_upload), false, null);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -95,7 +179,15 @@ public class TablesActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
-            finish();
+            if (tableListAdapter.isFile()) {
+                Messages.showErrorMessage(this, getString(R.string.lb_cancel_frequency_upload), getString(R.string.lb_cancel_frequencies), true, () -> {
+                    setVisibility("overview");
+                    tableListAdapter.setFile(false);
+                    tableListAdapter.notifyDataSetChanged();
+                });
+            } else {
+                finish();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -110,10 +202,25 @@ public class TablesActivity extends BaseActivity {
 
     @Override
     protected void downloadData(byte[] data) {
-        if (Converters.getHexValue(data[0]).equals("7A")) {
+        if (data[0] == ValueCodes.TABLES_COMMAND)
             downloadTables(data);
-        } else if (Converters.getHexValue(data[0]).equals("67")) {
+        else if (data[0] == ValueCodes.DETECTION_FILTER_COMMAND)
             downloadDetectionFilter(data);
+    }
+
+    private void setVisibility(String value) {
+        switch (value) {
+            case "overview":
+                title_tables_textView.setText(R.string.lb_select_table);
+                load_from_file_button.setVisibility(View.VISIBLE);
+                options_loaded_linearLayout.setVisibility(View.GONE);
+                removed_frequencies_linearLayout.setVisibility(View.GONE);
+                break;
+            case "loaded":
+                title_tables_textView.setText(R.string.lb_table_summary);
+                load_from_file_button.setVisibility(View.GONE);
+                options_loaded_linearLayout.setVisibility(View.VISIBLE);
+                break;
         }
     }
 
@@ -135,41 +242,50 @@ public class TablesActivity extends BaseActivity {
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
+                removedFrequencies = new LinkedList<>();
+                tableListAdapter.emptyLoadedTables();
                 String line;
                 int tableNumber = 0;
-                String message = "";
-                int[][] tables = new int[12][];
                 List<Integer> frequenciesList = new LinkedList<>();
+                List<Integer> removedFrequenciesList = new LinkedList<>();
+                int frequencyRange = ((tableListAdapter.getRange() + tableListAdapter.getBaseFrequency()) * 1000) - 1;
                 while ((line = bufferedReader.readLine()) != null) { // Reads each line of the file and add it to the list
                     line = line.replace(" ", "");
                     if (line.toUpperCase().contains("TABLE")) {
                         if (tableNumber > 0) {
-                            tableListAdapter.setFrequenciesNumber(tableNumber, (byte) frequenciesList.size());
-                            tables[tableNumber - 1] = new int[frequenciesList.size()];
-                            for (int i = 0; i < frequenciesList.size(); i++)
-                                tables[tableNumber - 1][i] = frequenciesList.get(i);
-
-                            message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded" + ValueCodes.CR + ValueCodes.LF;
+                            tableListAdapter.addLoadedTable(new LoadedTable(tableNumber, frequenciesList.stream().mapToInt(Integer::intValue).toArray()));
+                            if (!removedFrequenciesList.isEmpty()) {
+                                removedFrequencies.add(new LoadedTable(tableNumber, removedFrequenciesList.stream().mapToInt(Integer::intValue).toArray()));
+                            }
                         }
                         tableNumber = Integer.parseInt(line.toUpperCase().replace("TABLE", ""));
                         frequenciesList = new LinkedList<>();
+                        removedFrequenciesList = new LinkedList<>();
                     } else {
-                        frequenciesList.add(Integer.parseInt(line));
-                        Log.i(TAG, "FREQ: " + line);
+                        try {
+                            int frequency = Integer.parseInt(line);
+                            if (frequency > (tableListAdapter.getBaseFrequency() * 1000) && frequency <= frequencyRange) {
+                                frequenciesList.add(frequency);
+                            } else {
+                                removedFrequenciesList.add(frequency);
+                                Log.i(TAG, "FREQ ADDED (" + removedFrequenciesList.size() + ")" + removedFrequenciesList.get(removedFrequenciesList.size() - 1));
+                                removed_frequencies_linearLayout.setVisibility(View.VISIBLE);
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
-                } //Last table in the file
-                tableListAdapter.setFrequenciesNumber(tableNumber, (byte) frequenciesList.size());
-                tables[tableNumber - 1] = new int[frequenciesList.size()];
-                for (int i = 0; i < frequenciesList.size(); i++)
-                    tables[tableNumber - 1][i] = frequenciesList.get(i);
-                message += "Table " + tableNumber + ", " + frequenciesList.size() + " frequencies loaded." + ValueCodes.CR + ValueCodes.LF;
-                tableListAdapter.setFile(true);
+                }
+                tableListAdapter.addLoadedTable(new LoadedTable(tableNumber, frequenciesList.stream().mapToInt(Integer::intValue).toArray())); //Last table in the file
+                if (!removedFrequenciesList.isEmpty()) {
+                    removedFrequencies.add(new LoadedTable(tableNumber, removedFrequenciesList.stream().mapToInt(Integer::intValue).toArray()));
+                }
 
-                tableListAdapter.setFrequenciesFile(tables);
+                tableListAdapter.setFile(true);
                 tableListAdapter.notifyDataSetChanged();
+                setVisibility("loaded");
 
                 fileInputStream.close();
-                showMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -199,23 +315,37 @@ public class TablesActivity extends BaseActivity {
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
     }
 
-    private void showMessage(String message) {
-        message += "You now must review each of these tables in order for each one to be stored.";
-        Message.showMessage(this, "Message!", message);
-    }
-
     /**
      * With the received packet, gets the number of frequencies from each table and display on the screen.
      * @param data The received packet.
      */
     private void downloadTables(byte[] data) {
+        setVisibility("overview");
         tableListAdapter.setData(data);
         tables_listView.setAdapter(tableListAdapter);
+        tableListAdapter.setFile(false);
         TransferBleData.readDetectionFilter();
     }
 
     private void downloadDetectionFilter(byte[] data) {
-        boolean isTemperature = Converters.getHexValue(data[1]).equals("07") && Converters.getHexValue(data[11]).equals("06");
+        boolean isTemperature = data[1] == DetectionFilter.VARIABLE && data[11] == DetectionFilter.VARIABLE_TEMPERATURE;
         tableListAdapter.setTemperature(isTemperature);
+    }
+
+    private boolean setTable(LoadedTable loadedTable) {
+        byte[] b = setCalendar(244);
+        b[0] = (byte) 0x7E;
+        b[7] = (byte) loadedTable.tableNumber;
+        b[8] = (byte) loadedTable.frequenciesLoaded.length;
+        b[9] = (byte) tableListAdapter.getBaseFrequency();
+        int index = 10;
+        int i = 0;
+        while (i < loadedTable.frequenciesLoaded.length) {
+            b[index] = (byte) ((loadedTable.frequenciesLoaded[i] - (tableListAdapter.getBaseFrequency() * 1000)) / 256);
+            b[index + 1] = (byte) ((loadedTable.frequenciesLoaded[i] - (tableListAdapter.getBaseFrequency() * 1000)) % 256);
+            index += 2;
+            i++;
+        }
+        return TransferBleData.writeFrequencies(b);
     }
 }

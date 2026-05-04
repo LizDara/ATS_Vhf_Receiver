@@ -47,11 +47,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".BeaconTag.BeaconTagDetectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".BluetoothReceiver.MenuActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".BluetoothReceiver.TagDetectionActivity"
+            android:name=".BluetoothReceiver.BluetoothTagDetectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

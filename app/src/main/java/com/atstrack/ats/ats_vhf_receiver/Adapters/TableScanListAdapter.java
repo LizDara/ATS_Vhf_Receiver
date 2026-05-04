@@ -11,7 +11,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.R;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.slate_gray;
 
 import java.util.ArrayList;
 
@@ -73,7 +72,7 @@ public class TableScanListAdapter extends BaseAdapter {
 
         if (frequencies[position + 1] == 0) {
             frequencyNumber.setEnabled(false);
-            frequencyNumber.setTextColor(ContextCompat.getColor(inflater.getContext(), slate_gray));
+            frequencyNumber.setTextColor(ContextCompat.getColor(inflater.getContext(), R.color.slate_gray));
         }
         frequencyNumber.setText("Table " + (position + 1) + " (" + frequencies[position + 1] + " frequencies)");
         frequencyNumber.setChecked(selected.get(position));

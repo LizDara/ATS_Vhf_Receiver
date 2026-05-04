@@ -21,16 +21,13 @@
         layout="@layout/downloading_file"/>
 
     <include
-        layout="@layout/download_complete"/>
-
-    <include
         layout="@layout/delete_data_receiver"/>
 
     <include
-        layout="@layout/deleting_data_receiver"/>
+        layout="@layout/loading_message"/>
 
     <include
-        layout="@layout/message_complete"/>
+        layout="@layout/complete_message"/>
 
     <include
         layout="@layout/receiver_status"/>

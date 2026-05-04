@@ -18,7 +18,6 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.TableMergeListAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.AudioOptions;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ViewDetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -41,12 +41,6 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.ArrayList;
 import java.util.Objects;
-
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ebony_clay;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.ghost;
-import static com.atstrack.ats.ats_vhf_receiver.R.color.mountain_meadow;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_primary;
-import static com.atstrack.ats.ats_vhf_receiver.R.drawable.button_stop;
 
 public class MobileScanActivity extends ScanBaseActivity {
 
@@ -70,8 +64,8 @@ public class MobileScanActivity extends ScanBaseActivity {
     TextView table_index_aerial_textView;
     @BindView(R.id.frequency_aerial_textView)
     TextView frequency_aerial_textView;
-    @BindView(R.id.hold_aerial_imageView)
-    ImageView hold_aerial_imageView;
+    @BindView(R.id.frequency_hold_textView)
+    TextView frequency_hold_textView;
     @BindView(R.id.hold_aerial_button)
     TextView hold_aerial_button;
     @BindView(R.id.decrease_imageView)
@@ -100,8 +94,6 @@ public class MobileScanActivity extends ScanBaseActivity {
     TextView table_total_aerial_textView;
     @BindView(R.id.tables_merge_listView)
     ListView tables_merge_listView;
-    @BindView(R.id.gps_imageView)
-    ImageView gps_imageView;
     @BindView(R.id.gps_state_textView)
     TextView gps_state_textView;
     @BindView(R.id.view_detection_aerial_textView)
@@ -120,7 +112,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     private boolean isHold; // This can change during scanning
     private boolean isRecord; // This can change during scanning
     private int frequencyRange;
-    private final byte[] audioOption = {(byte) 0x5A, 0, 0};
+    private byte[] audioOption = {ValueCodes.AUDIO_ALL_COMMAND, 0, 0};
     private DialogFragment audioOptions;
     private MobileDefaults mobileDefaults;
     private boolean goEditDefault;
@@ -157,13 +149,11 @@ public class MobileScanActivity extends ScanBaseActivity {
                 mobileDefaults.scanRate = Double.parseDouble(scan_rate_seconds_aerial_textView.getText().toString());
                 break;
             case ValueCodes.GPS_CODE:
-                b[2] = gps_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) | 0x80)
-                        : (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) & 0x7F);
+                b[2] = gps_switch.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x80) : (byte) (Byte.toUnsignedInt(b[2]) & 0x7F);
                 mobileDefaults.gpsOn = gps_switch.isChecked();
                 break;
             case ValueCodes.AUTO_RECORD_CODE:
-                b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) | 0x40)
-                        : (byte) (Integer.parseInt(Converters.getDecimalValue(b[2])) & 0xBF);
+                b[2] = aerial_auto_record_switch.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x40) : (byte) (Byte.toUnsignedInt(b[2]) & 0xBF);
                 mobileDefaults.autoRecordOn = aerial_auto_record_switch.isChecked();
                 break;
         }
@@ -174,10 +164,10 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     private void setStartScan() {
-        byte[] b = setCalendar();
-        b[0] = (byte) 0x82;
+        byte[] b = setCalendar(10);
+        b[0] = ValueCodes.MOBILE_SCAN_COMMAND;
         b[7] = (byte) mobileDefaults.tableNumber;
-        isScanning = TransferBleData.writeStartScan(ValueCodes.MOBILE, b);
+        isScanning = TransferBleData.writeStartScan(ValueCodes.MOBILE_SCAN_COMMAND, b);
         if (isScanning) {
             removeHold();
             isRecord = mobileDefaults.autoRecordOn;
@@ -188,7 +178,7 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     private void setStopScan() {
-        boolean result = TransferBleData.writeStopScan(ValueCodes.MOBILE);
+        boolean result = TransferBleData.writeStopScan(ValueCodes.MOBILE_SCAN_COMMAND);
         if (result) {
             clear();
             isScanning = false;
@@ -239,7 +229,7 @@ public class MobileScanActivity extends ScanBaseActivity {
      * Writes a value for merge other tables to the selected table.
      */
     private void setMergeTable() {
-        byte[] b = new byte[]{(byte) 0x8A, (byte) tableMergeListAdapter.getTableNumber()};
+        byte[] b = new byte[]{ValueCodes.SCAN_FREQUENCIES_NUMBER_COMMAND, (byte) tableMergeListAdapter.getTableNumber()};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
             isHold = false;
@@ -263,16 +253,16 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     private void setAudio() {
         byte[] b;
-        String audioDescription = "All";
-        if (Converters.getHexValue(audioOption[0]).equals("59"))
+        if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
             b = new byte[] {audioOption[0], audioOption[1], audioOption[2]};
         else
             b = new byte[] {audioOption[0], audioOption[2]};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            if (Converters.getHexValue(audioOption[0]).equals("59"))
-                audioDescription = "Single (" + Converters.getDecimalValue(audioOption[1]) + ")";
-            else if (Converters.getHexValue(audioOption[0]).equals("5B"))
+            String audioDescription = "All";
+            if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
+                audioDescription = "Single (" + Byte.toUnsignedInt(audioOption[1]) + ")";
+            else if (audioOption[0] == ValueCodes.AUDIO_NONE_COMMAND)
                 audioDescription = "None";
             id_audio_textView.setText(audioDescription);
         }
@@ -397,13 +387,9 @@ public class MobileScanActivity extends ScanBaseActivity {
         getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                String state = bundle.getString(ValueCodes.PARAMETER);
-                if (state != null && state.equals(ValueCodes.AUDIO)) {
-                    audioOption[0] = bundle.getByte(ValueCodes.AUDIO);
-                    audioOption[1] = (byte) bundle.getInt(ValueCodes.VALUE);
-                    audioOption[2] = bundle.getByte(ValueCodes.BACKGROUND);
+                audioOption = bundle.getByteArray(ValueCodes.VALUE);
+                if (audioOption != null)
                     setAudio();
-                }
             }
         });
         audioOptions.show(getSupportFragmentManager(), AudioOptions.TAG);
@@ -424,18 +410,16 @@ public class MobileScanActivity extends ScanBaseActivity {
         isHold = isReadyToTemporary = goEditDefault = false;
         handlerMessage = new Handler();
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
-        if (isScanning) { // The device is already scanning
+        if (isScanning && data != null) { // The device is already scanning
             previousScanning = true;
-            parameter = ValueCodes.CONTINUE_LOG;
+            parameter = ValueCodes.MOBILE_SCAN_COMMAND;
 
             mobileDefaults = new MobileDefaults();
-            int currentFrequency = (Integer.parseInt(Converters.getDecimalValue(data[16])) * 256)
-                    + Integer.parseInt(Converters.getDecimalValue(data[17])) + baseFrequency;
-            int currentIndex = (Integer.parseInt(Converters.getDecimalValue(data[7])) * 256)
-                    + Integer.parseInt(Converters.getDecimalValue(data[8]));
-            mobileDefaults.autoRecordOn = isRecord = (Integer.parseInt(Converters.getDecimalValue(data[15])) >> 6 & 1) == 1;
-            mobileDefaults.gpsOn = (Integer.parseInt(Converters.getDecimalValue(data[15])) >> 7 & 1) == 1;
-            isHold = Converters.getHexValue(data[1]).equals("81");
+            int currentFrequency = (Byte.toUnsignedInt(data[16]) * 256) + Byte.toUnsignedInt(data[17]) + baseFrequency;
+            int currentIndex = (Byte.toUnsignedInt(data[7]) * 256) + Byte.toUnsignedInt(data[8]);
+            mobileDefaults.autoRecordOn = isRecord = (Byte.toUnsignedInt(data[15]) >> 6 & 1) == 1;
+            mobileDefaults.gpsOn = (Byte.toUnsignedInt(data[15]) >> 7 & 1) == 1;
+            isHold = data[1] == ValueCodes.MOBILE_HOLD_COMMAND;
             frequency_aerial_textView.setText(Converters.getFrequency(currentFrequency));
             table_index_aerial_textView.setText(String.valueOf(currentIndex));
             if (isHold) setHold(); else removeHold();
@@ -455,7 +439,7 @@ public class MobileScanActivity extends ScanBaseActivity {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (!isScanning) {
                 Intent intent = new Intent(this, ScanningActivity.class);
-                intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES);
+                intent.putExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
                 startActivity(intent);
                 finish();
             } else {
@@ -483,31 +467,32 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     @Override
-    protected void updateVisibility(int visibility) {
-        super.updateVisibility(visibility);
+    protected void updateVisibility() {
+        super.updateVisibility();
+        int visibility = detectionType == DetectionFilter.CODED ? View.GONE : View.VISIBLE;
         audio_linearLayout.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
         view_detection_aerial_textView.setVisibility(visibility);
     }
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.CONTINUE_LOG))
+        if (parameter == ValueCodes.MOBILE_SCAN_COMMAND)
             setNotificationLogScanning();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        switch (Converters.getHexValue(data[0])) {
-            case "7A": // Get tables
+        switch (data[0]) {
+            case ValueCodes.TABLES_COMMAND:
                 downloadTables(data);
                 break;
-            case "6D": // Get aerial defaults data
+            case ValueCodes.MOBILE_DEFAULTS_COMMAND:
                 downloadMobileDefault(data);
                 break;
-            case "44": // Fatal Scan Error
+            case ValueCodes.FATAL_SCAN_ERROR_COMMAND:
                 break;
-            default: // Get log scan
+            default:
                 setCurrentLog(data);
                 break;
         }
@@ -575,8 +560,8 @@ public class MobileScanActivity extends ScanBaseActivity {
         ArrayList<Integer> frequencies = new ArrayList<>();
         ArrayList<Integer> tables = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
-            if (data[i] != 0 && !Converters.getHexValue(data[i]).equals("FF")) {
-                frequencies.add(Integer.parseInt(Converters.getDecimalValue(data[i])));
+            if (data[i] != ValueCodes.NONE && data[i] != ValueCodes.NULL) {
+                frequencies.add(Byte.toUnsignedInt(data[i]));
                 tables.add(i);
             }
         }
@@ -611,38 +596,38 @@ public class MobileScanActivity extends ScanBaseActivity {
 
     private void setHold() {
         hold_aerial_button.setText(R.string.lb_release);
-        hold_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_lock));
-        frequency_aerial_textView.setTextColor(ContextCompat.getColor(this, mountain_meadow));
-        edit_table_textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
+        frequency_hold_textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_lock, 0);
+        frequency_aerial_textView.setTextColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+        edit_table_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
         edit_table_textView.setEnabled(true);
     }
 
     private void removeHold() {
         hold_aerial_button.setText(R.string.lb_hold);
-        hold_aerial_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_unlock));
-        frequency_aerial_textView.setTextColor(ContextCompat.getColor(this, ebony_clay));
-        edit_table_textView.setTextColor(ContextCompat.getColor(this, ghost));
+        frequency_hold_textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_unlock, 0);
+        frequency_aerial_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+        edit_table_textView.setTextColor(ContextCompat.getColor(this, R.color.ghost));
         edit_table_textView.setEnabled(false);
     }
 
     private void setRecord() {
         record_data_button.setText(R.string.lb_stop_recording);
-        record_data_button.setBackground(ContextCompat.getDrawable(this, button_stop));
+        record_data_button.setBackground(ContextCompat.getDrawable(this, R.drawable.button_stop));
     }
 
     private void removeRecord() {
         record_data_button.setText(R.string.lb_record_data);
-        record_data_button.setBackground(ContextCompat.getDrawable(this, button_primary));
+        record_data_button.setBackground(ContextCompat.getDrawable(this, R.drawable.button_primary));
     }
 
     private void setGpsOff() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_off));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_off, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_off_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsSearching() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_searching));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_searching, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_searching_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
         latitude_textView.setText("");
@@ -650,13 +635,13 @@ public class MobileScanActivity extends ScanBaseActivity {
     }
 
     private void setGpsFailed() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_failed));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_failed, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_failed_gps);
         coordinates_linearLayout.setVisibility(View.GONE);
     }
 
     private void setGpsValid() {
-        gps_imageView.setBackground(ContextCompat.getDrawable(this, R.drawable.ic_gps_valid));
+        gps_state_textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_valid, 0, 0, 0);
         gps_state_textView.setText(R.string.lb_valid_gps);
         coordinates_linearLayout.setVisibility(View.VISIBLE);
     }
@@ -666,67 +651,64 @@ public class MobileScanActivity extends ScanBaseActivity {
      * @param data The received packet.
      */
     private void setCurrentLog(byte[] data) {
-        switch (Converters.getHexValue(data[0])) {
-            case "50":
+        switch (data[0]) {
+            case ValueCodes.SCAN_STATE_COMMAND:
                 scanState(data);
                 break;
-            case "51":
+            case ValueCodes.SCAN_GPS_STATE_COMMAND:
                 gpsState(data);
                 break;
-            case "A1":
+            case ValueCodes.SCAN_GPS_COMMAND:
                 logGps(data);
                 break;
-            case "8A":
+            case ValueCodes.SCAN_FREQUENCIES_NUMBER_COMMAND:
                 frequenciesNumber(data);
                 break;
-            case "F0":
+            case ValueCodes.SCAN_HEADER_COMMAND:
                 logScanHeader(data);
                 break;
-            case "F1":
-                logScanCoded(data); //Coded 0x09
+            case ValueCodes.SCAN_FIX_CODED_COMMAND:
+                logScanCoded(data);
                 break;
-            case "E1":
-            case "E2":
-            case "EA": //Non Coded
-                int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-                int period = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
-                if (Converters.getHexValue(detectionType).equals("08")) // Non Coded Fixed
+            case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
+            case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
+            case ValueCodes.SCAN_DATA_VARIABLE_NON_CODED_COMMAND:
+                int signalStrength = Byte.toUnsignedInt(data[4]);
+                int period = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
+                if (detectionType == DetectionFilter.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (Converters.getHexValue(detectionType).equals("07")) // Non Coded Variable
+                else if (detectionType == DetectionFilter.VARIABLE)
                     scanNonCodedVariable(period, signalStrength);
                 break;
         }
     }
 
     private void scanState(byte[] data) {
-        int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[5])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[6]));
+        int maxIndex = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
         max_index_aerial_textView.setText("Table Index (" + maxIndex + " Total)");
         table_total_aerial_textView.setText(String.valueOf(maxIndex));
         detectionType = data[18];
-        scanDetailListAdapter = new ScanDetailListAdapter(this, Converters.getHexValue(detectionType).equals("09"));
+        scanDetailListAdapter = new ScanDetailListAdapter(this, detectionType == DetectionFilter.CODED);
         item_recyclerView.setAdapter(scanDetailListAdapter);
         item_recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        int visibility = Converters.getHexValue(detectionType).equals("09") ? View.GONE : View.VISIBLE;
-        updateVisibility(visibility);
-        if (!Converters.getHexValue(detectionType).equals("09")) {
+        updateVisibility();
+        if (detectionType != DetectionFilter.CODED)
             initializeDetectionFilter(data);
-        } else {
+        else
             audioOptions = AudioOptions.newInstance();
-        }
     }
 
     private void gpsState(byte[] data) {
-        int state = Integer.parseInt(Converters.getDecimalValue(data[1]));
-        if (state == 3) // Valid
+        if (data[1] == ValueCodes.GPS_VALID)
             setGpsValid();
-        else if (state == 2) // Failed
+        else if (data[1] == ValueCodes.GPS_FAILED)
             setGpsFailed();
-        else if (state == 1) // Searching
+        else if (data[1] == ValueCodes.GPS_SEARCHING)
             setGpsSearching();
     }
 
     private void frequenciesNumber(byte[] data) {
-        int maxIndex = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) + Integer.parseInt(Converters.getDecimalValue(data[2]));
+        int maxIndex = (Byte.toUnsignedInt(data[1]) * 256) + Byte.toUnsignedInt(data[2]);
         max_index_aerial_textView.setText("Table Index (" + maxIndex + " Total)");
         table_total_aerial_textView.setText(String.valueOf(maxIndex));
     }
@@ -737,17 +719,16 @@ public class MobileScanActivity extends ScanBaseActivity {
      */
     private void logScanHeader(byte[] data) {
         clear();
-        int frequency = (Integer.parseInt(Converters.getDecimalValue(data[1])) * 256) +
-                Integer.parseInt(Converters.getDecimalValue(data[2])) + baseFrequency;
-        int index = (((Integer.parseInt(Converters.getDecimalValue(data[1])) >> 6) & 1) * 256) + Integer.parseInt(Converters.getDecimalValue(data[3]));
+        int frequency = (Byte.toUnsignedInt(data[1]) * 256) + Byte.toUnsignedInt(data[2]) + baseFrequency;
+        int index = (((Byte.toUnsignedInt(data[1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(data[3]);
         table_index_aerial_textView.setText(String.valueOf(index));
         frequency_aerial_textView.setText(Converters.getFrequency(frequency));
     }
 
     private void logScanCoded(byte[] data) {
-        int code = Integer.parseInt(Converters.getDecimalValue(data[3]));
-        int signalStrength = Integer.parseInt(Converters.getDecimalValue(data[4]));
-        int mortality = Integer.parseInt(Converters.getDecimalValue(data[5]));
+        int code = Byte.toUnsignedInt(data[3]);
+        int signalStrength = Byte.toUnsignedInt(data[4]);
+        int mortality = Byte.toUnsignedInt(data[5]);
         scanCoded(code, signalStrength, mortality);
     }
 

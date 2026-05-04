@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,8 +18,7 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Message;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class DetectionFilterActivity extends BaseActivity {
@@ -49,6 +49,8 @@ public class DetectionFilterActivity extends BaseActivity {
     TextView pr2_textView;
     @BindView(R.id.pr2_tolerance_textView)
     TextView pr2_tolerance_textView;
+    @BindView(R.id.save_changes_detection_button)
+    Button save_changes_detection_button;
 
     private DetectionFilter detectionFilter;
 
@@ -58,18 +60,18 @@ public class DetectionFilterActivity extends BaseActivity {
                     return;
                 int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                 switch (result.getResultCode()) {
-                    case ValueCodes.PULSE_RATE_TYPE_CODE: // Gets the modified pulse rate type
-                        if (value == ValueCodes.FIXED_PULSE_RATE_CODE)
+                    case ValueCodes.PULSE_RATE_TYPE_CODE:
+                        if (value == DetectionFilter.FIXED)
                             setVisibility("Fixed");
-                        else if (value == ValueCodes.VARIABLE_PULSE_RATE_CODE)
+                        else if (value == DetectionFilter.VARIABLE)
                             setVisibility("Variable");
-                        else if (value == ValueCodes.CODED_CODE)
+                        else if (value == DetectionFilter.CODED)
                             setVisibility("Coded");
                         break;
-                    case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE: // Gets the modified matches for valid pattern
+                    case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE:
                         matches_for_valid_pattern_textView.setText(String.valueOf(value));
                         break;
-                    case ValueCodes.MAX_PULSE_RATE_CODE: // Gets the modified max pulse rate
+                    case ValueCodes.MAX_PULSE_RATE_CODE:
                         max_pulse_rate_textView.setText(String.valueOf(value));
                         break;
                     case ValueCodes.MIN_PULSE_RATE_CODE:
@@ -78,7 +80,7 @@ public class DetectionFilterActivity extends BaseActivity {
                     case ValueCodes.DATA_CALCULATION_TYPE_CODE:
                         if (value == 0)
                             optional_data_textView.setText(R.string.lb_none);
-                        else if (value == 6)
+                        else if (value == DetectionFilter.VARIABLE_TEMPERATURE)
                             optional_data_textView.setText(R.string.lb_temperature);
                         break;
                     case ValueCodes.PULSE_RATE_1_CODE:
@@ -90,6 +92,9 @@ public class DetectionFilterActivity extends BaseActivity {
                         pr2_tolerance_textView.setText(String.valueOf(value % 100));
                         break;
                 }
+                boolean changed = existChanges();
+                save_changes_detection_button.setEnabled(changed);
+                save_changes_detection_button.setAlpha(changed ? (float) 1 : (float) 0.6);
             });
 
     /**
@@ -100,19 +105,19 @@ public class DetectionFilterActivity extends BaseActivity {
         b[0] = (byte) 0x47;
         switch (pulse_rate_type_textView.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
-                b = new byte[] {(byte) 0x47, (byte) 0x08, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
+                b = new byte[] {(byte) 0x47, DetectionFilter.FIXED, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
                         (byte) Integer.parseInt(pr1_textView.getText().toString()), (byte) Integer.parseInt(pr1_tolerance_textView.getText().toString()),
                         (byte) Integer.parseInt(pr2_textView.getText().toString()), (byte) Integer.parseInt(pr2_tolerance_textView.getText().toString()),
                         0, 0, 0, 0, 0};
                 break;
             case "Non Coded (Variable Pulse Rate)":
-                int optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_none)) ? 0 : 6;
-                b = new byte[] {(byte) 0x47, (byte) 0x07, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
+                int optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_none)) ? 0 : DetectionFilter.VARIABLE_TEMPERATURE;
+                b = new byte[] {(byte) 0x47, DetectionFilter.VARIABLE, (byte) Integer.parseInt(matches_for_valid_pattern_textView.getText().toString()),
                         (byte) (Integer.parseInt(max_pulse_rate_textView.getText().toString())), 0,
                         (byte) (Integer.parseInt(min_pulse_rate_textView.getText().toString())), 0, 0, 0, 0, 0, (byte) optionalData};
                 break;
             case "Coded":
-                b[1] = (byte) 0x09;
+                b[1] = DetectionFilter.CODED;
                 break;
         }
         boolean result = TransferBleData.writeDetectionFilter(b);
@@ -164,8 +169,7 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickPR1(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_1_CODE);
-        intent.putExtra(ValueCodes.PULSE_RATE_1, detectionFilter.pulseRate1);
-        intent.putExtra(ValueCodes.PULSE_RATE_TOLERANCE_1, detectionFilter.pulseRateTolerance1);
+        intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate1 * 100) + detectionFilter.pulseRateTolerance1);
         launcher.launch(intent);
     }
 
@@ -173,18 +177,17 @@ public class DetectionFilterActivity extends BaseActivity {
     public void onClickPR2(View v) {
         Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
         intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_2_CODE);
-        intent.putExtra(ValueCodes.PULSE_RATE_2, detectionFilter.pulseRate2);
-        intent.putExtra(ValueCodes.PULSE_RATE_TOLERANCE_2, detectionFilter.pulseRateTolerance2);
+        intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate2 * 100) + detectionFilter.pulseRateTolerance2);
         launcher.launch(intent);
     }
 
     @OnClick(R.id.save_changes_detection_button)
     public void onClickSaveChanges(View v) {
-        if (checkChanges()) {
+        if (existChanges()) {
             if (isDataCorrect())
                 setDetectionFilter();
             else
-                Message.showMessage(this, 1);
+                Messages.showMessage(this, 1);
         }
     }
 
@@ -196,8 +199,8 @@ public class DetectionFilterActivity extends BaseActivity {
         title = getString(R.string.set_transmitter_type);
         super.onCreate(savedInstanceState);
 
-        parameter = getIntent().getExtras().getString(ValueCodes.PARAMETER, "");
-        if (parameter.isEmpty()) {
+        parameter = getIntent().getByteExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
+        if (parameter == ValueCodes.NONE) {
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
@@ -213,21 +216,21 @@ public class DetectionFilterActivity extends BaseActivity {
 
     @Override
     protected void discoverCharacteristic() {
-        if (parameter.equals(ValueCodes.DETECTION_TYPE))
+        if (parameter == ValueCodes.DETECTION_FILTER_COMMAND)
             TransferBleData.readDetectionFilter();
     }
 
     @Override
     protected void downloadData(byte[] data) {
         super.downloadData(data);
-        if (Converters.getHexValue(data[0]).equals("67")) { // Detection Filter
-            parameter = "";
+        if (data[0] == ValueCodes.DETECTION_FILTER_COMMAND) {
+            parameter = ValueCodes.NONE;
             detectionFilter = new DetectionFilter(data);
-            switch (Converters.getHexValue(data[1])) {
-                case "09":
+            switch (data[1]) {
+                case DetectionFilter.CODED:
                     setVisibility("Coded");
                     break;
-                case "08":
+                case DetectionFilter.FIXED:
                     setVisibility("Fixed");
 
                     matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
@@ -236,7 +239,7 @@ public class DetectionFilterActivity extends BaseActivity {
                     pr2_textView.setText(String.valueOf(detectionFilter.pulseRate2));
                     pr2_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
                     break;
-                case "07":
+                case DetectionFilter.VARIABLE:
                     setVisibility("Variable");
 
                     matches_for_valid_pattern_textView.setText(String.valueOf(detectionFilter.matches));
@@ -245,6 +248,8 @@ public class DetectionFilterActivity extends BaseActivity {
                     optional_data_textView.setText(detectionFilter.optionalData == 6 ? R.string.lb_temperature : R.string.lb_none);
                     break;
             }
+            save_changes_detection_button.setEnabled(false);
+            save_changes_detection_button.setAlpha((float) 0.6);
         }
     }
 
@@ -284,46 +289,35 @@ public class DetectionFilterActivity extends BaseActivity {
      * Checks for changes to the default data.
      * @return Returns true, if there are changes.
      */
-    private boolean checkChanges() {
-        byte pulseRateType = 0;
-        int matches = (matches_for_valid_pattern_textView.getText().equals(""))
+    private boolean existChanges() {
+        DetectionFilter currentDetectionFilter = new DetectionFilter();
+        currentDetectionFilter.matches = (matches_for_valid_pattern_textView.getText().equals(""))
                 ? 0 : Integer.parseInt(matches_for_valid_pattern_textView.getText().toString());
-        int pulseRate1 = 0;
-        int pulseRate2 = 0;
-        int pulseRate3 = 0;
-        int pulseRate4 = 0;
-        int pulseRateTolerance1 = 0;
-        int pulseRateTolerance2 = 0;
-        int pulseRateTolerance3 = 0;
-        int pulseRateTolerance4 = 0;
-        int maxPulseRate = 0;
-        int minPulseRate = 0;
-        int optionalData = 0;
         switch (pulse_rate_type_textView.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
-                pulseRateType = (byte) 0x08;
-                pulseRate1 = Integer.parseInt(pr1_textView.getText().toString());
-                pulseRate2 = Integer.parseInt(pr2_textView.getText().toString());
-                pulseRateTolerance1 = Integer.parseInt(pr1_tolerance_textView.getText().toString());
-                pulseRateTolerance2 = Integer.parseInt(pr2_tolerance_textView.getText().toString());
+                currentDetectionFilter.detectionType = DetectionFilter.FIXED;
+                currentDetectionFilter.pulseRate1 = Integer.parseInt(pr1_textView.getText().toString());
+                currentDetectionFilter.pulseRate2 = Integer.parseInt(pr2_textView.getText().toString());
+                currentDetectionFilter.pulseRateTolerance1 = Integer.parseInt(pr1_tolerance_textView.getText().toString());
+                currentDetectionFilter.pulseRateTolerance2 = Integer.parseInt(pr2_tolerance_textView.getText().toString());
                 break;
             case "Non Coded (Variable Pulse Rate)":
-                pulseRateType = (byte) 0x07;
-                maxPulseRate = Integer.parseInt(max_pulse_rate_textView.getText().toString());
-                minPulseRate = Integer.parseInt(min_pulse_rate_textView.getText().toString());
-                optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_temperature)) ? 6 : 0;
+                currentDetectionFilter.detectionType = DetectionFilter.VARIABLE;
+                currentDetectionFilter.maxPulseRate = Integer.parseInt(max_pulse_rate_textView.getText().toString());
+                currentDetectionFilter.minPulseRate = Integer.parseInt(min_pulse_rate_textView.getText().toString());
+                currentDetectionFilter.optionalData = optional_data_textView.getText().toString().equals(getString(R.string.lb_temperature)) ? DetectionFilter.VARIABLE_TEMPERATURE : 0;
                 break;
             case "Coded":
-                pulseRateType = (byte) 0x09;
+                currentDetectionFilter.detectionType = DetectionFilter.CODED;
                 break;
         }
-        return detectionFilter.detectionType != Integer.parseInt(Converters.getDecimalValue(pulseRateType))
-                || detectionFilter.matches != matches || detectionFilter.pulseRate1 != pulseRate1
-                || detectionFilter.pulseRate2 != pulseRate2 || detectionFilter.pulseRate3 != pulseRate3
-                || detectionFilter.pulseRate4 != pulseRate4 || detectionFilter.pulseRateTolerance1 != pulseRateTolerance1
-                || detectionFilter.pulseRateTolerance2 != pulseRateTolerance2 || detectionFilter.pulseRateTolerance3 != pulseRateTolerance3
-                || detectionFilter.pulseRateTolerance4 != pulseRateTolerance4 || detectionFilter.maxPulseRate != maxPulseRate
-                || detectionFilter.minPulseRate != minPulseRate || detectionFilter.optionalData != optionalData;
+        return detectionFilter.detectionType != currentDetectionFilter.detectionType || detectionFilter.matches != currentDetectionFilter.matches
+                || detectionFilter.pulseRate1 != currentDetectionFilter.pulseRate1 || detectionFilter.pulseRate2 != currentDetectionFilter.pulseRate2
+                || detectionFilter.pulseRate3 != currentDetectionFilter.pulseRate3 || detectionFilter.pulseRate4 != currentDetectionFilter.pulseRate4
+                || detectionFilter.pulseRateTolerance1 != currentDetectionFilter.pulseRateTolerance1
+                || detectionFilter.pulseRateTolerance2 != currentDetectionFilter.pulseRateTolerance2 || detectionFilter.pulseRateTolerance3 != currentDetectionFilter.pulseRateTolerance3
+                || detectionFilter.pulseRateTolerance4 != currentDetectionFilter.pulseRateTolerance4 || detectionFilter.maxPulseRate != currentDetectionFilter.maxPulseRate
+                || detectionFilter.minPulseRate != currentDetectionFilter.minPulseRate || detectionFilter.optionalData != currentDetectionFilter.optionalData;
     }
 
     private boolean isDataCorrect() {

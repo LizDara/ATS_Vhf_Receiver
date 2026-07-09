@@ -21,26 +21,26 @@ public class ActivitySetting {
     }
 
     public static void setSdCardStatus(Activity context) {
-        ImageView sd_card_imageView = context.findViewById(R.id.sd_card_imageView);
-        TextView sd_card_textView = context.findViewById(R.id.sd_card_textView);
+        ImageView sd_card_imageView = context.findViewById(R.id.img_sd_card);
+        TextView sd_card_textView = context.findViewById(R.id.tv_sd_card);
         sd_card_imageView.setBackground(ContextCompat.getDrawable(context, ReceiverInformation.getReceiverInformation().isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
         sd_card_textView.setText(ReceiverInformation.getReceiverInformation().isSDCardInserted() ? "Inserted" : "None");
     }
 
     public static void setBatteryPercent(Activity context) {
-        ImageView percent_battery_imageView = context.findViewById(R.id.battery_imageView);
-        TextView percent_battery_textView = context.findViewById(R.id.percent_battery_textView);
+        ImageView percent_battery_imageView = context.findViewById(R.id.img_battery);
+        TextView percent_battery_textView = context.findViewById(R.id.tv_percent_battery);
         percent_battery_imageView.setBackground(ContextCompat.getDrawable(context, ReceiverInformation.getReceiverInformation().getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
         percent_battery_textView.setText(ReceiverInformation.getReceiverInformation().getPercentBattery() + "%");
     }
 
     public static void setToolbar(AppCompatActivity context, String title, String deviceCategory) {
-        Toolbar toolbar = context.findViewById(R.id.toolbar);
+        Toolbar toolbar = context.findViewById(R.id.tb_main);
         if (!deviceCategory.equals(ValueCodes.VHF)) {
-            View state = context.findViewById(R.id.state_view);
+            View state = context.findViewById(R.id.v_state);
             state.setVisibility(View.GONE);
         }
-        TextView title_toolbar = context.findViewById(R.id.title_toolbar);
+        TextView title_toolbar = context.findViewById(R.id.tv_title_toolbar);
         title_toolbar.setText(title);
         context.setSupportActionBar(toolbar);
         Objects.requireNonNull(context.getSupportActionBar()).setDisplayHomeAsUpEnabled(true);

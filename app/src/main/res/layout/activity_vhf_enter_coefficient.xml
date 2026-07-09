@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
     tools:context=".VHF.EnterCoefficientActivity">
 
     <include
-        layout="@layout/ats_toolbar"/>
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16sp"
+        android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
-        android:layout_marginEnd="16sp"
         android:background="@color/catskill_white"
         android:elevation="4sp"
         android:orientation="vertical"
         android:paddingVertical="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/include_toolbar"
         tools:ignore="NestedWeights">
 
         <TextView
-            android:id="@+id/coefficient_textView"
+            android:id="@+id/tv_coefficient"
             style="@style/subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +43,7 @@
             android:textColor="@color/slate_gray" />
 
         <View
-            android:id="@+id/line_frequency_view"
+            android:id="@+id/v_line_frequency"
             android:layout_width="match_parent"
             android:layout_height="1sp"
             android:layout_marginHorizontal="16sp"
@@ -43,17 +51,12 @@
             tools:ignore="SmallSp" />
 
         <include
-            layout="@layout/coefficients_number"/>
+            layout="@layout/include_coefficients_number"/>
 
     </LinearLayout>
 
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
     <Button
-        android:id="@+id/save_coefficient_button"
+        android:id="@+id/btn_save_coefficient"
         style="@style/button_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,9 +64,18 @@
         android:layout_marginVertical="24sp"
         android:alpha="0.6"
         android:enabled="false"
-        android:text="@string/lb_save" />
+        android:text="@string/lb_save"
+        app:layout_constraintBottom_toTopOf="@id/include_vhf_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <include
-        layout="@layout/receiver_status"/>
+        android:id="@+id/include_vhf_status"
+        layout="@layout/include_vhf_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

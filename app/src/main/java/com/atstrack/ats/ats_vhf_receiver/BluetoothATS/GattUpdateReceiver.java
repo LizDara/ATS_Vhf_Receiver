@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 
 public class GattUpdateReceiver {
     private final ReceiverCallback receiverCallback;

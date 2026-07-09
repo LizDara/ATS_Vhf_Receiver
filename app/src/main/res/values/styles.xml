@@ -1,5 +1,11 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+
+    <!--resources>
+        <style name="Theme.App.Splash" parent="Theme.MaterialComponents.Light.NoActionBar">
+            <android:item name="android:windowBackground">@drawable/background_branding</android:item>
+        </style>
+    </resources-->
 
     <style name="h1" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/h1</item>

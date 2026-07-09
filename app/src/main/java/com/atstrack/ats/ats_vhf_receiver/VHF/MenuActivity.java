@@ -18,8 +18,7 @@ import android.widget.TextView;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Services.FirmwareServiceHelper;
-import com.atstrack.ats.ats_vhf_receiver.Fragments.SelectDetectionFilter;
-import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
+import com.atstrack.ats.ats_vhf_receiver.DialogsFragment.DetectionFilterDialogFragment;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
@@ -27,18 +26,18 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class MenuActivity extends BaseActivity {
 
-    @BindView(R.id.vhf_name_textView)
-    TextView vhf_name_textView;
-    @BindView(R.id.menu_imageView)
-    ImageView menu_imageView;
-    @BindView(R.id.percent_battery_menu_textView)
-    TextView percent_battery_menu_textView;
-    @BindView(R.id.sd_card_menu_textView)
-    TextView sd_card_menu_textView;
-    @BindView(R.id.battery_menu_imageView)
-    ImageView battery_menu_imageView;
-    @BindView(R.id.sd_card_menu_imageView)
-    ImageView sd_card_menu_imageView;
+    @BindView(R.id.tv_vhf_name)
+    TextView tv_vhf_name;
+    @BindView(R.id.img_menu)
+    ImageView img_menu;
+    @BindView(R.id.tv_percent_battery_menu)
+    TextView tv_percent_battery_menu;
+    @BindView(R.id.tv_sd_card_menu)
+    TextView tv_sd_card_menu;
+    @BindView(R.id.img_battery_menu)
+    ImageView img_battery_menu;
+    @BindView(R.id.img_sd_card_menu)
+    ImageView img_sd_card_menu;
 
     private final static String TAG = MenuActivity.class.getSimpleName();
 
@@ -53,46 +52,39 @@ public class MenuActivity extends BaseActivity {
         boolean result = TransferBleData.writeDetectionFilter(b);
         Log.i(TAG, Converters.getHexValue(b));
         if (result) {
-            firmwareServiceHelper.updateAvailable(false);
+            firmwareServiceHelper.updateAvailable();
         } else {
             detectionType = ValueCodes.NONE;
-            detectionFilter.show(getSupportFragmentManager(), SelectDetectionFilter.TAG);
+            detectionFilter.show(getSupportFragmentManager(), DetectionFilterDialogFragment.TAG);
         }
     }
 
-    @OnClick(R.id.disconnect_button)
+    @OnClick(R.id.btn_disconnect)
     public void onClickDisconnect(View v) {
         leServiceConnection.getBluetoothLeService().disconnect();
     }
 
-    @OnClick(R.id.start_scanning_button)
+    @OnClick(R.id.btn_start_scanning)
     public void onClickStartScanning(View v) {
-        Intent intent = new Intent(this, ScanningActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_FILTER_COMMAND);
+        Intent intent = new Intent(this, StartScanningActivity.class);
         startActivity(intent);
     }
 
-    @OnClick(R.id.receiver_configuration_button)
+    @OnClick(R.id.btn_receiver_configuration)
     public void onClickReceiverConfiguration(View v) {
         Intent intent = new Intent(this, ConfigurationActivity.class);
         startActivity(intent);
     }
 
-    @OnClick(R.id.manage_receiver_data_button)
+    @OnClick(R.id.btn_manage_receiver_data)
     public void onClickManageReceiverData(View v) {
         Intent intent = new Intent(this, ManageDataActivity.class);
         startActivity(intent);
     }
 
-    @OnClick(R.id.convert_raw_data_button)
+    @OnClick(R.id.btn_convert_raw_data)
     public void onClickConvertRaw(View v) {
         Intent intent = new Intent(this, RawDataActivity.class);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.diagnostics_button)
-    public void onClickDiagnostics(View v) {
-        Intent intent = new Intent(this, DiagnosticsActivity.class);
         startActivity(intent);
     }
 
@@ -103,15 +95,12 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         firmwareServiceHelper = new FirmwareServiceHelper(this);
-        menu_imageView.setVisibility(View.GONE);
+        img_menu.setVisibility(View.GONE);
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        boolean firstTime = getIntent().getBooleanExtra(ValueCodes.FIRST_TIME, false);
-        if (firstTime) { // Check the detection type and firmware update
-            checkDetectionType(receiverInformation.getDeviceName().substring(15, 16));
-            if (detectionType != ValueCodes.NONE)
-                firmwareServiceHelper.updateAvailable(false);
-        }
-        vhf_name_textView.setText("Receiver " + receiverInformation.getSerialNumber());
+        checkDetectionType(receiverInformation.getDeviceName().substring(15, 16));
+        if (detectionType != ValueCodes.NONE)
+            firmwareServiceHelper.updateAvailable();
+        tv_vhf_name.setText("Receiver " + receiverInformation.getSerialNumber());
         setBattery(receiverInformation);
         setSdCard(receiverInformation);
     }
@@ -149,17 +138,17 @@ public class MenuActivity extends BaseActivity {
     private void checkDetectionType(String detection) {
         switch (detection) {
             case "F":
-                detectionType = DetectionFilter.FIXED;
+                detectionType = ValueCodes.FIXED;
                 break;
             case "V":
-                detectionType = DetectionFilter.VARIABLE;
+                detectionType = ValueCodes.VARIABLE;
                 break;
             case "C":
-                detectionType = DetectionFilter.CODED;
+                detectionType = ValueCodes.CODED;
                 break;
         }
         if (detectionType == ValueCodes.NONE) {
-            detectionFilter = SelectDetectionFilter.newInstance();
+            detectionFilter = DetectionFilterDialogFragment.newInstance();
 
             getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
                 @Override
@@ -168,17 +157,17 @@ public class MenuActivity extends BaseActivity {
                     setDetectionFilter();
                 }
             });
-            detectionFilter.show(getSupportFragmentManager(), SelectDetectionFilter.TAG);
+            detectionFilter.show(getSupportFragmentManager(), DetectionFilterDialogFragment.TAG);
         }
     }
 
     private void setBattery(ReceiverInformation receiverInformation) {
-        percent_battery_menu_textView.setText(receiverInformation.getPercentBattery() + "%");
-        battery_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
+        tv_percent_battery_menu.setText(receiverInformation.getPercentBattery() + "%");
+        img_battery_menu.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
     }
 
     private void setSdCard(ReceiverInformation receiverInformation) {
-        sd_card_menu_textView.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
-        sd_card_menu_imageView.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
+        tv_sd_card_menu.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
+        img_sd_card_menu.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

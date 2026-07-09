@@ -12,12 +12,9 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
-import com.atstrack.ats.ats_vhf_receiver.Services.FirmwareServiceHelper;
-import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Models.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class DiagnosticsActivity extends BaseActivity {
@@ -47,8 +44,8 @@ public class DiagnosticsActivity extends BaseActivity {
 
     @OnClick(R.id.update_receiver_button)
     public void onClickUpdateReceiver(View v) {
-        FirmwareServiceHelper firmwareServiceHelper = new FirmwareServiceHelper(this);
-        firmwareServiceHelper.updateAvailable(true);
+        //FirmwareServiceHelper firmwareServiceHelper = new FirmwareServiceHelper(this);
+        //firmwareServiceHelper.updateAvailable(true);
     }
 
     @Override
@@ -60,10 +57,10 @@ public class DiagnosticsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         parameter = ValueCodes.DIAGNOSTIC_COMMAND;
-        Messages.showLoadingMessage(this, getString(R.string.lb_running_diagnostics), getString(R.string.lb_diagnostics_complete), null, () -> {
+        /*Messages.showLoadingMessage(this, getString(R.string.lb_running_diagnostics), getString(R.string.lb_diagnostics_complete), null, () -> {
             loading_linearLayout.setVisibility(View.GONE);
             test_complete_scrollView.setVisibility(View.VISIBLE);
-        });
+        });*/
     }
 
     @Override
@@ -100,15 +97,15 @@ public class DiagnosticsActivity extends BaseActivity {
             frequency_tables_textView.setText(Converters.getDecimalValue(data[2]));
             for (int i = 3; i <= 14; i++) { // Only shows tables that have frequencies
                 if (Byte.toUnsignedInt(data[i]) > 0) {
-                    View table = getLayoutInflater().inflate(R.layout.frequency_tables, null);
-                    TextView number_of_table_textView = table.findViewById(R.id.number_of_table_textView);
-                    TextView frequencies_table_textView = table.findViewById(R.id.frequencies_table_textView);
+                    View table = getLayoutInflater().inflate(R.layout.item_frequency_tables, null);
+                    TextView number_of_table_textView = table.findViewById(R.id.tv_number_of_table);
+                    TextView frequencies_table_textView = table.findViewById(R.id.tv_frequencies_table);
                     number_of_table_textView.setText("Table " + (i - 2) + ":");
                     frequencies_table_textView.setText(Converters.getDecimalValue(data[i]));
                     frequencies_table_linearLayout.addView(table);
                 }
             }
-            tx_type_textView.setText(data[25] == DetectionFilter.CODED ? "Coded" : "Non coded");
+            tx_type_textView.setText(data[25] == ValueCodes.CODED ? "Coded" : "Non coded");
             software_version_textView.setText(Converters.getDecimalValue(data[26]));
             hardware_version_textView.setText(Converters.getDecimalValue(data[27]));
         }

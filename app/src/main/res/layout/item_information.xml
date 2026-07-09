@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_receiver_status"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/catskill_white"
+    android:orientation="vertical"
+    android:elevation="@dimen/elevation_button">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16sp">
+
+        <LinearLayout
+            android:id="@+id/layout_device_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="14sp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/img_device_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:ignore="ContentDescription" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8sp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tv_device_number"
+                style="@style/body_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+            <TextView
+                android:id="@+id/tv_device_status"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_selected"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_status_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/slate_300"
+            tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="16sp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8sp"
+                    android:text="@string/lb_frequency_range"
+                    android:textColor="@color/slate_700" />
+
+                <TextView
+                    android:id="@+id/tv_frequency_range"
+                    style="@style/body_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/slate_900" />
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_device_battery" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

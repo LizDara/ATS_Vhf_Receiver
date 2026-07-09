@@ -10,7 +10,7 @@
     tools:context=".VHF.CloneActivity">
 
     <include
-        layout="@layout/ats_toolbar"/>
+        layout="@layout/include_toolbar"/>
 
     <LinearLayout
         android:id="@+id/no_receiver_linearLayout"
@@ -184,6 +184,6 @@
     </LinearLayout>
 
     <include
-        layout="@layout/receiver_status"/>
+        layout="@layout/include_vhf_status"/>
 
 </LinearLayout>

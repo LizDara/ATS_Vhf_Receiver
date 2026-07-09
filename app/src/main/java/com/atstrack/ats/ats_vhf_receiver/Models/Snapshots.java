@@ -7,7 +7,7 @@ public class Snapshots {
     private boolean filled;
     private final byte[] snapshot;
     public int byteIndex;
-    private int size;
+    private final int size;
 
     public Snapshots() {
         //attributable variables

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_frequency_select"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
+    android:orientation="horizontal"
+    android:padding="16sp">
+
+    <CheckBox
+        android:id="@+id/cb_frequency_number"
+        style="@style/body_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/ebony_clay" />
+
+</LinearLayout>

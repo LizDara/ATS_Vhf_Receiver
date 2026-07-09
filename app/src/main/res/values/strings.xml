@@ -48,8 +48,7 @@
 
     <string-array name="categories">
         <item>VHF Receivers</item>
-        <item>Acoustic Receivers</item>
-        <item>Bluetooth Tags</item>
+        <item>BT2400 BluTrack Receiver</item>
         <item>Wildlink</item>
     </string-array>
 
@@ -96,16 +95,16 @@
     <string name="lb_period">Period</string>
     <string name="lb_pulse_rate">Pulse Rate</string>
     <string name="lb_record_data">Record Data</string>
-    <string name="lb_id_audio">ID Audio</string>
+    <string name="lb_id_audio">Code Audio</string>
     <string name="lb_latitude">Latitude</string>
     <string name="lb_longitude">Longitude</string>
     <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
-    <string name="lb_select_ids_audio">Select IDs for Audio</string>
+    <string name="lb_select_ids_audio">Select Codes for Audio</string>
     <string name="lb_single">Single</string>
     <string name="lb_all">All</string>
     <string name="lb_none">None</string>
+    <string name="lb_background">Background</string>
     <string name="lb_enter_digit_id">Enter a two digit ID</string>
-    <string name="lb_play_background_signals">Play Background Signals</string>
 
     <!--AERIAL SCAN-->
     <string name="aerial_scanning">Mobile Scanning</string>
@@ -131,6 +130,8 @@
     <string name="lb_non_coded_detection">Non Coded Detection Filter</string>
     <string name="lb_filter_type">Filter Type</string>
     <string name="lb_edit_default_settings"><u>Edit Default Settings</u></string>
+    <string name="lb_fatal_scan_error">Fatal Scan Error</string>
+    <string name="lb_receiver_repair">Please send receiver in for repairs.</string>
 
     <!--EDIT TABLE SCAN-->
     <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
@@ -161,6 +162,7 @@
 
     <!--EDIT FREQUENCY TABLES-->
     <string name="edit_frequency_tables">Edit Frequency Tables</string>
+    <string name="lb_tables_loaded">Tables Loaded</string>
     <string name="lb_select_table">Select a Table</string>
     <string name="lb_table_summary">Table Summary</string>
     <string name="lb_load_table_from_file">Load From File</string>
@@ -184,6 +186,7 @@
     <string name="lb_delete_frequencies">Delete Frequencies</string>
     <string name="lb_add_frequency">Add Frequency</string>
     <string name="lb_tap_frequency">Tap to Edit</string>
+    <string name="lb_view_tables"><u>View All Tables</u></string>
     <string name="lb_enter_frequency_digits">Enter Frequency Digits</string>
     <string name="lb_select_frequencies_delete">Select Frequencies to Delete</string>
     <string name="lb_frequency_saved">Frequency Saved</string>
@@ -328,7 +331,7 @@
         <item>4</item>
     </string-array>
 
-    <string-array name="scanRateAerial">
+    <string-array name="scanRateMobile">
         <item>1.5</item>
         <item>2.0</item>
         <item>2.5</item>
@@ -897,7 +900,7 @@
 
     <!-- - - - - - BLUETOOTH RECEIVER - - - - - -->
     <!--HOME-->
-    <string name="bluetooth_beacon">BLUETOOTH BEACON</string>
+    <string name="bluetooth_beacon">BluTrack Beacon</string>
     <string name="lb_detect_tags">Detect Tags</string>
 
     <!--TAGS-->
@@ -914,6 +917,15 @@
     <string name="lb_temperature_c">Temperature (C): </string>
     <string name="lb_voltage">Voltage (mV): </string>
     <string name="lb_isolate_audio">Isolate Audio</string>
+    <string name="lb_view_tag">Plot Tag Data</string>
+    <string name="lb_chart">Chart</string>
+    <string name="lb_chart_type">Chart Type</string>
+
+    <string-array name="chartTypes">
+        <item>RSSI</item>
+        <item>Voltage</item>
+        <item>Temperature</item>
+    </string-array>
 
     <!-- - - - - - FIRMWARE UPDATE - - - - - -->
     <string name="firmware_update">Firmware Update</string>

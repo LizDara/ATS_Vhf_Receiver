@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_tags"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/catskill_white"
+    android:elevation="@dimen/elevation_button"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_beep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16sp">
+
+        <TextView
+            android:id="@+id/tv_tag"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@drawable/ic_circle_light" />
+
+        <TextView
+            android:id="@+id/tv_detections_tag"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8sp"
+            android:drawablePadding="12dp"
+            app:drawableEndCompat="@drawable/ic_audio_on" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_up"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_tag_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/slate_300"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_rssi"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16sp"
+            android:textColor="@color/ebony_clay" />
+
+        <TextView
+            android:id="@+id/tv_time_since"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:textColor="@color/ebony_clay" />
+
+        <TextView
+            android:id="@+id/tv_temperature_c"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16sp"
+            android:textColor="@color/ebony_clay" />
+
+        <TextView
+            android:id="@+id/tv_voltage"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16sp"
+            android:layout_marginBottom="16sp"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/slate_300"
+            android:layout_marginHorizontal="16sp"
+            tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16sp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_isolate_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                style="@style/button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/lb_isolate_audio"
+                android:textColor="@color/limed_spruce" />
+
+            <Button
+                android:id="@+id/btn_view_tag"
+                style="@style/button_primary_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_view_tag" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

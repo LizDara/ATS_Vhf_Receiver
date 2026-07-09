@@ -37,6 +37,12 @@ public class BluetoothScannerActivity extends AppCompatActivity {
         initScanCallback();
     }
 
+    @Override
+    protected void onDestroy() {
+        scanLeDevice(false);
+        super.onDestroy();
+    }
+
     protected void initScanCallback() {
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE); // Initializes a Bluetooth adapter.
         mBluetoothAdapter = bluetoothManager.getAdapter();

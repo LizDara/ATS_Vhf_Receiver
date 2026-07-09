@@ -2,12 +2,10 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.CallSuper;
 import androidx.annotation.UiThread;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.Unbinder;
 import butterknife.internal.Utils;
@@ -26,16 +24,13 @@ public class MainActivity_ViewBinding implements Unbinder {
   public MainActivity_ViewBinding(MainActivity target, View source) {
     this.target = target;
 
-    target.toolbar = Utils.findRequiredViewAsType(source, R.id.toolbar, "field 'toolbar'", Toolbar.class);
-    target.state_view = Utils.findRequiredView(source, R.id.state_view, "field 'state_view'");
-    target.title_toolbar = Utils.findRequiredViewAsType(source, R.id.title_toolbar, "field 'title_toolbar'", TextView.class);
-    target.version_textView = Utils.findRequiredViewAsType(source, R.id.version_textView, "field 'version_textView'", TextView.class);
-    target.splash_screen_constraintLayout = Utils.findRequiredViewAsType(source, R.id.splash_screen_constraintLayout, "field 'splash_screen_constraintLayout'", ConstraintLayout.class);
-    target.bridge_app_linearLayout = Utils.findRequiredViewAsType(source, R.id.bridge_app_linearLayout, "field 'bridge_app_linearLayout'", LinearLayout.class);
-    target.bridge_subtitle_textView = Utils.findRequiredViewAsType(source, R.id.bridge_subtitle_textView, "field 'bridge_subtitle_textView'", TextView.class);
-    target.bridge_message_textView = Utils.findRequiredViewAsType(source, R.id.bridge_message_textView, "field 'bridge_message_textView'", TextView.class);
-    target.types_subtitle_textView = Utils.findRequiredViewAsType(source, R.id.types_subtitle_textView, "field 'types_subtitle_textView'", TextView.class);
-    target.category_recyclerView = Utils.findRequiredViewAsType(source, R.id.category_recyclerView, "field 'category_recyclerView'", RecyclerView.class);
+    target.tb_main = Utils.findRequiredViewAsType(source, R.id.tb_main, "field 'tb_main'", Toolbar.class);
+    target.v_state = Utils.findRequiredView(source, R.id.v_state, "field 'v_state'");
+    target.tv_title_toolbar = Utils.findRequiredViewAsType(source, R.id.tv_title_toolbar, "field 'tv_title_toolbar'", TextView.class);
+    target.tv_bridge_subtitle = Utils.findRequiredViewAsType(source, R.id.tv_bridge_subtitle, "field 'tv_bridge_subtitle'", TextView.class);
+    target.tv_bridge_message = Utils.findRequiredViewAsType(source, R.id.tv_bridge_message, "field 'tv_bridge_message'", TextView.class);
+    target.tv_types_subtitle = Utils.findRequiredViewAsType(source, R.id.tv_types_subtitle, "field 'tv_types_subtitle'", TextView.class);
+    target.rv_item = Utils.findRequiredViewAsType(source, R.id.rv_item, "field 'rv_item'", RecyclerView.class);
   }
 
   @Override
@@ -45,15 +40,12 @@ public class MainActivity_ViewBinding implements Unbinder {
     if (target == null) throw new IllegalStateException("Bindings already cleared.");
     this.target = null;
 
-    target.toolbar = null;
-    target.state_view = null;
-    target.title_toolbar = null;
-    target.version_textView = null;
-    target.splash_screen_constraintLayout = null;
-    target.bridge_app_linearLayout = null;
-    target.bridge_subtitle_textView = null;
-    target.bridge_message_textView = null;
-    target.types_subtitle_textView = null;
-    target.category_recyclerView = null;
+    target.tb_main = null;
+    target.v_state = null;
+    target.tv_title_toolbar = null;
+    target.tv_bridge_subtitle = null;
+    target.tv_bridge_message = null;
+    target.tv_types_subtitle = null;
+    target.rv_item = null;
   }
 }

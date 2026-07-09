@@ -1,7 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;

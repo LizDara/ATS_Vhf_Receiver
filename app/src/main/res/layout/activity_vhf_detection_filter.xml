@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
     android:fitsSystemWindows="true"
-    android:gravity="center"
-    android:orientation="vertical"
     tools:context=".VHF.DetectionFilterActivity">
 
     <include
-        layout="@layout/ats_toolbar"/>
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/include_toolbar"
+        app:layout_constraintBottom_toTopOf="@id/btn_save_changes_detection">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,7 +49,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/pulse_rate_type_linearLayout"
+                    android:id="@+id/layout_pulse_rate_type"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -64,7 +72,7 @@
                             android:textColor="@color/limed_spruce" />
 
                         <TextView
-                            android:id="@+id/pulse_rate_type_textView"
+                            android:id="@+id/tv_pulse_rate_type"
                             style="@style/body_regular"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -73,7 +81,6 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:id="@+id/pulse_rate_type_imageView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/ic_next"
@@ -82,7 +89,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/matches_for_valid_pattern_linearLayout"
+                    android:id="@+id/layout_matches_for_valid_pattern"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -116,7 +123,7 @@
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
-                                android:id="@+id/matches_for_valid_pattern_textView"
+                                android:id="@+id/tv_matches_for_valid_pattern"
                                 style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -136,7 +143,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/pulse_rates_linearLayout"
+                    android:id="@+id/layout_pulse_rates"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -148,7 +155,7 @@
                         android:background="@color/light_gray" />
 
                     <LinearLayout
-                        android:id="@+id/max_pulse_rate_linearLayout"
+                        android:id="@+id/layout_max_pulse_rate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -171,7 +178,7 @@
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
-                                android:id="@+id/max_pulse_rate_textView"
+                                android:id="@+id/tv_max_pulse_rate"
                                 style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -194,7 +201,7 @@
                         android:background="@color/light_gray" />
 
                     <LinearLayout
-                        android:id="@+id/min_pulse_rate_linearLayout"
+                        android:id="@+id/layout_min_pulse_rate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -217,7 +224,7 @@
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
-                                android:id="@+id/min_pulse_rate_textView"
+                                android:id="@+id/tv_min_pulse_rate"
                                 style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -240,7 +247,7 @@
                         android:background="@color/light_gray" />
 
                     <LinearLayout
-                        android:id="@+id/optional_data_linearLayout"
+                        android:id="@+id/layout_optional_data"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -263,7 +270,7 @@
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
-                                android:id="@+id/optional_data_textView"
+                                android:id="@+id/tv_optional_data"
                                 style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -285,7 +292,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/target_pulse_rate_linearLayout"
+                android:id="@+id/layout_target_pulse_rate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -310,7 +317,7 @@
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:id="@+id/pr1_linearLayout"
+                        android:id="@+id/layout_pr1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -340,7 +347,7 @@
                                     android:textColor="@color/limed_spruce" />
 
                                 <TextView
-                                    android:id="@+id/pr1_textView"
+                                    android:id="@+id/tv_pr1"
                                     style="@style/body_regular"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -378,7 +385,7 @@
                                         tools:ignore="HardcodedText,RtlSymmetry" />
 
                                     <TextView
-                                        android:id="@+id/pr1_tolerance_textView"
+                                        android:id="@+id/tv_pr1_tolerance"
                                         style="@style/body_regular"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -406,7 +413,7 @@
                         android:background="@color/light_gray" />
 
                     <LinearLayout
-                        android:id="@+id/pr2_linearLayout"
+                        android:id="@+id/layout_pr2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -436,7 +443,7 @@
                                     android:textColor="@color/limed_spruce" />
 
                                 <TextView
-                                    android:id="@+id/pr2_textView"
+                                    android:id="@+id/tv_pr2"
                                     style="@style/body_regular"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -474,7 +481,7 @@
                                         tools:ignore="HardcodedText,RtlSymmetry" />
 
                                     <TextView
-                                        android:id="@+id/pr2_tolerance_textView"
+                                        android:id="@+id/tv_pr2_tolerance"
                                         style="@style/body_regular"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -505,14 +512,23 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/save_changes_detection_button"
+        android:id="@+id/btn_save_changes_detection"
         style="@style/button_primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_save_changes" />
+        android:text="@string/lb_save_changes"
+        app:layout_constraintBottom_toTopOf="@id/include_vhf_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <include
-        layout="@layout/receiver_status"/>
+        android:id="@+id/include_vhf_status"
+        layout="@layout/include_vhf_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

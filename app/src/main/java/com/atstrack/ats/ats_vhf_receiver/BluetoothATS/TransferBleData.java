@@ -49,7 +49,7 @@ public class TransferBleData {
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
             case ValueCodes.MOBILE_SCAN_COMMAND:
-                characteristic = AtsUuids.UUID_CHARACTERISTIC_AERIAL;
+                characteristic = AtsUuids.UUID_CHARACTERISTIC_MOBILE;
                 break;
             case ValueCodes.STATIONARY_SCAN_COMMAND:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
@@ -64,7 +64,7 @@ public class TransferBleData {
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_MANUAL;
         switch (type) {
             case ValueCodes.MOBILE_SCAN_COMMAND:
-                characteristic = AtsUuids.UUID_CHARACTERISTIC_AERIAL;
+                characteristic = AtsUuids.UUID_CHARACTERISTIC_MOBILE;
                 break;
             case ValueCodes.STATIONARY_SCAN_COMMAND:
                 characteristic = AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
@@ -79,7 +79,7 @@ public class TransferBleData {
      */
     public static boolean writeRecord(boolean start, boolean isManual) {
         byte[] data = new byte[] {start ? (byte) 0x8C : (byte) 0x8E};
-        UUID characteristic = isManual ? AtsUuids.UUID_CHARACTERISTIC_MANUAL : AtsUuids.UUID_CHARACTERISTIC_AERIAL;
+        UUID characteristic = isManual ? AtsUuids.UUID_CHARACTERISTIC_MANUAL : AtsUuids.UUID_CHARACTERISTIC_MOBILE;
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(AtsUuids.UUID_SERVICE_SCAN, characteristic, data);
     }
 
@@ -106,7 +106,7 @@ public class TransferBleData {
     public static boolean setHold(boolean isHold) {
         byte[] b = new byte[] {isHold ? (byte) 0x80 : (byte) 0x81};
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_AERIAL, b);
+                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_MOBILE, b);
     }
 
     /**
@@ -122,7 +122,7 @@ public class TransferBleData {
      * Requests a read for get defaults data.
      */
     public static void readDefaults(boolean isMobile) {
-        UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_AERIAL : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
+        UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_MOBILE : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsUuids.UUID_SERVICE_SCAN, characteristic, new byte[] { isMobile ? (byte) 0x6D : (byte) 0x6C });
     }
@@ -144,7 +144,7 @@ public class TransferBleData {
     }
 
     public static boolean writeDefaults(boolean isMobile, byte[] data) {
-        UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_AERIAL : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
+        UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_MOBILE : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsUuids.UUID_SERVICE_SCAN, characteristic, data);
     }

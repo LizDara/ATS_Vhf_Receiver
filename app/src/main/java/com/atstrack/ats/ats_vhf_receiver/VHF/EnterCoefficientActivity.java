@@ -18,67 +18,67 @@ import butterknife.OnClick;
 
 public class EnterCoefficientActivity extends BaseActivity {
 
-    @BindView(R.id.coefficient_textView)
-    TextView coefficient_textView;
-    @BindView(R.id.save_coefficient_button)
-    Button save_coefficient_button;
+    @BindView(R.id.tv_coefficient)
+    TextView tv_coefficient;
+    @BindView(R.id.btn_save_coefficient)
+    Button btn_save_coefficient;
 
     private int position;
 
-    @OnClick(R.id.plus_minus_button)
+    @OnClick(R.id.btn_plus_minus)
     public void onClickPlusMinus(View v) {
-        String number = coefficient_textView.getText().toString();
-        if (coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
-                coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
-                coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
-                coefficient_textView.getText().toString().isEmpty()) {
-            coefficient_textView.setText("-");
-            coefficient_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-            save_coefficient_button.setEnabled(true);
-            save_coefficient_button.setAlpha(1);
+        String number = tv_coefficient.getText().toString();
+        if (tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
+                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
+                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
+                tv_coefficient.getText().toString().isEmpty()) {
+            tv_coefficient.setText("-");
+            tv_coefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+            btn_save_coefficient.setEnabled(true);
+            btn_save_coefficient.setAlpha(1);
         } else {
             if (number.startsWith("-"))
-                coefficient_textView.setText(number.substring(1));
+                tv_coefficient.setText(number.substring(1));
             else
-                coefficient_textView.setText("-" + number);
+                tv_coefficient.setText("-" + number);
         }
     }
 
-    @OnClick({R.id.one_coefficient_button, R.id.two_coefficient_button, R.id.three_coefficient_button, R.id.four_coefficient_button,
-            R.id.five_coefficient_button, R.id.six_coefficient_button, R.id.seven_coefficient_button, R.id.eight_coefficient_button,
-            R.id.nine_coefficient_button, R.id.zero_coefficient_button})
+    @OnClick({R.id.btn_one_coefficient, R.id.btn_two_coefficient, R.id.btn_three_coefficient, R.id.btn_four_coefficient,
+            R.id.btn_five_coefficient, R.id.btn_six_coefficient, R.id.btn_seven_coefficient, R.id.btn_eight_coefficient,
+            R.id.btn_nine_coefficient, R.id.btn_zero_coefficient})
     public void onClickNumber(View v) {
         Button button = (Button) v;
-        if (coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
-                coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
-                coefficient_textView.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
-                coefficient_textView.getText().toString().isEmpty()) {
-            coefficient_textView.setText(button.getText());
-            coefficient_textView.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-            save_coefficient_button.setEnabled(true);
-            save_coefficient_button.setAlpha(1);
-        } else if (coefficient_textView.getText().toString().length() < 7) {
-            String number = coefficient_textView.getText().toString();
-            coefficient_textView.setText(number + button.getText());
+        if (tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
+                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
+                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
+                tv_coefficient.getText().toString().isEmpty()) {
+            tv_coefficient.setText(button.getText());
+            tv_coefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+            btn_save_coefficient.setEnabled(true);
+            btn_save_coefficient.setAlpha(1);
+        } else if (tv_coefficient.getText().toString().length() < 7) {
+            String number = tv_coefficient.getText().toString();
+            tv_coefficient.setText(number + button.getText());
         }
     }
 
-    @OnClick(R.id.delete_coefficient_imageView)
+    @OnClick(R.id.img_delete_coefficient)
     public void onClickDelete(View v) {
-        String number = coefficient_textView.getText().toString();
+        String number = tv_coefficient.getText().toString();
         if (!number.isEmpty()) {
-            coefficient_textView.setText(number.substring(0, number.length() - 1));
-            if (coefficient_textView.getText().toString().isEmpty()) {
-                save_coefficient_button.setEnabled(false);
-                save_coefficient_button.setAlpha((float) 0.6);
+            tv_coefficient.setText(number.substring(0, number.length() - 1));
+            if (tv_coefficient.getText().toString().isEmpty()) {
+                btn_save_coefficient.setEnabled(false);
+                btn_save_coefficient.setAlpha((float) 0.6);
             }
         }
     }
 
-    @OnClick(R.id.save_coefficient_button)
+    @OnClick(R.id.btn_save_coefficient)
     public void onClickSaveCoefficient(View v) {
         Intent intent = new Intent();
-        intent.putExtra(ValueCodes.VALUE, coefficient_textView.getText().toString());
+        intent.putExtra(ValueCodes.VALUE, tv_coefficient.getText().toString());
         intent.putExtra(ValueCodes.POSITION, position);
         setResult(ValueCodes.RESULT_OK, intent);
         finish();
@@ -94,13 +94,13 @@ public class EnterCoefficientActivity extends BaseActivity {
 
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
         if (type.equals(getString(R.string.lb_coefficient_a))) {
-            coefficient_textView.setText(R.string.lb_enter_coefficient_a);
+            tv_coefficient.setText(R.string.lb_enter_coefficient_a);
             position = -2;
         } else if (type.equals(getString(R.string.lb_coefficient_b))) {
-            coefficient_textView.setText(R.string.lb_enter_coefficient_b);
+            tv_coefficient.setText(R.string.lb_enter_coefficient_b);
             position = -3;
         } else if (type.equals(getString(R.string.lb_constant))) {
-            coefficient_textView.setText(R.string.lb_enter_constant);
+            tv_coefficient.setText(R.string.lb_enter_constant);
             position = -4;
         }
     }

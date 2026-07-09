@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
@@ -8,75 +8,32 @@
     android:orientation="vertical">
 
     <include
-        layout="@layout/ats_toolbar"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_toolbar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="16sp"
-        android:padding="16sp"
-        android:background="@color/catskill_white">
-
-        <ImageView
-            android:id="@+id/location_data_imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_gps_valid"
-            tools:ignore="ContentDescription" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8sp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/location_data_textView"
-                style="@style/body_regular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:text="@string/lb_location_enabled"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:id="@+id/coordinates_textView"
-                style="@style/body_small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lb_location_unknown"
-                android:textColor="@color/ebony_clay" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/location_data_button"
-            style="@style/button_tertiary_small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/lb_disable" />
-
-    </LinearLayout>
-
-    <TextView
-        style="@style/body_large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16sp"
-        android:text="@string/lb_detected_tags"
-        android:textStyle="bold" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        layout="@layout/item_list"/>
+        layout="@layout/include_fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_export_data"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/include_toolbar" />
 
     <Button
-        android:id="@+id/export_data_button"
-        android:layout_width="match_parent"
+        android:id="@+id/btn_export_data"
+        style="@style/button_primary"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/lb_export_data"
         android:layout_margin="16sp"
-        style="@style/button_primary"/>
+        android:text="@string/lb_export_data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

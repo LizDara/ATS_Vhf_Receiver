@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16sp"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="48sp"
+        android:layout_marginBottom="24sp" />
+
+    <ImageView
+        android:id="@+id/img_loaded"
+        android:layout_width="@dimen/button_height"
+        android:layout_height="@dimen/button_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="48sp"
+        android:layout_marginBottom="24sp"
+        android:background="@drawable/circle_check"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tv_state_loading"
+        style="@style/h1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48sp"
+        android:gravity="center"
+        android:textColor="@color/ebony_clay" />
+
+</LinearLayout>

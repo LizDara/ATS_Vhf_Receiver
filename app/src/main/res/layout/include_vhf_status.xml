@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/catskill_white"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="@dimen/receiver_status"
+        android:layout_height="@dimen/receiver_status"
+        android:background="@drawable/vhf_color"
+        android:elevation="4sp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginVertical="8sp"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="@dimen/receiver_image_status"
+            android:layout_height="@dimen/receiver_image_status"
+            android:src="@drawable/receiver"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_device_battery" />
+
+    <ImageView
+        android:id="@+id/img_sd_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8sp"
+        android:layout_marginStart="20sp"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/body_x_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lb_sd_card"
+            android:textColor="@color/slate_700"/>
+
+        <TextView
+            android:id="@+id/tv_sd_card"
+            style="@style/body_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/slate_900" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16sp"
+            android:layout_marginTop="24sp"
+            android:layout_marginEnd="16sp"
+            android:text="@string/lb_number_matches"
+            android:textColor="@color/limed_spruce" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16sp"
+            android:layout_marginTop="8sp"
+            android:layout_marginEnd="16sp"
+            android:layout_marginBottom="16sp"
+            android:background="@color/catskill_white"
+            android:elevation="4sp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_two"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="2"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_three"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="3"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_four"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="4"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_five"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="5"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_six"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="6"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_seven"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="7"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
+                android:id="@+id/tv_eight"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="8"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.Models.Data;
-import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Models.Snapshots;
 import com.atstrack.ats.ats_vhf_receiver.Models.TagDetail;
 import com.atstrack.ats.ats_vhf_receiver.R;
@@ -23,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class Converters {
 
@@ -121,12 +121,12 @@ public class Converters {
 
     public static String getDetectionFilter(byte type) {
         switch (type) {
-            case DetectionFilter.CODED:
+            case ValueCodes.CODED:
                 return "Coded";
-            case DetectionFilter.FIXED:
+            case ValueCodes.FIXED:
                 return "Fixed Pulse Rate";
-            case DetectionFilter.VARIABLE:
-            case DetectionFilter.VARIABLE_TEMPERATURE:
+            case ValueCodes.VARIABLE:
+            case ValueCodes.VARIABLE_TEMPERATURE:
                 return "Variable Pulse Rate";
         }
         return "";
@@ -149,8 +149,8 @@ public class Converters {
             return isLogo ? R.drawable.ic_salmon_icon : R.drawable.ic_acoustic_receiver;
         else if (name.contains(ValueCodes.WILDLINK) || name.contains("Wildlink"))
             return isLogo ? R.drawable.ic_deer_icon : R.drawable.ic_wildlink_receiver;
-        else if (name.contains("Bluetooth Tags"))
-            return isLogo ? R.drawable.ic_bird_icon : R.drawable.ic_bluetooth_tag;
+        else if (name.contains("BT2400"))
+            return isLogo ? R.drawable.ic_insect_icon : R.drawable.ic_bluetooth_tag;
         else if (name.contains(ValueCodes.BLUETOOTH_RECEIVER) || name.contains("Bluetooth Receiver"))
             return isLogo ? R.drawable.bluetooth_receiver : R.drawable.ic_bluetooth_tag;
         else if (name.contains(ValueCodes.BEACON) || name.contains("Beacon"))
@@ -283,6 +283,18 @@ public class Converters {
         return pageNumber;
     }
 
+    public static byte[] setCalendar(int length) {
+        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        byte[] b = new byte[length];
+        b[1] = (byte) (currentDate.get(Calendar.YEAR) % 100);
+        b[2] = (byte) (currentDate.get(Calendar.MONTH) + 1);
+        b[3] = (byte) currentDate.get(Calendar.DAY_OF_MONTH);
+        b[4] = (byte) currentDate.get(Calendar.HOUR_OF_DAY);
+        b[5] = (byte) currentDate.get(Calendar.MINUTE);
+        b[6] = (byte) currentDate.get(Calendar.SECOND);
+        return b;
+    }
+
     /**
      * Processes the data when the download is complete.
      *
@@ -336,13 +348,13 @@ public class Converters {
                                 matches = Byte.toUnsignedInt(packet[index + 2]) / 16;
                                 String detection = "Coded";
                                 String details = "";
-                                if (detectionType == DetectionFilter.FIXED) {
+                                if (detectionType == ValueCodes.FIXED) {
                                     detection = "Non Coded Fixed Pulse Rate";
                                     details = matches + " matches required";
-                                } else if (detectionType == DetectionFilter.VARIABLE) {
+                                } else if (detectionType == ValueCodes.VARIABLE) {
                                     detection = "Non Coded Variable Pulse Rate";
                                     details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
-                                } else if (detectionType == DetectionFilter.VARIABLE_TEMPERATURE)
+                                } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
@@ -358,13 +370,13 @@ public class Converters {
                                 matches = Byte.toUnsignedInt(packet[index + 4]) / 16;
                                 String detection = "Coded";
                                 String details = "";
-                                if (detectionType == DetectionFilter.FIXED) {
+                                if (detectionType == ValueCodes.FIXED) {
                                     detection = "Non Coded Fixed Pulse Rate";
                                     details = matches + " matches required";
-                                } else if (detectionType == DetectionFilter.VARIABLE) {
+                                } else if (detectionType == ValueCodes.VARIABLE) {
                                     detection = "Non Coded Variable Pulse Rate";
                                     details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
-                                } else if (detectionType == DetectionFilter.VARIABLE_TEMPERATURE)
+                                } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
@@ -388,9 +400,9 @@ public class Converters {
                                 text += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 1] & (byte) 0x0F);
                                 String detection = "Coded";
-                                if (detectionType == DetectionFilter.FIXED)
+                                if (detectionType == ValueCodes.FIXED)
                                     detection = "Non Coded Fixed Pulse Rate";
-                                else if (detectionType == DetectionFilter.VARIABLE)
+                                else if (detectionType == ValueCodes.VARIABLE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
@@ -405,7 +417,7 @@ public class Converters {
                             }
                         }
                         text += "[Data]" + ValueCodes.CR + ValueCodes.LF;
-                        text += (detectionType == DetectionFilter.CODED ?
+                        text += (detectionType == ValueCodes.CODED ?
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
                         break;
@@ -419,7 +431,6 @@ public class Converters {
                                     ((TextView) process_percent).setText(" - " + percent + "%");
                             });
                         }
-
                         frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 2]));
                         frequencyTableIndex = (((Byte.toUnsignedInt(packet[index + 1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(packet[index + 3]);
                         if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND) {

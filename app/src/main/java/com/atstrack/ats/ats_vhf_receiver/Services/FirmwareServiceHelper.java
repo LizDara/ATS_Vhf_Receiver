@@ -1,6 +1,5 @@
 package com.atstrack.ats.ats_vhf_receiver.Services;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,9 +18,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentResultListener;
 
 import com.atstrack.ats.ats_vhf_receiver.FirmwareUpdateActivity;
-import com.atstrack.ats.ats_vhf_receiver.Fragments.FirmwareUpdate;
+import com.atstrack.ats.ats_vhf_receiver.DialogsFragment.FirmwareUpdateDialogFragment;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.RetrofitServices;
 import com.atstrack.ats.ats_vhf_receiver.Models.FirmwareResponse;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class FirmwareServiceHelper {
@@ -38,7 +37,7 @@ public class FirmwareServiceHelper {
         api = retrofit.create(RetrofitServices.class);
     }
 
-    public void updateAvailable(boolean showUpdatedReceiverMessage) {
+    public void updateAvailable() {
         api.getFirmwareConfig(RetrofitServices.apiKey).enqueue(new retrofit2.Callback<FirmwareResponse>() {
             @Override
             public void onResponse(Call<FirmwareResponse> call, retrofit2.Response<FirmwareResponse> response) {
@@ -48,13 +47,15 @@ public class FirmwareServiceHelper {
                     int currentVersion = sharedPreferences.getInt(ValueCodes.FIRMWARE_VERSION, 0);
                     int result = compareVersions(currentVersion, response.body().getVersion());
                     if (result > 0) {
-                        firmwareUpdate = FirmwareUpdate.newInstance();
-                        showFirmwareMessage(response.body());
+                        firmwareUpdate = FirmwareUpdateDialogFragment.newInstance();
+                        showDialogFragment(response.body());
                     } else {
                         Log.d("OTA", "The receiver is already updated.");
-                        if (showUpdatedReceiverMessage) {
-                            Messages.showMessage((Activity) context, "Updated!", "The receiver is already updated.");
-                        }
+                        /*if (showUpdatedReceiverMessage) {
+                            AlertDialog dialog = Messages.showMessage((Activity) context, "Updated!", "The receiver is already updated.", false);
+                            dialogList.add(dialog);
+                            dialog.setOnDismissListener(d -> dialogList.remove(dialog));
+                        }*/
                     }
                 }
             }
@@ -75,24 +76,9 @@ public class FirmwareServiceHelper {
         if (Integer.parseInt(newParts[0]) > currentVersion) return 1; // Update is available
         if (Integer.parseInt(newParts[0]) < currentVersion) return -1; // The one from the device is newer
         return 0; // They are exactly the same
-        /*String[] currentParts = currentVersion.split("\\.");
-        String[] newParts = newVersion.split("\\.");
-
-        int length = Math.max(currentParts.length, newParts.length);
-
-        for (int i = 0; i < length; i++) {
-            // Si una versión es más corta que otra (ej: "1.0" vs "1.0.1"), tratamos el faltante como 0
-            int vCurrent = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-            int vNew = i < newParts.length ? Integer.parseInt(newParts[i]) : 0;
-
-            if (vNew > vCurrent) return 1;  // Hay actualización disponible
-            if (vCurrent > vNew) return -1; // La del dispositivo es más reciente
-        }
-
-        return 0; // Son exactamente iguales*/
     }
 
-    private void showFirmwareMessage(FirmwareResponse latestVersion) {
+    private void showDialogFragment(FirmwareResponse latestVersion) {
         if (context instanceof FragmentActivity) {
             FragmentActivity activity = (FragmentActivity) context;
             activity.getSupportFragmentManager().setFragmentResultListener(ValueCodes.VALUE, activity, new FragmentResultListener() {
@@ -103,7 +89,7 @@ public class FirmwareServiceHelper {
                 }
             });
             try {
-                firmwareUpdate.show(activity.getSupportFragmentManager(), FirmwareUpdate.TAG);
+                firmwareUpdate.show(activity.getSupportFragmentManager(), FirmwareUpdateDialogFragment.TAG);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

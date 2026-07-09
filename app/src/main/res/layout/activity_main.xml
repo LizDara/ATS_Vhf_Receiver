@@ -1,15 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/slate_300"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <include
-        layout="@layout/splash_screen"/>
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <include
-        layout="@layout/bridge_app"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/include_toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16sp"
+            android:background="@color/slate_50"
+            android:elevation="@dimen/elevation_button"
+            android:orientation="vertical"
+            android:padding="16sp">
+
+            <TextView
+                android:id="@+id/tv_bridge_subtitle"
+                style="@style/text_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_device_selection"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tv_bridge_message"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:text="@string/lb_type_of_device"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_types_subtitle"
+            style="@style/text_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16sp"
+            android:text="@string/lb_device_categories"
+            android:textColor="@color/black" />
+
+        <include
+            layout="@layout/include_recycler_view" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

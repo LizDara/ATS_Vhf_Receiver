@@ -7,7 +7,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +14,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -25,48 +23,39 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryListAdapter;
+import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity;
-import com.atstrack.ats.ats_vhf_receiver.Utils.OnAdapterClickListener;
-import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnAdapterClickListener {
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.state_view)
-    View state_view;
-    @BindView(R.id.title_toolbar)
-    TextView title_toolbar;
-    @BindView(R.id.version_textView)
-    TextView version_textView;
-    @BindView(R.id.splash_screen_constraintLayout)
-    ConstraintLayout splash_screen_constraintLayout;
-    @BindView(R.id.bridge_app_linearLayout)
-    LinearLayout bridge_app_linearLayout;
-    @BindView(R.id.bridge_subtitle_textView)
-    TextView bridge_subtitle_textView;
-    @BindView(R.id.bridge_message_textView)
-    TextView bridge_message_textView;
-    @BindView(R.id.types_subtitle_textView)
-    TextView types_subtitle_textView;
-    @BindView(R.id.category_recyclerView)
-    RecyclerView category_recyclerView;
+    @BindView(R.id.tb_main)
+    Toolbar tb_main;
+    @BindView(R.id.v_state)
+    View v_state;
+    @BindView(R.id.tv_title_toolbar)
+    TextView tv_title_toolbar;
+    @BindView(R.id.tv_bridge_subtitle)
+    TextView tv_bridge_subtitle;
+    @BindView(R.id.tv_bridge_message)
+    TextView tv_bridge_message;
+    @BindView(R.id.tv_types_subtitle)
+    TextView tv_types_subtitle;
+    @BindView(R.id.rv_item)
+    RecyclerView rv_item;
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private CategoryListAdapter categoryListAdapter;
+    private CategoryAdapter categoryListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private String deniedPermissions = "";
     private boolean isNightModeOn;
@@ -74,13 +63,11 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     ActivityResultLauncher<Intent> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == -1) {
-                    if (this.deniedPermissions.isEmpty())
-                        initialize(ValueCodes.MESSAGE_PERIOD);
-                    else
-                        showAlert();
+                    if (!this.deniedPermissions.isEmpty())
+                        showAlertDialog();
                 } else {
                     this.deniedPermissions += "\n- Nearby devices";
-                    showAlert();
+                    showAlertDialog();
                 }
             });
 
@@ -102,9 +89,9 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-        state_view.setVisibility(View.GONE);
-        title_toolbar.setText(R.string.bridge_app);
+        setSupportActionBar(tb_main);
+        v_state.setVisibility(View.GONE);
+        tv_title_toolbar.setText(R.string.bridge_app);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         init();
     }
@@ -113,16 +100,17 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
      * Initializes the app theme and checks permissions to use bluetooth and storage.
      */
     private void init() {
-        version_textView.setText("version: " + BuildConfig.VERSION_NAME);
-        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        if (receiverInformation.getDeviceAddress().equals("Unknown")) {
-            bridge_app_linearLayout.setVisibility(View.GONE);
-            checkPermissions();
-        } else {
-            receiverInformation.initialize();
-            checkStatusBLE();
-            initialize(0);
-        }
+        //ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+        checkPermissions();
+        //receiverInformation.initialize();
+        checkStatusBLE();
+
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        rv_item.setLayoutManager(manager);
+        rv_item.setHasFixedSize(true);
+        categoryListAdapter = new CategoryAdapter(this, this);
+        rv_item.setAdapter(categoryListAdapter);
+        setVisibility(ValueCodes.CATEGORIES);
         /*int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         SharedPreferences appSettingPrefs = getSharedPreferences(ValueCodes.SETTING_PREFERENCES, 0);
         SharedPreferences.Editor sharedPreferencesEditor = appSettingPrefs.edit();
@@ -130,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         sharedPreferencesEditor.putBoolean(ValueCodes.NIGHT_MODE, isNightModeOn);
         sharedPreferencesEditor.apply();
         isNightModeOn = appSettingPrefs.getBoolean("NightMode", false);
-
         if (isNightModeOn)
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         else
@@ -167,88 +154,65 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
             requestPermissionLauncher.launch(enableBtIntent);
             return;
         } else if (deniedPermissions.isEmpty()) {
-            initialize(ValueCodes.MESSAGE_PERIOD);
             return;
         } else if (deniedPermissions.contains("BLUETOOTH")) {
             deniedPermissions = deniedPermissions.replace("BLUETOOTH", "");
             deniedPermissions += "\n- Nearby devices";
         }
-        showAlert();
+        showAlertDialog();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-            if (!title_toolbar.getText().toString().equals(getResources().getString(R.string.bridge_app)))
-                showDeviceCategories();
-            else
-                finish();
+            if (!tv_title_toolbar.getText().toString().equals(getResources().getString(R.string.bridge_app)))
+                setVisibility(ValueCodes.CATEGORIES);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public void onAdapterItemClickListener(int position) {
-        if (categoryListAdapter.getTypes()[position].contains("Bluetooth Tags")) {
-            showBluetoothTags();
+        if (categoryListAdapter.types[position].contains("BT2400")) {
+            setVisibility(ValueCodes.BLUETOOTH_TAGS);
             return;
         }
-        if (categoryListAdapter.getTypes()[position].contains("Beacon")) {
+        if (categoryListAdapter.types[position].contains("Beacon")) {
             Intent intent = new Intent(this, BeaconTagDetectionActivity.class);
             startActivity(intent);
             return;
         }
         String type = "";
-        if (categoryListAdapter.getTypes()[position].contains("VHF"))
+        if (categoryListAdapter.types[position].contains("VHF"))
             type = ValueCodes.VHF;
-        else if (categoryListAdapter.getTypes()[position].contains("Acoustic"))
-            type = ValueCodes.ACOUSTIC;
-        else if (categoryListAdapter.getTypes()[position].contains("Wildlink"))
+        else if (categoryListAdapter.types[position].contains("Wildlink"))
             type = ValueCodes.WILDLINK;
-        else if (categoryListAdapter.getTypes()[position].contains("Bluetooth Receiver"))
+        else if (categoryListAdapter.types[position].contains("Bluetooth Receiver"))
             type = ValueCodes.BLUETOOTH_RECEIVER;
         Intent intent = new Intent(this, ScanDevicesActivity.class);
         intent.putExtra(ValueCodes.TYPE, type);
         startActivity(intent);
     }
 
-    private void showDeviceCategories() {
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        title_toolbar.setText(R.string.bridge_app);
-        splash_screen_constraintLayout.setVisibility(View.GONE);
-        bridge_app_linearLayout.setVisibility(View.VISIBLE);
-        bridge_app_linearLayout.setVisibility(View.VISIBLE);
-        bridge_subtitle_textView.setText(R.string.lb_device_selection);
-        bridge_message_textView.setText(R.string.lb_type_of_device);
-        types_subtitle_textView.setText(R.string.lb_device_categories);
-        categoryListAdapter = new CategoryListAdapter(this, this);
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        category_recyclerView.setLayoutManager(manager);
-        category_recyclerView.setHasFixedSize(true);
-        category_recyclerView.setAdapter(categoryListAdapter);
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void showBluetoothTags() {
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-        title_toolbar.setText(R.string.bluetooth_tags);
-        bridge_subtitle_textView.setText(R.string.lb_bluetooth_receive_data);
-        bridge_message_textView.setText(R.string.lb_bluetooth_tags_message);
-        types_subtitle_textView.setText(R.string.lb_connection_modes);
-        categoryListAdapter.setBluetoothTags();
+    private void setVisibility(int view) {
+        if (view == ValueCodes.CATEGORIES) {
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
+            tv_title_toolbar.setText(R.string.bridge_app);
+            tv_bridge_subtitle.setText(R.string.lb_device_selection);
+            tv_bridge_message.setText(R.string.lb_type_of_device);
+            tv_types_subtitle.setText(R.string.lb_device_categories);
+            categoryListAdapter.types = getResources().getStringArray(R.array.categories);
+        } else if (view == ValueCodes.BLUETOOTH_TAGS) {
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
+            tv_title_toolbar.setText(R.string.bluetooth_tags);
+            tv_bridge_subtitle.setText(R.string.lb_bluetooth_receive_data);
+            tv_bridge_message.setText(R.string.lb_bluetooth_tags_message);
+            tv_types_subtitle.setText(R.string.lb_connection_modes);
+            categoryListAdapter.types = getResources().getStringArray(R.array.connection_modes);
+        }
         categoryListAdapter.notifyDataSetChanged();
-    }
-
-    private void initialize(int TIME) {
-        new Handler().postDelayed(() -> showDeviceCategories(), TIME);
     }
 
     /**
@@ -270,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                 Manifest.permission.ACCESS_COARSE_LOCATION,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001); //Any number
-            } else {
-                initialize(ValueCodes.BRANDING_PERIOD);
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
@@ -290,8 +252,6 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
-            } else {
-                initialize(ValueCodes.BRANDING_PERIOD);
             }
         } else {
             int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
@@ -305,8 +265,6 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
-            } else {
-                initialize(ValueCodes.BRANDING_PERIOD);
             }
         }
     }
@@ -324,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         }
     }
 
-    private void showAlert() {
+    private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("App Permissions Required");
         builder.setMessage("To ensure complete functioning of this app please select it your phone's settings and set \"Allow\" for the following permissions:" + deniedPermissions);

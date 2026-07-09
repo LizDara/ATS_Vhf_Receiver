@@ -23,18 +23,16 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class EnterFrequencyActivity extends BaseActivity {
 
-    @BindView(R.id.frequency_textView)
-    TextView frequency_textView;
-    @BindView(R.id.line_frequency_view)
-    View line_frequency_view;
-    @BindView(R.id.edit_frequency_message_textView)
-    TextView edit_frequency_message_textView;
-    @BindView(R.id.number_buttons_linearLayout)
-    LinearLayout number_buttons_linearLayout;
-    @BindView(R.id.save_changes_button)
-    Button save_changes_button;
-    @BindView(R.id.one_button)
-    Button one_button;
+    @BindView(R.id.tv_frequency)
+    TextView tv_frequency;
+    @BindView(R.id.v_line_frequency)
+    View v_line_frequency;
+    @BindView(R.id.tv_edit_frequency_message)
+    TextView tv_edit_frequency_message;
+    @BindView(R.id.layout_number_buttons)
+    LinearLayout layout_number_buttons;
+    @BindView(R.id.btn_save_changes)
+    Button btn_save_changes;
 
     private int position;
     private int baseFrequency;
@@ -55,42 +53,42 @@ public class EnterFrequencyActivity extends BaseActivity {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            if (frequency_textView.getText().toString().length() == 6) {
-                int frequency = Integer.parseInt(frequency_textView.getText().toString());
+            if (tv_frequency.getText().toString().length() == 6) {
+                int frequency = Integer.parseInt(tv_frequency.getText().toString());
                 if (frequency > baseFrequency && frequency <= frequencyRange) {
-                    save_changes_button.setEnabled(true);
-                    save_changes_button.setAlpha(1);
-                    line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.ghost));
-                    edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.slate_gray));
+                    btn_save_changes.setEnabled(true);
+                    btn_save_changes.setAlpha(1);
+                    v_line_frequency.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.ghost));
+                    tv_edit_frequency_message.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.slate_gray));
                 }
             } else {
-                save_changes_button.setEnabled(false);
-                save_changes_button.setAlpha((float) 0.6);
-                line_frequency_view.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
-                edit_frequency_message_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
+                btn_save_changes.setEnabled(false);
+                btn_save_changes.setAlpha((float) 0.6);
+                v_line_frequency.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
+                tv_edit_frequency_message.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.tall_poppy));
             }
         }
     };
 
-    @OnClick({R.id.one_button, R.id.two_button, R.id.three_button, R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button, R.id.eight_button, R.id.nine_button, R.id.zero_button})
+    @OnClick({R.id.btn_one, R.id.btn_two, R.id.btn_three, R.id.btn_four, R.id.btn_five, R.id.btn_six, R.id.btn_seven, R.id.btn_eight, R.id.btn_nine, R.id.btn_zero})
     public void onClickNumber(View v) {
-        if (frequency_textView.getText().toString().length() >= 3 && frequency_textView.getText().toString().length() < 6) {
+        if (tv_frequency.getText().toString().length() >= 3 && tv_frequency.getText().toString().length() < 6) {
             Button button = (Button) v;
-            String number = frequency_textView.getText().toString();
-            frequency_textView.setText(number + button.getText());
+            String number = tv_frequency.getText().toString();
+            tv_frequency.setText(number + button.getText());
         }
     }
 
-    @OnClick(R.id.delete_imageView)
+    @OnClick(R.id.img_delete)
     public void onClickDelete(View v) {
-        String number = frequency_textView.getText().toString();
+        String number = tv_frequency.getText().toString();
         if (!number.isEmpty())
-            frequency_textView.setText(number.substring(0, number.length() - 1));
+            tv_frequency.setText(number.substring(0, number.length() - 1));
     }
 
-    @OnClick(R.id.save_changes_button)
+    @OnClick(R.id.btn_save_changes)
     public void onClickSaveChanges(View v) {
-        int newFrequency = Integer.parseInt(frequency_textView.getText().toString());
+        int newFrequency = Integer.parseInt(tv_frequency.getText().toString());
         Intent intent = new Intent();
         intent.putExtra(ValueCodes.POSITION, position);
         intent.putExtra(ValueCodes.VALUE, newFrequency);
@@ -110,11 +108,11 @@ public class EnterFrequencyActivity extends BaseActivity {
         int range = getIntent().getIntExtra(ValueCodes.RANGE, 0);
         frequencyRange = ((range + (baseFrequency / 1000)) * 1000) - 1;
         position = getIntent().getIntExtra(ValueCodes.POSITION, -2);
-        frequency_textView.addTextChangedListener(textChangedListener);
+        tv_frequency.addTextChangedListener(textChangedListener);
         String message = "Frequency range is " + baseFrequency + " to " + frequencyRange;
-        edit_frequency_message_textView.setText(message);
+        tv_edit_frequency_message.setText(message);
         if (position == -1)
-            save_changes_button.setText(R.string.lb_add_frequency);
+            btn_save_changes.setText(R.string.lb_add_frequency);
         createNumberButtons(range);
     }
 
@@ -135,15 +133,15 @@ public class EnterFrequencyActivity extends BaseActivity {
                 newBaseButton(baseNumber);
                 int finalBaseNumber = baseNumber;
                 buttonBaseFrequency.setOnClickListener(view -> {
-                    if (frequency_textView.getText().toString().isEmpty() || frequency_textView.getText().toString().length() > 6) {
-                        frequency_textView.setText(String.valueOf(finalBaseNumber));
-                        frequency_textView.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.ebony_clay));
+                    if (tv_frequency.getText().toString().isEmpty() || tv_frequency.getText().toString().length() > 6) {
+                        tv_frequency.setText(String.valueOf(finalBaseNumber));
+                        tv_frequency.setTextColor(ContextCompat.getColor(getBaseContext(), R.color.ebony_clay));
                     }
                 });
                 linearLayoutBaseFrequency.addView(buttonBaseFrequency);
                 baseNumber++;
             }
-            number_buttons_linearLayout.addView(linearLayoutBaseFrequency);
+            layout_number_buttons.addView(linearLayoutBaseFrequency);
         }
     }
 

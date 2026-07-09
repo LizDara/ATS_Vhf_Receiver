@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="32sp"
+    android:layout_marginVertical="16sp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tv_gps_state"
+        style="@style/body_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:text="@string/lb_off_gps"
+        android:textColor="@color/ebony_clay"
+        app:drawableStartCompat="@drawable/ic_gps_off" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btn_record_data"
+        style="@style/button_primary_small"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_small_height"
+        android:paddingHorizontal="10sp"
+        android:text="@string/lb_record_data" />
+
+</LinearLayout>

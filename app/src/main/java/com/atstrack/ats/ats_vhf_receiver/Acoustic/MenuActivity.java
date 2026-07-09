@@ -33,7 +33,7 @@ public class MenuActivity extends BaseActivity {
     TextView utc_time_textView;
     @BindView(R.id.tilt_textView)
     TextView tilt_textView;
-    @BindView(R.id.temperature_textView)
+    @BindView(R.id.tv_temperature)
     TextView temperature_textView;
     @BindView(R.id.pressure_textView)
     TextView pressure_textView;
@@ -42,12 +42,12 @@ public class MenuActivity extends BaseActivity {
 
     private final static String TAG = MenuActivity.class.getSimpleName();
 
-    @OnClick(R.id.disconnect_button)
+    @OnClick(R.id.btn_disconnect)
     public void onClickDisconnect(View v) {
         leServiceConnection.getBluetoothLeService().disconnect();
     }
 
-    @OnClick(R.id.menu_imageView)
+    @OnClick(R.id.img_menu)
     public void onClickMenu(View v) {
         Intent intent = new Intent(this, OptionActivity.class);
         startActivity(intent);

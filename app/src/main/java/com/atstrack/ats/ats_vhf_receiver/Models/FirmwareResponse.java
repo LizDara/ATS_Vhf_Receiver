@@ -3,7 +3,7 @@ package com.atstrack.ats.ats_vhf_receiver.Models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FirmwareResponse/* implements Parcelable*/ {
+public class FirmwareResponse {
     @SerializedName("version")
     @Expose
     private String version;

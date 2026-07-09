@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="8sp"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_current_frequency" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:background="@color/catskill_white"
+        android:elevation="4sp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16sp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/body_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8sp"
+                    android:text="@string/lb_starting_frequency"
+                    android:textColor="@color/limed_spruce" />
+
+                <TextView
+                    android:id="@+id/tv_frequency_manual"
+                    style="@style/body_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ebony_clay" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_enter_new_frequency"
+                style="@style/button_tertiary_small"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_small_height"
+                android:paddingHorizontal="10sp"
+                android:text="@string/lb_set_frequency" />
+
+        </LinearLayout>
+
+        <include
+            layout="@layout/include_gps_option"/>
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:ignore="NestedWeights" />
+
+    <Button
+        android:id="@+id/btn_start_manual"
+        style="@style/button_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_start_manual_scan" />
+
+</LinearLayout>

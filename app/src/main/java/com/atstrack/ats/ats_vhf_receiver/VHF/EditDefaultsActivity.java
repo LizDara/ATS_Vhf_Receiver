@@ -13,14 +13,14 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class EditDefaultsActivity extends BaseActivity {
 
-    @OnClick(R.id.aerial_defaults_button)
-    public void onClickAerialDefaults(View v) {
+    @OnClick(R.id.btn_mobile_defaults)
+    public void onClickMobileDefaults(View v) {
         Intent intent = new Intent(this, MobileDefaultsActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.MOBILE_DEFAULTS_COMMAND);
         startActivity(intent);
     }
 
-    @OnClick(R.id.stationary_defaults_button)
+    @OnClick(R.id.btn_stationary_defaults)
     public void onClickStationaryDefaults(View v) {
         Intent intent = new Intent(this, StationaryDefaultsActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.STATIONARY_DEFAULTS_COMMAND);

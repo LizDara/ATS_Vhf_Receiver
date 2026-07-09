@@ -1,62 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/firmware_update_message_linearLayout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16sp"
-    android:padding="16sp"
+    android:layout_marginHorizontal="16sp"
+    android:layout_marginVertical="24sp"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
     android:orientation="vertical"
-    android:background="@color/slate_50"
-    android:elevation="@dimen/elevation_button"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <ImageButton
-        android:id="@+id/close_imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_close"
-        tools:ignore="ContentDescription" />
+    android:padding="16sp">
 
     <TextView
-        style="@style/body_large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="8sp"
-        android:text="@string/lb_cant_empty_table"
-        android:textColor="@color/slate_700"/>
-
-    <TextView
-        style="@style/body_small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16sp"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/lb_table_empty_message"
-        android:textColor="@color/slate_700" />
-
-    <LinearLayout
+        style="@style/h2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:layout_marginBottom="16sp"
+        android:gravity="center"
+        android:text="@string/lb_no_frequencies"
+        android:textColor="@color/black" />
 
-        <TextView
-            android:id="@+id/dismiss_textView"
-            style="@style/button_small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24sp"
-            android:text="@string/lb_dismiss"
-            android:textColor="@color/slate_700" />
-
-        <Button
-            android:id="@+id/edit_default_button"
-            style="@style/button_primary_small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="8sp"
-            android:text="@string/lb_edit_defaults" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_add_new_frequency"
+        style="@style/button_primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginBottom="24sp"
+        android:text="@string/lb_add_frequency" />
 
 </LinearLayout>

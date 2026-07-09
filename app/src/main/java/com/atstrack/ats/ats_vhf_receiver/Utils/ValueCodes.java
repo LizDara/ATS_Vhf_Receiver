@@ -4,7 +4,7 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ATSar";
     public static final String VHF = "ATSvr";
-    public static final String BLUETOOTH_RECEIVER = "ATSbr"; // UART
+    public static final String BLUETOOTH_RECEIVER = "UART"; // ATSbr
     public static final String WILDLINK = "ATSwl";
     public static final String BEACON = "CTT"; // ATSbt
 
@@ -32,17 +32,47 @@ public class ValueCodes {
     //Periods
     public static final int WAITING_PERIOD = 180;
     public static final int MESSAGE_PERIOD = 1000;
-    public static final int DOWNLOAD_PERIOD = 200; //280
+    public static final int DOWNLOAD_PERIOD = 220; //280
     public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
     public static final int CONNECT_TIMEOUT = 3200;
 
     //Firmware Update
     public static final byte MTU = (byte) 0xF7;
-    public static final byte  UPDATE = (byte) 0xF8;
+    public static final byte UPDATE = (byte) 0xF8;
     public static final byte FINISH = (byte) 0xF9;
 
+    //Views
+    public static final int CATEGORIES = 301;
+    public static final int BLUETOOTH_TAGS = 302;
+    public static final int SEARCHING = 303;
+    public static final int FOUNDED = 304;
+    public static final int NO_FOUNDED = 305;
+    public static final int CONNECTING = 306;
+    public static final int CONNECTED = 307;
+    public static final int OVERVIEW = 308;
+    public static final int PROCESSING = 309;
+    public static final int FIRST_STEP = 311;
+    public static final int SECOND_STEP = 312;
+    public static final int THIRD_STEP = 313;
+    public static final int FOURTH_STEP = 314;
+    public static final int DELETE = 315;
+    public static final int DOWNLOAD = 317;
+    public static final int DOWNLOADING = 318;
+    public static final int DOWNLOADED = 319;
+    public static final int SCANNING = 322;
+    public static final int START_RECORD = 323;
+    public static final int STOP_RECORD = 324;
+    public static final int START_HOLD = 327;
+    public static final int STOP_HOLD = 328;
+
     /* ----------------- VHF DEVICE ---------------- */
+    //Detection Filter
+    public static final byte CODED = 0x09;
+    public static final byte FIXED = 0x08;
+    public static final byte VARIABLE = 0x07;
+    public static final byte VARIABLE_TEMPERATURE = 0x06;
+
     //Defaults
     public static final int TABLE_NUMBER_CODE = 1001;
     public static final int TABLES_NUMBER_CODE = 1002;
@@ -65,20 +95,16 @@ public class ValueCodes {
     public static final int AUTO_RECORD_CODE = 1022;
 
     //Values
-    public static final String SCANNING = "scanning";
+    public static final String IS_SCANNING = "isScanning";
     public static final String DEFAULT_SETTING = "defaults";
     public static final String BASE_FREQUENCY = "baseFrequency";
     public static final String RANGE = "range";
-    public static final String FIRST_TIME = "firstTime";
     public static final String TITLE = "title";
     public static final String POSITION = "position";
     public static final String TYPE = "type";
     public static final String TOTAL = "total";
-    public static final String IS_FILE = "isFile";
-    public static final String FREQUENCIES = "frequencies";
     public static final String IS_TEMPERATURE = "isTemperature";
     public static final String TABLE = "table";
-    public static final String DETECTION_TYPE = "detectionType";
 
     //Data
     public static final String FIRST_TABLE_NUMBER = "FirstTableNumber";
@@ -120,12 +146,13 @@ public class ValueCodes {
     public static final byte SCAN_STOP_COMMAND = (byte) 0x87;
     public static final byte AUDIO_ONE_COMMAND = (byte) 0x59;
     public static final byte AUDIO_ALL_COMMAND = (byte) 0x5A;
-    public static final byte AUDIO_NONE_COMMAND = (byte) 0x5B;
+    public static final byte AUDIO_BACKGROUND_COMMAND = (byte) 0x5B;
     public static final byte FATAL_SCAN_ERROR_COMMAND = (byte) 0x44;
 
     public static final byte GPS_VALID = 3;
     public static final byte GPS_FAILED = 2;
     public static final byte GPS_SEARCHING = 1;
+    public static final byte GPS_OFF = 0;
 
     /* ----------------- ACOUSTIC DEVICE ---------------- */
 
@@ -133,6 +160,15 @@ public class ValueCodes {
     public static final byte ACOUSTIC_STATUS_COMMAND = (byte) 0x78;
 
     /* ----------------- BLUETOOTH RECEIVER DEVICE ---------------- */
+    public static final int RSSI = 10;
+    public static final int VOLTAGE = 11;
+    public static final int TEMPERATURE = 12;
+
     public static final int MIN_RSSI = -90;
-    public static final int MAX_RSSI = -20;
+    public static final int MAX_BLUETOOTH_RSSI = -20;
+    public static final int MAX_TAG_RSSI = -44;
+    public static final int MIN_VOLTAGE = 0;
+    public static final int MAX_VOLTAGE = 1800;
+    public static final int MIN_TEMPERATURE = 0;
+    public static final int MAX_TEMPERATURE = 60;
 }

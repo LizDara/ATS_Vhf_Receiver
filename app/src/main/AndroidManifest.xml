@@ -47,6 +47,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".BeaconTag.BeaconTagDetectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -135,7 +144,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".VHF.ScanningActivity"
+            android:name=".VHF.StartScanningActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -157,15 +166,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action
-                    android:name="android.intent.action.MAIN"
-                    android:exported="true" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".BluetoothATS.BluetoothLeService"

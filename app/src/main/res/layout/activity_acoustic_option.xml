@@ -9,9 +9,9 @@
     tools:context=".Acoustic.OptionActivity">
 
     <include
-        layout="@layout/ats_toolbar" />
+        layout="@layout/include_toolbar" />
 
     <include
-        layout="@layout/fragment_firmware_update" />
+        layout="@layout/dialog_alert_firmware_update" />
 
 </LinearLayout>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".DialogsFragment.AudioOptionsDialogFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/catskill_white"
+        android:elevation="4sp"
+        android:orientation="vertical"
+        android:padding="24sp">
+
+        <ImageButton
+            android:id="@+id/ib_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_close"/>
+
+        <TextView
+            style="@style/h2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="24sp"
+            android:gravity="center"
+            android:text="@string/lb_select_ids_audio"
+            android:textColor="@color/limed_spruce" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="8sp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_single"
+                style="@style/button_tertiary_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_single"
+                android:textColor="@color/limed_spruce" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btn_all"
+                style="@style/button_tertiary_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_audio"
+                android:text="@string/lb_all"
+                android:textColor="@color/catskill_white" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btn_background"
+                style="@style/button_tertiary_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_background"
+                android:textColor="@color/limed_spruce" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_enter_digit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_digit"
+                style="@style/subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16sp"
+                android:layout_marginBottom="8sp"
+                android:gravity="center"
+                android:textColor="@color/ebony_clay" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:background="@color/ghost"
+                tools:ignore="SmallSp" />
+
+            <TextView
+                style="@style/paragraph_small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:text="@string/lb_enter_digit_id"
+                android:textColor="@color/slate_gray"
+                android:gravity="center" />
+
+            <include
+                layout="@layout/include_numbers"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/ghost"
+            android:layout_marginTop="16sp"
+            tools:ignore="SmallSp" />
+
+        <Button
+            android:id="@+id/btn_save_digit"
+            style="@style/button_primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32sp"
+            android:text="@string/lb_save_changes" />
+
+    </LinearLayout>
+
+</FrameLayout>

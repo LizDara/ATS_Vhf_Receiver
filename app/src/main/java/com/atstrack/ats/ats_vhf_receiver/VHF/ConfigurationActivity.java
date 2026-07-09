@@ -13,27 +13,27 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class ConfigurationActivity extends BaseActivity {
 
-    @OnClick(R.id.edit_frequency_tables_button)
+    @OnClick(R.id.btn_edit_frequency_tables)
     public void onClickEditFrequencyTables(View v) {
         Intent intent = new Intent(this, TablesActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES_COMMAND);
         startActivity(intent);
     }
 
-    @OnClick(R.id.edit_receiver_defaults_button)
+    @OnClick(R.id.btn_edit_receiver_defaults)
     public void onClickEditReceiverDefaults(View v) {
         Intent intent = new Intent(this, EditDefaultsActivity.class);
         startActivity(intent);
     }
 
-    @OnClick(R.id.set_transmitter_type_button)
+    @OnClick(R.id.btn_set_transmitter_type)
     public void onClickSetTransmitterType(View v) {
         Intent intent = new Intent(this, DetectionFilterActivity.class);
         intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_FILTER_COMMAND);
         startActivity(intent);
     }
 
-    @OnClick(R.id.clone_from_other_receiver_button)
+    @OnClick(R.id.btn_clone_from_other_receiver)
     public void onClickCloneFromOtherReceiver(View v) {
         Intent intent = new Intent(this, CloneActivity.class);
         startActivity(intent);

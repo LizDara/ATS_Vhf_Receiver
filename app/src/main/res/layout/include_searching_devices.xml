@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_devices_subtitle"
+        style="@style/main_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32sp"
+        android:text="@string/lb_searching_devices" />
+
+    <TextView
+        android:id="@+id/tv_searching_message"
+        style="@style/body_regular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16sp"
+        android:layout_marginBottom="8sp"
+        android:gravity="center_horizontal"
+        android:text="@string/lb_message_searching" />
+
+    <Button
+        android:id="@+id/btn_retry"
+        style="@style/button_tertiary_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16sp"
+        android:text="@string/lb_retry" />
+
+    <include
+        layout="@layout/include_recycler_view" />
+
+    <Button
+        android:id="@+id/btn_connect"
+        style="@style/button_primary.main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginBottom="16sp"
+        android:enabled="false"
+        android:alpha="0.6"
+        android:text="@string/lb_connect" />
+
+</LinearLayout>

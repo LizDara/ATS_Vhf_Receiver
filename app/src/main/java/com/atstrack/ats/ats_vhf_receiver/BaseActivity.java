@@ -1,10 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -18,25 +21,26 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Models.Data;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Messages;
-import com.atstrack.ats.ats_vhf_receiver.Utils.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.List;
 
 import butterknife.ButterKnife;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private final static String TAG = BaseActivity.class.getSimpleName();
+    public final static String TAG = BaseActivity.class.getSimpleName();
     protected int contentViewId;
     protected boolean showToolbar;
     protected String deviceCategory;
     protected String title;
+    protected final List<Dialog> dialogList = new ArrayList<>();
+    protected final Handler messageHandler = new Handler();
 
     protected final Context mContext = this;
     protected byte parameter = ValueCodes.NONE;
@@ -88,8 +92,15 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if (messageHandler != null)
+            messageHandler.removeCallbacksAndMessages(null);
+        for (Dialog dialog : dialogList) {
+            if (dialog != null && dialog.isShowing())
+                dialog.dismiss();
+        }
+        dialogList.clear();
         Log.i(TAG, "ON DESTROY ACTIVITY ...");
+        super.onDestroy();
     }
 
     private void initializeCallback() {
@@ -127,8 +138,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void gattDisconnected() {
         parameter = ValueCodes.NONE;
-        Messages.showDisconnectionMessage(mContext);
         createLog();
+        showDisconnectionAlertDialog();
     }
 
     protected void discoverCharacteristic() {
@@ -149,16 +160,21 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected byte[] setCalendar(int length) {
-        Calendar currentDate = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        byte[] b = new byte[length];
-        b[1] = (byte) (currentDate.get(Calendar.YEAR) % 100);
-        b[2] = (byte) (currentDate.get(Calendar.MONTH) + 1);
-        b[3] = (byte) currentDate.get(Calendar.DAY_OF_MONTH);
-        b[4] = (byte) currentDate.get(Calendar.HOUR_OF_DAY);
-        b[5] = (byte) currentDate.get(Calendar.MINUTE);
-        b[6] = (byte) currentDate.get(Calendar.SECOND);
-        return b;
+    protected void showDisconnectionAlertDialog() {
+        AlertDialog dialog = Dialogs.createDisconnectionDialog(mContext, getString(R.string.disconnect_receiver));
+        dialogList.add(dialog);
+        messageHandler.postDelayed(() -> {
+            try {
+                if (leServiceConnection.existConnection())
+                    leServiceConnection.close();
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } catch (Exception ex) {
+                Log.i("Message", ex.getLocalizedMessage());
+            }
+        }, ValueCodes.MESSAGE_PERIOD);
+        dialog.show();
     }
 
     protected void createLog() {

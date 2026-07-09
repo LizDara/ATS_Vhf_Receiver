@@ -1,50 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/slate_300"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
     tools:context=".VHF.StationaryDefaultsActivity">
 
     <include
-        layout="@layout/ats_toolbar"/>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16sp"
-                android:text="@string/lb_stationary_settings"
-                android:textColor="@color/limed_spruce" />
-
-            <include
-                layout="@layout/stationary_settings"/>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <Button
-        android:id="@+id/save_changes_stationary_button"
-        style="@style/button_primary"
-        android:layout_width="match_parent"
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_toolbar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16sp"
-        android:text="@string/lb_save_changes" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        layout="@layout/receiver_status"/>
+        layout="@layout/fragment_stationary_settings"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/include_vhf_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/include_toolbar" />
 
-</LinearLayout>
+    <include
+        android:id="@+id/include_vhf_status"
+        layout="@layout/include_vhf_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

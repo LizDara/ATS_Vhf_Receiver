@@ -17,10 +17,10 @@ import butterknife.OnClick;
 
 public class MenuActivity extends BaseActivity {
 
-    @BindView(R.id.receiver_name_textView)
-    TextView receiver_name_textView;
+    @BindView(R.id.tv_receiver_name)
+    TextView tv_receiver_name;
 
-    @OnClick(R.id.detect_tags_button)
+    @OnClick(R.id.btn_detect_tags)
     public void onClickDetectTags(View v) {
         Intent intent = new Intent(this, BluetoothTagDetectionActivity.class);
         startActivity(intent);
@@ -35,7 +35,7 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiver_name_textView.setText(receiverInformation.getSerialNumber() + " Bluetooth Receiver");
+        tv_receiver_name.setText(receiverInformation.getSerialNumber() + " Bluetooth Receiver");
     }
 
     @Override

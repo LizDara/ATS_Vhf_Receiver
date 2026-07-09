@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="16sp"
+        android:padding="16sp"
+        android:background="@color/catskill_white">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_current_frequency"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/tv_current_frequency_mobile"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_current_index"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/tv_current_index_mobile"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lb_table_total"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/tv_table_total_mobile"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_add_frequency_scan"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:text="@string/lb_add_frequency_scan" />
+
+    <Button
+        android:id="@+id/btn_delete_frequency_scan"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="16sp"
+        android:text="@string/lb_delete_frequency_scan" />
+
+    <Button
+        android:id="@+id/btn_merge_table_scan"
+        style="@style/button_rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_merge_table_scan" />
+
+</LinearLayout>

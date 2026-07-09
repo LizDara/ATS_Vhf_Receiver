@@ -51,6 +51,16 @@
         android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
+            android:name="com.atstrack.ats.ats_vhf_receiver.SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -139,7 +149,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.atstrack.ats.ats_vhf_receiver.VHF.ScanningActivity"
+            android:name="com.atstrack.ats.ats_vhf_receiver.VHF.StartScanningActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -161,15 +171,7 @@
         <activity
             android:name="com.atstrack.ats.ats_vhf_receiver.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action
-                    android:name="android.intent.action.MAIN"
-                    android:exported="true" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait" />
 
         <service
             android:name="com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService"

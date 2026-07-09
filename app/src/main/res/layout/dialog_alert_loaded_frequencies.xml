@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16sp"
+    android:background="@color/slate_50"
+    android:elevation="@dimen/elevation_button"
+    android:orientation="vertical"
+    android:padding="16sp">
+
+    <ImageButton
+        android:id="@+id/ib_close_loaded_frequencies"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_close"
+        android:layout_gravity="end"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tv_title_frequencies_loaded"
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black" />
+
+    <include
+        layout="@layout/include_list_view" />
+
+</LinearLayout>

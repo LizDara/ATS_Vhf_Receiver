@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16sp"
+    android:background="@color/catskill_white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16sp">
+
+        <TextView
+            android:id="@+id/tv_tag_view"
+            style="@style/button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/limed_spruce" />
+
+        <TextView
+            android:id="@+id/tv_detections_tag_view"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ebony_clay" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:background="@color/light_gray"
+        tools:ignore="SmallSp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16sp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_rssi_tag"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12sp"
+                android:textColor="@color/ebony_clay" />
+
+            <TextView
+                android:id="@+id/tv_temperature_tag"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_since_tag"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12sp"
+                android:textColor="@color/ebony_clay" />
+
+            <TextView
+                android:id="@+id/tv_voltage_tag"
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:background="@color/light_gray"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        style="@style/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:text="@string/lb_chart"
+        android:textColor="@color/limed_spruce" />
+
+    <TextView
+        style="@style/body_small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:text="@string/lb_chart_type"
+        android:textColor="@color/ebony_clay" />
+
+    <Spinner
+        android:id="@+id/sp_chart_type"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/input_height"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginVertical="8sp"
+        android:background="@drawable/spinner" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lc_tag"
+        android:layout_width="match_parent"
+        android:layout_height="220sp"
+        android:layout_margin="16sp" />
+
+</LinearLayout>

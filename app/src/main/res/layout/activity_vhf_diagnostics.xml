@@ -10,7 +10,7 @@
     tools:context=".VHF.DiagnosticsActivity">
 
     <include
-        layout="@layout/ats_toolbar"/>
+        layout="@layout/include_toolbar"/>
 
     <LinearLayout
         android:id="@+id/loading_linearLayout"
@@ -351,6 +351,6 @@
     </ScrollView>
 
     <include
-        layout="@layout/receiver_status"/>
+        layout="@layout/include_vhf_status"/>
 
 </LinearLayout>

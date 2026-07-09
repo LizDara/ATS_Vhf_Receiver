@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16sp">
+
+    <TextView
+        style="@style/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp"
+        android:layout_marginBottom="8sp"
+        android:text="@string/lb_select_store_rate"
+        android:textColor="@color/limed_spruce" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/catskill_white"
+        android:elevation="4sp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_continuous_store"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_continuous_store"
+            android:textColor="@color/ebony_clay"
+            app:drawableEndCompat="@drawable/ic_check" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_five_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_5_minutes"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_ten_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_10_minutes"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_fifteen_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_15_minutes"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_thirty_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_30_minutes"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_sixty_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_60_minutes"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_one_hundred_twenty_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lb_120_minutes"
+            android:textColor="@color/ebony_clay" />
+
+    </LinearLayout>
+
+</LinearLayout>

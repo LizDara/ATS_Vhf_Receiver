@@ -10,10 +10,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 public class AudioService {
     public static final int[] frequencies = {800, 951, 1131, 1345, 1600, 1903, 2263, 2691, 3200, 3806, 4525};
 
-    public static void emitAudioPulse(int frequency, float rssi) {
+    public static void emitAudioPulse(int frequency, float rssi, boolean isTagDirectly) {
         int durationMs = 30; // 30ms
         int sampleRate = 44100; // Standard quality
-        float volume = calculateVolume(rssi);
+        float volume = calculateVolume(rssi, isTagDirectly);
 
         int frameCount = (int) ((durationMs / 1000.0) * sampleRate);
         short[] buffer = new short[frameCount];
@@ -77,19 +77,19 @@ public class AudioService {
         }
     }
 
-    public static float calculateVolume(float rssi) {
+    public static float calculateVolume(float rssi, boolean isTagDirectly) {
         float amplitude;
         if (rssi <= ValueCodes.MIN_RSSI) {
             amplitude = 0.001f;
-        } else if (rssi >= ValueCodes.MAX_RSSI) {
+        } else if (rssi >= (isTagDirectly ? ValueCodes.MAX_TAG_RSSI : ValueCodes.MAX_BLUETOOTH_RSSI)) {
             amplitude = 1.0f;
         } else {
-            float exponent = (rssi - ValueCodes.MAX_RSSI) / 6.0f;
+            float exponent = (rssi - (isTagDirectly ? ValueCodes.MAX_TAG_RSSI : ValueCodes.MAX_BLUETOOTH_RSSI)) / 6.0f;
             amplitude = (float) Math.pow(2.0, exponent);
         }
 
         float estimatedMVPP = amplitude * 2800.0f;
-        Log.d("AudioTest", String.format("RSSI: %.1f | Amp: %.4f | mVpp: %.1f", rssi, amplitude, estimatedMVPP));
+        //Log.d("AudioTest", String.format("RSSI: %.1f | Amp: %.4f | mVpp: %.1f", rssi, amplitude, estimatedMVPP));
         return Math.max(0.001f, amplitude);
     }
 }

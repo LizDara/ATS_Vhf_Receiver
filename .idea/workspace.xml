@@ -46,6 +46,11 @@
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_splash.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_tag_detection.xml">
         <config>
           <theme>@style/AppTheme</theme>
@@ -86,17 +91,7 @@
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_frequencies.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manage_data.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manual_scan.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_fragment.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
@@ -111,27 +106,7 @@
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_mobile_scan.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_raw_data.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_scanning.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_stationary_defaults.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_stationary_scan.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
@@ -141,127 +116,77 @@
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_value_defaults.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_detection_filter.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_value_detection_filter.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_disconnect.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/aerial_current_settings.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_empty_table.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/aerial_scanning.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_error.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/aerial_settings.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_firmware_update.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/ats_toolbar.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_frequency.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/audio_option.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_loaded_frequencies.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/begin_download.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_loading.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/bridge_app.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_form_audio_options.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/coefficients_number.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_form_detection_filter.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/complete_message.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_converting_raw.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/connecting_device.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_data_calculation.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/coordinates.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_delete_frequencies.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/data_calculation_types.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_downloading_data.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/delete_frequencies.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/device_battery.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/disconnect_menu.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/disconnect_message.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/downloading_file.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/downloading_process.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/edit_table_scan.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/edit_temperature_frequency.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/error_message.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_audio_options.xml">
-        <config>
-          <theme>@style/AppTheme</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_detection_filter.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_edit_table_scan.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
@@ -271,182 +196,257 @@
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_update.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_file_converted.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_view_detection_filter.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_file_source.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/frequencies_overview.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_version.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/frequency_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_frequencies_overview.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/frequency_message.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_manual_scanning.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/frequency_tables.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_manual_settings.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/gps_option.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_matches_number.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/gps_record_options.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_max_min_pulse_rate.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/information_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_menu_manage_data.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_list.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_menu_scan.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_mobile_scanning.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_message.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_mobile_settings.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/loading_message.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_pulse_rate_types.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/manual_current_settings.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_pulse_rate_values.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/manual_scanning.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_select_value.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/matches_number.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_stationary_scanning.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/max_min_pulse_rate.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_stationary_settings.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/menu_manage_receiver.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_store_rate_values.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/merge_tables_scan.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_successful_message.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/no_device_found.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_tables_scan.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/numbers.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_tag_chart.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/pulse_rate_types.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_tags.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/pulse_rate_values.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_temperature_frequency.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/receiver_status.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_updating_firmware.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/scan_details.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_warning_message.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/scan_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_audio_option.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/searching_devices.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_coefficients_number.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/set_value.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_coordinates.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/splash_screen.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_device_battery.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/stationary_current_settings.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_disconnect_menu.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/stationary_scanning.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_downloading_process.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/stationary_settings.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_fragment_container.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/store_rate_values.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_gps_option.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/table_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_gps_record_options.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/tag_item.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_list_view.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/warning_message.xml">
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_mobile_settings.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_numbers.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_recycler_view.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_scan_details.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_searching_devices.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_stationary_settings.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_toolbar.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/include_vhf_status.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_frequency.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_frequency_select.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_frequency_tables.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_information.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_loaded_table.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_scan.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_table.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_tag.xml">
         <config>
           <theme>@style/AppTheme</theme>
         </config>
@@ -461,29 +461,61 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b651b20-dfa1-4718-80bb-d9835253cf15" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LoadedFrequenciesAdapter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BeaconTag/BeaconTagDetectionActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothScannerActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/LoadedTable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/AudioService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/DriveServiceHelper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/FirmwareServiceHelper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/RetrofitServices.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/TagDetection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_alert.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_audio_off.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_audio_on.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_beep.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_bird_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_bridge_app_logo.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_deer_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_error_alert.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_reptile_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_salmon_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_transmitter_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/error_message.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_item.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_message.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ConvertingRawFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/DataCalculationFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/DeleteFrequenciesFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/DownloadingDataFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/EditTableScanFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/EmptyTableFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FileConvertedFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FileSourceFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FirmwareVersionFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FrequenciesOverviewFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/LoadingFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ManualScanningFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ManualSettingsFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MatchesNumberFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MaxMinPulseRateFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MenuManageDataFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MenuScanFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MobileScanningFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/MobileSettingsFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/PulseRateTypesFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/PulseRateValuesFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ScanBaseFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/SelectValueFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/StationaryScanningFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/StationarySettingsFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/StoreRateValuesFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/SuccessfulMessageFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/TablesScanFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/TagChartFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/TagsFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/TemperatureFrequencyFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/UpdatingFirmwareFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/WarningMessageFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Interfaces/OnDialogCreatedListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Interfaces/OnTimeTickListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/Detection.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/DeviceData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/TagDetections.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/SplashActivity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/CustomXAxisRenderer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Dialogs.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_insect_icon.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/spinner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_fragment.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_empty_table.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_converting_raw.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_file_converted.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_file_source.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_version.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_tag_chart.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_tags.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_updating_firmware.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_fragment_container.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_list_view.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_recycler_view.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.2/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.2/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.2/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.2/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.2/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.2/fileHashes/fileHashes.bin" afterDir="false" />
@@ -495,42 +527,29 @@
       <change beforePath="$PROJECT_DIR$/.gradle/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/checksums/md5-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/checksums/sha1-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_loader_loader_1_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_20_6_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_api_phone_18_0_1_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_auth_base_18_0_4_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_android_gms_play_services_basement_18_2_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_api_client_google_api_client_android_1_26_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_apis_google_api_services_drive_v3_rev136_1_25_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_http_client_google_http_client_android_1_26_0.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.androidTest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.androidTest.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.unitTest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/ATS_VHF_Receiver.app.unitTest.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/generated/ap_generated_sources/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/generated/ap_generated_sources/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/dex_archive_input_jar_hashes/debug/out" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/dex_archive_input_jar_hashes/debug/out" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/debug-mergeJavaRes/merge-state" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/debug-mergeJavaRes/merge-state" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/debug-mergeJavaRes/zip-cache/+N1Ge4XQJvmM1udQi_v5VtcfPVM=" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeDebugResources/compile-file-map.properties" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeDebugResources/compile-file-map.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeDebugResources/merger.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeDebugResources/merger.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/javaResources0" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/javaResources0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$LocalBinder.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$LocalBinder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/MainActivity.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/MainActivity.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/javac/debug/classes/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.class" afterDir="false" />
@@ -538,107 +557,17 @@
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/debug.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-af.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-af.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-am.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-am.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ar.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ar.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-as.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-as.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-az.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-az.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-b+sr+Latn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-b+sr+Latn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-be.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-be.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bg.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bg.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bs.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-bs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ca.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ca.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-cs.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-cs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-da.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-da.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-de.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-de.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-el.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-el.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rAU.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rAU.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rCA.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rCA.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rGB.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rGB.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rIN.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rIN.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rXC.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-en-rXC.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-es-rUS.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-es-rUS.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-es.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-es.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-et.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-et.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-eu.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-eu.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fa.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fa.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fi.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fi.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fr-rCA.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fr-rCA.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fr.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-fr.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-gl.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-gl.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-gu.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-gu.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hi.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hi.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hr.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hr.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hu.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hu.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hy.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-hy.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-in.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-in.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-is.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-is.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-it.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-it.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-iw.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-iw.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ja.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ja.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ka.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ka.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-kk.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-kk.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-km.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-km.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-kn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-kn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ko.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ko.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ky.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ky.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lo.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lo.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lt.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lt.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lv.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-lv.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mk.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mk.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ml.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ml.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mn.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mr.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-mr.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ms.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ms.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-my.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-my.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-nb.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-nb.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ne.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ne.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-nl.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-nl.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-or.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-or.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pa.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pa.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pl.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pl.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt-rBR.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt-rBR.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt-rPT.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt-rPT.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-pt.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ro.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ro.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ru.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ru.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-si.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-si.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sk.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sk.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sl.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sl.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sq.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sq.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sr.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sr.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sv.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sv.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sw.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-sw.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ta.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ta.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-te.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-te.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-th.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-th.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-tl.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-tl.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-tr.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-tr.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-uk.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-uk.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ur.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-ur.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-uz.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-uz.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-v16.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-v16.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-v21.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-v21.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-vi.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-vi.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-watch-v20.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-watch-v20.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rCN.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rCN.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rHK.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rHK.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rTW.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zh-rTW.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zu.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values-zu.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/multi-v2/values.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/single/debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_res_blame_folder/debug/out/single/debug.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/out/resources-debug.ap_" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/out/resources-debug.ap_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$1.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$1.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$LocalBinder.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService$LocalBinder.dex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.dex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter$MyViewHolder.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.dex" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.dex" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity.dex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/MainActivity_ViewBinding.dex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.dex" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/project_dex_archive/debug/out/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.dex" afterDir="false" />
@@ -649,37 +578,56 @@
       <change beforePath="$PROJECT_DIR$/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Acoustic/MenuActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Acoustic/MenuActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TagListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TagListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Acoustic/OptionActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Acoustic/OptionActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/CategoryListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/CategoryAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyDeleteListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyToDeleteAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/FrequencyAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LeDeviceListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/DeviceAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LoadedFrequenciesAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/LoadedTableAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/ScanDetailListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/ScanDetailAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableMergeListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableToMergeAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableScanListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TableToScanAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TagListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Adapters/TagAdapter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BaseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BaseActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/BluetoothLeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BeaconTag/BeaconTagDetectionActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BeaconTag/BeaconTagDetectionActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/GattUpdateReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/GattUpdateReceiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/TransferBleData.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothATS/TransferBleData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/BluetoothTagDetectionActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/BluetoothTagDetectionActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/MenuActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/MenuActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/TagDetectionActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothReceiver/BluetoothTagDetectionActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DriveService/DriveServiceHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DriveService/RetrofitServices.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DriveService/VersionResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/FirmwareResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothScannerActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/BluetoothScannerActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/FirmwareUpdateActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/FirmwareUpdateActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/AudioOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/AudioOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/DetectionFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/SelectDetectionFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FirmwareUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FirmwareUpdate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ViewDetectionFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ViewDetectionFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/AudioOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DialogsFragment/AudioOptionsDialogFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/EmptyTable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/FirmwareUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DialogsFragment/FirmwareUpdateDialogFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/SelectDetectionFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/DialogsFragment/DetectionFilterDialogFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Fragments/ViewDetectionFilter.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/MainActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/Coefficients.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/Coefficients.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/DetectionFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/DetectionFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/MobileDefaults.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/MobileDefaults.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/StationaryDefaults.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/StationaryDefaults.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/FirmwareResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/FirmwareResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/ReceiverInformation.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/ReceiverInformation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/Snapshots.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/Snapshots.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/TagDetail.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Models/TagDetail.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ScanDevicesActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/ScanDevicesActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/AudioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/AudioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/FirmwareServiceHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/FirmwareServiceHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Services/RetrofitServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Interfaces/RetrofitServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ActivitySetting.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ActivitySetting.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/AtsUuids.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/AtsUuids.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Converters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Messages.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/Messages.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/OnAdapterClickListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Interfaces/OnAdapterClickListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ReceiverCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Interfaces/ReceiverCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/TagDetection.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ValueCodes.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/Utils/ValueCodes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/CloneActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/CloneActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ConfigurationActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ConfigurationActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/DetectionFilterActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/DetectionFilterActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/DiagnosticsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/DiagnosticsActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EditDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EditDefaultsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EnterCoefficientActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EnterCoefficientActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EnterFrequencyActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/EnterFrequencyActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/FrequenciesActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/FrequenciesActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ManageDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ManageDataActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ManualScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ManualScanActivity.java" afterDir="false" />
@@ -688,61 +636,105 @@
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/MobileScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/MobileScanActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/RawDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/RawDataActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ScanBaseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ScanBaseActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ScanningActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ScanningActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ScanningActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/StartScanningActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/StationaryDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/StationaryDefaultsActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/StationaryScanActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/StationaryScanActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/TablesActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/TablesActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ValueDefaultsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ValueDefaultsActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ValueDetectionFilterActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atstrack/ats/ats_vhf_receiver/VHF/ValueDetectionFilterActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/acoustic_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/beacon_tags.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/bluetooth_tag.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/device.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/vhf_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/wildlink_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/acoustic_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/beacon_tags.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/bluetooth_tag.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/device.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/vhf_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/wildlink_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/acoustic_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/beacon_tags.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/bluetooth_tag.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/device.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/vhf_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/wildlink_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/acoustic_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/beacon_tags.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/bluetooth_tag.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/device.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/vhf_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/wildlink_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/acoustic_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/beacon_tags.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/bluetooth_tag.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/device.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/vhf_receiver.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-xxxhdpi/wildlink_receiver.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_acoustic_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_acoustic_menu.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_bluetooth_tag_detection.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_tag_detection.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_acoustic_option.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_acoustic_option.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_bluetooth_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_bluetooth_menu.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_firmware_update.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_firmware_update.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manage_data.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manage_data.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_scan_devices.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_scan_devices.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_tag_detection.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_tag_detection.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_clone.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_clone.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_configuration.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_configuration.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_detection_filter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_detection_filter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_diagnostics.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_diagnostics.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_edit_defaults.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_edit_defaults.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_enter_coefficient.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_enter_coefficient.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_enter_frequency.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_enter_frequency.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_frequencies.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manage_data.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_manual_scan.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_mobile_defaults.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_mobile_defaults.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_mobile_scan.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_raw_data.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_scanning.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_stationary_defaults.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_stationary_defaults.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_stationary_scan.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_tables.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_tables.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/aerial_scanning.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/aerial_scanning.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/connecting_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/loading_message.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/deleting_data_receiver.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/disconnect_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/disconnect_message.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/download_complete.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/downloading_process.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/downloading_process.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detection_filter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detection_filter.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_update.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_update.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/gps_record_options.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/gps_record_options.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/message_complete.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/complete_message.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/splash_screen.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/splash_screen.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/stationary_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/stationary_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/tag_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/tag_item.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_value_defaults.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_vhf_value_detection_filter.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/aerial_current_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_mobile_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/aerial_scanning.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_mobile_scanning.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/aerial_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_mobile_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/ats_toolbar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_toolbar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/audio_option.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_audio_option.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/begin_download.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bridge_app.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/coefficients_number.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_coefficients_number.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/complete_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_successful_message.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/connecting_device.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/coordinates.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_coordinates.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/data_calculation_types.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_data_calculation.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/delete_data_receiver.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/delete_frequencies.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_delete_frequencies.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/device_battery.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_device_battery.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/disconnect_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_disconnect_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/disconnect_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_disconnect.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/downloading_file.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_downloading_data.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/downloading_process.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_downloading_process.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/edit_table_scan.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_edit_table_scan.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/edit_temperature_frequency.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_temperature_frequency.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/error_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_error.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_audio_options.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_form_audio_options.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detection_filter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_form_detection_filter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_empty_table.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_empty_table.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_firmware_update.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_firmware_update.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_view_detection_filter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_detection_filter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequencies_overview.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_frequencies_overview.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequency_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_frequency.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequency_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_frequency.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequency_select_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_frequency_select.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/frequency_tables.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_frequency_tables.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/gps_option.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_gps_option.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/gps_record_options.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_gps_record_options.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/information_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_information.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/item_list.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_loaded_table.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/loaded_frequencies_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_loaded_frequencies.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/loading_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_alert_loading.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/manual_current_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_manual_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/manual_scanning.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_manual_scanning.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/matches_number.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_matches_number.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/max_min_pulse_rate.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_max_min_pulse_rate.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/menu_manage_receiver.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_menu_manage_data.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/menu_scan.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_menu_scan.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/merge_tables_scan.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_tables_scan.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/no_device_found.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/no_frequencies.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/numbers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_numbers.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/pulse_rate_types.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_pulse_rate_types.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/pulse_rate_values.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_pulse_rate_values.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/receiver_status.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_vhf_status.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/scan_details.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_scan_details.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/scan_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_scan.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/searching_devices.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_searching_devices.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/set_value.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_select_value.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/splash_screen.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_splash.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/stationary_current_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_stationary_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/stationary_scanning.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_stationary_scanning.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/stationary_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/include_stationary_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/store_rate_values.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_store_rate_values.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/table_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_table.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/tag_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_tag.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/warning_message.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_warning_message.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -753,7 +745,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=N0AA003791K82000314)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -807,10 +799,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="valueResourceFile" />
-        <option value="Interface" />
         <option value="resourceFile" />
-        <option value="Class" />
+        <option value="Interface" />
         <option value="layoutResourceFile" />
+        <option value="Class" />
       </list>
     </option>
   </component>

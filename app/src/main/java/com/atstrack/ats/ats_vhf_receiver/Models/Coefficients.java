@@ -1,7 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver.Models;
 
 public class Coefficients {
-    public int position;
+    public int position = -1;
     public int frequency = 255;
     public int coefficientA = 255;
     public int coefficientB = 255;

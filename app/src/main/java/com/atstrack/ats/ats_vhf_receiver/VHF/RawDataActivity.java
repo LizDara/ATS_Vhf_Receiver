@@ -7,15 +7,16 @@ import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.FileSourceFragment;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class RawDataActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.convert_raw_data);
+        title = getString(R.string.title_vhf_raw_main);
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

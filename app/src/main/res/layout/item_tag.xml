@@ -31,8 +31,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8sp"
-            android:drawablePadding="12dp"
+            android:drawablePadding="12sp"
             app:drawableEndCompat="@drawable/ic_audio_on" />
+
+        <TextView
+            android:id="@+id/tv_rssi_tag"
+            style="@style/body_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8sp"
+            android:drawablePadding="6sp"
+            app:drawableStartCompat="@drawable/ic_rssi" />
 
         <Space
             android:layout_width="0dp"
@@ -40,9 +49,10 @@
             android:layout_weight="1" />
 
         <ImageView
+            android:id="@+id/img_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_up"
+            android:background="@drawable/ic_down"
             tools:ignore="ContentDescription" />
 
     </LinearLayout>
@@ -116,7 +126,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/lb_isolate_audio"
+                android:text="@string/btn_bt_tag_isolate_audio"
                 android:textColor="@color/limed_spruce" />
 
             <Button
@@ -124,7 +134,7 @@
                 style="@style/button_primary_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_view_tag" />
+                android:text="@string/btn_bt_tag_plot_data" />
 
         </LinearLayout>
 

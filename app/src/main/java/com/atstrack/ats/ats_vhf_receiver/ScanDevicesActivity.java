@@ -16,13 +16,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.DeviceAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
@@ -39,6 +34,7 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StartScanningActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryScanActivity;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityScanDevicesBinding;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,28 +42,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 public class ScanDevicesActivity extends BluetoothScannerActivity {
-
-    @BindView(R.id.pb_searching)
-    ProgressBar pb_searching;
-    @BindView(R.id.tv_devices_subtitle)
-    TextView tv_devices_subtitle;
-    @BindView(R.id.tv_searching_message)
-    TextView tv_searching_message;
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-    @BindView(R.id.img_connected)
-    ImageView img_connected;
-    @BindView(R.id.btn_retry)
-    Button btn_retry;
-    @BindView(R.id.btn_cancel)
-    Button btn_cancel;
-    @BindView(R.id.btn_connect)
-    Button btn_connect;
-
     private DeviceAdapter deviceAdapter;
     private LeServiceConnection leServiceConnection;
     private Timer connectionTimeout;
@@ -75,7 +50,6 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
     private byte parameter = ValueCodes.NONE;
     private AlertDialog disconnectionDialog;
     private Handler messageHandler;
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         @Override
@@ -118,69 +92,62 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         if (!cancel && mConnected) {
             messageHandler.postDelayed(() -> {
                 TransferBleData.readBoardStatus();
-                Log.i(TAG, "SEND READ BOARD " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
             }, ValueCodes.WAITING_PERIOD);
         }
     }
 
-    @OnClick(R.id.btn_retry)
-    public void onClickRetry(View v) {
-        scanLeDevice(true);
-    }
-
     @SuppressLint("MissingPermission")
-    @OnClick(R.id.btn_connect)
-    public void onClickConnect(View v) {
-        initializeParameters();
-        mBluetoothLeScanner.stopScan(mLeScanCallback);
-        setVisibility(ValueCodes.CONNECTING);
-        DeviceData device = deviceAdapter.selectedDevice.get(0);
-        ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        receiverInformation.setInformation(device.bluetoothDevice.getName(), device.bluetoothDevice.getAddress(), device.batteryPercent);
-
-        leServiceConnection = LeServiceConnection.getInstance();
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
-        mRegisterReceiver();
-
-        if (deviceAdapter.deviceType.contains(ValueCodes.VHF))
-            parameter = ValueCodes.SCAN_STATE_COMMAND;
-
-        connectionTimeout.schedule(new TimerTask() { //create timer for connection timeout
-            @Override
-            public void run() {
-                Log.i(TAG, "SCAN TIMEOUT " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
-                if (!cancel && mConnected && !deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
-                    connectionTimeout.cancel();
-                    connectionTimeout.purge();
-                    if (deviceAdapter.deviceType.contains(ValueCodes.ACOUSTIC)) {
-                        showAcousticReceiverMenu();
-                    } else if (deviceAdapter.deviceType.contains(ValueCodes.BLUETOOTH_RECEIVER)) {
-                        showBluetoothReceiverMenu();
-                    }
-                } else {
-                    showDisconnectionAlertDialog(); //Connection timeout, make sure you write mac address correct and ble device is discoverable
-                }
-            }
-        }, ValueCodes.CONNECT_TIMEOUT);
-    }
-
-    @SuppressLint("MissingPermission")
-    @OnClick(R.id.btn_cancel)
-    public void onClickCancel(View v) {
-        cancelConnection();
-        setVisibility(ValueCodes.FOUNDED);
-        mBluetoothLeScanner.startScan(mLeScanCallback);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_scan_devices;
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
         setToolbarTitle(type);
+        binding = ActivityScanDevicesBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
-        deviceAdapter = new DeviceAdapter(this, type, btn_connect, tv_devices_subtitle, tv_searching_message); // Initializes list view adapter.
+        ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnRetry.setOnClickListener(v -> scanLeDevice(true));
+        ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect.setOnClickListener(v -> {
+            initializeParameters();
+            mBluetoothLeScanner.stopScan(mLeScanCallback);
+            setVisibility(ValueCodes.CONNECTING);
+            DeviceData device = deviceAdapter.selectedDevice.get(0);
+            ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
+            receiverInformation.setInformation(device.bluetoothDevice.getName(), device.bluetoothDevice.getAddress(), device.batteryPercent);
+
+            leServiceConnection = LeServiceConnection.getInstance();
+            Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+            bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
+            mRegisterReceiver();
+
+            if (deviceAdapter.deviceType.contains(ValueCodes.VHF))
+                parameter = ValueCodes.SCAN_STATE_COMMAND;
+
+            connectionTimeout.schedule(new TimerTask() { //create timer for connection timeout
+                @Override
+                public void run() {
+                    Log.i(TAG, "SCAN TIMEOUT " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
+                    if (!cancel && mConnected && !deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
+                        connectionTimeout.cancel();
+                        connectionTimeout.purge();
+                        if (deviceAdapter.deviceType.contains(ValueCodes.ACOUSTIC)) {
+                            showAcousticReceiverMenu();
+                        } else if (deviceAdapter.deviceType.contains(ValueCodes.BLUETOOTH_RECEIVER)) {
+                            showBluetoothReceiverMenu();
+                        }
+                    } else {
+                        if (!readBoardStatus || !readScanStatus)
+                            showDisconnectionAlertDialog(); //Connection timeout, make sure you write mac address correct and ble device is discoverable
+                    }
+                }
+            }, ValueCodes.CONNECT_TIMEOUT);
+        });
+        ((ActivityScanDevicesBinding) binding).btnCancel.setOnClickListener(v -> {
+            cancelConnection();
+            setVisibility(ValueCodes.FOUNDED);
+            mBluetoothLeScanner.startScan(mLeScanCallback);
+        });
+
+        deviceAdapter = new DeviceAdapter(this, type, ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect, ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle, ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage); // Initializes list view adapter.
         messageHandler = new Handler();
     }
 
@@ -238,57 +205,57 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
 
     private void setVisibility(int view) {
         if (view == ValueCodes.SEARCHING) {
-            btn_retry.setVisibility(View.GONE);
-            tv_devices_subtitle.setText(R.string.lb_searching_devices);
-            tv_searching_message.setText(R.string.lb_message_searching);
-            pb_searching.setVisibility(View.VISIBLE);
-            img_connected.setVisibility(View.GONE);
-            rv_item.setVisibility(View.INVISIBLE);
-            btn_connect.setEnabled(false);
-            btn_connect.setAlpha((float) 0.6);
-            btn_cancel.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnRetry.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle.setText(R.string.lbl_device_selection_searching);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage.setText(R.string.lbl_device_selection_searching_msg);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).imgConnected.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.includeRecyclerView.rvItem.setVisibility(View.INVISIBLE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect.setEnabled(false);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect.setAlpha((float) 0.6);
+            ((ActivityScanDevicesBinding) binding).btnCancel.setVisibility(View.GONE);
         } else if (view == ValueCodes.FOUNDED) {
-            tv_devices_subtitle.setText("Found " + deviceAdapter.getItemCount() + " Devices");
-            tv_searching_message.setText(R.string.lb_select_device);
-            pb_searching.setVisibility(View.GONE);
-            rv_item.setVisibility(View.VISIBLE);
-            pb_searching.setVisibility(View.GONE);
-            btn_cancel.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle.setText("Found " + deviceAdapter.getItemCount() + " Devices");
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage.setText(R.string.lbl_device_selection_guide);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.includeRecyclerView.rvItem.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).btnCancel.setVisibility(View.GONE);
         } else if (view == ValueCodes.NO_FOUNDED) {
-            tv_devices_subtitle.setText(R.string.lb_no_devices_found);
-            tv_searching_message.setText(R.string.lb_unable_find_device);
-            btn_retry.setVisibility(View.VISIBLE);
-            pb_searching.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle.setText(R.string.lbl_device_selection_none_found);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage.setText(R.string.lbl_device_selection_range_warning);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnRetry.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.GONE);
         } else if (view == ValueCodes.CONNECTING) {
-            pb_searching.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.VISIBLE);
             deviceAdapter.setSelectedDevice();
-            tv_devices_subtitle.setText(R.string.lb_connecting_device);
-            tv_searching_message.setText(R.string.lb_connecting_message);
-            btn_cancel.setVisibility(View.VISIBLE);
-            btn_connect.setEnabled(false);
-            btn_connect.setAlpha((float) 0.6);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle.setText(R.string.lbl_receiver_connection_connecting_device);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage.setText(R.string.lbl_receiver_connection_msg);
+            ((ActivityScanDevicesBinding) binding).btnCancel.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect.setEnabled(false);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.btnConnect.setAlpha((float) 0.6);
         } else if (view == ValueCodes.CONNECTED) {
-            pb_searching.setVisibility(View.GONE);
-            img_connected.setVisibility(View.VISIBLE);
-            tv_devices_subtitle.setText(R.string.lb_success);
-            tv_searching_message.setText(R.string.lb_device_connected);
-            btn_cancel.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).pbSearching.setVisibility(View.GONE);
+            ((ActivityScanDevicesBinding) binding).imgConnected.setVisibility(View.VISIBLE);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvDevicesSubtitle.setText(R.string.lbl_receiver_connection_success);
+            ((ActivityScanDevicesBinding) binding).includeSearchingDevices.tvSearchingMessage.setText(R.string.lbl_receiver_connection_success_msg);
+            ((ActivityScanDevicesBinding) binding).btnCancel.setVisibility(View.GONE);
         }
     }
 
     private void setToolbarTitle(String type) {
         switch (type) {
             case ValueCodes.VHF:
-                title = getString(R.string.select_vhf_receiver);
+                title = getString(R.string.title_device_selection_vhf);
                 break;
             case ValueCodes.ACOUSTIC:
-                title = getString(R.string.select_acoustic_receiver);
+                title = getString(R.string.title_device_selection_acoustic);
                 break;
             case ValueCodes.WILDLINK:
-                title = getString(R.string.select_wildlink);
+                title = getString(R.string.title_device_selection_wildlink);
                 break;
             case ValueCodes.BLUETOOTH_RECEIVER:
-                title = getString(R.string.select_bluetooth_beacon);
+                title = getString(R.string.title_device_selection_bluetooth_beacon);
                 break;
             default:
                 title = "SELECT DEVICE";
@@ -323,8 +290,8 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
 
             messageHandler.postDelayed(() -> {
                 if (deviceAdapter.getItemCount() > 0) { // Available devices were found to display
-                    rv_item.setAdapter(deviceAdapter);
-                    rv_item.setLayoutManager(new LinearLayoutManager(this));
+                    ((ActivityScanDevicesBinding) binding).includeSearchingDevices.includeRecyclerView.rvItem.setAdapter(deviceAdapter);
+                    ((ActivityScanDevicesBinding) binding).includeSearchingDevices.includeRecyclerView.rvItem.setLayoutManager(new LinearLayoutManager(this));
                     setVisibility(ValueCodes.FOUNDED);
                 } else { // Unable to find any devices within range
                     mBluetoothLeScanner.stopScan(mLeScanCallback);
@@ -343,23 +310,25 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         scanLeDevice(false);
         messageHandler.post(new Runnable() {
             public void run() {
-                disconnectionDialog = Dialogs.createDisconnectionDialog(context, getString(R.string.lb_failed_connect));
-                disconnectionDialog.show(); // a veces cuando desconecto quiere mostrar este mensaje como si siguiera corriendo el message handler
+                if (!readBoardStatus || !readScanStatus) {
+                    disconnectionDialog = Dialogs.createDisconnectionDialog(context, getString(R.string.lbl_receiver_connection_failed), deviceAdapter.deviceType);
+                    disconnectionDialog.show();
 
-                byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
-                Data logData = new Data(ValueCodes.LOG_FILE);
-                logData.packets.add(data);
-                ArrayList<Data> dataList = new ArrayList<>();
-                dataList.add(logData);
-                File root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
-                Converters.printDataFiles(root, dataList);
+                    byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
+                    Data logData = new Data(ValueCodes.LOG_FILE);
+                    logData.packets.add(data);
+                    ArrayList<Data> dataList = new ArrayList<>();
+                    dataList.add(logData);
+                    File root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
+                    Converters.printDataFiles(root, dataList);
 
-                messageHandler.postDelayed(() -> {
-                    disconnectionDialog.dismiss();
-                    if (leServiceConnection.existConnection())
-                        leServiceConnection.close();
-                    finish();
-                }, ValueCodes.BRANDING_PERIOD); // The message disappears after a pre-defined period and will search for other available BLE devices again
+                    messageHandler.postDelayed(() -> {
+                        disconnectionDialog.dismiss();
+                        if (leServiceConnection.existConnection())
+                            leServiceConnection.close();
+                        finish();
+                    }, ValueCodes.BRANDING_PERIOD); // The message disappears after a pre-defined period and will search for other available BLE devices again
+                }
             }
         });
     }
@@ -380,7 +349,6 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         sharedPreferencesEdit.putInt(ValueCodes.WIDTH, metrics.widthPixels);
-        sharedPreferencesEdit.putInt(ValueCodes.HEIGHT, metrics.heightPixels);
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         receiverInformation.changeSDCard(data[7] == 0x01);
         sharedPreferencesEdit.apply();
@@ -437,7 +405,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
     }
 
     private void showBluetoothReceiverMenu() {
-        Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver.MenuActivity.class);
+        Intent intent = new Intent(this, com.atstrack.ats.ats_vhf_receiver.BluetoothReceiver.BluetoothTagDetectionActivity.class);
         startActivity(intent);
         finish();
     }

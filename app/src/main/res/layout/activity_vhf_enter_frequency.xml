@@ -41,7 +41,7 @@
             android:layout_marginTop="16sp"
             android:layout_marginBottom="8sp"
             android:gravity="center"
-            android:text="@string/lb_enter_frequency_digits"
+            android:text="@string/lbl_vhf_tables_enter_digits"
             android:textColor="@color/slate_gray" />
 
         <View
@@ -85,6 +85,7 @@
                     android:layout_marginHorizontal="8sp">
 
                     <include
+                        android:id="@+id/include_numbers"
                         layout="@layout/include_numbers"/>
 
                 </LinearLayout>
@@ -104,7 +105,7 @@
         android:layout_marginVertical="24sp"
         android:alpha="0.6"
         android:enabled="false"
-        android:text="@string/lb_save_changes"
+        android:text="@string/btn_vhf_tables_save_changes"
         app:layout_constraintBottom_toTopOf="@id/include_vhf_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

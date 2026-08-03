@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24sp"
-            android:text="@string/lb_return_upload"
+            android:text="@string/btn_vhf_tables_return_upload"
             android:textColor="@color/slate_700" />
 
         <Button
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/button_stop"
-            android:text="@string/lb_cancel_upload" />
+            android:text="@string/btn_vhf_tables_cancel_upload" />
 
     </LinearLayout>
 

@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8sp"
         android:layout_marginBottom="8sp"
-        android:text="@string/lb_select_store_rate"
+        android:text="@string/lbl_vhf_defaults_store_rate_select"
         android:textColor="@color/limed_spruce" />
 
     <LinearLayout
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_continuous_store"
+            android:text="@string/lbl_vhf_defaults_store_rate_continuous"
             android:textColor="@color/ebony_clay"
             app:drawableEndCompat="@drawable/ic_check" />
 
@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_5_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_5m"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_10_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_10m"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_15_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_15m"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_30_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_30m"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -105,7 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_60_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_60m"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -120,7 +120,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_120_minutes"
+            android:text="@string/lbl_vhf_defaults_store_rate_120m"
             android:textColor="@color/ebony_clay" />
 
     </LinearLayout>

@@ -5,15 +5,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentResultListener;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -23,22 +18,9 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfMenuBinding;
 
 public class MenuActivity extends BaseActivity {
-
-    @BindView(R.id.tv_vhf_name)
-    TextView tv_vhf_name;
-    @BindView(R.id.img_menu)
-    ImageView img_menu;
-    @BindView(R.id.tv_percent_battery_menu)
-    TextView tv_percent_battery_menu;
-    @BindView(R.id.tv_sd_card_menu)
-    TextView tv_sd_card_menu;
-    @BindView(R.id.img_battery_menu)
-    ImageView img_battery_menu;
-    @BindView(R.id.img_sd_card_menu)
-    ImageView img_sd_card_menu;
-
     private final static String TAG = MenuActivity.class.getSimpleName();
 
     private byte detectionType;
@@ -59,50 +41,38 @@ public class MenuActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.btn_disconnect)
-    public void onClickDisconnect(View v) {
-        leServiceConnection.getBluetoothLeService().disconnect();
-    }
-
-    @OnClick(R.id.btn_start_scanning)
-    public void onClickStartScanning(View v) {
-        Intent intent = new Intent(this, StartScanningActivity.class);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_receiver_configuration)
-    public void onClickReceiverConfiguration(View v) {
-        Intent intent = new Intent(this, ConfigurationActivity.class);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_manage_receiver_data)
-    public void onClickManageReceiverData(View v) {
-        Intent intent = new Intent(this, ManageDataActivity.class);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_convert_raw_data)
-    public void onClickConvertRaw(View v) {
-        Intent intent = new Intent(this, RawDataActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_menu;
         showToolbar = false;
+        deviceCategory = ValueCodes.VHF;
+        binding = ActivityVhfMenuBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
+        ((ActivityVhfMenuBinding) binding).includeDisconnectMenu.btnDisconnect.setOnClickListener(v -> leServiceConnection.getBluetoothLeService().disconnect());
+        ((ActivityVhfMenuBinding) binding).btnStartScanning.setOnClickListener(v -> {
+            Intent intent = new Intent(this, StartScanningActivity.class);
+            startActivity(intent);
+        });
+        ((ActivityVhfMenuBinding) binding).btnReceiverConfiguration.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ConfigurationActivity.class);
+            startActivity(intent);
+        });
+        ((ActivityVhfMenuBinding) binding).btnManageReceiverData.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageDataActivity.class);
+            startActivity(intent);
+        });
+        ((ActivityVhfMenuBinding) binding).btnConvertRawData.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RawDataActivity.class);
+            startActivity(intent);
+        });
+
         firmwareServiceHelper = new FirmwareServiceHelper(this);
-        img_menu.setVisibility(View.GONE);
+        ((ActivityVhfMenuBinding) binding).includeDisconnectMenu.imgMenu.setVisibility(View.GONE);
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         checkDetectionType(receiverInformation.getDeviceName().substring(15, 16));
         if (detectionType != ValueCodes.NONE)
             firmwareServiceHelper.updateAvailable();
-        tv_vhf_name.setText("Receiver " + receiverInformation.getSerialNumber());
-        setBattery(receiverInformation);
-        setSdCard(receiverInformation);
+        ((ActivityVhfMenuBinding) binding).tvVhfName.setText("Receiver " + receiverInformation.getSerialNumber());
     }
 
     @Override
@@ -162,12 +132,12 @@ public class MenuActivity extends BaseActivity {
     }
 
     private void setBattery(ReceiverInformation receiverInformation) {
-        tv_percent_battery_menu.setText(receiverInformation.getPercentBattery() + "%");
-        img_battery_menu.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
+        ((ActivityVhfMenuBinding) binding).tvPercentBatteryMenu.setText(receiverInformation.getPercentBattery() + "%");
+        ((ActivityVhfMenuBinding) binding).imgBatteryMenu.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
     }
 
     private void setSdCard(ReceiverInformation receiverInformation) {
-        tv_sd_card_menu.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
-        img_sd_card_menu.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
+        ((ActivityVhfMenuBinding) binding).tvSdCardMenu.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
+        ((ActivityVhfMenuBinding) binding).imgSdCardMenu.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

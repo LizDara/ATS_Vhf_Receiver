@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -23,21 +22,10 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.EnterFrequencyActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentEditTableScanBinding;
 
 public class EditTableScanFragment extends Fragment implements ReceiverCallback {
-    @BindView(R.id.tv_current_frequency_mobile)
-    TextView tv_current_frequency_mobile;
-    @BindView(R.id.tv_current_index_mobile)
-    TextView tv_current_index_mobile;
-    @BindView(R.id.tv_table_total_mobile)
-    TextView tv_table_total_mobile;
-
-    private Unbinder unbinder;
+    private FragmentEditTableScanBinding binding = null;
     private final int baseFrequency;
     private final int range;
     private final int index;
@@ -55,52 +43,43 @@ public class EditTableScanFragment extends Fragment implements ReceiverCallback 
         initializeLauncher();
     }
 
-    @OnClick(R.id.btn_add_frequency_scan)
-    public void onClickAddFrequencyScan(View v) {
-        Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
-        intent.putExtra(ValueCodes.TITLE, getString(R.string.lb_add_frequency_scan));
-        intent.putExtra(ValueCodes.POSITION, -1);
-        intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
-        intent.putExtra(ValueCodes.RANGE, range);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.btn_delete_frequency_scan)
-    public void onClickDeleteFrequencyScan(View v) {
-        setDeleteFrequency();
-    }
-
-    @OnClick(R.id.btn_merge_table_scan)
-    public void onClickMergeTableScan(View v) {
-        if (tables == null) {
-            TransferBleData.readTables();
-        } else {
-            if (getParentFragmentManager() != null) {
-                getParentFragmentManager().beginTransaction()
-                        .setReorderingAllowed(true)
-                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                        .hide(this)
-                        .add(R.id.fcv_activity_fragment, new TablesScanFragment(tables, ValueCodes.MOBILE_SCAN_COMMAND), String.valueOf(ValueCodes.FOURTH_STEP))
-                        .addToBackStack(String.valueOf(ValueCodes.THIRD_STEP))
-                        .commit();
-            }
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_table_scan, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentEditTableScanBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tv_current_frequency_mobile.setText(String.valueOf(currentFrequency));
-        tv_current_index_mobile.setText(String.valueOf(index));
-        tv_table_total_mobile.setText(String.valueOf(total));
+        binding.btnAddFrequencyScan.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
+            intent.putExtra(ValueCodes.TITLE, getString(R.string.btn_vhf_mobile_add_frequency_scan));
+            intent.putExtra(ValueCodes.POSITION, -1);
+            intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
+            intent.putExtra(ValueCodes.RANGE, range);
+            launcher.launch(intent);
+        });
+        binding.btnDeleteFrequencyScan.setOnClickListener(v -> setDeleteFrequency());
+        binding.btnMergeTableScan.setOnClickListener(v -> {
+            if (tables == null) {
+                TransferBleData.readTables();
+            } else {
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().beginTransaction()
+                            .setReorderingAllowed(true)
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                            .hide(this)
+                            .add(R.id.fcv_activity_fragment, new TablesScanFragment(tables, ValueCodes.MOBILE_SCAN_COMMAND), String.valueOf(ValueCodes.FOURTH_STEP))
+                            .addToBackStack(String.valueOf(ValueCodes.THIRD_STEP))
+                            .commit();
+                }
+            }
+        });
+        binding.tvCurrentFrequencyMobile.setText(String.valueOf(currentFrequency));
+        binding.tvCurrentIndexMobile.setText(String.valueOf(index));
+        binding.tvTableTotalMobile.setText(String.valueOf(total));
 
         getParentFragmentManager().setFragmentResultListener(ValueCodes.TABLE, this, (requestKey, result) -> {
             if (!isAdded() || getView() == null) return;
@@ -125,8 +104,7 @@ public class EditTableScanFragment extends Fragment implements ReceiverCallback 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void initializeLauncher() {
@@ -149,14 +127,14 @@ public class EditTableScanFragment extends Fragment implements ReceiverCallback 
         byte[] b = new byte[] {(byte) 0x5D, (byte) ((newFrequency - baseFrequency) / 256), (byte) ((newFrequency - baseFrequency) % 256)};
         boolean result = TransferBleData.writeScanning(b);
         if (result)
-            showAlertDialog(getString(R.string.lb_frequency_added));
+            showAlertDialog(getString(R.string.lbl_vhf_tables_added));
     }
 
     private void setDeleteFrequency() {
         byte[] b = new byte[] {(byte) 0x5C, (byte) (index / 256), (byte) (index % 256)};
         boolean result = TransferBleData.writeScanning(b);
         if (result)
-            showAlertDialog(getString(R.string.lb_frequency_deleted));
+            showAlertDialog(getString(R.string.lbl_vhf_mobile_edit_table_freq_deleted));
     }
 
     private void showAlertDialog(String message) {
@@ -205,6 +183,6 @@ public class EditTableScanFragment extends Fragment implements ReceiverCallback 
 
     private void frequenciesNumber(byte[] data) {
         total = (Byte.toUnsignedInt(data[1]) * 256) + Byte.toUnsignedInt(data[2]);
-        tv_table_total_mobile.setText(String.valueOf(total));
+        binding.tvTableTotalMobile.setText(String.valueOf(total));
     }
 }

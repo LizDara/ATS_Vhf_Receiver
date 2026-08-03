@@ -358,8 +358,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="down" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\down.svg" />
+                            <entry key="outputName" value="ic_rssi" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\rssi.svg" />
                           </map>
                         </option>
                       </PersistentState>

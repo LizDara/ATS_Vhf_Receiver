@@ -4,13 +4,12 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ATSar";
     public static final String VHF = "ATSvr";
-    public static final String BLUETOOTH_RECEIVER = "UART"; // ATSbr
+    public static final String BLUETOOTH_RECEIVER = "ATSbr"; // UART
     public static final String WILDLINK = "ATSwl";
     public static final String BEACON = "CTT"; // ATSbt
 
     //Values
     public static final String WIDTH = "width";
-    public static final String HEIGHT = "height";
     public static final String VALUE = "value";
     public static final String FIRMWARE_VERSION = "version";
     public static final String PARAMETER = "parameter";
@@ -148,6 +147,7 @@ public class ValueCodes {
     public static final byte AUDIO_ALL_COMMAND = (byte) 0x5A;
     public static final byte AUDIO_BACKGROUND_COMMAND = (byte) 0x5B;
     public static final byte FATAL_SCAN_ERROR_COMMAND = (byte) 0x44;
+    public static final byte LOW_POWER_COMMAND = (byte) 0x45;
 
     public static final byte GPS_VALID = 3;
     public static final byte GPS_FAILED = 2;
@@ -165,10 +165,6 @@ public class ValueCodes {
     public static final int TEMPERATURE = 12;
 
     public static final int MIN_RSSI = -90;
-    public static final int MAX_BLUETOOTH_RSSI = -20;
-    public static final int MAX_TAG_RSSI = -44;
-    public static final int MIN_VOLTAGE = 0;
-    public static final int MAX_VOLTAGE = 1800;
-    public static final int MIN_TEMPERATURE = 0;
-    public static final int MAX_TEMPERATURE = 60;
+    public static final int MAX_BLUETOOTH_RSSI = -40; // -20
+    public static final int MAX_TAG_RSSI = -64; // -44
 }

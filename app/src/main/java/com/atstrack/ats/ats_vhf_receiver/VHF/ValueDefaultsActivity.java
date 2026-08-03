@@ -1,11 +1,8 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import butterknife.BindView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -14,24 +11,21 @@ import com.atstrack.ats.ats_vhf_receiver.Fragments.StoreRateValuesFragment;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.TablesScanFragment;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 import java.util.ArrayList;
 
 public class ValueDefaultsActivity extends BaseActivity {
-
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-
     private int type;
     public int value;
     private ArrayList<Integer> tables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.lb_select_value);
+        title = getString(R.string.lbl_vhf_defaults_mobile_select_val);
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
         type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
@@ -96,7 +90,7 @@ public class ValueDefaultsActivity extends BaseActivity {
         if (savedInstanceState == null) {
             switch (type) {
                 case ValueCodes.STORE_RATE_CODE:
-                    tv_title_toolbar.setText(R.string.store_rate);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_defaults_store_rate_title);
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fcv_activity_fragment, new StoreRateValuesFragment(value))
@@ -104,7 +98,7 @@ public class ValueDefaultsActivity extends BaseActivity {
                     break;
                 case ValueCodes.TABLES_NUMBER_CODE:
                 case ValueCodes.TABLE_NUMBER_CODE:
-                    tv_title_toolbar.setText(R.string.tables_scan);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_defaults_stationary_scan_tables);
                     parameter = ValueCodes.TABLES_COMMAND;
                     break;
                 default:

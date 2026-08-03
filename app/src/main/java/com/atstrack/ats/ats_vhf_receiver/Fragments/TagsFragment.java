@@ -8,16 +8,12 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.TagAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
@@ -30,6 +26,7 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Services.AudioService;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentTagsBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -40,23 +37,8 @@ import android.location.Location;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapterClickListener {
-    @BindView(R.id.img_location_data)
-    ImageView img_location_data;
-    @BindView(R.id.tv_location_data)
-    TextView tv_location_data;
-    @BindView(R.id.tv_coordinates)
-    TextView tv_coordinates;
-    @BindView(R.id.btn_location_data)
-    Button btn_location_data;
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-
-    private Unbinder unbinder;
+    private FragmentTagsBinding binding = null;
     private final String type;
     private ArrayList<TagDetail> tags;
     private TagAdapter tagAdapter;
@@ -87,9 +69,8 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tags, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentTagsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -97,9 +78,9 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
         super.onViewCreated(view, savedInstanceState);
         tagAdapter = new TagAdapter(requireContext(), this);
         LinearLayoutManager manager = new LinearLayoutManager(requireContext());
-        rv_item.setLayoutManager(manager);
-        rv_item.setHasFixedSize(true);
-        rv_item.setAdapter(tagAdapter);
+        binding.includeRecyclerView.rvItem.setLayoutManager(manager);
+        binding.includeRecyclerView.rvItem.setHasFixedSize(true);
+        binding.includeRecyclerView.rvItem.setAdapter(tagAdapter);
         coordinates = new Coordinates();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         locationCallback = new LocationCallback() {
@@ -108,7 +89,7 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
                 for (Location location : locationResult.getLocations()) {
                     coordinates.latitude = location.getLatitude();
                     coordinates.longitude = location.getLongitude();
-                    tv_coordinates.setText(coordinates.latitude + ", " + coordinates.longitude);
+                    binding.tvCoordinates.setText(coordinates.latitude + ", " + coordinates.longitude);
                 }
             }
         };
@@ -120,8 +101,7 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
         super.onDestroyView();
         fusedLocationClient.removeLocationUpdates(locationCallback);
         stopTagsTimer();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     @Override

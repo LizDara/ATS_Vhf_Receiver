@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32sp"
-        android:text="@string/lb_searching_devices" />
+        android:text="@string/lbl_device_selection_searching" />
 
     <TextView
         android:id="@+id/tv_searching_message"
@@ -21,7 +21,7 @@
         android:layout_marginTop="16sp"
         android:layout_marginBottom="8sp"
         android:gravity="center_horizontal"
-        android:text="@string/lb_message_searching" />
+        android:text="@string/lbl_device_selection_searching_msg" />
 
     <Button
         android:id="@+id/btn_retry"
@@ -29,9 +29,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_retry" />
+        android:text="@string/btn_device_selection_retry" />
 
     <include
+        android:id="@+id/include_recycler_view"
         layout="@layout/include_recycler_view" />
 
     <Button
@@ -43,6 +44,6 @@
         android:layout_marginBottom="16sp"
         android:enabled="false"
         android:alpha="0.6"
-        android:text="@string/lb_connect" />
+        android:text="@string/btn_device_selection_connect" />
 
 </LinearLayout>

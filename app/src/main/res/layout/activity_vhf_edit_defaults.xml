@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_aerial_defaults"
+        android:text="@string/btn_vhf_defaults_go_mobile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/include_toolbar" />
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_stationary_defaults"
+        android:text="@string/btn_vhf_defaults_go_stationary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_mobile_defaults" />

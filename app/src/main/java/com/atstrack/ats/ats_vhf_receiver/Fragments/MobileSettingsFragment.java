@@ -8,15 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -27,26 +23,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileDefaultsActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ScanBaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ValueDefaultsActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentMobileSettingsBinding;
 
 public class MobileSettingsFragment extends Fragment implements ReceiverCallback {
-    @BindView(R.id.tv_scan_rate_seconds_mobile)
-    TextView tv_scan_rate_seconds_mobile;
-    @BindView(R.id.tv_table_number_mobile)
-    TextView tv_table_number_mobile;
-    @BindView(R.id.sw_gps)
-    SwitchCompat sw_gps;
-    @BindView(R.id.sw_mobile_auto_record)
-    SwitchCompat sw_mobile_auto_record;
-    @BindView(R.id.btn_start_mobile)
-    Button btn_start_mobile;
-
-    private Unbinder unbinder;
+    private FragmentMobileSettingsBinding binding = null;
     private final int baseFrequency;
     private final int range;
     private MobileDefaults mobileDefaults;
@@ -69,70 +49,57 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
         initializeLauncher();
     }
 
-    @OnClick(R.id.layout_table_number_mobile)
-    public void onClickFrequencyTableNumber(View v) {
-        Intent intent = new Intent(requireContext(), ValueDefaultsActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLE_NUMBER_CODE);
-        intent.putExtra(ValueCodes.VALUE, mobileDefaults.tableNumber);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_scan_rate_seconds_mobile)
-    public void onClickScanRateSeconds(View v) {
-        Intent intent = new Intent(requireContext(), ValueDefaultsActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
-        intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanRate * 10));
-        launcher.launch(intent);
-    }
-
-    @OnCheckedChanged(R.id.sw_gps)
-    public void onCheckedChangedGps(CompoundButton button, boolean isChecked) {
-        if (isReadyToTemporary) {
-            sw_gps.setEnabled(false);
-            setTemporary(ValueCodes.GPS_CODE);
-        }
-    }
-
-    @OnCheckedChanged(R.id.sw_mobile_auto_record)
-    public void onCheckedChangedAutoRecord(CompoundButton button, boolean isChecked) {
-        if (isReadyToTemporary) {
-            sw_mobile_auto_record.setEnabled(false);
-            setTemporary(ValueCodes.AUTO_RECORD_CODE);
-        }
-    }
-
-    @OnClick(R.id.tv_edit_mobile_default)
-    public void onClickMobileDefault(View v) {
-        goEditDefault = true;
-        Intent intent = new Intent(requireContext(), MobileDefaultsActivity.class);
-        intent.putExtra(ValueCodes.VALUE, mobileDefaults.originalBytes);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_start_mobile)
-    public void onClickStartMobile(View v) {
-        if (getParentFragmentManager() != null) {
-            getParentFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                    .hide(this)
-                    .add(R.id.fcv_activity_fragment, new MobileScanningFragment(baseFrequency, range, mobileDefaults), String.valueOf(ValueCodes.SECOND_STEP))
-                    .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
-                    .commit();
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_mobile_settings, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentMobileSettingsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.includeMobileSettings.layoutTableNumberMobile.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ValueDefaultsActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.TABLE_NUMBER_CODE);
+            intent.putExtra(ValueCodes.VALUE, mobileDefaults.tableNumber);
+            launcher.launch(intent);
+        });
+        binding.includeMobileSettings.layoutScanRateSecondsMobile.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ValueDefaultsActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
+            intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanRate * 10));
+            launcher.launch(intent);
+        });
+        binding.includeMobileSettings.includeGpsOption.swGps.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (isReadyToTemporary) {
+                binding.includeMobileSettings.includeGpsOption.swGps.setEnabled(false);
+                setTemporary(ValueCodes.GPS_CODE);
+            }
+        });
+        binding.includeMobileSettings.swMobileAutoRecord.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (isReadyToTemporary) {
+                binding.includeMobileSettings.swMobileAutoRecord.setEnabled(false);
+                setTemporary(ValueCodes.AUTO_RECORD_CODE);
+            }
+        });
+        binding.tvEditMobileDefault.setOnClickListener(v -> {
+            goEditDefault = true;
+            Intent intent = new Intent(requireContext(), MobileDefaultsActivity.class);
+            intent.putExtra(ValueCodes.VALUE, mobileDefaults.originalBytes);
+            startActivity(intent);
+        });
+        binding.btnStartMobile.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .hide(this)
+                        .add(R.id.fcv_activity_fragment, new MobileScanningFragment(baseFrequency, range, mobileDefaults), String.valueOf(ValueCodes.SECOND_STEP))
+                        .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
+                        .commit();
+            }
+        });
         initialize();
         if (mobileDefaults != null)
             downloadMobileDefault();
@@ -169,8 +136,7 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void initialize() {
@@ -200,17 +166,17 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
 
     private void downloadMobileDefault() {
         if (mobileDefaults.tableNumber == 0) { // There are no tables with frequencies to scan
-            tv_table_number_mobile.setText(R.string.lb_none);
-            btn_start_mobile.setEnabled(false);
-            btn_start_mobile.setAlpha((float) 0.6);
+            binding.includeMobileSettings.tvTableNumberMobile.setText(R.string.lbl_vhf_manual_option_none);
+            binding.btnStartMobile.setEnabled(false);
+            binding.btnStartMobile.setAlpha((float) 0.6);
         } else { // Shows the table to be scanned
-            tv_table_number_mobile.setText(String.valueOf(mobileDefaults.tableNumber));
-            btn_start_mobile.setEnabled(true);
-            btn_start_mobile.setAlpha((float) 1);
+            binding.includeMobileSettings.tvTableNumberMobile.setText(String.valueOf(mobileDefaults.tableNumber));
+            binding.btnStartMobile.setEnabled(true);
+            binding.btnStartMobile.setAlpha((float) 1);
         }
-        tv_scan_rate_seconds_mobile.setText(String.valueOf(mobileDefaults.scanRate));
-        sw_gps.setChecked(mobileDefaults.gpsOn);
-        sw_mobile_auto_record.setChecked(mobileDefaults.autoRecordOn);
+        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(mobileDefaults.scanRate));
+        binding.includeMobileSettings.includeGpsOption.swGps.setChecked(mobileDefaults.gpsOn);
+        binding.includeMobileSettings.swMobileAutoRecord.setChecked(mobileDefaults.autoRecordOn);
         isReadyToTemporary = true;
     }
 
@@ -221,10 +187,10 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
                         return;
                     int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                     if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
-                        tv_table_number_mobile.setText(String.valueOf(value));
+                        binding.includeMobileSettings.tvTableNumberMobile.setText(String.valueOf(value));
                         setTemporary(ValueCodes.TABLE_NUMBER_CODE);
                     } else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) { // Gets the modified scan rate
-                        tv_scan_rate_seconds_mobile.setText(String.valueOf(value * 0.1));
+                        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(value * 0.1));
                         setTemporary(ValueCodes.SCAN_RATE_MOBILE_CODE);
                     }
                 });
@@ -236,20 +202,20 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
         byte[] b = new byte[]{(byte) 0x6F, (byte) mobileDefaults.tableNumber, (byte) info, (byte) ((int) (mobileDefaults.scanRate * 10))};
         switch (type) {
             case ValueCodes.TABLE_NUMBER_CODE:
-                b[1] = (byte) Integer.parseInt(tv_table_number_mobile.getText().toString());
-                mobileDefaults.tableNumber = Integer.parseInt(tv_table_number_mobile.getText().toString());
+                b[1] = (byte) Integer.parseInt(binding.includeMobileSettings.tvTableNumberMobile.getText().toString());
+                mobileDefaults.tableNumber = Integer.parseInt(binding.includeMobileSettings.tvTableNumberMobile.getText().toString());
                 break;
             case ValueCodes.SCAN_RATE_MOBILE_CODE:
-                b[3] = (byte) (Float.parseFloat(tv_scan_rate_seconds_mobile.getText().toString()) * 10);
-                mobileDefaults.scanRate = Double.parseDouble(tv_scan_rate_seconds_mobile.getText().toString());
+                b[3] = (byte) (Float.parseFloat(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString()) * 10);
+                mobileDefaults.scanRate = Double.parseDouble(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
                 break;
             case ValueCodes.GPS_CODE:
-                b[2] = sw_gps.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x80) : (byte) (Byte.toUnsignedInt(b[2]) & 0x7F);
-                mobileDefaults.gpsOn = sw_gps.isChecked();
+                b[2] = binding.includeMobileSettings.includeGpsOption.swGps.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x80) : (byte) (Byte.toUnsignedInt(b[2]) & 0x7F);
+                mobileDefaults.gpsOn = binding.includeMobileSettings.includeGpsOption.swGps.isChecked();
                 break;
             case ValueCodes.AUTO_RECORD_CODE:
-                b[2] = sw_mobile_auto_record.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x40) : (byte) (Byte.toUnsignedInt(b[2]) & 0xBF);
-                mobileDefaults.autoRecordOn = sw_mobile_auto_record.isChecked();
+                b[2] = binding.includeMobileSettings.swMobileAutoRecord.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x40) : (byte) (Byte.toUnsignedInt(b[2]) & 0xBF);
+                mobileDefaults.autoRecordOn = binding.includeMobileSettings.swMobileAutoRecord.isChecked();
                 break;
         }
         boolean result = TransferBleData.writeDefaults(true, b);
@@ -257,7 +223,7 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
             mobileDefaults = new MobileDefaults(mobileDefaults.originalBytes);
             downloadMobileDefault();
         }
-        sw_gps.setEnabled(true);
-        sw_mobile_auto_record.setEnabled(true);
+        binding.includeMobileSettings.includeGpsOption.swGps.setEnabled(true);
+        binding.includeMobileSettings.swMobileAutoRecord.setEnabled(true);
     }
 }

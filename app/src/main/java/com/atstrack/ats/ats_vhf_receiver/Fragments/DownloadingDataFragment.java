@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +30,7 @@ import com.atstrack.ats.ats_vhf_receiver.Services.DriveServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentDownloadingDataBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -41,30 +40,8 @@ import com.google.api.services.drive.DriveScopes;
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 public class DownloadingDataFragment extends Fragment implements ReceiverCallback {
-    @BindView(R.id.tv_first_step)
-    TextView tv_first_step;
-    @BindView(R.id.pb_first_step)
-    ProgressBar pb_first_step;
-    @BindView(R.id.tv_second_step)
-    TextView tv_second_step;
-    @BindView(R.id.pb_second_step)
-    ProgressBar pb_second_step;
-    @BindView(R.id.tv_third_step)
-    TextView tv_third_step;
-    @BindView(R.id.pb_third_step)
-    ProgressBar pb_third_step;
-    @BindView(R.id.tv_download_percent)
-    TextView tv_download_percent;
-    @BindView(R.id.tv_process_percent)
-    TextView tv_process_percent;
-
-    private Unbinder unbinder;
+    private FragmentDownloadingDataBinding binding = null;
     private File root;
     private ArrayList<byte[]> packets;
     private Handler receiveHandler;
@@ -105,7 +82,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
                                 }
                             }
                             int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
-                            tv_download_percent.setText(" - " + percent + "%");
+                            binding.includeDownloadingProcess.tvDownloadPercent.setText(" - " + percent + "%");
                             isOk = true;
                             LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page " + pageNumber + " downloaded successfully." + ValueCodes.CR + ValueCodes.LF;
                         } else {
@@ -128,24 +105,21 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         }
     };
 
-    @OnClick(R.id.btn_cancel_download)
-    public void onClickCancelDownload(View v) {
-        downloading = false;
-        TransferBleData.downloadResponse(false);
-        showAlertDialog("Download Timeout", "Do you want to save the downloaded bytes?", 3);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_downloading_data, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentDownloadingDataBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnCancelDownload.setOnClickListener(v -> {
+            downloading = false;
+            TransferBleData.downloadResponse(false);
+            showAlertDialog("Download Timeout", "Do you want to save the downloaded bytes?", 3);
+        });
         setVisibility(ValueCodes.DOWNLOADING);
         setNotification();
     }
@@ -156,7 +130,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         if (requestCode == ValueCodes.REQUEST_CODE_SIGN_IN) {
             if (resultCode == android.app.Activity.RESULT_OK) {
                 DriveServiceHelper driveServiceHelper = new DriveServiceHelper(root, dataList.get(1).fileName, requireContext());
-                driveServiceHelper.handleSignInIntent(data);
+                driveServiceHelper.handleSignInIntent(data, "");
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (getParentFragmentManager() != null) {
                         getParentFragmentManager().beginTransaction()
@@ -175,8 +149,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     @Override
@@ -224,12 +197,10 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         if (getParentFragmentManager() != null) {
             Fragment fragment1 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
             Fragment fragment2 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
-            //Fragment fragment3 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.THIRD_STEP));
             getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-            //if (fragment3 != null) transaction.remove(fragment3);
             if (fragment2 != null) transaction.remove(fragment2);
             transaction.remove(this);
             if (fragment1 != null)
@@ -272,40 +243,40 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     private void setVisibility(int view) {
         switch (view) {
             case ValueCodes.DOWNLOADING:
-                tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-                tv_first_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-                pb_first_step.setVisibility(View.GONE);
-                tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-                tv_second_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-                pb_second_step.setVisibility(View.GONE);
-                tv_third_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-                tv_third_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-                pb_third_step.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+                binding.includeDownloadingProcess.tvFirstStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+                binding.includeDownloadingProcess.pbFirstStep.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+                binding.includeDownloadingProcess.tvSecondStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+                binding.includeDownloadingProcess.pbSecondStep.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+                binding.includeDownloadingProcess.tvThirdStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+                binding.includeDownloadingProcess.pbThirdStep.setVisibility(View.GONE);
                 break;
             case ValueCodes.FIRST_STEP:
-                tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
-                tv_first_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-                pb_first_step.setVisibility(View.VISIBLE);
+                binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+                binding.includeDownloadingProcess.tvFirstStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+                binding.includeDownloadingProcess.pbFirstStep.setVisibility(View.VISIBLE);
                 break;
             case ValueCodes.SECOND_STEP:
-                tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
-                pb_first_step.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+                binding.includeDownloadingProcess.pbFirstStep.setVisibility(View.GONE);
 
-                tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
-                tv_second_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-                pb_second_step.setVisibility(View.VISIBLE);
+                binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+                binding.includeDownloadingProcess.tvSecondStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+                binding.includeDownloadingProcess.pbSecondStep.setVisibility(View.VISIBLE);
                 break;
             case ValueCodes.THIRD_STEP:
-                tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
-                pb_second_step.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+                binding.includeDownloadingProcess.pbSecondStep.setVisibility(View.GONE);
 
-                tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
-                tv_third_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-                pb_third_step.setVisibility(View.VISIBLE);
+                binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+                binding.includeDownloadingProcess.tvThirdStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+                binding.includeDownloadingProcess.pbThirdStep.setVisibility(View.VISIBLE);
                 break;
             case ValueCodes.FOURTH_STEP:
-                tv_third_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
-                pb_third_step.setVisibility(View.GONE);
+                binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+                binding.includeDownloadingProcess.pbThirdStep.setVisibility(View.GONE);
                 break;
         }
     }
@@ -358,10 +329,10 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         downloading = finalPageNumber > 0;
         receiveHandler = new Handler(Looper.getMainLooper());
         if (downloading) {
-            tv_download_percent.setVisibility(View.VISIBLE);
-            tv_process_percent.setVisibility(View.VISIBLE);
-            tv_download_percent.setText(" - 0%");
-            tv_process_percent.setText("");
+            binding.includeDownloadingProcess.tvDownloadPercent.setVisibility(View.VISIBLE);
+            binding.includeDownloadingProcess.tvProcessPercent.setVisibility(View.VISIBLE);
+            binding.includeDownloadingProcess.tvDownloadPercent.setText(" - 0%");
+            binding.includeDownloadingProcess.tvProcessPercent.setText("");
             setVisibility(ValueCodes.FIRST_STEP);
             setStartDownload();
         } else { // No data to download
@@ -388,17 +359,17 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
 
     private void checkPackets() {
         receiveHandler.removeCallbacks(downloadRunnable);
-        tv_process_percent.setText(" - 0%");
+        binding.includeDownloadingProcess.tvProcessPercent.setText(" - 0%");
         fillRawData();
-        tv_process_percent.setText(" - 1%");
+        binding.includeDownloadingProcess.tvProcessPercent.setText(" - 1%");
         new Thread(() -> {
             if (!error) {
                 dataList.add(rawData);
-                String processData = Converters.getPackageProcessed(rawData.packets, tv_process_percent, (BaseActivity) requireActivity(), false);
+                String processData = Converters.getPackageProcessed(rawData.packets, binding.includeDownloadingProcess.tvProcessPercent, (BaseActivity) requireActivity(), false);
                 byte[] data = Converters.convertToUTF8(processData);
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (isAdded() && getView() != null) {
-                        tv_process_percent.setText(" - 100%");
+                        binding.includeDownloadingProcess.tvProcessPercent.setText(" - 100%");
                         processedData.packets.add(data);
                         dataList.add(processedData);
 

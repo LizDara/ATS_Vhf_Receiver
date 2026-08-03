@@ -52,7 +52,7 @@
                 style="@style/h2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_no_receiver_detected"
+                android:text="@string/lbl_vhf_clone_no_device_detected"
                 android:textColor="@color/ebony_clay" />
 
             <TextView
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16sp"
                 android:gravity="center"
-                android:text="@string/lb_make_sure_receivers"
+                android:text="@string/lbl_vhf_clone_cable_instruction"
                 android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
@@ -79,7 +79,7 @@
             android:layout_marginStart="16sp"
             android:layout_marginEnd="16sp"
             android:layout_marginBottom="24sp"
-            android:text="@string/lb_retry_receiver_search" />
+            android:text="@string/btn_vhf_clone_retry_search" />
 
     </LinearLayout>
 
@@ -123,7 +123,7 @@
                 style="@style/h1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_ready_clone"
+                android:text="@string/lbl_vhf_clone_ready"
                 android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
@@ -141,7 +141,7 @@
             android:layout_marginStart="16sp"
             android:layout_marginEnd="16sp"
             android:layout_marginBottom="24sp"
-            android:text="@string/lb_start_cloning" />
+            android:text="@string/btn_vhf_clone_start" />
 
     </LinearLayout>
 
@@ -176,7 +176,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24sp"
-                android:text="@string/lb_cloning"
+                android:text="@string/lbl_vhf_clone_processing"
                 android:textColor="@color/ebony_clay" />
 
         </LinearLayout>

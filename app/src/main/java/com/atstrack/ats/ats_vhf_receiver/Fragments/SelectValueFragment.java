@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,20 +14,13 @@ import androidx.fragment.app.Fragment;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ValueDefaultsActivity;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentSelectValueBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
-import butterknife.Unbinder;
-
 public class SelectValueFragment extends Fragment {
-    @BindView(R.id.sp_value)
-    Spinner sp_value;
-
-    private Unbinder unbinder;
+    private FragmentSelectValueBinding binding = null;
     private final int type;
     private int value;
     private byte[] data;
@@ -44,36 +36,39 @@ public class SelectValueFragment extends Fragment {
         this.data = tables;
     }
 
-    @OnItemSelected(R.id.sp_value)
-    public void onItemSelectedValue(AdapterView<?> adapter, View v, int position, long id) {
-        if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) // Send the mobile scan rate value
-            value = (int) (Float.parseFloat(sp_value.getSelectedItem().toString()) * 10);
-        else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
-            value = Integer.parseInt(sp_value.getSelectedItem().toString());
-        else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
-            value = (sp_value.getSelectedItem().toString().equals("None")) ? 0 :
-                    Integer.parseInt(sp_value.getSelectedItem().toString().replace("Table ", ""));
-        else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
-            value = sp_value.getSelectedItemPosition() + 1;
-        else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
-            value = Integer.parseInt(sp_value.getSelectedItem().toString());
-        else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
-            value = sp_value.getSelectedItemPosition();
-        if (getActivity() instanceof ValueDefaultsActivity)
-            ((ValueDefaultsActivity) getActivity()).value = value;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_select_value, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentSelectValueBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.spValue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) // Send the mobile scan rate value
+                    value = (int) (Float.parseFloat(binding.spValue.getSelectedItem().toString()) * 10);
+                else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
+                    value = Integer.parseInt(binding.spValue.getSelectedItem().toString());
+                else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
+                    value = (binding.spValue.getSelectedItem().toString().equals("None")) ? 0 :
+                            Integer.parseInt(binding.spValue.getSelectedItem().toString().replace("Table ", ""));
+                else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
+                    value = binding.spValue.getSelectedItemPosition() + 1;
+                else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
+                    value = Integer.parseInt(binding.spValue.getSelectedItem().toString());
+                else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
+                    value = binding.spValue.getSelectedItemPosition();
+                if (getActivity() instanceof ValueDefaultsActivity)
+                    ((ValueDefaultsActivity) getActivity()).value = value;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
         switch (type) {
             case ValueCodes.TABLE_NUMBER_CODE:
                 setTables();
@@ -97,8 +92,7 @@ public class SelectValueFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void setTables() {
@@ -114,67 +108,67 @@ public class SelectValueFragment extends Fragment {
             tables.add("None");
         ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, tables);
         tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp_value.setAdapter(tablesAdapter);
-        sp_value.setSelection(position);
+        binding.spValue.setAdapter(tablesAdapter);
+        binding.spValue.setSelection(position);
     }
 
     private void setScanRate() {
         if (type == ValueCodes.SCAN_RATE_MOBILE_CODE) { // Mobile scan rate
-            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.scanRateMobile, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_mobile_scan_rate, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            sp_value.setAdapter(scanRateAdapter);
+            binding.spValue.setAdapter(scanRateAdapter);
 
             int index = 0;
             for (int i = 0; i < 49; i++) {
-                String item = sp_value.getItemAtPosition(i).toString().replace(".", "");
+                String item = binding.spValue.getItemAtPosition(i).toString().replace(".", "");
                 if (item.equals(String.valueOf(value))) {
                     index = i;
                     break;
                 }
             }
-            sp_value.setSelection(index);
+            binding.spValue.setSelection(index);
         } else { // Stationary scan rate
-            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.scanRateStationary, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> scanRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_scan_rate, android.R.layout.simple_spinner_item);
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            sp_value.setAdapter(scanRateAdapter);
+            binding.spValue.setAdapter(scanRateAdapter);
 
             if (value <= 255)
-                sp_value.setSelection(value - 10);
+                binding.spValue.setSelection(value - 10);
             else
-                sp_value.setSelection(0);
+                binding.spValue.setSelection(0);
         }
     }
 
     private void setAntennas() {
-        ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.antennas, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> antennasAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_antennas, android.R.layout.simple_spinner_item);
         antennasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp_value.setAdapter(antennasAdapter);
+        binding.spValue.setAdapter(antennasAdapter);
 
         if (value <= 4 && value > 0)
-            sp_value.setSelection(value - 1);
+            binding.spValue.setSelection(value - 1);
         else
-            sp_value.setSelection(0);
+            binding.spValue.setSelection(0);
     }
 
     private void setTimeout() {
-        ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.timeout, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> timeoutAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_timeout, android.R.layout.simple_spinner_item);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp_value.setAdapter(timeoutAdapter);
+        binding.spValue.setAdapter(timeoutAdapter);
 
         if (value <= 200)
-            sp_value.setSelection(value - 4);
+            binding.spValue.setSelection(value - 4);
         else
-            sp_value.setSelection(0);
+            binding.spValue.setSelection(0);
     }
 
     private void setReferenceFrequencyStoreRate() {
-        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.referenceFrequencyStoreRate, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_reference_rate, android.R.layout.simple_spinner_item);
         storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp_value.setAdapter(storeRateAdapter);
+        binding.spValue.setAdapter(storeRateAdapter);
 
         if (value <= 24)
-            sp_value.setSelection(value);
+            binding.spValue.setSelection(value);
         else
-            sp_value.setSelection(0);
+            binding.spValue.setSelection(0);
     }
 }

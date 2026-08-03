@@ -12,14 +12,13 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewbinding.ViewBinding;
 
 import com.atstrack.ats.ats_vhf_receiver.Utils.ActivitySetting;
 
-import butterknife.ButterKnife;
-
 public class BluetoothScannerActivity extends AppCompatActivity {
-
     protected final static String TAG = ScanDevicesActivity.class.getSimpleName();
+    protected ViewBinding binding = null;
     protected int contentViewId;
     protected String title;
 
@@ -30,8 +29,7 @@ public class BluetoothScannerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(contentViewId);
-        ButterKnife.bind(this);
+        setContentView(binding.getRoot());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);// Keep screen on
         ActivitySetting.setToolbar(this, title, "");
         initScanCallback();

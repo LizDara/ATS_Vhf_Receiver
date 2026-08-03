@@ -11,6 +11,8 @@ import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -19,10 +21,10 @@ public class ManageDataActivity extends BaseActivity implements OnDialogCreatedL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.manage_receiver_data);
+        title = getString(R.string.title_vhf_data_main);
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

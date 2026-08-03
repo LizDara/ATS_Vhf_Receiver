@@ -37,7 +37,7 @@
                 android:layout_marginStart="16sp"
                 android:layout_marginTop="24sp"
                 android:layout_marginEnd="16sp"
-                android:text="@string/lb_transmitter_detection"
+                android:text="@string/title_vhf_detection_options"
                 android:textColor="@color/limed_spruce" />
 
             <LinearLayout
@@ -68,7 +68,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8sp"
-                            android:text="@string/lb_pulse_rate_type"
+                            android:text="@string/title_vhf_detection_pulse_rate_type"
                             android:textColor="@color/limed_spruce" />
 
                         <TextView
@@ -119,7 +119,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
-                                android:text="@string/lb_matches_for_valid_pattern"
+                                android:text="@string/lbl_vhf_detection_matches_pattern"
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
@@ -174,7 +174,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
-                                android:text="@string/lb_max_pulse_rate"
+                                android:text="@string/lbl_vhf_detection_max_pulse_rate_ppm"
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
@@ -220,7 +220,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
-                                android:text="@string/lb_min_pulse_rate"
+                                android:text="@string/lbl_vhf_detection_min_pulse_rate_ppm"
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
@@ -266,7 +266,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8sp"
-                                android:text="@string/lb_optional_data"
+                                android:text="@string/lbl_vhf_detection_optional_data_calc"
                                 android:textColor="@color/limed_spruce" />
 
                             <TextView
@@ -274,7 +274,7 @@
                                 style="@style/body_regular"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lb_none"
+                                android:text="@string/lbl_vhf_manual_option_none"
                                 android:textColor="@color/ebony_clay" />
 
                         </LinearLayout>
@@ -305,7 +305,7 @@
                     android:layout_marginStart="16sp"
                     android:layout_marginTop="8sp"
                     android:layout_marginEnd="16sp"
-                    android:text="@string/lb_target_pulse_rates"
+                    android:text="@string/lbl_vhf_detection_target_rates_title"
                     android:textColor="@color/limed_spruce" />
 
                 <LinearLayout
@@ -343,7 +343,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_pr1"
+                                    android:text="@string/lbl_vhf_detection_target_pr1_ppm"
                                     android:textColor="@color/limed_spruce" />
 
                                 <TextView
@@ -367,7 +367,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_pr1_tolerance"
+                                    android:text="@string/lbl_vhf_detection_target_pr1_tolerance"
                                     android:textColor="@color/limed_spruce" />
 
                                 <LinearLayout
@@ -439,7 +439,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_pr2"
+                                    android:text="@string/lbl_vhf_detection_target_pr2_ppm"
                                     android:textColor="@color/limed_spruce" />
 
                                 <TextView
@@ -463,7 +463,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8sp"
-                                    android:text="@string/lb_pr2_tolerance"
+                                    android:text="@string/lbl_vhf_detection_target_pr2_tolerance"
                                     android:textColor="@color/limed_spruce" />
 
                                 <LinearLayout
@@ -517,7 +517,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_save_changes"
+        android:text="@string/btn_vhf_tables_save_changes"
         app:layout_constraintBottom_toTopOf="@id/include_vhf_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

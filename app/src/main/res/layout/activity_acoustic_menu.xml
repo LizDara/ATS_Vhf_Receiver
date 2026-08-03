@@ -17,6 +17,7 @@
         android:padding="16sp">
 
         <include
+            android:id="@+id/acoustic_disconnect_menu_include"
             layout="@layout/include_disconnect_menu" />
 
         <LinearLayout
@@ -164,7 +165,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2sp"
-                android:text="@string/lb_temperature"
+                android:text="@string/lbl_vhf_detection_temperature"
                 android:textColor="@color/slate_700" />
 
             <TextView

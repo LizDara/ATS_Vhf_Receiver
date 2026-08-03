@@ -21,9 +21,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16sp"
-                android:text="@string/lb_scan_settings" />
+                android:text="@string/lbl_vhf_mobile_scan_settings" />
 
             <include
+                android:id="@+id/include_stationary_settings"
                 layout="@layout/include_stationary_settings" />
 
         </LinearLayout>
@@ -38,7 +39,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="16sp"
         android:gravity="end"
-        android:text="@string/lb_edit_default_settings"
+        android:text="@string/btn_vhf_mobile_edit_default_settings"
         android:textColor="@color/limed_spruce" />
 
     <Button
@@ -47,6 +48,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_start_scanning" />
+        android:text="@string/btn_vhf_stationary_start_scan" />
 
 </LinearLayout>

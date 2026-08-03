@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
-        android:text="@string/lb_manual_scan" />
+        android:text="@string/lbl_vhf_start_scan_manual" />
 
     <Button
         android:id="@+id/btn_start_mobile_scan"
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_aerial_scan" />
+        android:text="@string/lbl_vhf_start_scan_mobile" />
 
     <Button
         android:id="@+id/btn_start_stationary_scan"
@@ -27,6 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
-        android:text="@string/lb_stationary_scan" />
+        android:text="@string/lbl_vhf_start_scan_stationary" />
 
 </LinearLayout>

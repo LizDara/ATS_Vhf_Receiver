@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class Converters {
-
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     public static String getHexValue(byte[] value) { // Gets value in hexadecimal system
@@ -151,8 +150,8 @@ public class Converters {
             return isLogo ? R.drawable.ic_deer_icon : R.drawable.ic_wildlink_receiver;
         else if (name.contains("BT2400"))
             return isLogo ? R.drawable.ic_insect_icon : R.drawable.ic_bluetooth_tag;
-        else if (name.contains(ValueCodes.BLUETOOTH_RECEIVER) || name.contains("Bluetooth Receiver"))
-            return isLogo ? R.drawable.bluetooth_receiver : R.drawable.ic_bluetooth_tag;
+        else if (name.contains(ValueCodes.BLUETOOTH_RECEIVER) || name.contains("BluTrack"))
+            return isLogo ? R.drawable.ic_bluetooth_receiver : R.drawable.ic_bluetooth_tag;
         else if (name.contains(ValueCodes.BEACON) || name.contains("Beacon"))
             return isLogo ? R.drawable.ic_transmitter_icon : R.drawable.ic_bluetooth_tag;
         return 0;
@@ -340,10 +339,10 @@ public class Converters {
                                 text += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : Converters.getDecimalValue(packet[index + 5])) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))) + ValueCodes.CR + ValueCodes.LF;
                                 int referenceFrequency = (Byte.toUnsignedInt(packet[index + 9]) * 256) + Byte.toUnsignedInt(packet[index + 10]) + baseFrequency;
                                 text += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Reference Frequency Store Interval (minutes): " + (referenceFrequency == baseFrequency ? "No" : Converters.getDecimalValue(packet[index + 11])) + ValueCodes.CR + ValueCodes.LF;
+                                text += "Reference Frequency Store Interval (minutes): " + (referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))) + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 2] & (byte) 0x0F);
                                 matches = Byte.toUnsignedInt(packet[index + 2]) / 16;
                                 String detection = "Coded";
@@ -491,8 +490,8 @@ public class Converters {
                     case ValueCodes.SCAN_DATA_VARIABLE_NON_CODED_COMMAND:
                         secondsOffset = Byte.toUnsignedInt(packet[index + 1]);
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
-                        periodHi = Byte.toUnsignedInt(packet[index + 5]);
-                        periodLo = Byte.toUnsignedInt(packet[index + 6]);
+                        periodHi = (Byte.toUnsignedInt(packet[index + 5]) << 8) | Byte.toUnsignedInt(packet[index + 6]);
+                        periodLo = 0;
                         numberDetection = Byte.toUnsignedInt(packet[index + 7]);
                         currentDateTime.setTime(baseDateTime.getTime());
                         currentDateTime.add(Calendar.SECOND, secondsOffset);
@@ -520,8 +519,8 @@ public class Converters {
                         break;
                     case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
-                        periodHi = Byte.toUnsignedInt(packet[index + 5]);
-                        periodLo = Byte.toUnsignedInt(packet[index + 6]);
+                        periodHi = (Byte.toUnsignedInt(packet[index + 5]) << 8) | Byte.toUnsignedInt(packet[index + 6]);
+                        periodLo = 0;
                         numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
@@ -560,8 +559,8 @@ public class Converters {
                         frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) +
                                 Byte.toUnsignedInt(packet[index + 2]));
                         signalStrength = Byte.toUnsignedInt(packet[index + 3]);
-                        periodHi = Byte.toUnsignedInt(packet[index + 4]);
-                        periodLo = Byte.toUnsignedInt(packet[index + 5]);
+                        periodHi = (Byte.toUnsignedInt(packet[index + 4]) << 8) | Byte.toUnsignedInt(packet[index + 5]);
+                        periodLo = 0;
 
                         if (index + 8 < packet.length && packet[index + 8] == ValueCodes.SCAN_GPS_COMMAND) {
                             byte[] gpsData = new byte[16];
@@ -648,7 +647,6 @@ public class Converters {
                 stream.flush(); //save the file
                 stream.close();
                 i++;
-                Log.i("CONVERTERS", "FINISH CREATE FILE " + newFile.getAbsolutePath() + " " + i);
             }
             return i == dataList.size();
         } catch (Exception e) {

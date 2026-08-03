@@ -17,13 +17,10 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.EnterFrequencyActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.FrequenciesActivity;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentEmptyTableBinding;
 
 public class EmptyTableFragment extends Fragment {
-    private Unbinder unbinder;
+    private FragmentEmptyTableBinding binding = null;
     private final FrequencyAdapter frequencyAdapter;
     private ActivityResultLauncher<Intent> launcher;
 
@@ -32,39 +29,36 @@ public class EmptyTableFragment extends Fragment {
         initializeLauncher();
     }
 
-    @OnClick(R.id.btn_add_new_frequency)
-    public void onClickAddFrequency(View v) {
-        if (frequencyAdapter.isTemperature) {
-            if (getParentFragmentManager() != null) {
-                getParentFragmentManager().beginTransaction()
-                        .setReorderingAllowed(true)
-                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                        .hide(this)
-                        .add(R.id.fcv_activity_fragment, new TemperatureFrequencyFragment(-1, frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
-                        .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
-                        .commit();
-            }
-        } else {
-            Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
-            intent.putExtra(ValueCodes.TITLE, "Add Frequency");
-            intent.putExtra(ValueCodes.POSITION, -1);
-            intent.putExtra(ValueCodes.BASE_FREQUENCY, frequencyAdapter.baseFrequency);
-            intent.putExtra(ValueCodes.RANGE, frequencyAdapter.range);
-            launcher.launch(intent);
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_empty_table, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentEmptyTableBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnAddNewFrequency.setOnClickListener(v -> {
+            if (frequencyAdapter.isTemperature) {
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().beginTransaction()
+                            .setReorderingAllowed(true)
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                            .hide(this)
+                            .add(R.id.fcv_activity_fragment, new TemperatureFrequencyFragment(-1, frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
+                            .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
+                            .commit();
+                }
+            } else {
+                Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
+                intent.putExtra(ValueCodes.TITLE, "Add Frequency");
+                intent.putExtra(ValueCodes.POSITION, -1);
+                intent.putExtra(ValueCodes.BASE_FREQUENCY, frequencyAdapter.baseFrequency);
+                intent.putExtra(ValueCodes.RANGE, frequencyAdapter.range);
+                launcher.launch(intent);
+            }
+        });
         setToolbarTitle();
 
         getParentFragmentManager().setFragmentResultListener(ValueCodes.IS_TEMPERATURE, this, (requestKey, result) -> {
@@ -90,8 +84,7 @@ public class EmptyTableFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void setToolbarTitle() {

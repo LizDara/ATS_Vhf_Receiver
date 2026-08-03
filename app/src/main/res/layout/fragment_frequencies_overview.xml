@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4sp"
             android:drawablePadding="8sp"
-            android:text="@string/lb_removed_frequencies"
+            android:text="@string/lbl_vhf_tables_warn_removed"
             android:textColor="@color/tall_poppy"
             app:drawableStartCompat="@drawable/ic_alert" />
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/tall_poppy"
             style="@style/body_x_small"
-            android:text="@string/lb_removed_frequencies_message"/>
+            android:text="@string/lbl_vhf_tables_warn_removed_msg"/>
 
     </LinearLayout>
 
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="bottom"
-            android:text="@string/lb_tap_frequency"
+            android:text="@string/lbl_vhf_tables_tap_to_edit"
             android:textColor="@color/black" />
 
         <Button
@@ -60,11 +60,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="12sp"
-            android:text="@string/lb_delete_frequencies" />
+            android:text="@string/btn_vhf_tables_delete_frequencies" />
 
     </LinearLayout>
 
     <include
+        android:id="@+id/include_recycler_view"
         layout="@layout/include_recycler_view" />
 
     <LinearLayout
@@ -81,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16sp"
             android:layout_marginTop="16sp"
-            android:text="@string/lb_note_push"
+            android:text="@string/lbl_vhf_tables_note_overwrite"
             android:textColor="@color/black"
             android:visibility="gone" />
 
@@ -91,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16sp"
-            android:text="@string/lb_add_frequency" />
+            android:text="@string/btn_vhf_tables_add_frequency" />
 
         <TextView
             android:id="@+id/tv_view_tables"
@@ -100,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16sp"
-            android:text="@string/lb_view_tables"
+            android:text="@string/btn_vhf_tables_view_all"
             android:textColor="@color/slate_700" />
 
     </LinearLayout>

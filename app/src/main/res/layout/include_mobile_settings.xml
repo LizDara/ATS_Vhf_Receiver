@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_table"
+                android:text="@string/lbl_vhf_defaults_mobile_scan_table"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_rate"
+                android:text="@string/lbl_vhf_mobile_scan_rate"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -96,6 +96,7 @@
     </LinearLayout>
 
     <include
+        android:id="@+id/include_gps_option"
         layout="@layout/include_gps_option"/>
 
     <View
@@ -113,7 +114,7 @@
             style="@style/body_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lb_auto_record"
+            android:text="@string/lbl_vhf_mobile_auto_record"
             android:textColor="@color/limed_spruce" />
 
         <Space

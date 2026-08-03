@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/lb_detections"
+            android:text="@string/lbl_vhf_manual_detections"
             android:textColor="@color/limed_spruce" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/lb_signal_strength"
+            android:text="@string/lbl_vhf_manual_signal_strength"
             android:textColor="@color/limed_spruce" />
 
     </LinearLayout>
@@ -61,6 +61,7 @@
         tools:ignore="SmallSp" />
 
     <include
+        android:id="@+id/include_recycler_view"
         layout="@layout/include_recycler_view" />
 
 </LinearLayout>

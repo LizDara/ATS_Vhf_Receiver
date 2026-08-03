@@ -30,7 +30,7 @@
             style="@style/body_regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/lb_empty_table"
+            android:text="@string/lbl_vhf_tables_empty_count"
             android:textColor="@color/ebony_clay" />
 
     </LinearLayout>

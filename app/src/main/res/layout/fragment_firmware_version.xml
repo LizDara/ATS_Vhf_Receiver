@@ -22,7 +22,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="16sp"
         android:gravity="center"
-        android:text="@string/lb_firmware_file"
+        android:text="@string/lbl_fw_update_file_desc"
         android:textColor="@color/black" />
 
     <Space
@@ -37,6 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="24sp"
-        android:text="@string/lb_begin_update" />
+        android:text="@string/btn_fw_update_begin" />
 
 </LinearLayout>

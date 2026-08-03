@@ -1,12 +1,9 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import butterknife.BindView;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.DataCalculationFragment;
@@ -17,20 +14,18 @@ import com.atstrack.ats.ats_vhf_receiver.Fragments.PulseRateValuesFragment;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class ValueDetectionFilterActivity extends BaseActivity {
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-
     private int type;
     public int value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.lb_select_value);
+        title = getString(R.string.lbl_vhf_defaults_mobile_select_val);
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
         type = getIntent().getIntExtra(ValueCodes.TYPE, 0);
@@ -66,14 +61,14 @@ public class ValueDetectionFilterActivity extends BaseActivity {
         if (savedInstanceState == null) {
             switch (type) {
                 case ValueCodes.PULSE_RATE_TYPE_CODE:
-                    tv_title_toolbar.setText(R.string.pulse_rate_type_options);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.title_vhf_detection_pulse_rate_type);
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fcv_activity_fragment, new PulseRateTypesFragment(value))
                             .commit();
                     break;
                 case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE:
-                    tv_title_toolbar.setText(R.string.matches_for_valid_pattern);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_matches_pattern);
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fcv_activity_fragment, new MatchesNumberFragment(value))
@@ -85,16 +80,16 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                 case ValueCodes.PULSE_RATE_4_CODE:
                     switch (type) {
                         case ValueCodes.PULSE_RATE_1_CODE:
-                            tv_title_toolbar.setText(R.string.target_pulse_rate_1);
+                            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_target_pr1);
                             break;
                         case ValueCodes.PULSE_RATE_2_CODE:
-                            tv_title_toolbar.setText(R.string.target_pulse_rate_2);
+                            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_target_pr2);
                             break;
                         case ValueCodes.PULSE_RATE_3_CODE:
-                            tv_title_toolbar.setText(R.string.target_pulse_rate_3);
+                            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_target_pr3);
                             break;
                         case ValueCodes.PULSE_RATE_4_CODE:
-                            tv_title_toolbar.setText(R.string.target_pulse_rate_4);
+                            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_target_pr4);
                             break;
                     }
                     getSupportFragmentManager().beginTransaction()
@@ -104,14 +99,14 @@ public class ValueDetectionFilterActivity extends BaseActivity {
                     break;
                 case ValueCodes.MAX_PULSE_RATE_CODE:
                 case ValueCodes.MIN_PULSE_RATE_CODE:
-                    tv_title_toolbar.setText(type == ValueCodes.MIN_PULSE_RATE_CODE ? R.string.min_pulse_rate : R.string.max_pulse_rate);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(type == ValueCodes.MIN_PULSE_RATE_CODE ? R.string.lbl_vhf_detection_min_pulse_rate : R.string.lbl_vhf_detection_max_pulse_rate);
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fcv_activity_fragment, new MaxMinPulseRateFragment(type, value))
                             .commit();
                     break;
                 case ValueCodes.DATA_CALCULATION_TYPE_CODE:
-                    tv_title_toolbar.setText(R.string.optional_data_calculations);
+                    ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_detection_optional_data);
                     getSupportFragmentManager().beginTransaction()
                             .setReorderingAllowed(true)
                             .add(R.id.fcv_activity_fragment, new DataCalculationFragment(value))

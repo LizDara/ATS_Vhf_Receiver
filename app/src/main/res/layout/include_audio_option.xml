@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_id_audio"
+                android:text="@string/lbl_vhf_manual_id_audio"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -32,7 +32,7 @@
                 style="@style/body_large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_all"
+                android:text="@string/lbl_vhf_manual_option_all"
                 android:textColor="@color/ebony_clay"
                 android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8sp"
             android:gravity="end"
-            android:text="@string/lb_edit_audio_options"
+            android:text="@string/btn_vhf_manual_edit_audio_options"
             android:textColor="@color/limed_spruce" />
 
     </LinearLayout>

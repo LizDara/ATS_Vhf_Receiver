@@ -2,17 +2,12 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import butterknife.BindView;
-import butterknife.OnClick;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -20,39 +15,11 @@ import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfDetectionFilterBinding;
 
 public class DetectionFilterActivity extends BaseActivity {
-
-    @BindView(R.id.tv_pulse_rate_type)
-    TextView tv_pulse_rate_type;
-    @BindView(R.id.tv_matches_for_valid_pattern)
-    TextView tv_matches_for_valid_pattern;
-    @BindView(R.id.layout_matches_for_valid_pattern)
-    LinearLayout layout_matches_for_valid_pattern;
-    @BindView(R.id.layout_pulse_rates)
-    LinearLayout layout_pulse_rates;
-    @BindView(R.id.tv_max_pulse_rate)
-    TextView tv_max_pulse_rate;
-    @BindView(R.id.tv_min_pulse_rate)
-    TextView tv_min_pulse_rate;
-    @BindView(R.id.tv_optional_data)
-    TextView tv_optional_data;
-    @BindView(R.id.layout_target_pulse_rate)
-    LinearLayout layout_target_pulse_rate;
-    @BindView(R.id.tv_pr1)
-    TextView tv_pr1;
-    @BindView(R.id.tv_pr1_tolerance)
-    TextView tv_pr1_tolerance;
-    @BindView(R.id.tv_pr2)
-    TextView tv_pr2;
-    @BindView(R.id.tv_pr2_tolerance)
-    TextView tv_pr2_tolerance;
-    @BindView(R.id.btn_save_changes_detection)
-    Button btn_save_changes_detection;
-
     private DetectionFilter detectionFilter;
-
-    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
@@ -62,32 +29,32 @@ public class DetectionFilterActivity extends BaseActivity {
                         setVisibility(value);
                         break;
                     case ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE:
-                        tv_matches_for_valid_pattern.setText(String.valueOf(value));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText(String.valueOf(value));
                         break;
                     case ValueCodes.MAX_PULSE_RATE_CODE:
-                        tv_max_pulse_rate.setText(String.valueOf(value));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.setText(String.valueOf(value));
                         break;
                     case ValueCodes.MIN_PULSE_RATE_CODE:
-                        tv_min_pulse_rate.setText(String.valueOf(value));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.setText(String.valueOf(value));
                         break;
                     case ValueCodes.DATA_CALCULATION_TYPE_CODE:
                         if (value == 0)
-                            tv_optional_data.setText(R.string.lb_none);
+                            ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(R.string.lbl_vhf_manual_option_none);
                         else if (value == ValueCodes.VARIABLE_TEMPERATURE)
-                            tv_optional_data.setText(R.string.lb_temperature);
+                            ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(R.string.lbl_vhf_detection_temperature);
                         break;
                     case ValueCodes.PULSE_RATE_1_CODE:
-                        tv_pr1.setText(String.valueOf(value / 100));
-                        tv_pr1_tolerance.setText(String.valueOf(value % 100));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvPr1.setText(String.valueOf(value / 100));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvPr1Tolerance.setText(String.valueOf(value % 100));
                         break;
                     case ValueCodes.PULSE_RATE_2_CODE:
-                        tv_pr2.setText(String.valueOf(value / 100));
-                        tv_pr2_tolerance.setText(String.valueOf(value % 100));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvPr2.setText(String.valueOf(value / 100));
+                        ((ActivityVhfDetectionFilterBinding) binding).tvPr2Tolerance.setText(String.valueOf(value % 100));
                         break;
                 }
                 boolean changed = existChanges();
-                btn_save_changes_detection.setEnabled(changed);
-                btn_save_changes_detection.setAlpha(changed ? (float) 1 : (float) 0.6);
+                ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setEnabled(changed);
+                ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setAlpha(changed ? (float) 1 : (float) 0.6);
             });
 
     /**
@@ -96,18 +63,18 @@ public class DetectionFilterActivity extends BaseActivity {
     private void setDetectionFilter() {
         byte[] b = new byte[12];
         b[0] = (byte) 0x47;
-        switch (tv_pulse_rate_type.getText().toString()) {
+        switch (((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
-                b = new byte[] {(byte) 0x47, ValueCodes.FIXED, (byte) Integer.parseInt(tv_matches_for_valid_pattern.getText().toString()),
-                        (byte) Integer.parseInt(tv_pr1.getText().toString()), (byte) Integer.parseInt(tv_pr1_tolerance.getText().toString()),
-                        (byte) Integer.parseInt(tv_pr2.getText().toString()), (byte) Integer.parseInt(tv_pr2_tolerance.getText().toString()),
+                b = new byte[] {(byte) 0x47, ValueCodes.FIXED, (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.getText().toString()),
+                        (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr1.getText().toString()), (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr1Tolerance.getText().toString()),
+                        (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr2.getText().toString()), (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr2Tolerance.getText().toString()),
                         0, 0, 0, 0, 0};
                 break;
             case "Non Coded (Variable Pulse Rate)":
-                int optionalData = tv_optional_data.getText().toString().equals(getString(R.string.lb_none)) ? 0 : ValueCodes.VARIABLE_TEMPERATURE;
-                b = new byte[] {(byte) 0x47, ValueCodes.VARIABLE, (byte) Integer.parseInt(tv_matches_for_valid_pattern.getText().toString()),
-                        (byte) (Integer.parseInt(tv_max_pulse_rate.getText().toString())), 0,
-                        (byte) (Integer.parseInt(tv_min_pulse_rate.getText().toString())), 0, 0, 0, 0, 0, (byte) optionalData};
+                int optionalData = ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.getText().toString().equals(getString(R.string.lbl_vhf_manual_option_none)) ? 0 : ValueCodes.VARIABLE_TEMPERATURE;
+                b = new byte[] {(byte) 0x47, ValueCodes.VARIABLE, (byte) Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.getText().toString()),
+                        (byte) (Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.getText().toString())), 0,
+                        (byte) (Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.getText().toString())), 0, 0, 0, 0, 0, (byte) optionalData};
                 break;
             case "Coded":
                 b[1] = ValueCodes.CODED;
@@ -118,82 +85,67 @@ public class DetectionFilterActivity extends BaseActivity {
             finish();
     }
 
-    @OnClick(R.id.layout_pulse_rate_type)
-    public void onClickPulseRateType(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_TYPE_CODE);
-        intent.putExtra(ValueCodes.VALUE, (int) detectionFilter.detectionType);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_matches_for_valid_pattern)
-    public void onClickMatchesValidPattern(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE);
-        intent.putExtra(ValueCodes.VALUE, detectionFilter.matches);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_max_pulse_rate)
-    public void onClickMaxPulseRate(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.MAX_PULSE_RATE_CODE);
-        intent.putExtra(ValueCodes.VALUE, detectionFilter.maxPulseRate);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_min_pulse_rate)
-    public void onClickMinPulseRate(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.MIN_PULSE_RATE_CODE);
-        intent.putExtra(ValueCodes.VALUE, detectionFilter.minPulseRate);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_optional_data)
-    public void onClickOptionalDataCalculations(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.DATA_CALCULATION_TYPE_CODE);
-        intent.putExtra(ValueCodes.VALUE, detectionFilter.optionalData);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_pr1)
-    public void onClickPR1(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_1_CODE);
-        intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate1 * 100) + detectionFilter.pulseRateTolerance1);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.layout_pr2)
-    public void onClickPR2(View v) {
-        Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_2_CODE);
-        intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate2 * 100) + detectionFilter.pulseRateTolerance2);
-        launcher.launch(intent);
-    }
-
-    @OnClick(R.id.btn_save_changes_detection)
-    public void onClickSaveChanges(View v) {
-        if (existChanges()) {
-            if (isDataCorrect())
-                setDetectionFilter();
-            else {
-                AlertDialog dialog = Dialogs.createAlertDialog(this, "Error", "Data Incorrect", false);
-                dialogList.add(dialog);
-                dialog.setOnDismissListener(d -> dialogList.remove(dialog));
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_detection_filter;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.set_transmitter_type);
+        title = getString(R.string.title_vhf_detection_main);
+        binding = ActivityVhfDetectionFilterBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
+
+        ((ActivityVhfDetectionFilterBinding) binding).layoutPulseRateType.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_TYPE_CODE);
+            intent.putExtra(ValueCodes.VALUE, (int) detectionFilter.detectionType);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutMatchesForValidPattern.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.MATCHES_FOR_VALID_PATTERN_CODE);
+            intent.putExtra(ValueCodes.VALUE, detectionFilter.matches);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutMaxPulseRate.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.MAX_PULSE_RATE_CODE);
+            intent.putExtra(ValueCodes.VALUE, detectionFilter.maxPulseRate);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutMinPulseRate.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.MIN_PULSE_RATE_CODE);
+            intent.putExtra(ValueCodes.VALUE, detectionFilter.minPulseRate);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutOptionalData.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.DATA_CALCULATION_TYPE_CODE);
+            intent.putExtra(ValueCodes.VALUE, detectionFilter.optionalData);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutPr1.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_1_CODE);
+            intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate1 * 100) + detectionFilter.pulseRateTolerance1);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).layoutPr2.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ValueDetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.TYPE, ValueCodes.PULSE_RATE_2_CODE);
+            intent.putExtra(ValueCodes.VALUE, (detectionFilter.pulseRate2 * 100) + detectionFilter.pulseRateTolerance2);
+            launcher.launch(intent);
+        });
+        ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setOnClickListener(v -> {
+            if (existChanges()) {
+                if (isDataCorrect())
+                    setDetectionFilter();
+                else {
+                    AlertDialog dialog = Dialogs.createAlertDialog(this, "Error", "Data Incorrect", false);
+                    dialogList.add(dialog);
+                    dialog.setOnDismissListener(d -> dialogList.remove(dialog));
+                }
+            }
+        });
 
         parameter = getIntent().getByteExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
         if (parameter == ValueCodes.NONE) {
@@ -227,49 +179,49 @@ public class DetectionFilterActivity extends BaseActivity {
                 case ValueCodes.CODED:
                     break;
                 case ValueCodes.FIXED:
-                    tv_matches_for_valid_pattern.setText(String.valueOf(detectionFilter.matches));
-                    tv_pr1.setText(String.valueOf(detectionFilter.pulseRate1));
-                    tv_pr1_tolerance.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
-                    tv_pr2.setText(String.valueOf(detectionFilter.pulseRate2));
-                    tv_pr2_tolerance.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText(String.valueOf(detectionFilter.matches));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvPr1.setText(String.valueOf(detectionFilter.pulseRate1));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvPr1Tolerance.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvPr2.setText(String.valueOf(detectionFilter.pulseRate2));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvPr2Tolerance.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
                     break;
                 case ValueCodes.VARIABLE:
-                    tv_matches_for_valid_pattern.setText(String.valueOf(detectionFilter.matches));
-                    tv_max_pulse_rate.setText(String.valueOf(detectionFilter.maxPulseRate));
-                    tv_min_pulse_rate.setText(String.valueOf(detectionFilter.minPulseRate));
-                    tv_optional_data.setText(detectionFilter.optionalData == 6 ? R.string.lb_temperature : R.string.lb_none);
+                    ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText(String.valueOf(detectionFilter.matches));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.setText(String.valueOf(detectionFilter.maxPulseRate));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.setText(String.valueOf(detectionFilter.minPulseRate));
+                    ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(detectionFilter.optionalData == 6 ? R.string.lbl_vhf_detection_temperature : R.string.lbl_vhf_manual_option_none);
                     break;
             }
-            btn_save_changes_detection.setEnabled(false);
-            btn_save_changes_detection.setAlpha((float) 0.6);
+            ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setEnabled(false);
+            ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setAlpha((float) 0.6);
         }
     }
 
     private void setVisibility(int view) {
         if (view == ValueCodes.CODED) {
-            tv_pulse_rate_type.setText(R.string.lb_coded);
-            layout_matches_for_valid_pattern.setVisibility(View.GONE);
-            layout_target_pulse_rate.setVisibility(View.GONE);
-            layout_pulse_rates.setVisibility(View.GONE);
+            ((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.setText(R.string.lbl_vhf_detection_type_coded);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutMatchesForValidPattern.setVisibility(View.GONE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutTargetPulseRate.setVisibility(View.GONE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutPulseRates.setVisibility(View.GONE);
         } else if (view == ValueCodes.FIXED) {
-            tv_pulse_rate_type.setText(R.string.lb_non_coded_fixed);
-            layout_matches_for_valid_pattern.setVisibility(View.VISIBLE);
-            layout_target_pulse_rate.setVisibility(View.VISIBLE);
-            layout_pulse_rates.setVisibility(View.GONE);
-            tv_matches_for_valid_pattern.setText("3");
-            tv_pr1.setText("0");
-            tv_pr1_tolerance.setText("0");
-            tv_pr2.setText("0");
-            tv_pr2_tolerance.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.setText(R.string.lbl_vhf_detection_type_non_coded_fixed);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutMatchesForValidPattern.setVisibility(View.VISIBLE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutTargetPulseRate.setVisibility(View.VISIBLE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutPulseRates.setVisibility(View.GONE);
+            ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText("3");
+            ((ActivityVhfDetectionFilterBinding) binding).tvPr1.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvPr1Tolerance.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvPr2.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvPr2Tolerance.setText("0");
         } else if (view == ValueCodes.VARIABLE) {
-            tv_pulse_rate_type.setText(R.string.lb_non_coded_variable);
-            layout_matches_for_valid_pattern.setVisibility(View.VISIBLE);
-            layout_target_pulse_rate.setVisibility(View.GONE);
-            layout_pulse_rates.setVisibility(View.VISIBLE);
-            tv_matches_for_valid_pattern.setText("3");
-            tv_max_pulse_rate.setText("0");
-            tv_min_pulse_rate.setText("0");
-            tv_optional_data.setText(getString(R.string.lb_none));
+            ((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.setText(R.string.lbl_vhf_detection_type_non_coded_variable);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutMatchesForValidPattern.setVisibility(View.VISIBLE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutTargetPulseRate.setVisibility(View.GONE);
+            ((ActivityVhfDetectionFilterBinding) binding).layoutPulseRates.setVisibility(View.VISIBLE);
+            ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText("3");
+            ((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.setText("0");
+            ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(getString(R.string.lbl_vhf_manual_option_none));
         }
     }
 
@@ -279,21 +231,21 @@ public class DetectionFilterActivity extends BaseActivity {
      */
     private boolean existChanges() {
         DetectionFilter currentDetectionFilter = new DetectionFilter();
-        currentDetectionFilter.matches = (tv_matches_for_valid_pattern.getText().equals(""))
-                ? 0 : Integer.parseInt(tv_matches_for_valid_pattern.getText().toString());
-        switch (tv_pulse_rate_type.getText().toString()) {
+        currentDetectionFilter.matches = (((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.getText().equals(""))
+                ? 0 : Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.getText().toString());
+        switch (((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.getText().toString()) {
             case "Non Coded (Fixed Pulse Rate)":
                 currentDetectionFilter.detectionType = ValueCodes.FIXED;
-                currentDetectionFilter.pulseRate1 = Integer.parseInt(tv_pr1.getText().toString());
-                currentDetectionFilter.pulseRate2 = Integer.parseInt(tv_pr2.getText().toString());
-                currentDetectionFilter.pulseRateTolerance1 = Integer.parseInt(tv_pr1_tolerance.getText().toString());
-                currentDetectionFilter.pulseRateTolerance2 = Integer.parseInt(tv_pr2_tolerance.getText().toString());
+                currentDetectionFilter.pulseRate1 = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr1.getText().toString());
+                currentDetectionFilter.pulseRate2 = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr2.getText().toString());
+                currentDetectionFilter.pulseRateTolerance1 = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr1Tolerance.getText().toString());
+                currentDetectionFilter.pulseRateTolerance2 = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvPr2Tolerance.getText().toString());
                 break;
             case "Non Coded (Variable Pulse Rate)":
                 currentDetectionFilter.detectionType = ValueCodes.VARIABLE;
-                currentDetectionFilter.maxPulseRate = Integer.parseInt(tv_max_pulse_rate.getText().toString());
-                currentDetectionFilter.minPulseRate = Integer.parseInt(tv_min_pulse_rate.getText().toString());
-                currentDetectionFilter.optionalData = tv_optional_data.getText().toString().equals(getString(R.string.lb_temperature)) ? ValueCodes.VARIABLE_TEMPERATURE : 0;
+                currentDetectionFilter.maxPulseRate = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.getText().toString());
+                currentDetectionFilter.minPulseRate = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.getText().toString());
+                currentDetectionFilter.optionalData = ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.getText().toString().equals(getString(R.string.lbl_vhf_detection_temperature)) ? ValueCodes.VARIABLE_TEMPERATURE : 0;
                 break;
             case "Coded":
                 currentDetectionFilter.detectionType = ValueCodes.CODED;
@@ -309,11 +261,11 @@ public class DetectionFilterActivity extends BaseActivity {
     }
 
     private boolean isDataCorrect() {
-        if (tv_pulse_rate_type.getText().toString().equals(getString(R.string.lb_non_coded_fixed)))
-            return !tv_pr1.getText().equals("0");
-        else if (tv_pulse_rate_type.getText().toString().equals(getString(R.string.lb_non_coded_variable))) {
-            int max = Integer.parseInt(tv_max_pulse_rate.getText().toString());
-            int min = Integer.parseInt(tv_min_pulse_rate.getText().toString());
+        if (((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.getText().toString().equals(getString(R.string.lbl_vhf_detection_type_non_coded_fixed)))
+            return !((ActivityVhfDetectionFilterBinding) binding).tvPr1.getText().equals("0");
+        else if (((ActivityVhfDetectionFilterBinding) binding).tvPulseRateType.getText().toString().equals(getString(R.string.lbl_vhf_detection_type_non_coded_variable))) {
+            int max = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.getText().toString());
+            int min = Integer.parseInt(((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.getText().toString());
             return (max > 0 && max <= 240) && (min > 0 && min <= 240) && (max > min);
         }
         return true;

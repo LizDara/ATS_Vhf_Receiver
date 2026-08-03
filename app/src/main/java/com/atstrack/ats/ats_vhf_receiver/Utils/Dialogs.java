@@ -6,8 +6,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.LoadedTableAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
@@ -17,12 +21,31 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import java.util.List;
 
 public class Dialogs {
-    public static AlertDialog createDisconnectionDialog(Context context, String message) {
+    public static AlertDialog createDisconnectionDialog(Context context, String message, String deviceType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_alert_disconnect, null);
         final AlertDialog dialog = new AlertDialog.Builder(context).create();
         TextView disconnect_message = view.findViewById(R.id.tv_disconnect_message);
+        ImageView img_receiver = view.findViewById(R.id.img_receiver);
+        if (deviceType.equals(ValueCodes.VHF))
+            img_receiver.setImageResource(R.drawable.receiver);
+        else
+            img_receiver.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_blu_track));
         disconnect_message.setText(message);
+        dialog.setView(view);
+        return dialog;
+    }
+
+    public static AlertDialog createLowPowerDialog(Context context) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.dialog_alert_disconnect, null);
+        final AlertDialog dialog = new AlertDialog.Builder(context).create();
+        TextView disconnect_message = view.findViewById(R.id.tv_disconnect_message);
+        ImageView img_receiver = view.findViewById(R.id.img_receiver);
+        LinearLayout layout_background_alert = view.findViewById(R.id.layout_background_alert);
+        layout_background_alert.setBackground(ContextCompat.getDrawable(context, R.drawable.connected_light));
+        img_receiver.setImageResource(R.drawable.receiver);
+        disconnect_message.setText(R.string.lbl_vhf_home_low_power);
         dialog.setView(view);
         return dialog;
     }
@@ -121,8 +144,8 @@ public class Dialogs {
                 pr2_description_textView.setVisibility(View.GONE);
                 pulse_rate_2_textView.setVisibility(View.GONE);
                 period_2_tolerance_textView.setVisibility(View.GONE);
-                pr_description_textView.setText(R.string.lb_max_pulse_rate);
-                pr_tolerance_description_textView.setText(R.string.lb_min_pulse_rate);
+                pr_description_textView.setText(R.string.lbl_vhf_detection_max_pulse_rate_ppm);
+                pr_tolerance_description_textView.setText(R.string.lbl_vhf_detection_min_pulse_rate_ppm);
                 optional_data_calculation_textView.setText(detectionFilter.optionalData == ValueCodes.VARIABLE_TEMPERATURE ? "Yes" : "No");
             }
             ImageButton close = view.findViewById(R.id.ib_close);

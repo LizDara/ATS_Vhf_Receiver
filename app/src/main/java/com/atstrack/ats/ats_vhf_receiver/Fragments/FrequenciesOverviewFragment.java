@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyAdapter;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
@@ -26,19 +25,12 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.EnterFrequencyActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.FrequenciesActivity;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentFrequenciesOverviewBinding;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 public class FrequenciesOverviewFragment extends Fragment implements ReceiverCallback, OnAdapterClickListener {
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-
-    private Unbinder unbinder;
+    private FragmentFrequenciesOverviewBinding binding = null;
     private final FrequencyAdapter frequencyAdapter;
     private ActivityResultLauncher<Intent> launcher;
     private int newFrequency = 0;
@@ -54,67 +46,60 @@ public class FrequenciesOverviewFragment extends Fragment implements ReceiverCal
         initializeLauncher();
     }
 
-    @OnClick(R.id.btn_frequencies)
-    public void onClickDeleteFrequencies(View v) {
-        if (getParentFragmentManager() != null) {
-            getParentFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                    .hide(this)
-                    .add(R.id.fcv_activity_fragment, new DeleteFrequenciesFragment(frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
-                    .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
-                    .commit();
-        }
-    }
-
-    @OnClick(R.id.btn_frequency)
-    public void onClickAddFrequency(View v) {
-        if (isWithinLimit()) {
-            if (frequencyAdapter.isTemperature) {
-                if (getParentFragmentManager() != null) {
-                    getParentFragmentManager().beginTransaction()
-                            .setReorderingAllowed(true)
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                            .hide(this)
-                            .add(R.id.fcv_activity_fragment, new TemperatureFrequencyFragment(-1, frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
-                            .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
-                            .commit();
-                }
-            } else {
-                Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
-                intent.putExtra(ValueCodes.TITLE, "Add Frequency");
-                intent.putExtra(ValueCodes.POSITION, -1);
-                intent.putExtra(ValueCodes.BASE_FREQUENCY, frequencyAdapter.baseFrequency);
-                intent.putExtra(ValueCodes.RANGE, frequencyAdapter.range);
-                launcher.launch(intent);
-            }
-        } else {
-            showAlertDialog();
-        }
-    }
-
-    @OnClick(R.id.tv_view_tables)
-    public void onClickViewTables(View v) {
-        if (getActivity() != null)
-            getActivity().finish();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_frequencies_overview, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentFrequenciesOverviewBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnFrequencies.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .hide(this)
+                        .add(R.id.fcv_activity_fragment, new DeleteFrequenciesFragment(frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
+                        .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
+                        .commit();
+            }
+        });
+        binding.btnFrequency.setOnClickListener(v -> {
+            if (isWithinLimit()) {
+                if (frequencyAdapter.isTemperature) {
+                    if (getParentFragmentManager() != null) {
+                        getParentFragmentManager().beginTransaction()
+                                .setReorderingAllowed(true)
+                                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                                .hide(this)
+                                .add(R.id.fcv_activity_fragment, new TemperatureFrequencyFragment(-1, frequencyAdapter), String.valueOf(ValueCodes.SECOND_STEP))
+                                .addToBackStack(String.valueOf(ValueCodes.FIRST_STEP))
+                                .commit();
+                    }
+                } else {
+                    Intent intent = new Intent(requireContext(), EnterFrequencyActivity.class);
+                    intent.putExtra(ValueCodes.TITLE, "Add Frequency");
+                    intent.putExtra(ValueCodes.POSITION, -1);
+                    intent.putExtra(ValueCodes.BASE_FREQUENCY, frequencyAdapter.baseFrequency);
+                    intent.putExtra(ValueCodes.RANGE, frequencyAdapter.range);
+                    launcher.launch(intent);
+                }
+            } else {
+                showAlertDialog();
+            }
+        });
+        binding.tvViewTables.setOnClickListener(v -> {
+            if (getActivity() != null)
+                getActivity().finish();
+        });
         frequencyAdapter.setContext(requireContext());
         frequencyAdapter.launcher = launcher;
         frequencyAdapter.adapterClickListener = this;
-        rv_item.setAdapter(frequencyAdapter);
-        rv_item.setLayoutManager(new LinearLayoutManager(frequencyAdapter.context));
+        binding.includeRecyclerView.rvItem.setAdapter(frequencyAdapter);
+        binding.includeRecyclerView.rvItem.setLayoutManager(new LinearLayoutManager(frequencyAdapter.context));
 
         if (newFrequency > 0) {
             addFrequency(newFrequency);
@@ -138,7 +123,7 @@ public class FrequenciesOverviewFragment extends Fragment implements ReceiverCal
             boolean deleted = result.getBoolean(ValueCodes.VALUE, false);
             if (deleted) {
                 setToolbarTitle();
-                showAlertDialog(getString(R.string.lb_frequencies_deleted));
+                showAlertDialog(getString(R.string.lbl_vhf_tables_deleted));
             }
         });
     }
@@ -155,8 +140,7 @@ public class FrequenciesOverviewFragment extends Fragment implements ReceiverCal
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     @Override
@@ -227,7 +211,7 @@ public class FrequenciesOverviewFragment extends Fragment implements ReceiverCal
         frequencyAdapter.frequencies.set(position, frequency);
         frequencyAdapter.notifyDataSetChanged();
 
-        showAlertDialog(getString(R.string.lb_frequency_saved));
+        showAlertDialog(getString(R.string.lbl_vhf_tables_saved));
     }
 
     private void addFrequency(int frequency) {
@@ -235,7 +219,7 @@ public class FrequenciesOverviewFragment extends Fragment implements ReceiverCal
         frequencyAdapter.notifyDataSetChanged();
         setToolbarTitle();
 
-        showAlertDialog(getString(R.string.lb_frequency_added));
+        showAlertDialog(getString(R.string.lbl_vhf_tables_added));
     }
 
     private void showAlertDialog() {

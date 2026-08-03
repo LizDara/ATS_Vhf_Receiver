@@ -19,8 +19,7 @@ public class StationaryScanActivity extends ScanBaseActivity implements OnDialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
-        title = getString(R.string.stationary_scanning);
+        title = getString(R.string.title_vhf_stationary_settings);
         scanType = ValueCodes.STATIONARY_SCAN_COMMAND;
         super.onCreate(savedInstanceState);
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);

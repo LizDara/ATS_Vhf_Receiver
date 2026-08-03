@@ -11,8 +11,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewbinding.ViewBinding;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.BluetoothLeService;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.GattUpdateReceiver;
@@ -25,17 +27,15 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-
 public class BaseActivity extends AppCompatActivity {
-
     public final static String TAG = BaseActivity.class.getSimpleName();
-    protected int contentViewId;
+    protected ViewBinding binding = null;
     protected boolean showToolbar;
     protected String deviceCategory;
     protected String title;
@@ -51,12 +51,18 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(contentViewId);
-        ButterKnife.bind(this);
+        setContentView(binding.getRoot());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);// Keep screen on
 
         if (showToolbar)
             ActivitySetting.setToolbar(this, title, deviceCategory);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Log.i(TAG, "On back pressed");
+            }
+        });
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, leServiceConnection.getServiceConnection(), BIND_AUTO_CREATE);
@@ -83,11 +89,6 @@ public class BaseActivity extends AppCompatActivity {
         } catch (Exception ex) {
             Log.i(TAG, "Failed to unregister receiver");
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.i(TAG, "ON BACK PRESSED ...");
     }
 
     @Override
@@ -157,11 +158,16 @@ public class BaseActivity extends AppCompatActivity {
                     setBatteryPercent(data);
                     break;
                 }
+            case ValueCodes.LOW_POWER_COMMAND:
+                if (data.length < 230) {
+                    showLowPower();
+                    break;
+                }
         }
     }
 
     protected void showDisconnectionAlertDialog() {
-        AlertDialog dialog = Dialogs.createDisconnectionDialog(mContext, getString(R.string.disconnect_receiver));
+        AlertDialog dialog = Dialogs.createDisconnectionDialog(mContext, getString(R.string.lbl_disconnect_receiver), deviceCategory);
         dialogList.add(dialog);
         messageHandler.postDelayed(() -> {
             try {
@@ -173,7 +179,18 @@ public class BaseActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 Log.i("Message", ex.getLocalizedMessage());
             }
-        }, ValueCodes.MESSAGE_PERIOD);
+        }, ValueCodes.BRANDING_PERIOD);
+        dialog.show();
+    }
+
+    protected void showLowPower() {
+        AlertDialog dialog = Dialogs.createLowPowerDialog(mContext);
+        dialogList.add(dialog);
+        messageHandler.postDelayed(() -> {
+            Intent intent = new Intent(this, MenuActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }, ValueCodes.BRANDING_PERIOD);
         dialog.show();
     }
 

@@ -44,7 +44,7 @@
             style="@style/body_x_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lb_sd_card"
+            android:text="@string/lbl_vhf_home_sd_card"
             android:textColor="@color/slate_700"/>
 
         <TextView

@@ -7,8 +7,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,40 +26,9 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import butterknife.BindView;
-import butterknife.OnClick;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentMobileScanningBinding;
 
 public class MobileScanningFragment extends ScanBaseFragment implements ReceiverCallback {
-    @BindView(R.id.tv_max_index_mobile)
-    TextView tv_max_index_mobile;
-    @BindView(R.id.tv_table_index_mobile)
-    TextView tv_table_index_mobile;
-    @BindView(R.id.tv_frequency_mobile)
-    TextView tv_frequency_mobile;
-    @BindView(R.id.tv_frequency_hold)
-    TextView tv_frequency_hold;
-    @BindView(R.id.btn_hold)
-    TextView btn_hold;
-    @BindView(R.id.tv_edit_table)
-    TextView tv_edit_table;
-    @BindView(R.id.tv_id_audio)
-    TextView tv_id_audio;
-    @BindView(R.id.btn_record_data)
-    Button btn_record_data;
-    @BindView(R.id.tv_gps_state)
-    TextView tv_gps_state;
-    @BindView(R.id.tv_view_detection_mobile)
-    TextView tv_view_detection_mobile;
-    @BindView(R.id.layout_coordinates)
-    LinearLayout layout_coordinates;
-    @BindView(R.id.tv_latitude)
-    TextView tv_latitude;
-    @BindView(R.id.tv_longitude)
-    TextView tv_longitude;
-    @BindView(R.id.layout_audio)
-    LinearLayout layout_audio;
-
     private MobileDefaults mobileDefaults;
     private byte[] scanState;
     private boolean isHold; // This can change during scanning
@@ -83,79 +50,52 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
         isScanning = true;
     }
 
-    @OnClick(R.id.btn_hold)
-    public void onClickHold(View v) {
-        setHoldScan();
-    }
-
-    @OnClick(R.id.img_decrease)
-    public void onClickDecrease(View v) {
-        if (currentFrequency > baseFrequency)
-            setDecreaseOrIncrease(true);
-    }
-
-    @OnClick(R.id.img_increase)
-    public void onClickIncrease(View v) {
-        if (currentFrequency < frequencyRange)
-            setDecreaseOrIncrease(false);
-    }
-
-    @OnClick(R.id.btn_record_data)
-    public void onClickRecordData(View v) {
-        setRecordScan();
-    }
-
-    @OnClick(R.id.img_left)
-    public void onClickLeft(View v) {
-        TransferBleData.writeLeftRight(true);
-    }
-
-    @OnClick(R.id.img_right)
-    public void onClickRight(View v) {
-        TransferBleData.writeLeftRight(false);
-    }
-
-    @OnClick(R.id.tv_edit_audio)
-    public void onClickEditAudio(View v) {
-        getParentFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                audioOption = bundle.getByteArray(ValueCodes.VALUE);
-                if (audioOption != null)
-                    setAudio();
-            }
-        });
-        audioOptions.show(getParentFragmentManager(), AudioOptionsDialogFragment.TAG);
-    }
-
-    @OnClick(R.id.tv_edit_table)
-    public void onClickEditTable(View v) {
-        if (getParentFragmentManager() != null) {
-            getParentFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                    .hide(this)
-                    .add(R.id.fcv_activity_fragment, new EditTableScanFragment(baseFrequency, range, currentIndex, currentFrequency, totalFrequencies), String.valueOf(ValueCodes.THIRD_STEP))
-                    .addToBackStack(String.valueOf(ValueCodes.SECOND_STEP))
-                    .commit();
-        }
-    }
-
-    @OnClick(R.id.tv_view_detection_mobile)
-    public void onClickViewDetection(View v) {
-        showDetectionAlertDialog();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         scanType = ValueCodes.MOBILE_SCAN_COMMAND;
+        binding = FragmentMobileScanningBinding.inflate(inflater, container, false);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ((FragmentMobileScanningBinding) binding).btnHold.setOnClickListener(v -> setHoldScan());
+        ((FragmentMobileScanningBinding) binding).imgDecrease.setOnClickListener(v -> {
+            if (currentFrequency > baseFrequency)
+                setDecreaseOrIncrease(true);
+        });
+        ((FragmentMobileScanningBinding) binding).imgIncrease.setOnClickListener(v -> {
+            if (currentFrequency < frequencyRange)
+                setDecreaseOrIncrease(false);
+        });
+        ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.btnRecordData.setOnClickListener(v -> setRecordScan());
+        ((FragmentMobileScanningBinding) binding).imgLeft.setOnClickListener(v -> TransferBleData.writeLeftRight(true));
+        ((FragmentMobileScanningBinding) binding).imgRight.setOnClickListener(v -> TransferBleData.writeLeftRight(false));
+        ((FragmentMobileScanningBinding) binding).includeAudioOption.tvEditAudio.setOnClickListener(v -> {
+            getParentFragmentManager().setFragmentResultListener(ValueCodes.VALUE, this, new FragmentResultListener() {
+                @Override
+                public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                    audioOption = bundle.getByteArray(ValueCodes.VALUE);
+                    if (audioOption != null)
+                        setAudio();
+                }
+            });
+            audioOptions.show(getParentFragmentManager(), AudioOptionsDialogFragment.TAG);
+        });
+        ((FragmentMobileScanningBinding) binding).tvEditTable.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .hide(this)
+                        .add(R.id.fcv_activity_fragment, new EditTableScanFragment(baseFrequency, range, currentIndex, currentFrequency, totalFrequencies), String.valueOf(ValueCodes.THIRD_STEP))
+                        .addToBackStack(String.valueOf(ValueCodes.SECOND_STEP))
+                        .commit();
+            }
+        });
+        ((FragmentMobileScanningBinding) binding).tvViewDetectionMobile.setOnClickListener(v -> showDetectionAlertDialog());
         if (isScanning) {
             setNotificationLogScanning();
             initializeScanning();
@@ -170,7 +110,7 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
             if (tableMerged) {
                 isHold = false;
                 setVisibility(ValueCodes.STOP_HOLD);
-                showAlertDialog(getString(R.string.lb_tables_merged));
+                showAlertDialog(getString(R.string.lbl_vhf_mobile_tables_merged));
             }
         });
     }
@@ -196,50 +136,50 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
     }
 
     @Override
-    protected void updateVisibility() {
-        super.updateVisibility();
+    protected void updateVisibility(TextView tv_code_period, TextView tv_mortality_pulse_rate) {
+        super.updateVisibility(tv_code_period, tv_mortality_pulse_rate);
         int visibility = detectionType == ValueCodes.CODED ? View.GONE : View.VISIBLE;
-        layout_audio.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE); // se muestra solo cuando es CODED
-        tv_view_detection_mobile.setVisibility(visibility);
+        ((FragmentMobileScanningBinding) binding).includeAudioOption.layoutAudio.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE); // se muestra solo cuando es CODED
+        ((FragmentMobileScanningBinding) binding).tvViewDetectionMobile.setVisibility(visibility);
     }
 
     private void setVisibility(int view) {
         if (view == ValueCodes.START_HOLD) {
-            btn_hold.setText(R.string.lb_release);
-            tv_frequency_hold.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_lock, 0);
-            tv_frequency_mobile.setTextColor(ContextCompat.getColor(requireContext(), R.color.mountain_meadow));
-            tv_edit_table.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-            tv_edit_table.setEnabled(true);
+            ((FragmentMobileScanningBinding) binding).btnHold.setText(R.string.btn_vhf_mobile_release);
+            ((FragmentMobileScanningBinding) binding).tvFrequencyHold.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_lock, 0);
+            ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setTextColor(ContextCompat.getColor(requireContext(), R.color.mountain_meadow));
+            ((FragmentMobileScanningBinding) binding).tvEditTable.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+            ((FragmentMobileScanningBinding) binding).tvEditTable.setEnabled(true);
         } else if (view == ValueCodes.STOP_HOLD) {
-            btn_hold.setText(R.string.lb_hold);
-            tv_frequency_hold.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_unlock, 0);
-            tv_frequency_mobile.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-            tv_edit_table.setTextColor(ContextCompat.getColor(requireContext(), R.color.ghost));
-            tv_edit_table.setEnabled(false);
+            ((FragmentMobileScanningBinding) binding).btnHold.setText(R.string.btn_vhf_mobile_hold);
+            ((FragmentMobileScanningBinding) binding).tvFrequencyHold.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_unlock, 0);
+            ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+            ((FragmentMobileScanningBinding) binding).tvEditTable.setTextColor(ContextCompat.getColor(requireContext(), R.color.ghost));
+            ((FragmentMobileScanningBinding) binding).tvEditTable.setEnabled(false);
         } else if (view == ValueCodes.START_RECORD) {
-            btn_record_data.setText(R.string.lb_stop_recording);
-            btn_record_data.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.button_stop));
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.btnRecordData.setText(R.string.btn_vhf_mobile_stop_recording);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.btnRecordData.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.button_stop));
         } else if (view == ValueCodes.STOP_RECORD) {
-            btn_record_data.setText(R.string.lb_record_data);
-            btn_record_data.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.button_primary));
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.btnRecordData.setText(R.string.btn_vhf_manual_record_data);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.btnRecordData.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.button_primary));
         } else if (view == ValueCodes.GPS_OFF) {
-            tv_gps_state.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_off, 0, 0, 0);
-            tv_gps_state.setText(R.string.lb_off_gps);
-            layout_coordinates.setVisibility(View.GONE);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_off, 0, 0, 0);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setText(R.string.lbl_vhf_mobile_gps_off);
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.layoutCoordinates.setVisibility(View.GONE);
         } else if (view == ValueCodes.GPS_SEARCHING) {
-            tv_gps_state.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_searching, 0, 0, 0);
-            tv_gps_state.setText(R.string.lb_searching_gps);
-            layout_coordinates.setVisibility(View.GONE);
-            tv_latitude.setText("");
-            tv_longitude.setText("");
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_searching, 0, 0, 0);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setText(R.string.lbl_vhf_mobile_gps_searching);
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.layoutCoordinates.setVisibility(View.GONE);
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLatitude.setText("");
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLongitude.setText("");
         } else if (view == ValueCodes.GPS_FAILED) {
-            tv_gps_state.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_failed, 0, 0, 0);
-            tv_gps_state.setText(R.string.lb_failed_gps);
-            layout_coordinates.setVisibility(View.GONE);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_failed, 0, 0, 0);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setText(R.string.lbl_vhf_mobile_gps_failed);
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.layoutCoordinates.setVisibility(View.GONE);
         } else if (view == ValueCodes.GPS_VALID) {
-            tv_gps_state.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_valid, 0, 0, 0);
-            tv_gps_state.setText(R.string.lb_valid_gps);
-            layout_coordinates.setVisibility(View.VISIBLE);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_gps_valid, 0, 0, 0);
+            ((FragmentMobileScanningBinding) binding).includeGpsRecordOptions.tvGpsState.setText(R.string.lbl_vhf_mobile_gps_valid);
+            ((FragmentMobileScanningBinding) binding).includeCoordinates.layoutCoordinates.setVisibility(View.VISIBLE);
         }
     }
 
@@ -264,8 +204,8 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
         mobileDefaults.autoRecordOn = isRecord = (Byte.toUnsignedInt(scanState[15]) >> 6 & 1) == 1;
         mobileDefaults.gpsOn = (Byte.toUnsignedInt(scanState[15]) >> 7 & 1) == 1;
         isHold = scanState[1] == ValueCodes.MOBILE_HOLD_COMMAND;
-        tv_frequency_mobile.setText(Converters.getFrequency(currentFrequency));
-        tv_table_index_mobile.setText(String.valueOf(currentIndex));
+        ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setText(Converters.getFrequency(currentFrequency));
+        ((FragmentMobileScanningBinding) binding).tvTableIndexMobile.setText(String.valueOf(currentIndex));
         setVisibility(isHold ? ValueCodes.START_HOLD : ValueCodes.STOP_HOLD);
         setVisibility(isRecord ? ValueCodes.START_RECORD : ValueCodes.STOP_RECORD);
         setVisibility(mobileDefaults.gpsOn ? ValueCodes.GPS_SEARCHING : ValueCodes.GPS_OFF);
@@ -305,7 +245,7 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
                 audioDescription = "Single (" + Byte.toUnsignedInt(audioOption[1]) + ")";
             else if (audioOption[0] == ValueCodes.AUDIO_BACKGROUND_COMMAND)
                 audioDescription = "None";
-            tv_id_audio.setText(audioDescription);
+            ((FragmentMobileScanningBinding) binding).includeAudioOption.tvIdAudio.setText(audioDescription);
         }
     }
 
@@ -337,20 +277,22 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
                 int period = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
                 if (detectionType == ValueCodes.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (detectionType == ValueCodes.VARIABLE)
-                    scanNonCodedVariable(period, signalStrength);
+                else if (detectionType == ValueCodes.VARIABLE) {
+                    if (period > 0)
+                        scanNonCodedVariable(period, signalStrength);
+                }
                 break;
         }
     }
 
     private void scanState(byte[] data) {
         totalFrequencies = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
-        tv_max_index_mobile.setText("Table Index (" + totalFrequencies + " Total)");
+        ((FragmentMobileScanningBinding) binding).tvMaxIndexMobile.setText("Table Index (" + totalFrequencies + " Total)");
         detectionType = data[18];
         scanDetailAdapter = new ScanDetailAdapter(requireContext(), detectionType == ValueCodes.CODED);
-        rv_item.setAdapter(scanDetailAdapter);
-        rv_item.setLayoutManager(new LinearLayoutManager(requireContext()));
-        updateVisibility();
+        ((FragmentMobileScanningBinding) binding).includeScanDetails.includeRecyclerView.rvItem.setAdapter(scanDetailAdapter);
+        ((FragmentMobileScanningBinding) binding).includeScanDetails.includeRecyclerView.rvItem.setLayoutManager(new LinearLayoutManager(requireContext()));
+        updateVisibility(((FragmentMobileScanningBinding) binding).includeScanDetails.tvCodePeriod, ((FragmentMobileScanningBinding) binding).includeScanDetails.tvMortalityPulseRate);
         if (detectionType != ValueCodes.CODED)
             initializeDetectionFilter(data);
         else
@@ -363,15 +305,15 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
 
     private void frequenciesNumber(byte[] data) {
         totalFrequencies = (Byte.toUnsignedInt(data[1]) * 256) + Byte.toUnsignedInt(data[2]);
-        tv_max_index_mobile.setText("Table Index (" + totalFrequencies + " Total)");
+        ((FragmentMobileScanningBinding) binding).tvMaxIndexMobile.setText("Table Index (" + totalFrequencies + " Total)");
     }
 
     private void logScanHeader(byte[] data) {
         clear();
         currentFrequency = (Byte.toUnsignedInt(data[1]) * 256) + Byte.toUnsignedInt(data[2]) + baseFrequency;
         currentIndex = (((Byte.toUnsignedInt(data[1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(data[3]);
-        tv_table_index_mobile.setText(String.valueOf(currentIndex));
-        tv_frequency_mobile.setText(Converters.getFrequency(currentFrequency));
+        ((FragmentMobileScanningBinding) binding).tvTableIndexMobile.setText(String.valueOf(currentIndex));
+        ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setText(Converters.getFrequency(currentFrequency));
     }
 
     private void logScanCoded(byte[] data) {
@@ -383,19 +325,20 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
 
     private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
         int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
-        scanNonCodedFixed(period, signalStrength, type);
+        if (period > 0)
+            scanNonCodedFixed(period, signalStrength, type);
     }
 
     private void logGps(byte[] data) {
         String[] coordinates = Converters.getGpsData(data);
-        tv_latitude.setText(coordinates[0]);
-        tv_longitude.setText(coordinates[1]);
+        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLatitude.setText(coordinates[0]);
+        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLongitude.setText(coordinates[1]);
     }
 
     @Override
     protected void clear() {
-        tv_table_index_mobile.setText("");
-        tv_frequency_mobile.setText("");
+        ((FragmentMobileScanningBinding) binding).tvTableIndexMobile.setText("");
+        ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setText("");
         super.clear();
     }
 

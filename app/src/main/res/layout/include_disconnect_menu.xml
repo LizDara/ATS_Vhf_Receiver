@@ -1,35 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_disconnect"
+        style="@style/button_secondary_light"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:paddingHorizontal="16sp"
+        android:text="@string/btn_vhf_home_disconnect" />
 
-        <Button
-            android:id="@+id/btn_disconnect"
-            style="@style/button_secondary_light"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16sp"
-            android:text="@string/lb_disconnect" />
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+    <ImageView
+        android:id="@+id/img_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_menu"
+        tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/img_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_menu"
-            tools:ignore="ContentDescription" />
-
-    </LinearLayout>
-
-</merge>
+</LinearLayout>

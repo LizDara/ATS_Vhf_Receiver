@@ -3,8 +3,6 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -12,17 +10,11 @@ import androidx.core.content.ContextCompat;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 import java.util.Objects;
 
-import butterknife.BindView;
-
 public class ScanBaseActivity extends BaseActivity {
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-    @BindView(R.id.v_state)
-    View v_state;
-
     protected final String TAG = ScanBaseActivity.class.getSimpleName();
     protected AnimationDrawable animationDrawable;
     protected boolean isScanning;
@@ -36,6 +28,7 @@ public class ScanBaseActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
         isScanning = getIntent().getBooleanExtra(ValueCodes.IS_SCANNING, false);
@@ -53,21 +46,21 @@ public class ScanBaseActivity extends BaseActivity {
 
     public void setScanViews(boolean isScanning) {
         this.isScanning = isScanning;
-        int titleId = isScanning ? R.string.lb_manual_scanning : R.string.manual_scanning;
+        int titleId = isScanning ? R.string.title_vhf_manual_scanning : R.string.title_vhf_manual_settings;
         if (scanType == ValueCodes.MOBILE_SCAN_COMMAND)
-            titleId = isScanning ? R.string.lb_aerial_scanning : R.string.aerial_scanning;
+            titleId = isScanning ? R.string.title_vhf_mobile_scanning : R.string.title_vhf_mobile_settings;
         else if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND)
-            titleId = isScanning ? R.string.lb_stationary_scanning : R.string.stationary_scanning;
+            titleId = isScanning ? R.string.title_vhf_stationary_scanning : R.string.title_vhf_stationary_settings;
         if (isScanning) {
-            tv_title_toolbar.setText(titleId);
+            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(titleId);
             Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
-            v_state.setBackgroundResource(R.drawable.scanning_animation);
-            animationDrawable = (AnimationDrawable) v_state.getBackground();
+            ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.setBackgroundResource(R.drawable.scanning_animation);
+            animationDrawable = (AnimationDrawable) ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.getBackground();
             animationDrawable.start();
         } else {
-            tv_title_toolbar.setText(titleId);
+            ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(titleId);
             Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
-            v_state.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
+            ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
         }
     }
 }

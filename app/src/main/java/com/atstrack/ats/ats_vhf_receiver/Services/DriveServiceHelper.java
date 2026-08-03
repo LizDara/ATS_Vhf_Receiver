@@ -2,12 +2,15 @@ package com.atstrack.ats.ats_vhf_receiver.Services;
 
 import static com.google.api.client.json.gson.GsonFactory.getDefaultInstance;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -41,19 +44,14 @@ public class DriveServiceHelper {
      * Access the drive files of the logged in account.
      * @param data Content of account information.
      */
-    public void handleSignInIntent(Intent data) {
+    public void handleSignInIntent(Intent data, String type) {
         GoogleSignIn.getSignedInAccountFromIntent(data).addOnSuccessListener(googleSignInAccount -> {
             GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                     context, Collections.singleton(DriveScopes.DRIVE_FILE));
             credential.setSelectedAccount(googleSignInAccount.getAccount());
-            mDriveService = new Drive.Builder(
-                    new NetHttpTransport(),
-                    getDefaultInstance(),
-                    credential)
-                    .setApplicationName("ATS Bridge")
-                    .build();
-
-            uploadFile();
+            mDriveService = new Drive.Builder(new NetHttpTransport(), getDefaultInstance(), credential)
+                    .setApplicationName("ATS Bridge").build();
+            uploadFile(type);
         }).addOnFailureListener(e -> Log.i(TAG, "Sign-in failed: " + e));
     }
 
@@ -61,7 +59,7 @@ public class DriveServiceHelper {
     /**
      * Saves the document in the drive account.
      */
-    private void uploadFile() {
+    private void uploadFile(String type) {
         ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Uploading to Google Drive.");
         progressDialog.setMessage("Please wait...");
@@ -70,9 +68,17 @@ public class DriveServiceHelper {
         createFile(root.getAbsolutePath(), fileName).addOnSuccessListener(s -> {
             progressDialog.dismiss();
             Toast.makeText(context, "Uploaded successfully.", Toast.LENGTH_LONG).show();
+            if (type.equals(ValueCodes.BLUETOOTH_RECEIVER))
+                LeServiceConnection.getInstance().getBluetoothLeService().disconnect();
+            else if (type.equals(ValueCodes.BEACON))
+                ((Activity) context).finish();
         }).addOnFailureListener(e -> {
             progressDialog.dismiss();
             Toast.makeText(context, "Check your Google Drive Api key", Toast.LENGTH_LONG).show();
+            if (type.equals(ValueCodes.BLUETOOTH_RECEIVER))
+                LeServiceConnection.getInstance().getBluetoothLeService().disconnect();
+            else if (type.equals(ValueCodes.BEACON))
+                ((Activity) context).finish();
         });
     }
 

@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <include
+        android:id="@+id/include_gps_record_options"
         layout="@layout/include_gps_record_options"/>
 
     <LinearLayout
@@ -30,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_frequency"
+                android:text="@string/lbl_vhf_mobile_frequency"
                 android:textColor="@color/limed_spruce" />
 
             <LinearLayout
@@ -73,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/button_small_height"
                     android:paddingHorizontal="10sp"
-                    android:text="@string/lb_edit_frequency" />
+                    android:text="@string/btn_vhf_manual_edit_frequency" />
 
             </LinearLayout>
 
@@ -86,6 +87,7 @@
             tools:ignore="SmallSp" />
 
         <include
+            android:id="@+id/include_audio_option"
             layout="@layout/include_audio_option"/>
 
         <LinearLayout
@@ -99,7 +101,7 @@
                 style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_gps_data"
+                android:text="@string/lbl_vhf_manual_gps_data"
                 android:textColor="@color/limed_spruce" />
 
             <Space
@@ -123,9 +125,11 @@
             tools:ignore="SmallSp" />
 
         <include
+            android:id="@+id/include_coordinates"
             layout="@layout/include_coordinates"/>
 
         <include
+            android:id="@+id/include_scan_details"
             layout="@layout/include_scan_details"/>
 
     </LinearLayout>
@@ -137,7 +141,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4sp"
         android:layout_marginStart="16sp"
-        android:text="@string/lb_view_detection_filter"
+        android:text="@string/btn_vhf_mobile_view_detection_filter"
         android:textColor="@color/ebony_clay" />
 
 </LinearLayout>

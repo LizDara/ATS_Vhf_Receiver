@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,6 +21,7 @@ import com.atstrack.ats.ats_vhf_receiver.Models.TagDetail;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityTagDetectionBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,43 +31,28 @@ import com.google.api.services.drive.DriveScopes;
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.OnClick;
-
 public class BeaconTagDetectionActivity extends BluetoothScannerActivity {
-
     private ArrayList<TagDetail> tags;
     private File root;
     private ArrayList<Data> dataList;
-
-    @OnClick(R.id.btn_export_data)
-    public void onClickExportData(View v) {
-        String text = Converters.getTagsData(tags);
-        byte[] data = Converters.convertToUTF8(text);
-        Data processedData = new Data(ValueCodes.BLUETOOTH_FILE);
-        processedData.packets.add(data);
-        dataList = new ArrayList<>();
-        dataList.add(processedData);
-        String fileName = processedData.fileName;
-        root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
-        boolean result = Converters.printDataFiles(root, dataList);
-        if (result) {
-            String message = "File saved as " + fileName;
-            showAlertDialog("Finished", message, 1);
-        }
-    }
+    private boolean disconnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         contentViewId = R.layout.activity_tag_detection;
-        title = getString(R.string.tag_detection);
+        title = getString(R.string.title_bt_tag_detection);
+        binding = ActivityTagDetectionBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
         tags = new ArrayList<>();
+        disconnect = false;
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fcv_activity_fragment, new TagsFragment(ValueCodes.BEACON, tags), String.valueOf(ValueCodes.FIRST_STEP))
                     .commit();
         }
+
+        ((ActivityTagDetectionBinding) binding).btnExportData.setOnClickListener(v -> saveFile());
     }
 
     @Override
@@ -76,7 +61,7 @@ public class BeaconTagDetectionActivity extends BluetoothScannerActivity {
         if (requestCode == ValueCodes.REQUEST_CODE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 DriveServiceHelper driveServiceHelper = new DriveServiceHelper(root, dataList.get(0).fileName, this);
-                driveServiceHelper.handleSignInIntent(data);
+                driveServiceHelper.handleSignInIntent(data, disconnect ? ValueCodes.BEACON : "");
             }
         }
     }
@@ -98,10 +83,12 @@ public class BeaconTagDetectionActivity extends BluetoothScannerActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 getSupportFragmentManager().popBackStack();
-            else
-                finish();
+            } else {
+                disconnect = true;
+                saveFile();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -132,6 +119,22 @@ public class BeaconTagDetectionActivity extends BluetoothScannerActivity {
         };
     }
 
+    private void saveFile() {
+        String text = Converters.getTagsData(tags);
+        byte[] data = Converters.convertToUTF8(text);
+        Data processedData = new Data(ValueCodes.BLUETOOTH_FILE);
+        processedData.packets.add(data);
+        dataList = new ArrayList<>();
+        dataList.add(processedData);
+        String fileName = processedData.fileName;
+        root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack"); //set the directory path
+        boolean result = Converters.printDataFiles(root, dataList);
+        if (result) {
+            String message = "File saved as " + fileName;
+            showAlertDialog("Finished", message, 1);
+        }
+    }
+
     private void showAlertDialog(String title, String message, int buttonNum) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
@@ -141,7 +144,10 @@ public class BeaconTagDetectionActivity extends BluetoothScannerActivity {
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     requestSignIn();
                 });
-                builder.setNegativeButton("Cancel", null);
+                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                    if (disconnect)
+                        finish();
+                });
                 break;
             case 1: // Ask if you want to save file to the cloud
                 builder.setPositiveButton("OK", (dialog, which) -> {

@@ -9,9 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,22 +29,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.FrequenciesActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileDefaultsActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryDefaultsActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentDeleteFrequenciesBinding;
 
 public class DeleteFrequenciesFragment extends Fragment implements ReceiverCallback {
-    @BindView(R.id.lv_item)
-    ListView lv_item;
-    @BindView(R.id.cb_all_frequencies)
-    CheckBox cb_all_frequencies;
-    @BindView(R.id.btn_delete_frequencies)
-    Button btn_delete_frequencies;
-
-    private Unbinder unbinder;
+    private FragmentDeleteFrequenciesBinding binding = null;
     private final FrequencyAdapter frequencyAdapter;
     private FrequencyToDeleteAdapter frequencyToDeleteAdapter;
     private MobileDefaults mobileDefaults;
@@ -57,40 +42,32 @@ public class DeleteFrequenciesFragment extends Fragment implements ReceiverCallb
         this.frequencyAdapter = frequencyAdapter;
     }
 
-    @OnClick(R.id.btn_delete_frequencies)
-    public void onClickDeleteSelectedFrequencies(View v) {
-        if (cb_all_frequencies.isChecked())
-            TransferBleData.readDefaults(true);
-        else
-            deleteFrequencies(true);
-    }
-
-    @OnCheckedChanged(R.id.cb_all_frequencies)
-    public void onCheckedChangeAllFrequencies(CompoundButton button, boolean isChecked) {
-        changeAllCheckBox(isChecked);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_delete_frequencies, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentDeleteFrequenciesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnDeleteFrequencies.setOnClickListener(v -> {
+            if (binding.cbAllFrequencies.isChecked())
+                TransferBleData.readDefaults(true);
+            else
+                deleteFrequencies(true);
+        });
+        binding.cbAllFrequencies.setOnCheckedChangeListener((compoundButton, b) -> changeAllCheckBox(b));
         setToolbarTitle();
-        frequencyToDeleteAdapter = new FrequencyToDeleteAdapter(requireContext(), frequencyAdapter.frequencies, cb_all_frequencies, btn_delete_frequencies);
-        lv_item.setAdapter(frequencyToDeleteAdapter);
+        frequencyToDeleteAdapter = new FrequencyToDeleteAdapter(requireContext(), frequencyAdapter.frequencies, binding.cbAllFrequencies, binding.btnDeleteFrequencies);
+        binding.includeListView.lvItem.setAdapter(frequencyToDeleteAdapter);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     @Override
@@ -136,7 +113,7 @@ public class DeleteFrequenciesFragment extends Fragment implements ReceiverCallb
             showAlertDialog(frequencyToDeleteAdapter.getCount() > 1);
         }
         deleteFrequencies(showMessage);
-        cb_all_frequencies.setChecked(false);
+        binding.cbAllFrequencies.setChecked(false);
     }
 
     private void changeAllCheckBox(boolean isChecked) {
@@ -144,11 +121,11 @@ public class DeleteFrequenciesFragment extends Fragment implements ReceiverCallb
         frequencyToDeleteAdapter.notifyDataSetChanged();
 
         if (isChecked) {
-            btn_delete_frequencies.setEnabled(true);
-            btn_delete_frequencies.setAlpha(1);
+            binding.btnDeleteFrequencies.setEnabled(true);
+            binding.btnDeleteFrequencies.setAlpha(1);
         } else {
-            btn_delete_frequencies.setEnabled(false);
-            btn_delete_frequencies.setAlpha((float) 0.6);
+            binding.btnDeleteFrequencies.setEnabled(false);
+            binding.btnDeleteFrequencies.setAlpha((float) 0.6);
         }
     }
 

@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
@@ -20,8 +19,7 @@ public class MobileScanActivity extends ScanBaseActivity implements OnDialogCrea
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
-        title = getString(R.string.aerial_scanning);
+        title = getString(R.string.title_vhf_mobile_settings);
         scanType = ValueCodes.MOBILE_SCAN_COMMAND;
         super.onCreate(savedInstanceState);
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
@@ -49,7 +47,6 @@ public class MobileScanActivity extends ScanBaseActivity implements OnDialogCrea
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (isScanning) {
-                Log.i(TAG, "BACK STACK COUNT: " + getSupportFragmentManager().getBackStackEntryCount());
                 if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
                     boolean result = TransferBleData.writeStopScan(scanType);
                     if (result) {

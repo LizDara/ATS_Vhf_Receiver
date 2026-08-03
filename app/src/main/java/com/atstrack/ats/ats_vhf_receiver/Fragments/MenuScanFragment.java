@@ -20,13 +20,10 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ManualScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.StationaryScanActivity;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentMenuScanBinding;
 
 public class MenuScanFragment extends Fragment implements ReceiverCallback {
-    private Unbinder unbinder;
+    private FragmentMenuScanBinding binding = null;
     private boolean isDetectionFilterEmpty;
     private boolean areTablesEmpty;
     private boolean isDefaultEmpty;
@@ -34,37 +31,26 @@ public class MenuScanFragment extends Fragment implements ReceiverCallback {
     private byte[] tablesData;
     private byte[] defaultData;
 
-    @OnClick(R.id.btn_start_manual_scan)
-    public void onClickStartManualScan(View v) {
-        if (isDetectionFilterEmpty) {
-            showWarningMessage(ValueCodes.DETECTION_FILTER_COMMAND, detectionData);
-        } else {
-            Intent intent = new Intent(requireContext(), ManualScanActivity.class);
-            startActivity(intent);
-        }
-    }
-
-    @OnClick(R.id.btn_start_mobile_scan)
-    public void onClickStartMobileScan(View v) {
-        TransferBleData.readDefaults(true);
-    }
-
-    @OnClick(R.id.btn_start_stationary_scan)
-    public void onClickStartStationaryScan(View v) {
-        TransferBleData.readDefaults(false);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_menu_scan, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentMenuScanBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnStartManualScan.setOnClickListener(v -> {
+            if (isDetectionFilterEmpty) {
+                showWarningMessage(ValueCodes.DETECTION_FILTER_COMMAND, detectionData);
+            } else {
+                Intent intent = new Intent(requireContext(), ManualScanActivity.class);
+                startActivity(intent);
+            }
+        });
+        binding.btnStartMobileScan.setOnClickListener(v -> TransferBleData.readDefaults(true));
+        binding.btnStartStationaryScan.setOnClickListener(v -> TransferBleData.readDefaults(false));
     }
 
     @Override
@@ -84,8 +70,7 @@ public class MenuScanFragment extends Fragment implements ReceiverCallback {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     @Override

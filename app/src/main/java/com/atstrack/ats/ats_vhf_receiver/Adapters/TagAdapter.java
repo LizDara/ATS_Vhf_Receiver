@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
 
     private final LayoutInflater inflater;
+    private final Context context;
     public final ArrayList<TagDetections> tags;
     public String audioIsolateTag = "";
     public String beepTag = "";
@@ -34,6 +36,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
 
     public TagAdapter(Context context, OnAdapterClickListener listener) {
         inflater = LayoutInflater.from(context);
+        this.context = context;
         tags = new ArrayList<>();
         adapterClickListener = listener;
     }
@@ -51,6 +54,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
         Detection currentDetection = tags.get(position).getLastDetection();
         holder.tv_tag.setText(tags.get(position).code);
         holder.tv_detections_tag.setText("Detections: " + tags.get(position).detections.size());
+        holder.tv_rssi_tag.setText(currentDetection.rssi + " dBm");
         holder.tv_rssi.setText("RSSI (dBm): " + currentDetection.rssi);
         holder.tv_time_since.setText("Time Since (secs): " + tags.get(position).timeSince);
         holder.tv_temperature_c.setText("Temperature (C): " + currentDetection.temperature);
@@ -82,6 +86,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
         LinearLayout layout_tags;
         TextView tv_tag;
         TextView tv_detections_tag;
+        TextView tv_rssi_tag;
         LinearLayout layout_tag_footer;
         TextView tv_rssi;
         TextView tv_time_since;
@@ -90,6 +95,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
         LinearLayout layout_beep;
         CheckBox cb_isolate_audio;
         Button btn_view_tag;
+        ImageView img_details;
 
         @SuppressLint("MissingPermission")
         public TagViewHolder(@NonNull View itemView) {
@@ -97,6 +103,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
             layout_tags = itemView.findViewById(R.id.layout_tags);
             tv_tag = itemView.findViewById(R.id.tv_tag);
             tv_detections_tag = itemView.findViewById(R.id.tv_detections_tag);
+            tv_rssi_tag = itemView.findViewById(R.id.tv_rssi_tag);
             layout_tag_footer = itemView.findViewById(R.id.layout_tag_footer);
             tv_rssi = itemView.findViewById(R.id.tv_rssi);
             tv_time_since = itemView.findViewById(R.id.tv_time_since);
@@ -105,9 +112,11 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
             layout_beep = itemView.findViewById(R.id.layout_beep);
             cb_isolate_audio = itemView.findViewById(R.id.cb_isolate_audio);
             btn_view_tag = itemView.findViewById(R.id.btn_view_tag);
+            img_details = itemView.findViewById(R.id.img_details);
 
             layout_tags.setOnClickListener(view -> {
                 layout_tag_footer.setVisibility(layout_tag_footer.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+                img_details.setBackground(ContextCompat.getDrawable(context, layout_tag_footer.getVisibility() == View.VISIBLE ? R.drawable.ic_up : R.drawable.ic_down));
                 tags.get(getLayoutPosition()).time_since_textView = tv_time_since;
             });
 

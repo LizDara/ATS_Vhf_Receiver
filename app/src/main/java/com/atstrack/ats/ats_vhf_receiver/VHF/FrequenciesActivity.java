@@ -2,12 +2,9 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.fragment.app.Fragment;
 
-import butterknife.BindView;
-
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.FrequencyAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
@@ -20,12 +17,9 @@ import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class FrequenciesActivity extends BaseActivity implements OnDialogCreatedListener {
-
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-
     private FrequencyAdapter frequencyAdapter;
 
     private void setTable() {
@@ -55,12 +49,12 @@ public class FrequenciesActivity extends BaseActivity implements OnDialogCreated
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
         int tableNumber = getIntent().getIntExtra(ValueCodes.TABLE, 0);
         int total = getIntent().getIntExtra(ValueCodes.TOTAL, 0);
         title = "Table " + tableNumber + " (" + total + " Frequencies)";
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
         int baseFrequency = getIntent().getIntExtra(ValueCodes.BASE_FREQUENCY, 0) * 1000;
@@ -113,7 +107,7 @@ public class FrequenciesActivity extends BaseActivity implements OnDialogCreated
     }
 
     public void setToolbarTitle(String title) {
-        tv_title_toolbar.setText(title);
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(title);
     }
 
     private boolean existChanges() {

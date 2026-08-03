@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
-        android:text="@string/lb_off_gps"
+        android:text="@string/lbl_vhf_mobile_gps_off"
         android:textColor="@color/ebony_clay"
         app:drawableStartCompat="@drawable/ic_gps_off" />
 
@@ -30,6 +30,6 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/button_small_height"
         android:paddingHorizontal="10sp"
-        android:text="@string/lb_record_data" />
+        android:text="@string/btn_vhf_manual_record_data" />
 
 </LinearLayout>

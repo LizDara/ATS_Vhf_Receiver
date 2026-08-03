@@ -11,15 +11,16 @@ import com.atstrack.ats.ats_vhf_receiver.Fragments.MenuScanFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class StartScanningActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.lb_start_scanning);
+        title = getString(R.string.btn_vhf_home_start_scanning);
+        binding = ActivityVhfFragmentBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

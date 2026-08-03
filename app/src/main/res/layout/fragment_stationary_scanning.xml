@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_scan_details"
+        android:text="@string/lbl_vhf_stationary_scan_details"
         android:textColor="@color/ebony_clay" />
 
     <LinearLayout
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8sp"
-                    android:text="@string/lb_frequency"
+                    android:text="@string/lbl_vhf_mobile_frequency"
                     android:textColor="@color/limed_spruce" />
 
                 <TextView
@@ -91,7 +91,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8sp"
-                    android:text="@string/lb_current_antenna"
+                    android:text="@string/lbl_vhf_stationary_current_antenna"
                     android:textColor="@color/limed_spruce" />
 
                 <TextView
@@ -112,6 +112,7 @@
             tools:ignore="SmallSp" />
 
         <include
+            android:id="@+id/include_scan_details"
             layout="@layout/include_scan_details"/>
 
     </LinearLayout>
@@ -123,7 +124,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4sp"
         android:layout_marginStart="16sp"
-        android:text="@string/lb_view_detection_filter"
+        android:text="@string/btn_vhf_mobile_view_detection_filter"
         android:textColor="@color/ebony_clay" />
 
 </LinearLayout>

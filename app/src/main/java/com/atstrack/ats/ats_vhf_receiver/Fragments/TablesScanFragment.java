@@ -5,9 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,23 +15,12 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.TableToScanAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentTablesScanBinding;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 public class TablesScanFragment extends Fragment {
-    @BindView(R.id.tv_option_tables)
-    TextView tv_option_tables;
-    @BindView(R.id.lv_item)
-    ListView lv_item;
-    @BindView(R.id.btn_merge_tables)
-    Button btn_merge_tables;
-
-    private Unbinder unbinder;
+    private FragmentTablesScanBinding binding = null;
     private BaseAdapter tableAdapter;
     private final byte[] data;
     private final int type;
@@ -51,32 +37,26 @@ public class TablesScanFragment extends Fragment {
         this.tables = tables;
     }
 
-    @OnClick(R.id.btn_merge_tables)
-    public void onClickMergeTables(View v) {
-        setMergeTable();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tables_scan, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentTablesScanBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnMergeTables.setOnClickListener(v -> setMergeTable());
         setTables();
         if (type == ValueCodes.STATIONARY_DEFAULTS_COMMAND)
-            btn_merge_tables.setVisibility(View.GONE);
+            binding.btnMergeTables.setVisibility(View.GONE);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void setMergeTable() {
@@ -108,11 +88,11 @@ public class TablesScanFragment extends Fragment {
                     tables.add(i);
                 }
             }
-            tableAdapter = new TableToMergeAdapter(requireContext(), tables, frequencies, btn_merge_tables);
+            tableAdapter = new TableToMergeAdapter(requireContext(), tables, frequencies, binding.btnMergeTables);
         } else {
-            tableAdapter = new TableToScanAdapter(requireContext(), data, tables, tv_option_tables, btn_merge_tables);
+            tableAdapter = new TableToScanAdapter(requireContext(), data, tables, binding.tvOptionTables, binding.btnMergeTables);
         }
-        lv_item.setAdapter(tableAdapter);
-        tv_option_tables.setText(type == ValueCodes.MOBILE_SCAN_COMMAND ? getString(R.string.lb_select_table_merge) : tables.size() + " Selected Tables (3 Max)");
+        binding.includeListView.lvItem.setAdapter(tableAdapter);
+        binding.tvOptionTables.setText(type == ValueCodes.MOBILE_SCAN_COMMAND ? getString(R.string.lbl_vhf_mobile_select_table_merge) : tables.size() + " Selected Tables (3 Max)");
     }
 }

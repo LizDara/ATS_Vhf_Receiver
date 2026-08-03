@@ -19,22 +19,9 @@ import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import butterknife.BindView;
-import butterknife.OnClick;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentStationaryScanningBinding;
 
 public class StationaryScanningFragment extends ScanBaseFragment implements ReceiverCallback {
-    @BindView(R.id.tv_max_index_stationary)
-    TextView tv_max_index_stationary;
-    @BindView(R.id.tv_index_stationary)
-    TextView tv_index_stationary;
-    @BindView(R.id.tv_frequency_stationary)
-    TextView tv_frequency_stationary;
-    @BindView(R.id.tv_current_antenna_stationary)
-    TextView tv_current_antenna_stationary;
-    @BindView(R.id.tv_view_detection_stationary)
-    TextView tv_view_detection_stationary;
-
     private StationaryDefaults stationaryDefaults;
     private byte[] scanState;
 
@@ -50,21 +37,18 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
         isScanning = true;
     }
 
-    @OnClick(R.id.tv_view_detection_stationary)
-    public void onClickViewDetection(View v) {
-        showDetectionAlertDialog();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         scanType = ValueCodes.STATIONARY_SCAN_COMMAND;
+        binding = FragmentStationaryScanningBinding.inflate(inflater, container, false);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ((FragmentStationaryScanningBinding) binding).tvViewDetectionStationary.setOnClickListener(v -> showDetectionAlertDialog());
         if (isScanning) {
             setNotificationLogScanning();
             initializeScanning();
@@ -95,9 +79,9 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
     }
 
     @Override
-    protected void updateVisibility() {
-        super.updateVisibility();
-        tv_view_detection_stationary.setVisibility(detectionType == ValueCodes.CODED ? View.GONE : View.VISIBLE);
+    protected void updateVisibility(TextView tv_code_period, TextView tv_mortality_pulse_rate) {
+        super.updateVisibility(tv_code_period, tv_mortality_pulse_rate);
+        ((FragmentStationaryScanningBinding) binding).tvViewDetectionStationary.setVisibility(detectionType == ValueCodes.CODED ? View.GONE : View.VISIBLE);
     }
 
     private void setStartScan() {
@@ -115,9 +99,9 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
         currentIndex = (Byte.toUnsignedInt(scanState[7]) * 256)
                 + Byte.toUnsignedInt(scanState[8]);
         int currentAntenna = Byte.toUnsignedInt(scanState[9]);
-        tv_frequency_stationary.setText(Converters.getFrequency(currentFrequency));
-        tv_index_stationary.setText(String.valueOf(currentIndex));
-        tv_current_antenna_stationary.setText((currentAntenna == 0) ? "All" : String.valueOf(currentAntenna));
+        ((FragmentStationaryScanningBinding) binding).tvFrequencyStationary.setText(Converters.getFrequency(currentFrequency));
+        ((FragmentStationaryScanningBinding) binding).tvIndexStationary.setText(String.valueOf(currentIndex));
+        ((FragmentStationaryScanningBinding) binding).tvCurrentAntennaStationary.setText((currentAntenna == 0) ? "All" : String.valueOf(currentAntenna));
         scanState(scanState);
     }
 
@@ -141,20 +125,22 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
                 int period = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
                 if (detectionType == ValueCodes.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (detectionType == ValueCodes.VARIABLE)
-                    scanNonCodedVariable(period, signalStrength);
+                else if (detectionType == ValueCodes.VARIABLE) {
+                    if (period > 0)
+                        scanNonCodedVariable(period, signalStrength);
+                }
                 break;
         }
     }
 
     private void scanState(byte[] data) {
         totalFrequencies = (Byte.toUnsignedInt(data[5]) * 256) + Byte.toUnsignedInt(data[6]);
-        tv_max_index_stationary.setText("Table Index (" + totalFrequencies + " Total)");
+        ((FragmentStationaryScanningBinding) binding).tvMaxIndexStationary.setText("Table Index (" + totalFrequencies + " Total)");
         detectionType = data[18];
         scanDetailAdapter = new ScanDetailAdapter(requireContext(), detectionType == ValueCodes.CODED);
-        rv_item.setAdapter(scanDetailAdapter);
-        rv_item.setLayoutManager(new LinearLayoutManager(requireContext()));
-        updateVisibility();
+        ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeRecyclerView.rvItem.setAdapter(scanDetailAdapter);
+        ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeRecyclerView.rvItem.setLayoutManager(new LinearLayoutManager(requireContext()));
+        updateVisibility(((FragmentStationaryScanningBinding) binding).includeScanDetails.tvCodePeriod, ((FragmentStationaryScanningBinding) binding).includeScanDetails.tvMortalityPulseRate);
         if (detectionType != ValueCodes.CODED)
             initializeDetectionFilter(data);
     }
@@ -171,30 +157,33 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
         int antennas = Byte.toUnsignedInt(data[1]) >> 7;
         if (antennas == 0) {
             antennas = (Byte.toUnsignedInt(data[7]) >> 6) + 1;
-            tv_current_antenna_stationary.setText(String.valueOf(antennas));
+            ((FragmentStationaryScanningBinding) binding).tvCurrentAntennaStationary.setText(String.valueOf(antennas));
         } else {
-            tv_current_antenna_stationary.setText(R.string.lb_all);
+            ((FragmentStationaryScanningBinding) binding).tvCurrentAntennaStationary.setText(R.string.lbl_vhf_manual_option_all);
         }
-        tv_index_stationary.setText(String.valueOf(currentIndex));
-        tv_frequency_stationary.setText(Converters.getFrequency(currentFrequency));
+        ((FragmentStationaryScanningBinding) binding).tvIndexStationary.setText(String.valueOf(currentIndex));
+        ((FragmentStationaryScanningBinding) binding).tvFrequencyStationary.setText(Converters.getFrequency(currentFrequency));
     }
 
     private void logScanCoded(byte[] data) {
         int code = Byte.toUnsignedInt(data[3]);
         int signalStrength = Byte.toUnsignedInt(data[4]);
         int mortality = Byte.toUnsignedInt(data[5]);
+        if (data[0] == ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND)
+            mortality = (Byte.toUnsignedInt(data[6]) << 8) | Byte.toUnsignedInt(data[5]);
         scanCoded(code, signalStrength, mortality);
     }
 
     private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
         int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
-        scanNonCodedFixed(period, signalStrength, type);
+        if (period > 0)
+            scanNonCodedFixed(period, signalStrength, type);
     }
 
     @Override
     protected void clear() {
-        tv_frequency_stationary.setText("");
-        tv_index_stationary.setText("");
+        ((FragmentStationaryScanningBinding) binding).tvFrequencyStationary.setText("");
+        ((FragmentStationaryScanningBinding) binding).tvIndexStationary.setText("");
         super.clear();
     }
 }

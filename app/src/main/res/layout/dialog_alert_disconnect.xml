@@ -10,6 +10,7 @@
     android:padding="32sp">
 
     <LinearLayout
+        android:id="@+id/layout_background_alert"
         android:layout_width="@dimen/connect_image"
         android:layout_height="@dimen/connect_image"
         android:layout_marginBottom="32sp"
@@ -18,9 +19,9 @@
         android:gravity="center">
 
         <ImageView
-            android:layout_width="@dimen/receiver_connect"
+            android:id="@+id/img_receiver"
+            android:layout_width="wrap_content"
             android:layout_height="@dimen/receiver_connect"
-            android:src="@drawable/receiver"
             tools:ignore="ContentDescription" />
 
     </LinearLayout>
@@ -31,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/disconnect_receiver"
+        android:text="@string/lbl_disconnect_receiver"
         android:textColor="@color/ebony_clay" />
 
     <TextView

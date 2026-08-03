@@ -10,6 +10,7 @@
     android:padding="16sp">
 
     <include
+        android:id="@+id/include_downloading_process"
         layout="@layout/include_downloading_process" />
 
     <Button
@@ -18,6 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32sp"
-        android:text="@string/lb_cancel_download" />
+        android:text="@string/btn_vhf_data_cancel_download" />
 
 </LinearLayout>

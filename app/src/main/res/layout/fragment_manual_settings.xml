@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_current_frequency" />
+        android:text="@string/lbl_vhf_manual_current_frequency" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8sp"
-                    android:text="@string/lb_starting_frequency"
+                    android:text="@string/lbl_vhf_manual_starting_frequency"
                     android:textColor="@color/limed_spruce" />
 
                 <TextView
@@ -57,11 +57,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_small_height"
                 android:paddingHorizontal="10sp"
-                android:text="@string/lb_set_frequency" />
+                android:text="@string/btn_vhf_manual_set_frequency" />
 
         </LinearLayout>
 
         <include
+            android:id="@+id/include_gps_option"
             layout="@layout/include_gps_option"/>
 
     </LinearLayout>
@@ -78,6 +79,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_start_manual_scan" />
+        android:text="@string/btn_vhf_manual_start_scan" />
 
 </LinearLayout>

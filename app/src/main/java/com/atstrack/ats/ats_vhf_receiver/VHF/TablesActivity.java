@@ -2,10 +2,6 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import butterknife.BindView;
-import butterknife.OnClick;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -36,6 +32,7 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfTablesBinding;
 import com.google.api.client.util.IOUtils;
 
 import java.io.BufferedReader;
@@ -50,103 +47,76 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TablesActivity extends BaseActivity implements OnAdapterClickListener {
-
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-    @BindView(R.id.tv_title_table)
-    TextView tv_title_table;
-    @BindView(R.id.btn_frequencies)
-    Button btn_frequencies;
-    @BindView(R.id.layout_removed_frequencies)
-    LinearLayout layout_removed_frequencies;
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-    @BindView(R.id.layout_options_loaded)
-    LinearLayout layout_options_loaded;
-    @BindView(R.id.tv_message_frequencies)
-    TextView tv_message_frequencies;
-    @BindView(R.id.tv_view_tables)
-    TextView tv_view_tables;
-    @BindView(R.id.btn_frequency)
-    Button btn_frequency;
-
     private TableAdapter tableAdapter;
     private List<LoadedTable> removedFrequencies;
     private Handler loadingHandler;
 
-    @OnClick(R.id.layout_removed_frequencies)
-    public void onClickRemovedFrequencies(View v) {
-        showAlertDialog(getString(R.string.lb_removed_frequencies), true, removedFrequencies);
-    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        showToolbar = true;
+        deviceCategory = ValueCodes.VHF;
+        title = getString(R.string.title_vhf_tables_edit);
+        binding = ActivityVhfTablesBinding.inflate(getLayoutInflater());
+        super.onCreate(savedInstanceState);
 
-    @OnClick(R.id.btn_frequencies)
-    public void onClickLoadTablesFromFile(View v) {
-        File[] externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
-        File externalFile = externalStorageVolumes[0];
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setDataAndType(Uri.parse(externalFile.getPath()), "text/plain");
-        startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
-        tableAdapter.isFile = true;
-    }
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutRemovedFrequencies.setOnClickListener(v -> showAlertDialog(getString(R.string.lbl_vhf_tables_warn_removed), true, removedFrequencies));
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setOnClickListener(v -> {
+            File[] externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
+            File externalFile = externalStorageVolumes[0];
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setDataAndType(Uri.parse(externalFile.getPath()), "text/plain");
+            startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
+            tableAdapter.isFile = true;
+        });
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequency.setOnClickListener(v -> {
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View view = inflater.inflate(R.layout.dialog_alert_loading, null);
+            final AlertDialog dialog = new AlertDialog.Builder(this).create();
+            ProgressBar loading_progressBar = view.findViewById(R.id.pb_loading);
+            ImageView loaded_imageView = view.findViewById(R.id.img_loaded);
+            TextView state_loading_textView = view.findViewById(R.id.tv_state_loading);
+            state_loading_textView.setText(R.string.lbl_vhf_tables_pushing);
+            dialog.setView(view);
+            dialog.show();
 
-    @OnClick(R.id.btn_frequency)
-    public void onClickPushFrequencies(View v) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.dialog_alert_loading, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        ProgressBar loading_progressBar = view.findViewById(R.id.pb_loading);
-        ImageView loaded_imageView = view.findViewById(R.id.img_loaded);
-        TextView state_loading_textView = view.findViewById(R.id.tv_state_loading);
-        state_loading_textView.setText(R.string.lb_pushing_frequencies);
-        dialog.setView(view);
-        dialog.show();
+            Timer pushingTimeout = new Timer();
+            pushingTimeout.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    dialog.dismiss();
+                    showAlertDialog(getString(R.string.err_vhf_tables_generic), getString(R.string.err_vhf_tables_push), false);
+                }
+            }, (long) ValueCodes.DOWNLOAD_PERIOD * 2 * tableAdapter.getItemCount());
 
-        Timer pushingTimeout = new Timer();
-        pushingTimeout.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-                showAlertDialog(getString(R.string.lb_error), getString(R.string.lb_error_push), false);
-            }
-        }, (long) ValueCodes.DOWNLOAD_PERIOD * 2 * tableAdapter.getItemCount());
-
-        int index = 0;
-        while (index < tableAdapter.getItemCount()) {
-            while (!setTable(tableAdapter.loadedTables.get(index))) {
+            int index = 0;
+            while (index < tableAdapter.getItemCount()) {
+                while (!setTable(tableAdapter.loadedTables.get(index))) {
+                    try {
+                        Thread.sleep(ValueCodes.WAITING_PERIOD);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 try {
-                    Thread.sleep(ValueCodes.WAITING_PERIOD);
+                    Thread.sleep(ValueCodes.DOWNLOAD_PERIOD);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                index++;
             }
-            try {
-                Thread.sleep(ValueCodes.DOWNLOAD_PERIOD);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            if (index == tableAdapter.getItemCount()) {
+                pushingTimeout.cancel();
+                pushingTimeout.purge();
+                state_loading_textView.setText(R.string.lbl_vhf_tables_pushed);
+                loading_progressBar.setVisibility(View.GONE);
+                loaded_imageView.setVisibility(View.VISIBLE);
+                messageHandler.postDelayed(() -> {
+                    TransferBleData.readTables();
+                    dialog.dismiss();
+                    setVisibility(ValueCodes.OVERVIEW);
+                }, ValueCodes.MESSAGE_PERIOD);
             }
-            index++;
-        }
-        if (index == tableAdapter.getItemCount()) {
-            pushingTimeout.cancel();
-            pushingTimeout.purge();
-            state_loading_textView.setText(R.string.lb_frequencies_pushed);
-            loading_progressBar.setVisibility(View.GONE);
-            loaded_imageView.setVisibility(View.VISIBLE);
-            messageHandler.postDelayed(() -> {
-                TransferBleData.readTables();
-                dialog.dismiss();
-                setVisibility(ValueCodes.OVERVIEW);
-            }, ValueCodes.MESSAGE_PERIOD);
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_tables;
-        showToolbar = true;
-        deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.edit_frequency_tables);
-        super.onCreate(savedInstanceState);
+        });
 
         tableAdapter = new TableAdapter(this, this);
         parameter = getIntent().getByteExtra(ValueCodes.PARAMETER, ValueCodes.NONE);
@@ -154,9 +124,9 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
             byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);
             downloadData(data);
         }
-        layout_options_loaded.setVisibility(View.GONE);
-        layout_removed_frequencies.setVisibility(View.GONE);
-        tv_view_tables.setVisibility(View.GONE);
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutOptionsLoaded.setVisibility(View.GONE);
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutRemovedFrequencies.setVisibility(View.GONE);
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvViewTables.setVisibility(View.GONE);
     }
 
     @Override
@@ -168,7 +138,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
                 final Cursor[] cursorContainer = { null };
                 showAlertDialog(uri, uriString, cursorContainer);
             } else {
-                showAlertDialog(getString(R.string.lb_error), getString(R.string.lb_error_upload), false);
+                showAlertDialog(getString(R.string.err_vhf_tables_generic), getString(R.string.err_vhf_tables_upload), false);
                 tableAdapter.isFile = false;
             }
         }
@@ -179,7 +149,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (tableAdapter.isFile)
-                showAlertDialog(getString(R.string.lb_cancel_frequency_upload), getString(R.string.lb_cancel_frequencies), true);
+                showAlertDialog(getString(R.string.btn_vhf_tables_cancel_upload), getString(R.string.lbl_vhf_tables_cancel_confirm_msg), true);
             else
                 finish();
             return true;
@@ -218,17 +188,17 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
 
     private void setVisibility(int view) {
         if (view == ValueCodes.OVERVIEW) {
-            tv_title_table.setText(R.string.lb_select_table);
-            btn_frequencies.setVisibility(View.VISIBLE);
-            btn_frequencies.setText(R.string.lb_load_table_from_file);
-            tv_title_toolbar.setText(R.string.edit_frequency_tables);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvTitleTable.setText(R.string.lbl_vhf_tables_select);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setVisibility(View.VISIBLE);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setText(R.string.btn_vhf_tables_load_file);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvTitleTable.setText(R.string.title_vhf_tables_edit);
         } else if (view == ValueCodes.DOWNLOADED) {
-            tv_title_table.setText(R.string.lb_table_summary);
-            btn_frequencies.setVisibility(View.GONE);
-            layout_options_loaded.setVisibility(View.VISIBLE);
-            btn_frequency.setText(R.string.lb_push_frequencies);
-            tv_message_frequencies.setVisibility(View.VISIBLE);
-            tv_title_toolbar.setText(R.string.lb_tables_loaded);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvTitleTable.setText(R.string.title_vhf_tables_summary);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setVisibility(View.GONE);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutOptionsLoaded.setVisibility(View.VISIBLE);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequency.setText(R.string.btn_vhf_tables_push_receiver);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvMessageFrequencies.setVisibility(View.VISIBLE);
+            ((ActivityVhfTablesBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.lbl_vhf_tables_loaded);
         }
     }
 
@@ -275,7 +245,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
                                 frequenciesList.add(frequency);
                             } else {
                                 removedFrequenciesList.add(frequency);
-                                layout_removed_frequencies.setVisibility(View.VISIBLE);
+                                ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutRemovedFrequencies.setVisibility(View.VISIBLE);
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
@@ -326,8 +296,8 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
     private void downloadTables(byte[] data) {
         setVisibility(ValueCodes.OVERVIEW);
         tableAdapter.setData(data);
-        rv_item.setAdapter(tableAdapter);
-        rv_item.setLayoutManager(new LinearLayoutManager(this));
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.includeRecyclerView.rvItem.setAdapter(tableAdapter);
+        ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.includeRecyclerView.rvItem.setLayoutManager(new LinearLayoutManager(this));
         tableAdapter.isFile = false;
         TransferBleData.readDetectionFilter();
     }
@@ -354,7 +324,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
     }
 
     private void showAlertDialog(Uri uri, String uriString, Cursor[] cursorContainer) {
-        AlertDialog dialog = Dialogs.createLoadingDialog(this, getString(R.string.lb_importing_tables));
+        AlertDialog dialog = Dialogs.createLoadingDialog(this, getString(R.string.lbl_vhf_tables_importing));
         dialogList.add(dialog);
         dialog.setOnDismissListener(d -> dialogList.remove(dialog));
         dialog.show();
@@ -364,7 +334,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
         TextView state_loading_textView = dialog.findViewById(R.id.tv_state_loading);
         loadingHandler = new Handler();
         messageHandler.postDelayed(() -> {
-            state_loading_textView.setText(getString(R.string.lb_frequencies_imported));
+            state_loading_textView.setText(getString(R.string.lbl_vhf_tables_imported));
             loading_progressBar.setVisibility(View.GONE);
             loaded_imageView.setVisibility(View.VISIBLE);
             if (uriString.startsWith("content://")) {
@@ -372,7 +342,7 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
                     cursorContainer[0] = getBaseContext().getContentResolver().query(uri, null, null, null, null);
                 } catch (Exception ex) {
                     dialog.dismiss();
-                    showAlertDialog(getString(R.string.lb_error), getString(R.string.lb_error_push), false);
+                    showAlertDialog(getString(R.string.err_vhf_tables_generic), getString(R.string.err_vhf_tables_push), false);
                     tableAdapter.isFile = false;
                 }
             }

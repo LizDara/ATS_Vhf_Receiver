@@ -7,15 +7,16 @@ import androidx.fragment.app.Fragment;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.FirmwareVersionFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityFirmwareUpdateBinding;
 
 public class FirmwareUpdateActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_firmware_update;
         showToolbar = true;
-        title = getString(R.string.firmware_update);
+        title = getString(R.string.title_fw_update_main);
         deviceCategory = ValueCodes.ACOUSTIC;
+        binding = ActivityFirmwareUpdateBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
         String latestVersion = getIntent().getStringExtra(ValueCodes.FIRMWARE_VERSION);
         String downloadURl = getIntent().getStringExtra(ValueCodes.VALUE);

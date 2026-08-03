@@ -44,7 +44,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         holder.tv_device_number.setText(types[position]);
         holder.layout_device_type.setBackground(ContextCompat.getDrawable(context, Converters.getDeviceType(types[position], false)));
         holder.img_device_type.setBackgroundResource(Converters.getDeviceType(types[position], true));
-        holder.tv_device_status.setText(types.length == 2 ? R.string.lb_brief_description : R.string.lb_supported_models);
+        holder.tv_device_status.setText(types.length == 2 ? R.string.lbl_bluetooth_tags_brief_description : R.string.lbl_bridge_app_supported_models);
         holder.img_selected.setVisibility(View.VISIBLE);
         holder.img_selected.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_next));
         TableRow.LayoutParams params = new TableRow.LayoutParams();

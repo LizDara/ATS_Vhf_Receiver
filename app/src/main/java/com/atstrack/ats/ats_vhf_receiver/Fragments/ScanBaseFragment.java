@@ -12,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
@@ -25,21 +25,8 @@ import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ScanBaseActivity;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 public class ScanBaseFragment extends Fragment {
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-    @BindView(R.id.tv_code_period)
-    TextView tv_code_period;
-    @BindView(R.id.tv_mortality_pulse_rate)
-    TextView tv_mortality_pulse_rate;
-    @BindView(R.id.v_line)
-    View v_line;
-
-    protected Unbinder unbinder;
+    protected ViewBinding binding = null;
     protected int scanType;
     protected boolean isScanning;
     protected int baseFrequency;
@@ -56,14 +43,7 @@ public class ScanBaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        int layoutId = R.layout.fragment_manual_scanning;
-        if (scanType == ValueCodes.MOBILE_SCAN_COMMAND)
-            layoutId = R.layout.fragment_mobile_scanning;
-        else if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND)
-            layoutId = R.layout.fragment_stationary_scanning;
-        View view = inflater.inflate(layoutId, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -76,8 +56,7 @@ public class ScanBaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     protected void initialize() {
@@ -99,9 +78,9 @@ public class ScanBaseFragment extends Fragment {
         TransferBleData.notificationLog(true);
     }
 
-    protected void updateVisibility() {
-        tv_code_period.setText(detectionType == ValueCodes.CODED ? R.string.lb_code : R.string.lb_period);
-        tv_mortality_pulse_rate.setText(detectionType == ValueCodes.CODED ? R.string.lb_mortality : R.string.lb_pulse_rate);
+    protected void updateVisibility(TextView tv_code_period, TextView tv_mortality_pulse_rate) {
+        tv_code_period.setText(detectionType == ValueCodes.CODED ? R.string.lbl_vhf_manual_code : R.string.lbl_vhf_manual_period);
+        tv_mortality_pulse_rate.setText(detectionType == ValueCodes.CODED ? R.string.lbl_vhf_manual_mortality : R.string.lbl_vhf_manual_pulse_rate);
     }
 
     protected void initializeDetectionFilter(byte[] data) {
@@ -166,7 +145,7 @@ public class ScanBaseFragment extends Fragment {
 
     protected void showAlertDialog() {
         errorScan = true;
-        AlertDialog dialog = Dialogs.createErrorDialog(requireContext(), getString(R.string.lb_fatal_scan_error), getString(R.string.lb_receiver_repair));
+        AlertDialog dialog = Dialogs.createErrorDialog(requireContext(), getString(R.string.lbl_vhf_mobile_fatal_scan_error), getString(R.string.lbl_vhf_mobile_receiver_repair));
         if (getActivity() instanceof OnDialogCreatedListener) {
             ((OnDialogCreatedListener) getActivity()).onNewDialogAdded(dialog);
         }

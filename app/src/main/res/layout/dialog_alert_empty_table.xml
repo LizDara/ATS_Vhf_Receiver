@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12sp"
         android:layout_marginVertical="8sp"
-        android:text="@string/lb_cant_empty_table"
+        android:text="@string/err_vhf_tables_cant_empty"
         android:textColor="@color/slate_700" />
 
     <TextView
@@ -33,7 +33,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="12sp"
         android:layout_marginBottom="16sp"
-        android:text="@string/lb_table_empty_message"
+        android:text="@string/lbl_vhf_tables_cant_empty_msg"
         android:textColor="@color/slate_700" />
 
     <LinearLayout
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24sp"
-            android:text="@string/lb_dismiss"
+            android:text="@string/btn_vhf_mobile_dismiss"
             android:textColor="@color/slate_700" />
 
         <Button
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="8sp"
-            android:text="@string/lb_edit_defaults" />
+            android:text="@string/btn_vhf_mobile_edit_default_settings" />
 
     </LinearLayout>
 

@@ -56,9 +56,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
      */
     @SuppressLint("MissingPermission")
     public void addDevice(BluetoothDevice device, byte[] scanRecord) {
-        Log.i("LeDeviceListAdapter", "Device: " + device.getName());
         if(!containsDeviceData(device)) {
             if (device.getName().contains(deviceType)) { // filter only ATS device
+                Log.i("LeDeviceListAdapter", "Device: " + device.getName());
                 devicesData.add(new DeviceData(device, scanRecord));
                 notifyDataSetChanged();
             }
@@ -92,8 +92,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     }
 
     private void setUnknownDevice(DeviceViewHolder holder) {
-        holder.tv_device_number.setText(R.string.unknown_device);
-        holder.tv_device_status.setText(R.string.lb_none);
+        holder.tv_device_number.setText(R.string.lbl_receiver_connection_unknown_device);
+        holder.tv_device_status.setText(R.string.lbl_vhf_manual_option_none);
         holder.tv_percent_battery.setText("0%");
         holder.img_battery.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_light_battery));
     }
@@ -198,8 +198,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                     if (devicesData.get(getLayoutPosition()).selected) {
                         connect_button.setEnabled(true);
                         connect_button.setAlpha(1);
-                        subtitle.setText(R.string.lb_device_selected);
-                        message.setText(R.string.lb_click_connect);
+                        subtitle.setText(R.string.lbl_device_selection_selected);
+                        message.setText(R.string.lbl_device_selection_click_instruction);
                         selectedPosition = getLayoutPosition();
 
                         //Clear the other selection
@@ -211,7 +211,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                         connect_button.setEnabled(false);
                         connect_button.setAlpha((float) 0.6);
                         subtitle.setText("Found " + devicesData.size() + " Devices");
-                        message.setText(R.string.lb_select_device);
+                        message.setText(R.string.lbl_device_selection_guide);
                         selectedPosition = -1;
                     }
                     notifyDataSetChanged();

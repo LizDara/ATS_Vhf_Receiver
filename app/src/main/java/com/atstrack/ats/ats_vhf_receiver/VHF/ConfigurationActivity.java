@@ -1,51 +1,42 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
-import butterknife.OnClick;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfConfigurationBinding;
 
 public class ConfigurationActivity extends BaseActivity {
 
-    @OnClick(R.id.btn_edit_frequency_tables)
-    public void onClickEditFrequencyTables(View v) {
-        Intent intent = new Intent(this, TablesActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES_COMMAND);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_edit_receiver_defaults)
-    public void onClickEditReceiverDefaults(View v) {
-        Intent intent = new Intent(this, EditDefaultsActivity.class);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_set_transmitter_type)
-    public void onClickSetTransmitterType(View v) {
-        Intent intent = new Intent(this, DetectionFilterActivity.class);
-        intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_FILTER_COMMAND);
-        startActivity(intent);
-    }
-
-    @OnClick(R.id.btn_clone_from_other_receiver)
-    public void onClickCloneFromOtherReceiver(View v) {
-        Intent intent = new Intent(this, CloneActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_configuration;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
-        title = getString(R.string.receiver_configuration);
+        title = getString(R.string.title_vhf_config_main);
+        binding = ActivityVhfConfigurationBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
+
+        ((ActivityVhfConfigurationBinding) binding).btnEditFrequencyTables.setOnClickListener(v -> {
+            Intent intent = new Intent(this, TablesActivity.class);
+            intent.putExtra(ValueCodes.PARAMETER, ValueCodes.TABLES_COMMAND);
+            startActivity(intent);
+        });
+        ((ActivityVhfConfigurationBinding) binding).btnEditReceiverDefaults.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditDefaultsActivity.class);
+            startActivity(intent);
+        });
+        ((ActivityVhfConfigurationBinding) binding).btnSetTransmitterType.setOnClickListener(v -> {
+            Intent intent = new Intent(this, DetectionFilterActivity.class);
+            intent.putExtra(ValueCodes.PARAMETER, ValueCodes.DETECTION_FILTER_COMMAND);
+            startActivity(intent);
+        });
+        ((ActivityVhfConfigurationBinding) binding).btnCloneFromOtherReceiver.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CloneActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

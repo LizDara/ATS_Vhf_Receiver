@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="24sp"
             android:gravity="center"
-            android:text="@string/lb_select_ids_audio"
+            android:text="@string/title_vhf_manual_select_audio"
             android:textColor="@color/limed_spruce" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                 style="@style/button_tertiary_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_single"
+                android:text="@string/lbl_vhf_manual_option_single"
                 android:textColor="@color/limed_spruce" />
 
             <Space
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_audio"
-                android:text="@string/lb_all"
+                android:text="@string/lbl_vhf_manual_option_all"
                 android:textColor="@color/catskill_white" />
 
             <Space
@@ -67,7 +67,7 @@
                 style="@style/button_tertiary_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_background"
+                android:text="@string/lbl_vhf_manual_option_background"
                 android:textColor="@color/limed_spruce" />
 
         </LinearLayout>
@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8sp"
-                android:text="@string/lb_enter_digit_id"
+                android:text="@string/lbl_vhf_manual_enter_id_digit"
                 android:textColor="@color/slate_gray"
                 android:gravity="center" />
 
@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32sp"
-            android:text="@string/lb_save_changes" />
+            android:text="@string/btn_vhf_tables_save_changes" />
 
     </LinearLayout>
 

@@ -6,12 +6,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -27,34 +22,18 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityMainBinding;
 
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnAdapterClickListener {
-
-    @BindView(R.id.tb_main)
-    Toolbar tb_main;
-    @BindView(R.id.v_state)
-    View v_state;
-    @BindView(R.id.tv_title_toolbar)
-    TextView tv_title_toolbar;
-    @BindView(R.id.tv_bridge_subtitle)
-    TextView tv_bridge_subtitle;
-    @BindView(R.id.tv_bridge_message)
-    TextView tv_bridge_message;
-    @BindView(R.id.tv_types_subtitle)
-    TextView tv_types_subtitle;
-    @BindView(R.id.rv_item)
-    RecyclerView rv_item;
-
     private final static String TAG = MainActivity.class.getSimpleName();
-
+    private ActivityMainBinding binding = null;
     private CategoryAdapter categoryListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private String deniedPermissions = "";
@@ -86,12 +65,12 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        setSupportActionBar(tb_main);
-        v_state.setVisibility(View.GONE);
-        tv_title_toolbar.setText(R.string.bridge_app);
+        setSupportActionBar(binding.includeToolbar.tbMain);
+        binding.includeToolbar.vState.setVisibility(View.GONE);
+        binding.includeToolbar.tvTitleToolbar.setText(R.string.title_bridge_app);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         init();
     }
@@ -100,16 +79,14 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
      * Initializes the app theme and checks permissions to use bluetooth and storage.
      */
     private void init() {
-        //ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         checkPermissions();
-        //receiverInformation.initialize();
         checkStatusBLE();
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
-        rv_item.setLayoutManager(manager);
-        rv_item.setHasFixedSize(true);
+        binding.includeRecyclerView.rvItem.setLayoutManager(manager);
+        binding.includeRecyclerView.rvItem.setHasFixedSize(true);
         categoryListAdapter = new CategoryAdapter(this, this);
-        rv_item.setAdapter(categoryListAdapter);
+        binding.includeRecyclerView.rvItem.setAdapter(categoryListAdapter);
         setVisibility(ValueCodes.CATEGORIES);
         /*int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         SharedPreferences appSettingPrefs = getSharedPreferences(ValueCodes.SETTING_PREFERENCES, 0);
@@ -165,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (!tv_title_toolbar.getText().toString().equals(getResources().getString(R.string.bridge_app)))
+            if (!binding.includeToolbar.tvTitleToolbar.getText().toString().equals(getResources().getString(R.string.title_bridge_app)))
                 setVisibility(ValueCodes.CATEGORIES);
             return true;
         }
@@ -188,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
             type = ValueCodes.VHF;
         else if (categoryListAdapter.types[position].contains("Wildlink"))
             type = ValueCodes.WILDLINK;
-        else if (categoryListAdapter.types[position].contains("Bluetooth Receiver"))
+        else if (categoryListAdapter.types[position].contains("BluTrack"))
             type = ValueCodes.BLUETOOTH_RECEIVER;
         Intent intent = new Intent(this, ScanDevicesActivity.class);
         intent.putExtra(ValueCodes.TYPE, type);
@@ -198,19 +175,19 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     private void setVisibility(int view) {
         if (view == ValueCodes.CATEGORIES) {
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-            tv_title_toolbar.setText(R.string.bridge_app);
-            tv_bridge_subtitle.setText(R.string.lb_device_selection);
-            tv_bridge_message.setText(R.string.lb_type_of_device);
-            tv_types_subtitle.setText(R.string.lb_device_categories);
-            categoryListAdapter.types = getResources().getStringArray(R.array.categories);
+            binding.includeToolbar.tvTitleToolbar.setText(R.string.title_bridge_app);
+            binding.tvBridgeSubtitle.setText(R.string.lbl_bridge_app_device_selection);
+            binding.tvBridgeMessage.setText(R.string.lbl_bridge_app_device_type);
+            binding.tvTypesSubtitle.setText(R.string.lbl_bridge_app_device_categories);
+            categoryListAdapter.types = getResources().getStringArray(R.array.array_bridge_app_categories);
         } else if (view == ValueCodes.BLUETOOTH_TAGS) {
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
-            tv_title_toolbar.setText(R.string.bluetooth_tags);
-            tv_bridge_subtitle.setText(R.string.lb_bluetooth_receive_data);
-            tv_bridge_message.setText(R.string.lb_bluetooth_tags_message);
-            tv_types_subtitle.setText(R.string.lb_connection_modes);
-            categoryListAdapter.types = getResources().getStringArray(R.array.connection_modes);
+            binding.includeToolbar.tvTitleToolbar.setText(R.string.title_bluetooth_tags);
+            binding.tvBridgeSubtitle.setText(R.string.lbl_bluetooth_tags_receive_data);
+            binding.tvBridgeMessage.setText(R.string.lbl_bluetooth_tags_message);
+            binding.tvTypesSubtitle.setText(R.string.lbl_bluetooth_tags_connection_modes);
+            categoryListAdapter.types = getResources().getStringArray(R.array.array_bridge_app_connection_modes);
         }
         categoryListAdapter.notifyDataSetChanged();
     }

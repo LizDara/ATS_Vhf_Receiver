@@ -1,316 +1,339 @@
 <resources>
-    <string name="app_name">ATS Universal</string>
+    <string name="lbl_app_name">ATS Universal</string>
 
-    <!--DISCONNECT RECEIVER-->
-    <string name="disconnect_receiver">Receiver Disconnected</string>
+    <!-- ========================================== -->
+    <!-- SPLASH SCREEN                              -->
+    <!-- ========================================== -->
+    <string name="lbL_bridge">ATS BRIDGE</string>
 
-    <!--BRIDGE APP-->
-    <string name="bridge_app">BRIDGE APP</string>
-    <string name="lb_device_selection">Device Selection</string>
-    <string name="lb_type_of_device">What type of device are you using? Please select from the categories below.</string>
-    <string name="lb_device_categories">Device Categories</string>
-    <string name="lb_supported_models">List of supported models.</string>
+    <!-- ========================================== -->
+    <!-- DISCONNECT RECEIVER                        -->
+    <!-- ========================================== -->
+    <string name="lbl_disconnect_receiver">Receiver Disconnected</string>
 
-    <!--BLUETOOTH TAGS-->
-    <string name="bluetooth_tags">BLUETOOTH TAGS</string>
-    <string name="lb_bluetooth_receive_data">How are you going to receive data?</string>
-    <string name="lb_bluetooth_tags_message">Bluetooth tags give you the option of connecting to a receiver or listening to tag transmissions directly.</string>
-    <string name="lb_connection_modes">Connection Modes</string>
-    <string name="lb_brief_description">Brief Description.</string>
-
-    <!--SELECT DEVICE-->
-    <string name="select_vhf_receiver">SELECT VHF RECEIVER</string>
-    <string name="select_acoustic_receiver">SELECT ACOUSTIC RECEIVER</string>
-    <string name="select_bluetooth_tag">SELECT BLUETOOTH TAG</string>
-    <string name="select_bluetooth_beacon">SELECT BLUETOOTH BEACON</string>
-    <string name="select_wildlink">SELECT WILDLINK</string>
-    <string name="lb_bridge">ATS BRIDGE</string>
-    <string name="lb_searching_devices">Searching For Devices ...</string>
-    <string name="lb_message_searching">It is only going to take a few seconds.</string>
-    <string name="lb_connect">Connect</string>
-    <string name="lb_device_selected">Device Selected</string>
-    <string name="lb_click_connect">Click the connect button.</string>
-    <string name="lb_no_devices_found">No Devices Found</string>
-    <string name="lb_unable_find_device">Please make sure your devices are within bluetooth range.</string>
-    <string name="lb_retry">Retry</string>
-    <string name="lb_select_device">Select device and click the connect button.</string>
-
-    <!--CONNECT TO RECEIVER-->
-    <string name="unknown_device">Unknown device</string>
-    <string name="lb_cancel">Cancel</string>
-    <string name="lb_connecting_message">This should only take a few seconds.</string>
-    <string name="lb_failed_connect">"Failed to connect to device"</string>
-    <string name="lb_success">Success</string>
-    <string name="lb_device_connected">Your device is connected.</string>
-    <string name="lb_update_required">Update Required</string>
-    <string name="lb_update">We have made an important update to the app and we need you to install the latest version. Please head to the App Store and upgrade to the latest version to continue using the app. Thank you.</string>
-    <string name="lb_DarkMode">Dark Mode</string>
-
-    <string-array name="categories">
+    <!-- ========================================== -->
+    <!-- BRIDGE APP                                 -->
+    <!-- ========================================== -->
+    <string name="title_bridge_app">BRIDGE APP</string>
+    <string name="lbl_bridge_app_device_selection">Device Selection</string>
+    <string name="lbl_bridge_app_device_type">What type of device are you using? Please select from the categories below.</string>
+    <string name="lbl_bridge_app_device_categories">Device Categories</string>
+    <string name="lbl_bridge_app_supported_models">List of supported models.</string>
+    <string name="lbl_bridge_app_dark_mode">Dark Mode</string>
+    <string name="lbl_bridge_app_update_required">Update Required</string>
+    <string name="lbl_bridge_app_update_desc">We have made an important update to the app and we need you to install the latest version. Please head to the Google Play Store and upgrade to the latest version to continue using the app. Thank you.</string>
+    <string-array name="array_bridge_app_categories">
         <item>VHF Receivers</item>
         <item>BT2400 BluTrack Receiver</item>
         <item>Wildlink</item>
     </string-array>
-
-    <string-array name="connection_modes">
-        <item>Connect to Bluetooth Receiver</item>
+    <string-array name="array_bridge_app_connection_modes">
+        <item>Connect to BluTrack</item>
         <item>View Beacon Tags Directly</item>
     </string-array>
 
-    <!-- - - - - - VHF RECEIVER - - - - - -->
-    <!--HOME-->
-    <string name="lb_start_scanning">Start Scanning</string>
-    <string name="lb_connecting_device">Connecting ...</string>
-    <string name="lb_battery">Battery</string>
-    <string name="lb_sd_card">SD Card</string>
-    <string name="lb_inserted">Inserted</string>
-    <string name="lb_disconnect">Disconnect</string>
+    <!-- ========================================== -->
+    <!-- BLUETOOTH TAGS                             -->
+    <!-- ========================================== -->
+    <string name="title_bluetooth_tags">BluTrack Beacon</string>
+    <string name="lbl_bluetooth_tags_receive_data">How are you going to receive data?</string>
+    <string name="lbl_bluetooth_tags_message">BluTrack give you the option of connecting to a receiver or listening to tag transmissions directly.</string>
+    <string name="lbl_bluetooth_tags_connection_modes">Connection Modes</string>
+    <string name="lbl_bluetooth_tags_brief_description">Brief Description.</string>
 
-    <!--START SCANNING-->
-    <string name="lb_manual_scan">Manual Scan</string>
-    <string name="lb_aerial_scan">Mobile Scan</string>
-    <string name="lb_stationary_scan">Stationary Scan</string>
-    <string name="lb_warning_no_tables">Warning: All frequency tables are empty. You must fill one before  starting a mobile or stationary scan.</string>
-    <string name="lb_go_tables">Go to Frequency Tables</string>
-    <string name="lb_warning_no_detection">Warning: Receiver detection filter not set. Please complete to be able to scan.</string>
-    <string name="lb_go_detection">Go to Detection Filter Settings</string>
-    <string name="lb_warning_no_defaults">Warning: Receiver default settings not complete. Please complete settings to be able to scan.</string>
-    <string name="lb_go_settings">Go to Receiver Settings</string>
+    <!-- ========================================== -->
+    <!-- DEVICE SELECTION / SCAN                    -->
+    <!-- ========================================== -->
+    <string name="title_device_selection_vhf">SELECT VHF RECEIVER</string>
+    <string name="title_device_selection_acoustic">SELECT ACOUSTIC RECEIVER</string>
+    <string name="title_device_selection_bluetooth_tag">SELECT TAG</string>
+    <string name="title_device_selection_bluetooth_beacon">SELECT BLUTRACK</string>
+    <string name="title_device_selection_wildlink">SELECT WILDLINK</string>
+    <string name="lbl_device_selection_searching">Searching For Devices ...</string>
+    <string name="lbl_device_selection_searching_msg">It is only going to take a few seconds.</string>
+    <string name="lbl_device_selection_none_found">No Devices Found</string>
+    <string name="lbl_device_selection_range_warning">Please make sure your devices are within range.</string>
+    <string name="lbl_device_selection_selected">Device Selected</string>
+    <string name="lbl_device_selection_click_instruction">Click the connect button.</string>
+    <string name="lbl_device_selection_guide">Select device and click the connect button.</string>
+    <string name="btn_device_selection_connect">Connect</string>
+    <string name="btn_device_selection_retry">Retry</string>
 
-    <!--MANUAL SCAN-->
-    <string name="manual_scanning">Manual Scanning</string>
-    <string name="lb_current_frequency">Current Frequency</string>
-    <string name="lb_starting_frequency">Starting Frequency</string>
-    <string name="lb_gps_data">GPS Data</string>
-    <string name="lb_set_frequency">Edit Starting Frequency</string>
-    <string name="lb_start_manual_scan">Start Manual Scan</string>
-    <string name="lb_change_frequency">Change Frequency</string>
-    <string name="lb_manual_scanning">Manual Scanning ...</string>
-    <string name="lb_saving_targets">Saving targets ...</string>
-    <string name="lb_edit_frequency">Edit Frequency</string>
-    <string name="lb_code">Code</string>
-    <string name="lb_signal_strength">Signal Strength</string>
-    <string name="lb_detections">Detections</string>
-    <string name="lb_mortality">Mortality</string>
-    <string name="lb_period">Period</string>
-    <string name="lb_pulse_rate">Pulse Rate</string>
-    <string name="lb_record_data">Record Data</string>
-    <string name="lb_id_audio">Code Audio</string>
-    <string name="lb_latitude">Latitude</string>
-    <string name="lb_longitude">Longitude</string>
-    <string name="lb_edit_audio_options"><u>Edit Audio Options</u></string>
-    <string name="lb_select_ids_audio">Select Codes for Audio</string>
-    <string name="lb_single">Single</string>
-    <string name="lb_all">All</string>
-    <string name="lb_none">None</string>
-    <string name="lb_background">Background</string>
-    <string name="lb_enter_digit_id">Enter a two digit ID</string>
+    <!-- ========================================== -->
+    <!-- CONNECTING TO RECEIVER                     -->
+    <!-- ========================================== -->
+    <string name="lbl_receiver_connection_unknown_device">Unknown device</string>
+    <string name="lbl_receiver_connection_connecting_device">Connecting ...</string>
+    <string name="lbl_receiver_connection_msg">This should only take a few seconds.</string>
+    <string name="lbl_receiver_connection_failed">Failed to connect to device</string>
+    <string name="lbl_receiver_connection_success">Success</string>
+    <string name="lbl_receiver_connection_success_msg">Your device is connected.</string>
+    <string name="btn_receiver_connection_cancel">Cancel</string>
 
-    <!--AERIAL SCAN-->
-    <string name="aerial_scanning">Mobile Scanning</string>
-    <string name="lb_scan_settings">Scan Settings</string>
-    <string name="lb_scan_time_seconds">Scan Time (Seconds)</string>
-    <string name="lb_scan_rate">Scan Rate</string>
-    <string name="lb_number_antennas">Number of Antennas</string>
-    <string name="lb_auto_record">Auto Record</string>
-    <string name="lb_start_aerial_scan">Start Mobile Scan</string>
-    <string name="lb_aerial_scanning">Mobile Scanning ...</string>
-    <string name="lb_searching_gps">GPS: Searching</string>
-    <string name="lb_off_gps">GPS: Off</string>
-    <string name="lb_valid_gps">GPS: Valid</string>
-    <string name="lb_failed_gps">GPS: Failed</string>
-    <string name="lb_frequency">Frequency</string>
-    <string name="lb_table_total">Table Total</string>
-    <string name="lb_current_index">Current Index</string>
-    <string name="lb_edit_table"><u>Edit Table</u></string>
-    <string name="lb_hold">Hold Frequency</string>
-    <string name="lb_release">Release Frequency</string>
-    <string name="lb_stop_recording">Stop Recording</string>
-    <string name="lb_view_detection_filter"><u>View Detection Filter Settings</u></string>
-    <string name="lb_non_coded_detection">Non Coded Detection Filter</string>
-    <string name="lb_filter_type">Filter Type</string>
-    <string name="lb_edit_default_settings"><u>Edit Default Settings</u></string>
-    <string name="lb_fatal_scan_error">Fatal Scan Error</string>
-    <string name="lb_receiver_repair">Please send receiver in for repairs.</string>
+    <!-- ========================================== -->
+    <!-- MODULE: VHF RECEIVER                       -->
+    <!-- ========================================== -->
 
-    <!--EDIT TABLE SCAN-->
-    <string name="lb_add_frequency_scan">Add a Frequency to Table</string>
-    <string name="lb_delete_frequency_scan">Delete Current Frequency From Table</string>
-    <string name="lb_merge_table_scan">Merge Table Into Table</string>
-    <string name="lb_merge_tables">Merge Table</string>
-    <string name="lb_select_table_merge">Select a table to merge into scan table</string>
-    <string name="lb_frequency_deleted">Frequency Deleted</string>
-    <string name="lb_tables_merged">Table Merged</string>
+    <!-- SUB-SECTION: HOME -->
+    <string name="lbl_vhf_home_battery">Battery</string>
+    <string name="lbl_vhf_home_sd_card">SD Card</string>
+    <string name="lbl_vhf_home_sd_card_inserted">Inserted</string>
+    <string name="lbl_vhf_home_low_power">Low Battery Detected</string>
+    <string name="btn_vhf_home_start_scanning">Start Scanning</string>
+    <string name="btn_vhf_home_configure_receiver">Configure Receiver</string>
+    <string name="btn_vhf_home_manage_data">Manage Receiver Data</string>
+    <string name="btn_vhf_home_convert_raw_data">Convert Raw Data (SD Card)</string>
+    <string name="btn_vhf_home_disconnect">Disconnect</string>
 
-    <!--STATIONARY SCAN-->
-    <string name="stationary_scanning">Stationary Scanning</string>
-    <string name="lb_store_rate">Store Rate (Minutes)</string>
-    <string name="lb_external_data_transfer">External Data Transfer</string>
-    <string name="lb_reference_frequency">Reference Frequency</string>
-    <string name="lb_reference_frequency_value">Reference Frequency Value</string>
-    <string name="lb_stationary_scanning">Stationary Scanning ...</string>
-    <string name="lb_current_antenna">Antenna #</string>
-    <string name="lb_scan_details">Scan Details</string>
+    <!-- SUB-SECTION: START SCANNING OPTIONS -->
+    <string name="lbl_vhf_start_scan_manual">Manual Scan</string>
+    <string name="lbl_vhf_start_scan_mobile">Mobile Scan</string>
+    <string name="lbl_vhf_start_scan_stationary">Stationary Scan</string>
+    <string name="lbl_vhf_start_scan_warn_no_tables">Warning: All frequency tables are empty. You must fill one before starting a mobile or stationary scan.</string>
+    <string name="lbl_vhf_start_scan_warn_no_detection">Warning: Receiver detection filter not set. Please complete to be able to scan.</string>
+    <string name="lbl_vhf_start_scan_warn_no_defaults">Warning: Receiver default settings not complete. Please complete settings to be able to scan.</string>
+    <string name="btn_vhf_start_scan_go_tables">Go to Frequency Tables</string>
+    <string name="btn_vhf_start_scan_go_detection">Go to Detection Filter Settings</string>
+    <string name="btn_vhf_start_scan_go_settings">Go to Receiver Settings</string>
 
-    <!--RECEIVER CONFIGURATION-->
-    <string name="receiver_configuration">Configure Receiver</string>
-    <string name="lb_edit_frequency_tables">Edit Frequency Tables</string>
-    <string name="lb_edit_receiver_defaults">Edit Receiver Defaults</string>
-    <string name="lb_set_transmitter_type">Set Detection Filter</string>
-    <string name="lb_clone_from_other_receiver">Clone From Other Receiver</string>
-    <string name="lb_not_set">Not Set</string>
+    <!-- SUB-SECTION: MANUAL SCAN -->
+    <string name="title_vhf_manual_settings">Manual Scanning</string>
+    <string name="title_vhf_manual_scanning">Manual Scanning ...</string>
+    <string name="title_vhf_manual_change_frequency">Change Frequency</string>
+    <string name="title_vhf_manual_select_audio">Select Codes for Audio</string>
+    <string name="lbl_vhf_manual_current_frequency">Current Frequency</string>
+    <string name="lbl_vhf_manual_starting_frequency">Starting Frequency</string>
+    <string name="lbl_vhf_manual_gps_data">GPS Data</string>
+    <string name="lbl_vhf_manual_enter_id_digit">Enter a two digit ID</string>
+    <string name="lbl_vhf_manual_saving_targets">Saving targets ...</string>
+    <string name="lbl_vhf_manual_code">Code</string>
+    <string name="lbl_vhf_manual_signal_strength">Signal Strength</string>
+    <string name="lbl_vhf_manual_detections">Detections</string>
+    <string name="lbl_vhf_manual_mortality">Mortality</string>
+    <string name="lbl_vhf_manual_period">Period</string>
+    <string name="lbl_vhf_manual_pulse_rate">Pulse Rate</string>
+    <string name="lbl_vhf_manual_latitude">Latitude</string>
+    <string name="lbl_vhf_manual_longitude">Longitude</string>
+    <string name="lbl_vhf_manual_id_audio">Code Audio</string>
+    <string name="lbl_vhf_manual_option_single">Single</string>
+    <string name="lbl_vhf_manual_option_all">All</string>
+    <string name="lbl_vhf_manual_option_none">None</string>
+    <string name="lbl_vhf_manual_option_background">Background</string>
+    <string name="btn_vhf_manual_set_frequency">Edit Starting Frequency</string>
+    <string name="btn_vhf_manual_start_scan">Start Manual Scan</string>
+    <string name="btn_vhf_manual_edit_frequency">Edit Frequency</string>
+    <string name="btn_vhf_manual_record_data">Record Data</string>
+    <string name="btn_vhf_manual_edit_audio_options"><u>Edit Audio Options</u></string>
 
-    <!--EDIT FREQUENCY TABLES-->
-    <string name="edit_frequency_tables">Edit Frequency Tables</string>
-    <string name="lb_tables_loaded">Tables Loaded</string>
-    <string name="lb_select_table">Select a Table</string>
-    <string name="lb_table_summary">Table Summary</string>
-    <string name="lb_load_table_from_file">Load From File</string>
-    <string name="lb_importing_tables">Importing Tables ...</string>
-    <string name="lb_frequencies_imported">Frequencies Imported</string>
-    <string name="lb_note_push">Note: pushing frequencies to receiver will overwrite any existing ones.</string>
-    <string name="lb_push_frequencies">Push Frequencies to Receiver</string>
-    <string name="lb_pushing_frequencies">Pushing Frequencies ...</string>
-    <string name="lb_frequencies_pushed">Frequencies pushed to receiver</string>
-    <string name="lb_return_upload"><u>Return to Upload</u></string>
-    <string name="lb_cancel_upload">Cancel Upload</string>
-    <string name="lb_removed_frequencies">Removed Frequencies</string>
-    <string name="lb_removed_frequencies_message">Some frequencies were out of range and automatically removed. Tap to view removed frequencies.</string>
-    <string name="lb_error">Error</string>
-    <string name="lb_cancel_frequency_upload">Cancel Frequency Upload?</string>
-    <string name="lb_error_upload">Something went wrong when trying to upload your frequencies. Please check your file and try again.</string>
-    <string name="lb_error_push">Something went wrong when trying to push your frequencies to the receiver. Please try again.</string>
-    <string name="lb_cancel_frequencies">If you go back before frequencies are pushed to receiver the upload will be canceled.</string>
-    <string name="lb_empty_table">0 frequencies</string>
-    <string name="lb_all_frequencies">All Frequencies</string>
-    <string name="lb_delete_frequencies">Delete Frequencies</string>
-    <string name="lb_add_frequency">Add Frequency</string>
-    <string name="lb_tap_frequency">Tap to Edit</string>
-    <string name="lb_view_tables"><u>View All Tables</u></string>
-    <string name="lb_enter_frequency_digits">Enter Frequency Digits</string>
-    <string name="lb_select_frequencies_delete">Select Frequencies to Delete</string>
-    <string name="lb_frequency_saved">Frequency Saved</string>
-    <string name="lb_frequency_added">Frequency Added</string>
-    <string name="lb_frequencies_deleted">Frequencies Deleted</string>
-    <string name="lb_no_frequencies">No frequencies in this table.</string>
-    <string name="lb_save_changes">Save Changes</string>
-    <string name="lb_temperature_coefficients">Temperature Coefficients</string>
-    <string name="lb_coefficient_a">Coef-a</string>
-    <string name="lb_coefficient_b">Coef-b</string>
-    <string name="lb_constant">Constant</string>
-    <string name="lb_enter_coefficient_a">Enter Coef-a Digits</string>
-    <string name="lb_enter_coefficient_b">Enter Coef-b Digits</string>
-    <string name="lb_enter_constant">Enter Constant Digits</string>
-    <string name="lb_save">Save</string>
-    <string name="lb_cant_empty_table">Can\'t Empty Table</string>
-    <string name="lb_table_empty_message">This table cannot be emptied while it is selected as a scan table in the default settings, please remove from there first.</string>
-    <string name="lb_edit_defaults">Edit Default Settings</string>
+    <!-- SUB-SECTION: MOBILE SCAN -->
+    <string name="title_vhf_mobile_settings">Mobile Scanning</string>
+    <string name="title_vhf_mobile_scanning">Mobile Scanning ...</string>
+    <string name="title_vhf_mobile_merge_table">Merge Table</string>
+    <string name="lbl_vhf_mobile_scan_settings">Scan Settings</string>
+    <string name="lbl_vhf_mobile_scan_time_seconds">Scan Time (Seconds)</string>
+    <string name="lbl_vhf_mobile_scan_rate">Scan Rate</string>
+    <string name="lbl_vhf_mobile_number_antennas">Number of Antennas</string>
+    <string name="lbl_vhf_mobile_auto_record">Auto Record</string>
+    <string name="lbl_vhf_mobile_frequency">Frequency</string>
+    <string name="lbl_vhf_mobile_table_total">Table Total</string>
+    <string name="lbl_vhf_mobile_current_index">Current Index</string>
+    <string name="lbl_vhf_mobile_gps_searching">GPS: Searching</string>
+    <string name="lbl_vhf_mobile_gps_off">GPS: Off</string>
+    <string name="lbl_vhf_mobile_gps_valid">GPS: Valid</string>
+    <string name="lbl_vhf_mobile_gps_failed">GPS: Failed</string>
+    <string name="lbl_vhf_mobile_non_coded_detection">Non Coded Detection Filter</string>
+    <string name="lbl_vhf_mobile_filter_type">Filter Type</string>
+    <string name="lbl_vhf_mobile_frequency_deleted">Frequency Deleted</string>
+    <string name="lbl_vhf_mobile_tables_merged">Table Merged</string>
+    <string name="lbl_vhf_mobile_select_table_merge">Select a table to merge into scan table</string>
+    <string name="lbl_vhf_mobile_fatal_scan_error">Fatal Scan Error</string>
+    <string name="lbl_vhf_mobile_receiver_repair">Please send receiver in for repairs.</string>
+    <string name="btn_vhf_mobile_start_scan">Start Mobile Scan</string>
+    <string name="btn_vhf_mobile_edit_table"><u>Edit Table</u></string>
+    <string name="btn_vhf_mobile_hold">Hold Frequency</string>
+    <string name="btn_vhf_mobile_release">Release Frequency</string>
+    <string name="btn_vhf_mobile_stop_recording">Stop Recording</string>
+    <string name="btn_vhf_mobile_view_detection_filter"><u>View Detection Filter Settings</u></string>
+    <string name="btn_vhf_mobile_edit_default_settings">Edit Default Settings</string>
+    <string name="btn_vhf_mobile_add_frequency_scan">Add a Frequency to Table</string>
+    <string name="btn_vhf_mobile_delete_frequency_scan">Delete Current Frequency From Table</string>
+    <string name="btn_vhf_mobile_merge_table_scan">Merge Table Into Table</string>
+    <string name="btn_vhf_mobile_dismiss">Dismiss</string>
 
-    <!--EDIT RECEIVER DEFAULTS-->
-    <string name="edit_receiver_defaults">Edit Receiver Defaults</string>
-    <string name="lb_aerial_defaults">Edit Mobile Defaults</string>
-    <string name="lb_stationary_defaults">Edit Stationary Defaults</string>
+    <!-- SUB-SECTION: EDIT TABLE SCAN -->
+    <string name="title_vhf_mobile_edit_table">Merge Table</string>
+    <string name="lbl_vhf_mobile_edit_table_select_merge">Select a table to merge into scan table</string>
+    <string name="lbl_vhf_mobile_edit_table_freq_deleted">Frequency Deleted</string>
+    <string name="lbl_vhf_mobile_edit_table_success_merge">Table Merged</string>
+    <string name="btn_vhf_mobile_edit_table_add_freq">Add a Frequency to Table</string>
+    <string name="btn_vhf_mobile_edit_table_delete_freq">Delete Current Frequency From Table</string>
+    <string name="btn_vhf_mobile_edit_table_merge_into">Merge Table Into Table</string>
 
-    <!--AERIAL DEFAULTS-->
-    <string name="aerial_defaults">Mobile Default Settings</string>
-    <string name="lb_aerial_settings">Mobile Settings</string>
-    <string name="lb_scan_table">Scan Table</string>
-    <string name="lb_select_value">Select Value</string>
+    <!-- SUB-SECTION: STATIONARY SCAN -->
+    <string name="title_vhf_stationary_settings">Stationary Scanning</string>
+    <string name="title_vhf_stationary_scanning">Stationary Scanning ...</string>
+    <string name="lbl_vhf_stationary_store_rate">Store Rate (Minutes)</string>
+    <string name="lbl_vhf_stationary_data_transfer">External Data Transfer</string>
+    <string name="lbl_vhf_stationary_scan_details">Scan Details</string>
+    <string name="lbl_vhf_stationary_current_antenna">Antenna #</string>
+    <string name="lbl_vhf_stationary_reference_freq">Reference Frequency</string>
+    <string name="lbl_vhf_stationary_reference_freq_val">Reference Frequency Value</string>
+    <string name="btn_vhf_stationary_start_scan">Start Stationary Scan</string>
 
-    <!--STATIONARY DEFAULTS-->
-    <string name="stationary_defaults">Stationary Default Settings</string>
-    <string name="tables_scan">Frequency Tables to Scan</string>
-    <string name="store_rate">Store Rate</string>
-    <string name="lb_stationary_settings">Stationary Settings</string>
-    <string name="lb_scan_tables">Scan Tables</string>
-    <string name="lb_scan_timeout">Timeout (Seconds)</string>
-    <string name="lb_select_store_rate">Select Store Rate</string>
-    <string name="lb_continuous_store">Continuous Store</string>
-    <string name="lb_5_minutes">5 minutes</string>
-    <string name="lb_10_minutes">10 minutes</string>
-    <string name="lb_15_minutes">15 minutes</string>
-    <string name="lb_30_minutes">30 minutes</string>
-    <string name="lb_60_minutes">60 minutes</string>
-    <string name="lb_120_minutes">120 minutes</string>
-    <string name="lb_reference_frequency_store_rate">Reference Frequency Store Rate (Minutes)</string>
-    <string name="lb_no_reference_frequency">No Reference Frequency</string>
+    <!-- SUB-SECTION: RECEIVER CONFIGURATION -->
+    <string name="title_vhf_config_main">Receiver Configuration</string>
+    <string name="lbl_vhf_config_not_set">Not Set</string>
+    <string name="btn_vhf_config_edit_tables">Edit Frequency Tables</string>
+    <string name="btn_vhf_config_edit_defaults">Edit Receiver Defaults</string>
+    <string name="btn_vhf_config_set_detection_filter">Set Detection Filter</string>
+    <string name="btn_vhf_config_clone_receiver">Clone From Other Receiver</string>
 
-    <!--SET TRANSMITTER TYPE-->
-    <string name="set_transmitter_type">Select Detection Filter</string>
-    <string name="pulse_rate_type_options">Pulse Rate Type Options</string>
-    <string name="matches_for_valid_pattern">Matches for Valid Pattern</string>
-    <string name="min_pulse_rate">Minimum Pulse Rate</string>
-    <string name="max_pulse_rate">Maximum Pulse Rate</string>
-    <string name="optional_data_calculations">Optional Data Calculations</string>
-    <string name="target_pulse_rate_1">Target Pulse Rate 1</string>
-    <string name="target_pulse_rate_2">Target Pulse Rate 2</string>
-    <string name="target_pulse_rate_3">Target Pulse Rate 3</string>
-    <string name="target_pulse_rate_4">Target Pulse Rate 4</string>
-    <string name="lb_select_detection_message">Please select a transmitter detection filter to continue. You can change this later in receiver options.</string>
-    <string name="lb_coded">Coded</string>
-    <string name="lb_non_coded_fixed">Non Coded (Fixed Pulse Rate)</string>
-    <string name="lb_non_coded_variable">Non Coded (Variable Pulse Rate)</string>
-    <string name="lb_continue">Continue</string>
-    <string name="lb_transmitter_detection">Transmitter Detection Filter Options</string>
-    <string name="lb_pulse_rate_type">Pulse Rate Type</string>
-    <string name="lb_matches_for_valid_pattern">Matches for Valid Pattern</string>
-    <string name="lb_max_pulse_rate">Max Pulse Rate (ppm)</string>
-    <string name="lb_min_pulse_rate">Min Pulse Rate (ppm)</string>
-    <string name="lb_optional_data">Optional Data Calculation</string>
-    <string name="lb_target_pulse_rates">Target Pulse Rates</string>
-    <string name="lb_pr1">PR1 (ppm)</string>
-    <string name="lb_pr1_tolerance">Period 1 Tolerance (ms)</string>
-    <string name="lb_pr2">PR2 (ppm)</string>
-    <string name="lb_pr2_tolerance">Period 2 Tolerance (ms)</string>
-    <string name="lb_pr3">PR3 (ppm)</string>
-    <string name="lb_pr3_tolerance">Period 3 Tolerance (ms)</string>
-    <string name="lb_pr4">PR4 (ppm)</string>
-    <string name="lb_pr4_tolerance">Period 4 Tolerance (ms)</string>
-    <string name="lb_select_pulse_rate">Select Pulse Rate Type</string>
-    <string name="lb_temperature">Temperature</string>
-    <string name="lb_number_matches">Number of Matches</string>
-    <string name="lb_data_calculation_types">Data Calculation Types</string>
+    <!-- SUB-SECTION: EDIT FREQUENCY TABLES -->
+    <string name="title_vhf_tables_edit">Edit Frequency Tables</string>
+    <string name="title_vhf_tables_summary">Table Summary</string>
+    <string name="title_vhf_tables_delete_selection">Select Frequencies to Delete</string>
+    <string name="title_vhf_tables_coefficients">Temperature Coefficients</string>
+    <string name="lbl_vhf_tables_loaded">Tables Loaded</string>
+    <string name="lbl_vhf_tables_select">Select a Table</string>
+    <string name="lbl_vhf_tables_importing">Importing Tables ...</string>
+    <string name="lbl_vhf_tables_imported">Frequencies Imported</string>
+    <string name="lbl_vhf_tables_pushing">Pushing Frequencies ...</string>
+    <string name="lbl_vhf_tables_pushed">Frequencies pushed to receiver</string>
+    <string name="lbl_vhf_tables_empty_count">0 frequencies</string>
+    <string name="lbl_vhf_tables_all">All Frequencies</string>
+    <string name="lbl_vhf_tables_tap_to_edit">Tap to Edit</string>
+    <string name="lbl_vhf_tables_enter_digits">Enter Frequency Digits</string>
+    <string name="lbl_vhf_tables_saved">Frequency Saved</string>
+    <string name="lbl_vhf_tables_added">Frequency Added</string>
+    <string name="lbl_vhf_tables_deleted">Frequencies Deleted</string>
+    <string name="lbl_vhf_tables_none">No frequencies in this table.</string>
+    <string name="lbl_vhf_tables_coef_a">Coef-a</string>
+    <string name="lbl_vhf_tables_coef_b">Coef-b</string>
+    <string name="lbl_vhf_tables_constant">Constant</string>
+    <string name="lbl_vhf_tables_enter_coef_a">Enter Coef-a Digits</string>
+    <string name="lbl_vhf_tables_enter_coef_b">Enter Coef-b Digits</string>
+    <string name="lbl_vhf_tables_enter_constant">Enter Constant Digits</string>
+    <string name="lbl_vhf_tables_note_overwrite">Note: pushing frequencies to receiver will overwrite any existing ones.</string>
+    <string name="lbl_vhf_tables_warn_removed">Removed Frequencies</string>
+    <string name="lbl_vhf_tables_warn_removed_msg">Some frequencies were out of range and automatically removed. Tap to view removed frequencies.</string>
+    <string name="lbl_vhf_tables_cancel_confirm_msg">If you go back before frequencies are pushed to receiver the upload will be canceled.</string>
+    <string name="lbl_vhf_tables_cancel_upload_question">Cancel Frequency Upload?</string>
+    <string name="lbl_vhf_tables_cant_empty_msg">This table cannot be emptied while it is selected as a scan table in the default settings, please remove from there first.</string>
+    <string name="err_vhf_tables_generic">Error</string>
+    <string name="err_vhf_tables_upload">Something went wrong when trying to upload your frequencies. Please check your file and try again.</string>
+    <string name="err_vhf_tables_push">Something went wrong when trying to push your frequencies to the receiver. Please try again.</string>
+    <string name="err_vhf_tables_cant_empty">Can\'t Empty Table</string>
+    <string name="btn_vhf_tables_load_file">Load From File</string>
+    <string name="btn_vhf_tables_push_receiver">Push Frequencies to Receiver</string>
+    <string name="btn_vhf_tables_return_upload">Return to Upload</string>
+    <string name="btn_vhf_tables_cancel_upload">Cancel Upload</string>
+    <string name="btn_vhf_tables_delete_frequencies">Delete Frequencies</string>
+    <string name="btn_vhf_tables_add_frequency">Add Frequency</string>
+    <string name="btn_vhf_tables_view_all">View All Tables</string>
+    <string name="btn_vhf_tables_save_changes">Save Changes</string>
+    <string name="btn_vhf_tables_save">Save</string>
+    <string name="btn_vhf_tables_edit_defaults">Edit Default Settings</string>
 
-    <!--CLONE RECEIVER-->
-    <string name="clone_receiver">Clone Receiver</string>
-    <string name="lb_no_receiver_detected">No Receivers Detected</string>
-    <string name="lb_make_sure_receivers">Make sure receivers are on and connected via the clone cable.</string>
-    <string name="lb_retry_receiver_search">Retry Receiver Search</string>
-    <string name="lb_ready_clone">Ready to Clone</string>
-    <string name="lb_start_cloning">Start Cloning</string>
-    <string name="lb_cloning">Cloning ...</string>
+    <!-- SUB-SECTION: EDIT RECEIVER DEFAULTS -->
+    <string name="title_vhf_defaults_main">Edit Receiver Defaults</string>
+    <string name="title_vhf_defaults_mobile">Mobile Default Settings</string>
+    <string name="title_vhf_defaults_stationary">Stationary Default Settings</string>
+    <string name="lbl_vhf_defaults_mobile_settings">Mobile Settings</string>
+    <string name="lbl_vhf_defaults_mobile_scan_table">Scan Table</string>
+    <string name="lbl_vhf_defaults_mobile_select_val">Select Value</string>
+    <string name="lbl_vhf_defaults_stationary_settings">Stationary Settings</string>
+    <string name="lbl_vhf_defaults_stationary_tables_scan">Frequency Tables to Scan</string>
+    <string name="lbl_vhf_defaults_stationary_scan_tables">Scan Tables</string>
+    <string name="lbl_vhf_defaults_stationary_timeout">Timeout (Seconds)</string>
+    <string name="lbl_vhf_defaults_stationary_reference_rate">Reference Frequency Store Rate (Minutes)</string>
+    <string name="lbl_vhf_defaults_stationary_no_reference">No Reference Frequency</string>
+    <string name="lbl_vhf_defaults_store_rate_title">Store Rate</string>
+    <string name="lbl_vhf_defaults_store_rate_select">Select Store Rate</string>
+    <string name="lbl_vhf_defaults_store_rate_continuous">Continuous Store</string>
+    <string name="lbl_vhf_defaults_store_rate_5m">5 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_10m">10 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_15m">15 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_30m">30 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_60m">60 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_120m">120 minutes</string>
+    <string name="btn_vhf_defaults_go_mobile">Edit Mobile Defaults</string>
+    <string name="btn_vhf_defaults_go_stationary">Edit Stationary Defaults</string>
 
-    <!--MANAGE RECEIVER DATA-->
-    <string name="manage_receiver_data">Manage Receiver Data</string>
-    <string name="lb_download_data">Download Data in Memory</string>
-    <string name="lb_erase_data">Delete Receiver Data in Memory</string>
-    <string name="lb_delete_receiver_data">Delete Receiver Data</string>
-    <string name="lb_begin_download_note">Note: preparing the file requires downloading the data, then processing it in real time. These steps can take several minutes to complete.</string>
-    <string name="lb_download_receiver_data">Download Receiver Data</string>
-    <string name="lb_begin_download">Begin Download</string>
-    <string name="lb_downloading_data">Downloading Data</string>
-    <string name="lb_processing_data">Processing Data</string>
-    <string name="lb_preparing_file">Preparing File</string>
-    <string name="lb_cancel_download">Cancel Download</string>
-    <string name="lb_download_complete">Download Complete</string>
-    <string name="lb_open_file">Open File Location</string>
-    <string name="lb_return"><u>Return to Main Menu</u></string>
-    <string name="lb_delete_all">Are you sure you want to delete all data blocks in memory?</string>
-    <string name="lb_deleting">Deleting Memory ...</string>
-    <string name="lb_return_screen">Return to Data Screen</string>
-    <string name="lb_deletion_complete">Deletion Complete</string>
+    <!-- SUB-SECTION: SET DETECTION FILTER -->
+    <string name="title_vhf_detection_main">Select Detection Filter</string>
+    <string name="title_vhf_detection_options">Transmitter Detection Filter Options</string>
+    <string name="title_vhf_detection_pulse_rate_type">Transmitter Filter Type</string>
+    <string name="lbl_vhf_detection_guide_msg">Please select a transmitter detection filter to continue. You can change this later in receiver options.</string>
+    <string name="lbl_vhf_detection_pulse_rate_type_label">Pulse Rate Type</string>
+    <string name="lbl_vhf_detection_select_pulse_rate_msg">Select Pulse Rate Type</string>
+    <string name="lbl_vhf_detection_matches_pattern">Matches for Valid Pattern</string>
+    <string name="lbl_vhf_detection_matches_number">Number of Matches</string>
+    <string name="lbl_vhf_detection_min_pulse_rate">Minimum Pulse Rate</string>
+    <string name="lbl_vhf_detection_min_pulse_rate_ppm">Min Pulse Rate (ppm)</string>
+    <string name="lbl_vhf_detection_max_pulse_rate">Maximum Pulse Rate</string>
+    <string name="lbl_vhf_detection_max_pulse_rate_ppm">Max Pulse Rate (ppm)</string>
+    <string name="lbl_vhf_detection_optional_data">Optional Data Calculations</string>
+    <string name="lbl_vhf_detection_optional_data_calc">Optional Data Calculation</string>
+    <string name="lbl_vhf_detection_data_calc_types">Data Calculation Types</string>
+    <string name="lbl_vhf_detection_temperature">Temperature</string>
+    <string name="lbl_vhf_detection_target_rates_title">Pulse Rates</string>
+    <string name="lbl_vhf_detection_target_pr1">Target Pulse Rate 1</string>
+    <string name="lbl_vhf_detection_target_pr1_ppm">PR1 (ppm)</string>
+    <string name="lbl_vhf_detection_target_pr1_tolerance">PR1 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr2">Target Pulse Rate 2</string>
+    <string name="lbl_vhf_detection_target_pr2_ppm">PR2 (ppm)</string>
+    <string name="lbl_vhf_detection_target_pr2_tolerance">PR2 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr3">Target Pulse Rate 3</string>
+    <string name="lbl_vhf_detection_target_pr3_ppm">PR3 (ppm)</string>
+    <string name="lbl_vhf_detection_target_pr3_tolerance">PR3 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr4">Target Pulse Rate 4</string>
+    <string name="lbl_vhf_detection_target_pr4_ppm">PR4 (ppm)</string>
+    <string name="lbl_vhf_detection_target_pr4_tolerance">PR4 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_type_coded">Coded</string>
+    <string name="lbl_vhf_detection_type_non_coded_fixed">Non Coded (Fixed Pulse Rate)</string>
+    <string name="lbl_vhf_detection_type_non_coded_variable">Non Coded (Variable Pulse Rate)</string>
+    <string name="btn_vhf_detection_continue">Continue</string>
+
+    <!-- SUB-SECTION: CLONE RECEIVER -->
+    <string name="title_vhf_clone_main">Clone Receiver</string>
+    <string name="lbl_vhf_clone_no_device_detected">No Receivers Detected</string>
+    <string name="lbl_vhf_clone_cable_instruction">Make sure receivers are on and connected via the clone cable.</string>
+    <string name="lbl_vhf_clone_ready">Ready to Clone</string>
+    <string name="lbl_vhf_clone_processing">Cloning ...</string>
+    <string name="btn_vhf_clone_retry_search">Retry Receiver Search</string>
+    <string name="btn_vhf_clone_start">Start Cloning</string>
+
+    <!-- SUB-SECTION: MANAGE RECEIVER DATA -->
+    <string name="title_vhf_data_main">Manage Receiver Data</string>
+    <string name="title_vhf_data_delete">Delete Receiver Data</string>
+    <string name="title_vhf_data_download">Download Receiver Data</string>
+    <string name="lbl_vhf_data_download_note">Note: preparing the file requires downloading the data, then processing it in real time. These steps can take several minutes to complete.</string>
+    <string name="lbl_vhf_data_delete_confirm_msg">Are you sure you want to delete all data blocks in memory?</string>
+    <string name="lbl_vhf_data_status_downloading">Downloading Data</string>
+    <string name="lbl_vhf_data_status_processing">Processing Data</string>
+    <string name="lbl_vhf_data_status_preparing">Preparing File</string>
+    <string name="lbl_vhf_data_status_deleting">Deleting Memory ...</string>
+    <string name="lbl_vhf_data_success_download">Download Complete</string>
+    <string name="lbl_vhf_data_success_delete">Deletion Complete</string>
+    <string name="btn_vhf_data_download_menu">Download Data in Memory</string>
+    <string name="btn_vhf_data_erase_menu">Delete Receiver Data in Memory</string>
+    <string name="btn_vhf_data_begin_download">Begin Download</string>
+    <string name="btn_vhf_data_cancel_download">Cancel Download</string>
+    <string name="btn_vhf_data_open_file">Open File Location</string>
+    <string name="btn_vhf_data_return_main"><u>Return to Main Menu</u></string>
+    <string name="btn_vhf_data_return_screen">Return to Data Screen</string>
 
     <!--CONVERT RAW DATA (SD CARD)-->
-    <string name="convert_raw_data">Convert Raw Data (SD Card)</string>
-    <string name="lb_file_source">File Source</string>
-    <string name="lb_none_detected">None Detected</string>
-    <string name="lb_message_none_detected">Please check your mobile device and ensure an SD Card is connected.</string>
-    <string name="lb_selected_file">Selected File</string>
-    <string name="lb_select_file">Select File</string>
-    <string name="lb_convert_data_file">Convert Data File</string>
-    <string name="lb_converting_raw_file">Converting Raw File ...</string>
-    <string name="lb_cancel_conversion">Cancel Conversion</string>
-    <string name="lb_file_converted">File Converted</string>
+    <string name="title_vhf_raw_main">Convert Raw Data (SD Card)</string>
+    <string name="lbl_vhf_raw_file_source">File Source</string>
+    <string name="lbl_vhf_raw_none_detected">None Detected</string>
+    <string name="lbl_vhf_raw_sd_card_warning_msg">Please check your mobile device and ensure an SD Card is connected.</string>
+    <string name="lbl_vhf_raw_selected_file">Selected File</string>
+    <string name="lbl_vhf_raw_status_converting">Converting Raw File ...</string>
+    <string name="lbl_vhf_raw_success_converted">File Converted</string>
+    <string name="btn_vhf_raw_select_file">Select File</string>
+    <string name="btn_vhf_raw_convert_file">Convert Data File</string>
+    <string name="btn_vhf_raw_cancel_conversion">Cancel Conversion</string>
 
     <!--TEST RECEIVER-->
     <string name="receiver_diagnostics">Run Receiver Diagnostics</string>
@@ -324,14 +347,14 @@
     <string name="lb_up_to_date">Up to Date</string>
     <string name="lb_update_receiver">Update Receiver</string>
 
-    <string-array name="antennas">
+    <string-array name="array_vhf_stationary_antennas">
         <item>1</item>
         <item>2</item>
         <item>3</item>
         <item>4</item>
     </string-array>
 
-    <string-array name="scanRateMobile">
+    <string-array name="array_vhf_mobile_scan_rate">
         <item>1.5</item>
         <item>2.0</item>
         <item>2.5</item>
@@ -383,7 +406,7 @@
         <item>25.5</item>
     </string-array>
 
-    <string-array name="scanRateStationary">
+    <string-array name="array_vhf_stationary_scan_rate">
         <item>10</item>
         <item>11</item>
         <item>12</item>
@@ -632,7 +655,7 @@
         <item>255</item>
     </string-array>
 
-    <string-array name="timeout">
+    <string-array name="array_vhf_stationary_timeout">
         <item>4</item>
         <item>5</item>
         <item>6</item>
@@ -832,7 +855,7 @@
         <item>200</item>
     </string-array>
 
-    <string-array name="referenceFrequencyStoreRate">
+    <string-array name="array_vhf_stationary_reference_rate">
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -860,7 +883,7 @@
         <item>24</item>
     </string-array>
 
-    <string-array name="pulseRateTolerance">
+    <string-array name="array_vhf_detection_pulse_tolerance">
         <item>4</item>
         <item>5</item>
         <item>6</item>
@@ -898,44 +921,56 @@
     <string name="lb_dismiss">Dismiss</string>
     <string name="lb_update_now">Update Now</string>
 
-    <!-- - - - - - BLUETOOTH RECEIVER - - - - - -->
-    <!--HOME-->
-    <string name="bluetooth_beacon">BluTrack Beacon</string>
-    <string name="lb_detect_tags">Detect Tags</string>
+    <!-- ========================================== -->
+    <!-- MODULE: BLUETOOTH RECEIVER (BLUTRACK)      -->
+    <!-- ========================================== -->
 
-    <!--TAGS-->
-    <string name="tag_detection">TAG DETECTION</string>
-    <string name="lb_disable">Disable</string>
-    <string name="lb_enable">Enable</string>
-    <string name="lb_location_disabled">Location Data (Disabled)</string>
-    <string name="lb_location_enabled">Location Data (Enabled)</string>
-    <string name="lb_location_unknown">Location: Unknown</string>
-    <string name="lb_detected_tags">Detected Tags:</string>
-    <string name="lb_export_data">Export Data</string>
-    <string name="lb_rssi">RSSI (dBm): </string>
-    <string name="lb_time_since">Time Since (secs): </string>
-    <string name="lb_temperature_c">Temperature (C): </string>
-    <string name="lb_voltage">Voltage (mV): </string>
-    <string name="lb_isolate_audio">Isolate Audio</string>
-    <string name="lb_view_tag">Plot Tag Data</string>
-    <string name="lb_chart">Chart</string>
-    <string name="lb_chart_type">Chart Type</string>
+    <!-- SUB-SECTION: HOME -->
+    <string name="title_bt_home">BLUTRACK BEACON</string>
+    <string name="btn_bt_home_detect_tags">Detect Tags</string>
 
-    <string-array name="chartTypes">
+    <!-- SUB-SECTION: TAG DETECTION & TELEMETRY -->
+    <string name="title_bt_tag_detection">Tag Detection</string>
+    <string name="lbl_bt_tag_location_disabled">Location Data (Disabled)</string>
+    <string name="lbl_bt_tag_location_enabled">Location Data (Enabled)</string>
+    <string name="lbl_bt_tag_location_unknown">Location: Unknown</string>
+    <string name="lbl_bt_tag_detected_count">Detected Tags:</string>
+    <string name="lbl_bt_tag_rssi">RSSI (dBm): </string>
+    <string name="lbl_bt_tag_time_since">Time Since (secs): </string>
+    <string name="lbl_bt_tag_temperature_c">Temperature (C): </string>
+    <string name="lbl_bt_tag_voltage">Voltage (mV): </string>
+    <string name="lbl_bt_tag_chart_type">Chart Type:</string>
+    <string name="lbl_bt_tag_time">∆ Time:</string>
+    <string name="lbl_bt_tag_option_disable">Disable</string>
+    <string name="lbl_bt_tag_option_enable">Enable</string>
+    <string name="btn_bt_tag_export_data">Export Data</string>
+    <string name="btn_bt_tag_isolate_audio">Isolate Audio</string>
+    <string name="btn_bt_tag_plot_data">Plot Tag Data</string>
+    <string name="btn_bt_tag_view_chart">Chart</string>
+    <string-array name="array_bt_tag_chart_types">
         <item>RSSI</item>
         <item>Voltage</item>
         <item>Temperature</item>
     </string-array>
+    <string-array name="array_bt_tag_times">
+        <item>10 Seconds</item>
+        <item>30 Seconds</item>
+        <item>1 Minute</item>
+        <item>5 Minutes</item>
+    </string-array>
 
-    <!-- - - - - - FIRMWARE UPDATE - - - - - -->
-    <string name="firmware_update">Firmware Update</string>
-    <string name="lb_select_firmware">Select Firmware Version</string>
-    <string name="lb_firmware_file">The latest version of the firmware file will be downloaded before installing.</string>
-    <string name="lb_begin_update">Begin Update</string>
-    <string name="lb_downloading_file">Downloading File</string>
-    <string name="lb_checking_file">Checking File</string>
-    <string name="lb_installing_firmware">Installing Firmware</string>
-    <string name="lb_installation_complete">Installation Complete</string>
-    <string name="lb_return_device_screen">Return to Device Screen</string>
-    <string name="lb_cancel_update">Cancel Update</string>
+    <!-- ========================================== -->
+    <!-- MODULE: FIRMWARE UPDATE                    -->
+    <!-- ========================================== -->
+
+    <string name="title_fw_update_main">Firmware Update</string>
+    <string name="lbl_fw_update_select_version">Select Firmware Version</string>
+    <string name="lbl_fw_update_file_desc">The latest version of the firmware file will be downloaded before installing.</string>
+    <string name="lbl_fw_update_status_downloading">Downloading File</string>
+    <string name="lbl_fw_update_status_checking">Checking File</string>
+    <string name="lbl_fw_update_status_installing">Installing Firmware</string>
+    <string name="lbl_fw_update_success_complete">Installation Complete</string>
+    <string name="btn_fw_update_begin">Begin Update</string>
+    <string name="btn_fw_update_cancel">Cancel Update</string>
+    <string name="btn_fw_update_return_device">Return to Device Screen</string>
 </resources>

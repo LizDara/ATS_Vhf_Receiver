@@ -11,7 +11,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
         android:layout_marginBottom="16sp"
-        android:text="@string/lb_frequency"
+        android:text="@string/lbl_vhf_mobile_frequency"
         android:textColor="@color/black"
         android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
         android:layout_marginBottom="16sp"
-        android:text="@string/lb_temperature_coefficients"
+        android:text="@string/title_vhf_tables_coefficients"
         android:textColor="@color/black"
         android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="8sp"
-        android:text="@string/lb_coefficient_a"
+        android:text="@string/lbl_vhf_tables_coef_a"
         android:textColor="@color/black" />
 
     <Button
@@ -56,7 +56,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="8sp"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_coefficient_b"
+        android:text="@string/lbl_vhf_tables_coef_b"
         android:textColor="@color/black" />
 
     <Button
@@ -73,7 +73,7 @@
         android:layout_marginHorizontal="16sp"
         android:layout_marginBottom="8sp"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_constant"
+        android:text="@string/lbl_vhf_tables_constant"
         android:textColor="@color/black" />
 
     <Button
@@ -95,6 +95,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginVertical="16sp"
-        android:text="@string/lb_save_changes" />
+        android:text="@string/btn_vhf_tables_save_changes" />
 
 </LinearLayout>

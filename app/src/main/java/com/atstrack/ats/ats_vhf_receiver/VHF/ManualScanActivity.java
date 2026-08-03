@@ -18,8 +18,7 @@ public class ManualScanActivity extends ScanBaseActivity implements OnDialogCrea
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_fragment;
-        title = getString(R.string.lb_start_scanning);
+        title = getString(R.string.title_vhf_manual_settings);
         scanType = ValueCodes.MANUAL_SCAN_COMMAND;
         super.onCreate(savedInstanceState);
         byte[] data = getIntent().getByteArrayExtra(ValueCodes.VALUE);

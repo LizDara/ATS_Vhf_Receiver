@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
-        android:text="@string/lb_edit_frequency_tables"
+        android:text="@string/btn_vhf_config_edit_tables"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/include_toolbar" />
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="16sp"
-        android:text="@string/lb_edit_receiver_defaults"
+        android:text="@string/btn_vhf_config_edit_defaults"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_edit_frequency_tables" />
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_set_transmitter_type"
+        android:text="@string/btn_vhf_config_set_detection_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_edit_receiver_defaults" />
@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/lb_clone_from_other_receiver"
+        android:text="@string/btn_vhf_config_clone_receiver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_set_transmitter_type" />

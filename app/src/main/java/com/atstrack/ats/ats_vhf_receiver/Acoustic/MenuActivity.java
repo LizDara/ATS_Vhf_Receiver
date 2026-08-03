@@ -4,63 +4,38 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Services.FirmwareServiceHelper;
-import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Models.ReceiverInformation;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 import java.nio.charset.StandardCharsets;
 
-import butterknife.BindView;
-import butterknife.OnClick;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityAcousticMenuBinding;
 
 public class MenuActivity extends BaseActivity {
-
-    @BindView(R.id.acoustic_name_textView)
-    TextView acoustic_name_textView;
-    @BindView(R.id.battery_voltage_textView)
-    TextView battery_voltage_textView;
-    @BindView(R.id.number_dets_textView)
-    TextView number_dets_textView;
-    @BindView(R.id.battery_usage_textView)
-    TextView battery_usage_textView;
-    @BindView(R.id.utc_time_textView)
-    TextView utc_time_textView;
-    @BindView(R.id.tilt_textView)
-    TextView tilt_textView;
-    @BindView(R.id.tv_temperature)
-    TextView temperature_textView;
-    @BindView(R.id.pressure_textView)
-    TextView pressure_textView;
-    @BindView(R.id.error_code_textView)
-    TextView error_code_textView;
-
     private final static String TAG = MenuActivity.class.getSimpleName();
-
-    @OnClick(R.id.btn_disconnect)
-    public void onClickDisconnect(View v) {
-        leServiceConnection.getBluetoothLeService().disconnect();
-    }
-
-    @OnClick(R.id.img_menu)
-    public void onClickMenu(View v) {
-        Intent intent = new Intent(this, OptionActivity.class);
-        startActivity(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_acoustic_menu;
         showToolbar = false;
+        binding = ActivityAcousticMenuBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
+        ((ActivityAcousticMenuBinding) binding).acousticDisconnectMenuInclude.btnDisconnect.setOnClickListener(v -> leServiceConnection.getBluetoothLeService().disconnect());
+        ((ActivityAcousticMenuBinding) binding).acousticDisconnectMenuInclude.imgMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), OptionActivity.class);
+                startActivity(intent);
+            }
+        });
+
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
-        acoustic_name_textView.setText(receiverInformation.getSerialNumber() + " Acoustic Receiver");
+        ((ActivityAcousticMenuBinding) binding).acousticNameTextView.setText(receiverInformation.getSerialNumber() + " Acoustic Receiver");
         FirmwareServiceHelper firmwareServiceHelper = new FirmwareServiceHelper(this);
         //firmwareServiceHelper.updateAvailable(false);
     }
@@ -85,16 +60,16 @@ public class MenuActivity extends BaseActivity {
         if (data[0] == ValueCodes.ACOUSTIC_STATUS_COMMAND) {
             Log.i(TAG, Converters.getHexValue(data));
             String volts = new String(new byte[]{data[5], (byte) 46, data[6]}, StandardCharsets.UTF_8);
-            battery_voltage_textView.setText(volts + " V");
+            ((ActivityAcousticMenuBinding) binding).batteryVoltageTextView.setText(volts + " V");
 
             String detections = new String(new byte[]{data[7], data[8], data[9], data[10]});
-            number_dets_textView.setText(String.valueOf(Integer.parseInt(detections)));
+            ((ActivityAcousticMenuBinding) binding).numberDetsTextView.setText(String.valueOf(Integer.parseInt(detections)));
 
             String batteryUsage = new String(new byte[]{data[11], data[12], data[13], data[14]});
-            battery_usage_textView.setText((Integer.parseInt(batteryUsage) * 100) + " mahrs");
+            ((ActivityAcousticMenuBinding) binding).batteryUsageTextView.setText((Integer.parseInt(batteryUsage) * 100) + " mahrs");
 
             String status = (Byte.toUnsignedInt(data[15]) == 97 && Byte.toUnsignedInt(data[16]) == 97) ? "NONE" : "ERROR";
-            error_code_textView.setText(status);
+            ((ActivityAcousticMenuBinding) binding).errorCodeTextView.setText(status);
         }
     }
 }

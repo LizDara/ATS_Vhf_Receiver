@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16sp"
         android:gravity="center"
-        android:text="@string/lb_file_converted"
+        android:text="@string/lbl_vhf_raw_success_converted"
         android:textColor="@color/ebony_clay" />
 
     <TextView

@@ -47,6 +47,7 @@
         android:textColor="@color/slate_900" />
 
     <include
+        android:id="@+id/include_downloading_process"
         layout="@layout/include_downloading_process" />
 
     <Button
@@ -56,6 +57,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24sp"
         android:paddingHorizontal="16sp"
-        android:text="@string/lb_cancel_update" />
+        android:text="@string/btn_fw_update_cancel" />
 
 </LinearLayout>

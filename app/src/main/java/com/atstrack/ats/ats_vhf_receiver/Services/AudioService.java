@@ -8,7 +8,7 @@ import android.util.Log;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 
 public class AudioService {
-    public static final int[] frequencies = {800, 951, 1131, 1345, 1600, 1903, 2263, 2691, 3200, 3806, 4525};
+    public static final int[] frequencies = {800, 951, 1071, 1145, 1290, 1423, 1583, 1711, 1860, 1996, 2135, 2287, 2414, 2562, 2708, 2859, 2996, 3142, 3279, 3433};
 
     public static void emitAudioPulse(int frequency, float rssi, boolean isTagDirectly) {
         int durationMs = 30; // 30ms
@@ -88,8 +88,8 @@ public class AudioService {
             amplitude = (float) Math.pow(2.0, exponent);
         }
 
-        float estimatedMVPP = amplitude * 2800.0f;
-        //Log.d("AudioTest", String.format("RSSI: %.1f | Amp: %.4f | mVpp: %.1f", rssi, amplitude, estimatedMVPP));
+//        float estimatedMVPP = amplitude * 2800.0f;
+//        Log.d("AudioTest", String.format("RSSI: %.1f | Amp: %.4f | mVpp: %.1f", rssi, amplitude, estimatedMVPP));
         return Math.max(0.001f, amplitude);
     }
 }

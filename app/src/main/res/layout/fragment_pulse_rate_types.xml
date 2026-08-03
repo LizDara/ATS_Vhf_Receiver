@@ -11,7 +11,7 @@
         android:layout_marginStart="16sp"
         android:layout_marginTop="24sp"
         android:layout_marginEnd="16sp"
-        android:text="@string/lb_select_pulse_rate"
+        android:text="@string/lbl_vhf_detection_select_pulse_rate_msg"
         android:textColor="@color/limed_spruce" />
 
     <LinearLayout
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_coded"
+            android:text="@string/lbl_vhf_detection_type_coded"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_non_coded_fixed"
+            android:text="@string/lbl_vhf_detection_type_non_coded_fixed"
             android:textColor="@color/ebony_clay" />
 
         <View
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16sp"
-            android:text="@string/lb_non_coded_variable"
+            android:text="@string/lbl_vhf_detection_type_non_coded_variable"
             android:textColor="@color/ebony_clay" />
 
     </LinearLayout>

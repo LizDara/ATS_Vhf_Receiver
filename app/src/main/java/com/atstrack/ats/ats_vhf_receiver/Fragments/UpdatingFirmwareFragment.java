@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,34 +18,14 @@ import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Services.FirmwareServiceHelper;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentUpdatingFirmwareBinding;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
 public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallback {
-    @BindView(R.id.tv_update_progress)
-    TextView tv_update_progress;
-    @BindView(R.id.pb_updating)
-    ProgressBar pb_updating;
-    @BindView(R.id.tv_first_step)
-    TextView tv_first_step;
-    @BindView(R.id.pb_first_step)
-    ProgressBar pb_first_step;
-    @BindView(R.id.tv_second_step)
-    TextView tv_second_step;
-    @BindView(R.id.pb_second_step)
-    ProgressBar pb_second_step;
-    @BindView(R.id.tv_third_step)
-    TextView tv_third_step;
-    @BindView(R.id.pb_third_step)
-    ProgressBar pb_third_step;
-
-    private Unbinder unbinder;
+    private FragmentUpdatingFirmwareBinding binding = null;
     private final String downloadUrl;
     private byte[] firmwareFile;
     private final int MTU = 247;
@@ -59,23 +37,20 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
         this.downloadUrl = downloadUrl;
     }
 
-    @OnClick(R.id.btn_cancel_update)
-    public void onClickCancelUpdate(View v) {
-        if (getParentFragmentManager() != null)
-            getParentFragmentManager().popBackStack();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_updating_firmware, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentUpdatingFirmwareBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnCancelUpdate.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null)
+                getParentFragmentManager().popBackStack();
+        });
         setVisibility(ValueCodes.PROCESSING);
         downloadFile();
     }
@@ -83,44 +58,43 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void setVisibility(int view) {
         if (view == ValueCodes.PROCESSING) {
-            tv_first_step.setText(R.string.lb_downloading_file);
-            tv_second_step.setText(R.string.lb_checking_file);
-            tv_third_step.setText(R.string.lb_installing_firmware);
+            binding.includeDownloadingProcess.tvFirstStep.setText(R.string.lbl_fw_update_status_downloading);
+            binding.includeDownloadingProcess.tvSecondStep.setText(R.string.lbl_fw_update_status_checking);
+            binding.includeDownloadingProcess.tvThirdStep.setText(R.string.lbl_fw_update_status_installing);
 
-            tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-            tv_first_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-            pb_first_step.setVisibility(View.GONE);
-            tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-            tv_second_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-            pb_second_step.setVisibility(View.GONE);
-            tv_third_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
-            tv_third_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
-            pb_third_step.setVisibility(View.GONE);
+            binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+            binding.includeDownloadingProcess.tvFirstStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+            binding.includeDownloadingProcess.pbFirstStep.setVisibility(View.GONE);
+            binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+            binding.includeDownloadingProcess.tvSecondStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+            binding.includeDownloadingProcess.pbSecondStep.setVisibility(View.GONE);
+            binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_light, 0, 0, 0);
+            binding.includeDownloadingProcess.tvThirdStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.slate_gray));
+            binding.includeDownloadingProcess.pbThirdStep.setVisibility(View.GONE);
         } else if (view == ValueCodes.FIRST_STEP) {
-            tv_update_progress.setText(getString(R.string.lb_downloading_file) + " ...");
-            tv_first_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-            tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+            binding.tvUpdateProgress.setText(getString(R.string.lbl_fw_update_status_downloading) + " ...");
+            binding.includeDownloadingProcess.tvFirstStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+            binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
             updateProgress(0);
         } else if (view == ValueCodes.SECOND_STEP) {
-            tv_update_progress.setText(getString(R.string.lb_checking_file) + " ...");
-            tv_first_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
-            tv_second_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-            tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+            binding.tvUpdateProgress.setText(getString(R.string.lbl_fw_update_status_checking) + " ...");
+            binding.includeDownloadingProcess.tvFirstStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+            binding.includeDownloadingProcess.tvSecondStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+            binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
             updateProgress(0);
         } else if (view == ValueCodes.THIRD_STEP) {
-            tv_update_progress.setText(getString(R.string.lb_installing_firmware) + " ...");
-            tv_second_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
-            tv_third_step.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
-            tv_third_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
+            binding.tvUpdateProgress.setText(getString(R.string.lbl_fw_update_status_installing) + " ...");
+            binding.includeDownloadingProcess.tvSecondStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+            binding.includeDownloadingProcess.tvThirdStep.setTextColor(ContextCompat.getColor(requireContext(), R.color.ebony_clay));
+            binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle, 0, 0, 0);
             updateProgress(0);
         } else if (view == ValueCodes.FOURTH_STEP) {
-            tv_third_step.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
+            binding.includeDownloadingProcess.tvThirdStep.setCompoundDrawablesWithIntrinsicBounds(R.drawable.circle_check, 0, 0, 0);
         }
     }
 
@@ -133,7 +107,7 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
-                        pb_updating.setProgress(80);
+                        binding.pbUpdating.setProgress(80);
                         firmwareFile = response.body().bytes();
                         updateProgress(100);
                         Log.d("OTA", "¡Descarga lista! Tamaño: " + firmwareFile.length + " bytes");
@@ -162,8 +136,8 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
 
     private void updateProgress(int value) {
         new Handler(Looper.getMainLooper()).post(() -> {
-            if (isAdded() && getView() != null && pb_updating != null)
-                pb_updating.setProgress(value);
+            if (isAdded() && getView() != null && binding.pbUpdating != null)
+                binding.pbUpdating.setProgress(value);
         });
     }
 
@@ -214,7 +188,7 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
                     if (success) {
                         index += currentChunkSize;
                         packetNumber++;
-                        pb_updating.setProgress((index * 100) / firmwareFile.length);
+                        binding.pbUpdating.setProgress((index * 100) / firmwareFile.length);
                     } else {
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                             if (isAdded() && getView() != null)

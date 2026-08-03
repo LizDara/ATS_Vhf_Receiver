@@ -5,102 +5,94 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-
-import butterknife.BindView;
-import butterknife.OnClick;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfEnterCoefficientBinding;
 
 public class EnterCoefficientActivity extends BaseActivity {
-
-    @BindView(R.id.tv_coefficient)
-    TextView tv_coefficient;
-    @BindView(R.id.btn_save_coefficient)
-    Button btn_save_coefficient;
-
     private int position;
-
-    @OnClick(R.id.btn_plus_minus)
-    public void onClickPlusMinus(View v) {
-        String number = tv_coefficient.getText().toString();
-        if (tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
-                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
-                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
-                tv_coefficient.getText().toString().isEmpty()) {
-            tv_coefficient.setText("-");
-            tv_coefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-            btn_save_coefficient.setEnabled(true);
-            btn_save_coefficient.setAlpha(1);
-        } else {
-            if (number.startsWith("-"))
-                tv_coefficient.setText(number.substring(1));
-            else
-                tv_coefficient.setText("-" + number);
-        }
-    }
-
-    @OnClick({R.id.btn_one_coefficient, R.id.btn_two_coefficient, R.id.btn_three_coefficient, R.id.btn_four_coefficient,
-            R.id.btn_five_coefficient, R.id.btn_six_coefficient, R.id.btn_seven_coefficient, R.id.btn_eight_coefficient,
-            R.id.btn_nine_coefficient, R.id.btn_zero_coefficient})
-    public void onClickNumber(View v) {
-        Button button = (Button) v;
-        if (tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_a)) ||
-                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_coefficient_b)) ||
-                tv_coefficient.getText().toString().equals(getString(R.string.lb_enter_constant)) ||
-                tv_coefficient.getText().toString().isEmpty()) {
-            tv_coefficient.setText(button.getText());
-            tv_coefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
-            btn_save_coefficient.setEnabled(true);
-            btn_save_coefficient.setAlpha(1);
-        } else if (tv_coefficient.getText().toString().length() < 7) {
-            String number = tv_coefficient.getText().toString();
-            tv_coefficient.setText(number + button.getText());
-        }
-    }
-
-    @OnClick(R.id.img_delete_coefficient)
-    public void onClickDelete(View v) {
-        String number = tv_coefficient.getText().toString();
-        if (!number.isEmpty()) {
-            tv_coefficient.setText(number.substring(0, number.length() - 1));
-            if (tv_coefficient.getText().toString().isEmpty()) {
-                btn_save_coefficient.setEnabled(false);
-                btn_save_coefficient.setAlpha((float) 0.6);
-            }
-        }
-    }
-
-    @OnClick(R.id.btn_save_coefficient)
-    public void onClickSaveCoefficient(View v) {
-        Intent intent = new Intent();
-        intent.putExtra(ValueCodes.VALUE, tv_coefficient.getText().toString());
-        intent.putExtra(ValueCodes.POSITION, position);
-        setResult(ValueCodes.RESULT_OK, intent);
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        contentViewId = R.layout.activity_vhf_enter_coefficient;
         showToolbar = true;
         deviceCategory = ValueCodes.VHF;
         title = getIntent().getStringExtra(ValueCodes.TYPE);
+        binding = ActivityVhfEnterCoefficientBinding.inflate(getLayoutInflater());
         super.onCreate(savedInstanceState);
 
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnPlusMinus.setOnClickListener(v -> {
+            String number = ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString();
+            if (((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_coef_a)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_coef_b)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_constant)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().isEmpty()) {
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText("-");
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+                ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setEnabled(true);
+                ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setAlpha(1);
+            } else {
+                if (number.startsWith("-"))
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(number.substring(1));
+                else
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText("-" + number);
+            }
+        });
+        View.OnClickListener listener = v -> {
+            Button button = (Button) v;
+            if (((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_coef_a)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_coef_b)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().equals(getString(R.string.lbl_vhf_tables_enter_constant)) ||
+                    ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().isEmpty()) {
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(button.getText());
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setTextColor(ContextCompat.getColor(this, R.color.ebony_clay));
+                ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setEnabled(true);
+                ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setAlpha(1);
+            } else if (((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().length() < 7) {
+                String number = ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString();
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(number + button.getText());
+            }
+        };
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnOneCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnTwoCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnThreeCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnFourCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnFiveCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnSixCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnSevenCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnEightCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnNineCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.btnZeroCoefficient.setOnClickListener(listener);
+        ((ActivityVhfEnterCoefficientBinding) binding).includeCoefficientsNumber.imgDeleteCoefficient.setOnClickListener(v -> {
+            String number = ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString();
+            if (!number.isEmpty()) {
+                ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(number.substring(0, number.length() - 1));
+                if (((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString().isEmpty()) {
+                    ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setEnabled(false);
+                    ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setAlpha((float) 0.6);
+                }
+            }
+        });
+        ((ActivityVhfEnterCoefficientBinding) binding).btnSaveCoefficient.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putExtra(ValueCodes.VALUE, ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.getText().toString());
+            intent.putExtra(ValueCodes.POSITION, position);
+            setResult(ValueCodes.RESULT_OK, intent);
+            finish();
+        });
+
         String type = getIntent().getStringExtra(ValueCodes.TYPE);
-        if (type.equals(getString(R.string.lb_coefficient_a))) {
-            tv_coefficient.setText(R.string.lb_enter_coefficient_a);
+        if (type.equals(getString(R.string.lbl_vhf_tables_coef_a))) {
+            ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(R.string.lbl_vhf_tables_enter_coef_a);
             position = -2;
-        } else if (type.equals(getString(R.string.lb_coefficient_b))) {
-            tv_coefficient.setText(R.string.lb_enter_coefficient_b);
+        } else if (type.equals(getString(R.string.lbl_vhf_tables_coef_b))) {
+            ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(R.string.lbl_vhf_tables_enter_coef_b);
             position = -3;
-        } else if (type.equals(getString(R.string.lb_constant))) {
-            tv_coefficient.setText(R.string.lb_enter_constant);
+        } else if (type.equals(getString(R.string.lbl_vhf_tables_constant))) {
+            ((ActivityVhfEnterCoefficientBinding) binding).tvCoefficient.setText(R.string.lbl_vhf_tables_enter_constant);
             position = -4;
         }
     }

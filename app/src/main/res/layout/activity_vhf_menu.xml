@@ -21,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <include
+            android:id="@+id/include_disconnect_menu"
             layout="@layout/include_disconnect_menu" />
 
         <LinearLayout
@@ -83,7 +84,7 @@
                             style="@style/body_x_small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/lb_battery"
+                            android:text="@string/lbl_vhf_home_battery"
                             android:textColor="@color/humming_bird" />
 
                         <TextView
@@ -112,7 +113,7 @@
                             style="@style/body_x_small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/lb_sd_card"
+                            android:text="@string/lbl_vhf_home_sd_card"
                             android:textColor="@color/humming_bird"/>
 
                         <TextView
@@ -136,7 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4sp"
-            android:text="@string/lb_start_scanning" />
+            android:text="@string/btn_vhf_home_start_scanning" />
 
     </LinearLayout>
 
@@ -147,7 +148,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
         android:layout_marginTop="24sp"
-        android:text="@string/receiver_configuration"
+        android:text="@string/btn_vhf_home_configure_receiver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_menu" />
@@ -158,7 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/manage_receiver_data"
+        android:text="@string/btn_vhf_home_manage_data"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_receiver_configuration" />
@@ -169,7 +170,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16sp"
-        android:text="@string/convert_raw_data"
+        android:text="@string/btn_vhf_home_convert_raw_data"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_manage_receiver_data" />

@@ -11,7 +11,7 @@
         style="@style/body_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lb_select_value"
+        android:text="@string/lbl_vhf_defaults_mobile_select_val"
         android:textColor="@color/limed_spruce" />
 
     <Spinner

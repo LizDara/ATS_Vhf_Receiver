@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +19,7 @@ import com.atstrack.ats.ats_vhf_receiver.Models.Data;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentConvertingRawBinding;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -27,16 +27,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 public class ConvertingRawFragment extends Fragment {
-    @BindView(R.id.pb_converting_raw)
-    ProgressBar pb_converting_raw;
-
-    private Unbinder unbinder;
+    private FragmentConvertingRawBinding binding = null;
     private final Uri uri;
     private final File rawFile;
 
@@ -45,31 +37,28 @@ public class ConvertingRawFragment extends Fragment {
         this.rawFile = rawFile;
     }
 
-    @OnClick(R.id.btn_cancel_conversion)
-    public void onClickCancelConversion(View v) {
-        if (getParentFragmentManager() != null)
-            getParentFragmentManager().popBackStack();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_converting_raw, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentConvertingRawBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.btnCancelConversion.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().popBackStack();
+            }
+        });
         convertRawData();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (unbinder != null)
-            unbinder.unbind();
+        binding = null;
     }
 
     private void convertRawData() {
@@ -86,7 +75,7 @@ public class ConvertingRawFragment extends Fragment {
                 ArrayList<byte[]> rawList = new ArrayList<>();
                 rawList.add(rawData);
 
-                String processData = Converters.getPackageProcessed(rawList, pb_converting_raw, (BaseActivity) fragmentContext, true);
+                String processData = Converters.getPackageProcessed(rawList, binding.pbConvertingRaw, (BaseActivity) fragmentContext, true);
                 byte[] data = Converters.convertToUTF8(processData);
 
                 Data processedData = new Data(ValueCodes.PROCESSED_FILE);
@@ -123,8 +112,8 @@ public class ConvertingRawFragment extends Fragment {
 
     private void updateProgress(int value) {
         new Handler(Looper.getMainLooper()).post(() -> {
-            if (isAdded() && getView() != null && pb_converting_raw != null)
-                pb_converting_raw.setProgress(value);
+            if (isAdded() && getView() != null && binding.pbConvertingRaw != null)
+                binding.pbConvertingRaw.setProgress(value);
         });
     }
 }

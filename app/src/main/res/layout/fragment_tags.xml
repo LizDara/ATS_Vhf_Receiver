@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_location_enabled"
+                android:text="@string/lbl_bt_tag_location_enabled"
                 android:textColor="@color/black" />
 
             <TextView
@@ -41,7 +41,7 @@
                 style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_location_unknown"
+                android:text="@string/lbl_bt_tag_location_unknown"
                 android:textColor="@color/ebony_clay" />
 
         </LinearLayout>
@@ -51,7 +51,7 @@
             style="@style/button_tertiary_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lb_disable" />
+            android:text="@string/lbl_bt_tag_option_disable" />
 
     </LinearLayout>
 
@@ -60,10 +60,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
-        android:text="@string/lb_detected_tags"
+        android:text="@string/lbl_bt_tag_detected_count"
         android:textStyle="bold" />
 
     <include
+        android:id="@+id/include_recycler_view"
         layout="@layout/include_recycler_view"/>
 
 </LinearLayout>

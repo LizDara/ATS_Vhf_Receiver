@@ -24,7 +24,7 @@
                 style="@style/button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_non_coded_detection"
+                android:text="@string/lbl_vhf_mobile_non_coded_detection"
                 android:textColor="@color/limed_spruce"
                 android:layout_weight="1"
                 android:layout_marginEnd="12sp"/>
@@ -54,7 +54,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_filter_type"
+                    android:text="@string/lbl_vhf_mobile_filter_type"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -70,7 +70,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_pr1"
+                    android:text="@string/lbl_vhf_detection_target_pr1_ppm"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -86,7 +86,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_pr2"
+                    android:text="@string/lbl_vhf_detection_target_pr2_ppm"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -102,7 +102,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/optional_data_calculations"
+                    android:text="@string/lbl_vhf_detection_optional_data_calc"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -125,7 +125,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_matches_for_valid_pattern"
+                    android:text="@string/lbl_vhf_detection_matches_pattern"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -141,7 +141,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_pr1_tolerance"
+                    android:text="@string/lbl_vhf_detection_target_pr1_tolerance"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView
@@ -157,7 +157,7 @@
                     style="@style/body_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lb_pr2_tolerance"
+                    android:text="@string/lbl_vhf_detection_target_pr2_tolerance"
                     android:textColor="@color/limed_spruce"/>
 
                 <TextView

@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/ebony_clay"
-            android:text="@string/lb_converting_raw_file" />
+            android:text="@string/lbl_vhf_raw_status_converting" />
 
     </LinearLayout>
 
@@ -44,6 +44,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="8sp"
-        android:text="@string/lb_cancel_conversion" />
+        android:text="@string/btn_vhf_raw_cancel_conversion" />
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16sp"
@@ -29,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_timeout"
+                android:text="@string/lbl_vhf_defaults_stationary_timeout"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -74,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_time_seconds"
+                android:text="@string/lbl_vhf_mobile_scan_time_seconds"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -119,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_store_rate"
+                android:text="@string/lbl_vhf_stationary_store_rate"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -135,7 +136,8 @@
             android:id="@+id/img_store_rate_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_next" />
+            android:background="@drawable/ic_next"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
@@ -164,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_scan_tables"
+                android:text="@string/lbl_vhf_defaults_stationary_scan_tables"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -177,10 +179,11 @@
         </LinearLayout>
 
         <ImageView
-                android:id="@+id/img_scan_tables_next"
+            android:id="@+id/img_scan_tables_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_next" />
+            android:background="@drawable/ic_next"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
@@ -209,7 +212,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_number_antennas"
+                android:text="@string/lbl_vhf_mobile_number_antennas"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -250,7 +253,7 @@
                 style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_external_data_transfer"
+                android:text="@string/lbl_vhf_stationary_data_transfer"
                 android:textColor="@color/limed_spruce" />
 
             <Space
@@ -282,7 +285,7 @@
                 style="@style/body_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_reference_frequency"
+                android:text="@string/lbl_vhf_stationary_reference_freq"
                 android:textColor="@color/limed_spruce" />
 
             <Space
@@ -325,7 +328,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_external_data_transfer"
+                android:text="@string/lbl_vhf_stationary_data_transfer"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -355,7 +358,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_reference_frequency"
+                android:text="@string/lbl_vhf_stationary_reference_freq"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -394,7 +397,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_reference_frequency_value"
+                android:text="@string/lbl_vhf_stationary_reference_freq_val"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -410,7 +413,8 @@
             android:id="@+id/img_reference_frequency_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_next" />
+            android:background="@drawable/ic_next"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
@@ -439,7 +443,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lb_reference_frequency_store_rate"
+                android:text="@string/lbl_vhf_defaults_stationary_reference_rate"
                 android:textColor="@color/limed_spruce" />
 
             <TextView
@@ -455,7 +459,8 @@
             android:id="@+id/img_reference_store_rate_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_next" />
+            android:background="@drawable/ic_next"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 

@@ -80,12 +80,6 @@ public class BluetoothTagDetectionActivity extends BaseActivity {
     }
 
     @Override
-    protected void gattDisconnected() {
-        unbindService(leServiceConnection.getServiceConnection());
-        super.gattDisconnected();
-    }
-
-    @Override
     protected void discoverCharacteristic() {
         TransferBleData.requestMtu(247, false);
         new Handler(getMainLooper()).postDelayed(() -> TransferBleData.receiveTags(true), ValueCodes.WAITING_PERIOD);

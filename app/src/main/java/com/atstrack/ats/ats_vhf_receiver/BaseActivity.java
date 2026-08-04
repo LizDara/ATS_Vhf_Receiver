@@ -100,7 +100,6 @@ public class BaseActivity extends AppCompatActivity {
                 dialog.dismiss();
         }
         dialogList.clear();
-        Log.i(TAG, "ON DESTROY ACTIVITY ...");
         super.onDestroy();
     }
 
@@ -172,7 +171,7 @@ public class BaseActivity extends AppCompatActivity {
         messageHandler.postDelayed(() -> {
             try {
                 if (leServiceConnection.existConnection())
-                    leServiceConnection.close();
+                    leServiceConnection.close(this);
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

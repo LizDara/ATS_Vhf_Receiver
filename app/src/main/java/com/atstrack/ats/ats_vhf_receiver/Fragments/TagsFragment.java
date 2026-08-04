@@ -175,6 +175,7 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
             tagAdapter.beepTag = currentTag.code;
         }
         tagAdapter.notifyDataSetChanged();
+        binding.tvDetectedTags.setText("Detected Tags: " + tagAdapter.tags.size());
     }
 
     private void stopTagsTimer() {

@@ -56,6 +56,8 @@ public class BluetoothLeService extends Service {
                 Log.d(TAG, "DEVICE DISCONNECTED, STATUS = " + status);
                 intentAction = ACTION_GATT_DISCONNECTED;
                 broadcastUpdate(intentAction);
+                if (status == 8) // TIMEOUT
+                    close();
             }
         }
 
@@ -176,21 +178,23 @@ public class BluetoothLeService extends Service {
             Log.w(TAG,"BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
-        // Previously connected device. Try to reconnect.
         if (mBluetoothGatt != null) {
-            Log.d(TAG,"Trying to use an existing mBluetoothGatt for connection.");
-            if (mBluetoothGatt.connect()) {
+            Log.d(TAG, "Checking existing mBluetoothGatt to keep connection alive across activities.");
+            BluetoothDevice connectedDevice = mBluetoothGatt.getDevice();
+            if (connectedDevice != null && connectedDevice.getAddress().equals(address)) {
+                Log.d(TAG, "Reusing functional connection for the same device address.");
                 broadcastUpdate(ACTION_GATT_CONNECTED);
-                //Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 return true;
             } else {
+                Log.w(TAG, "Existing GATT is corrupted or belongs to another device. Cleaning up.");
+                close();
                 return false;
             }
         }
         try {
             final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
             if (device == null) {
-                Log.w(TAG, "Device not found.  Unable to connect.");
+                Log.w(TAG, "Device not found. Unable to connect.");
                 return false;
             }
             // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
@@ -218,8 +222,6 @@ public class BluetoothLeService extends Service {
         }
         mBluetoothGatt.disconnect();
         downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - disconnect: The app disconnected an existing connection or cancel a pending connection" + ValueCodes.CR + ValueCodes.LF;
-        mBluetoothAdapter = null;
-        mBluetoothGatt = null;
     }
 
     /**
@@ -231,6 +233,7 @@ public class BluetoothLeService extends Service {
         if (mBluetoothGatt == null) {
             return;
         }
+        Log.i(TAG, "CLOSE BLUETOOTH GATT");
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }

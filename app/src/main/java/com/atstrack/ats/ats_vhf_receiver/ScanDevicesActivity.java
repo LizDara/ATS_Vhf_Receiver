@@ -274,8 +274,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         mConnected = false;
         readBoardStatus = false;
         parameter = ValueCodes.NONE;
-        unbindService(leServiceConnection.getServiceConnection());
-        if (leServiceConnection.existConnection()) leServiceConnection.close();
+        if (leServiceConnection.existConnection()) leServiceConnection.close(this);
         unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -325,7 +324,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                     messageHandler.postDelayed(() -> {
                         disconnectionDialog.dismiss();
                         if (leServiceConnection.existConnection())
-                            leServiceConnection.close();
+                            leServiceConnection.close(getBaseContext());
                         finish();
                     }, ValueCodes.BRANDING_PERIOD); // The message disappears after a pre-defined period and will search for other available BLE devices again
                 }

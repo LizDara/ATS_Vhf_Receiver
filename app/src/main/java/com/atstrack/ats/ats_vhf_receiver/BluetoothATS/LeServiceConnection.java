@@ -1,6 +1,7 @@
 package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
@@ -51,9 +52,17 @@ public class LeServiceConnection {
         return serviceConnection != null && bluetoothLeService != null;
     }
 
-    public void close() {
-        bluetoothLeService.close();
-        bluetoothLeService = null;
-        Log.i("LE SERVICE", "CLOSE SERVICE CONNECTION");
+    public void close(Context context) {
+        if (bluetoothLeService != null) {
+            bluetoothLeService.close();
+
+            try {
+                context.unbindService(serviceConnection);
+                Log.i(TAG, "Service unbound successfully from Context");
+            } catch (Exception e) {
+                Log.w(TAG, "Service already unbound or failed to unbind: " + e.getMessage());
+            }
+            bluetoothLeService = null;
+        }
     }
 }

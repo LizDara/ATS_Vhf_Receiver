@@ -84,16 +84,6 @@ public class MenuActivity extends BaseActivity {
     }
 
     @Override
-    protected void gattDisconnected() {
-        try {
-            unbindService(leServiceConnection.getServiceConnection());
-        } catch (Exception ex) {
-            Log.w(TAG, ex.getLocalizedMessage());
-        }
-        super.gattDisconnected();
-    }
-
-    @Override
     protected void downloadData(byte[] data) {
         ReceiverInformation receiverInformation = ReceiverInformation.getReceiverInformation();
         if (data[0] == ValueCodes.SD_CARD_COMMAND) {

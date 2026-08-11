@@ -27,6 +27,9 @@ public class Data {
         } else if (type == ValueCodes.PROCESSED_FILE) {
             fileName = "D" + ReceiverInformation.getReceiverInformation().getSerialNumber() + "_" + month + day + (time.get(Calendar.YEAR) - 2000)
                     + hour + minute + second + ".txt";
+        } else if (type == ValueCodes.METRICS_FILE) {
+            fileName = "D" + ReceiverInformation.getReceiverInformation().getSerialNumber() + "_" + month + day + (time.get(Calendar.YEAR) - 2000)
+                    + hour + minute + second + "Met.txt";
         } else if (type == ValueCodes.BLUETOOTH_FILE) {
             fileName = "ATS_BTBT_" + time.get(Calendar.YEAR) + month + day + "_" + hour + minute + second + ".txt";
         } else if (type == ValueCodes.LOG_FILE) {

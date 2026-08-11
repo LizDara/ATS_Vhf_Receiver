@@ -17,7 +17,6 @@ import java.util.Objects;
 public class ScanBaseActivity extends BaseActivity {
     protected final String TAG = ScanBaseActivity.class.getSimpleName();
     protected AnimationDrawable animationDrawable;
-    protected boolean isScanning;
     protected byte scanType;
     protected int baseFrequency;
     protected int range;

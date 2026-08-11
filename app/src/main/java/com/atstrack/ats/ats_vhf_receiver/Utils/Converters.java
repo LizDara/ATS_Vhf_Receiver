@@ -302,8 +302,9 @@ public class Converters {
      * @param baseActivity Base activity
      * @return Returns the processed data.
      */
-    public static synchronized String getPackageProcessed(ArrayList<byte[]> data, View process_percent, BaseActivity baseActivity, boolean isRawFile) {
+    public static synchronized String[] getPackageProcessed(ArrayList<byte[]> data, View process_percent, BaseActivity baseActivity, boolean isRawFile) {
         String text = "";
+        String metrics = "";
         byte scanType = 0;
         int baseFrequency = 0;
         int frequency = 0;
@@ -332,17 +333,25 @@ public class Converters {
                         scanType = packet[index];
                         YY = Byte.toUnsignedInt(packet[index + 6]);
                         text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
+                        metrics += "[Header]" + ValueCodes.CR + ValueCodes.LF;
                         switch (format) {
                             case ValueCodes.STATIONARY_SCAN_COMMAND: {
                                 baseFrequency = Byte.toUnsignedInt(packet[index + 20]) * 1000;
                                 text += "Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF;
                                 text += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))) + ValueCodes.CR + ValueCodes.LF;
                                 int referenceFrequency = (Byte.toUnsignedInt(packet[index + 9]) * 256) + Byte.toUnsignedInt(packet[index + 10]) + baseFrequency;
                                 text += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
                                 text += "Reference Frequency Store Interval (minutes): " + (referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Reference Frequency Store Interval (minutes): " + (referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))) + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 2] & (byte) 0x0F);
                                 matches = Byte.toUnsignedInt(packet[index + 2]) / 16;
                                 String detection = "Coded";
@@ -356,7 +365,9 @@ public class Converters {
                                 } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
                                 index += 16;
                                 byteIndex += 16;
                                 break;
@@ -364,7 +375,9 @@ public class Converters {
                             case ValueCodes.MOBILE_SCAN_COMMAND: {
                                 baseFrequency = Byte.toUnsignedInt(packet[index + 5]) * 1000;
                                 text += "Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF;
                                 text += "Scan Interval (seconds): " + (Byte.toUnsignedInt(packet[index + 3]) * 0.1) + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Interval (seconds): " + (Byte.toUnsignedInt(packet[index + 3]) * 0.1) + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 4] & (byte) 0x0F);
                                 matches = Byte.toUnsignedInt(packet[index + 4]) / 16;
                                 String detection = "Coded";
@@ -378,9 +391,12 @@ public class Converters {
                                 } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
                                 int gps = Byte.toUnsignedInt(packet[index + 2]) >> 7 & 1;
                                 text += "Gps: " + (gps == 1 ? "On" : "Off") + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Gps: " + (gps == 1 ? "On" : "Off") + ValueCodes.CR + ValueCodes.LF;
                                 index += 8;
                                 byteIndex += 8;
                                 break;
@@ -397,6 +413,7 @@ public class Converters {
                                 }
                                 baseFrequency = Byte.toUnsignedInt(packet[index + 15]) * 1000;
                                 text += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
                                 detectionType = (byte) (packet[index + 1] & (byte) 0x0F);
                                 String detection = "Coded";
                                 if (detectionType == ValueCodes.FIXED)
@@ -404,7 +421,9 @@ public class Converters {
                                 else if (detectionType == ValueCodes.VARIABLE)
                                     detection = "Non Coded Variable Pulse Rate";
                                 text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
                                 text += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
+                                metrics += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
                                 YY = Byte.toUnsignedInt(packet[index + 2]);
                                 MM = Byte.toUnsignedInt(packet[index + 3]);
                                 DD = Byte.toUnsignedInt(packet[index + 4]);
@@ -416,7 +435,11 @@ public class Converters {
                             }
                         }
                         text += "[Data]" + ValueCodes.CR + ValueCodes.LF;
+                        metrics += "[Data]" + ValueCodes.CR + ValueCodes.LF;
                         text += (detectionType == ValueCodes.CODED ?
+                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
+                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (detectionType == ValueCodes.CODED ?
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
                         break;
@@ -474,6 +497,10 @@ public class Converters {
                                 ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
+                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
+                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
                     case ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND:
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
@@ -482,6 +509,10 @@ public class Converters {
                         numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " +
+                                baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) +
+                                ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
+                                ", 0, 0, 0, " + ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " +
                                 baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) +
                                 ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
                                 ", 0, 0, 0, " + ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
@@ -516,6 +547,10 @@ public class Converters {
                                 ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
+                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
+                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
                     case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
@@ -524,6 +559,10 @@ public class Converters {
                         numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
+                                ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", 0, 0, 0, " +
+                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
                                 ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + frequencyTableIndex + ", " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", 0, 0, 0, " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
@@ -551,6 +590,10 @@ public class Converters {
                         }
 
                         text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
+                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + code + ", " + mort + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
+                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
                                 ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + code + ", " + mort + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
@@ -582,11 +625,17 @@ public class Converters {
                                 ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
                                 ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
                                 ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
+                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, 0, " + Converters.getFrequency(frequency) +
+                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", 0, " + coordinates[0] + ", " + coordinates[1] + ", " + gpsTimeStamp + ", " +
+                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
                         break;
                     case ValueCodes.SCAN_STOP_COMMAND:
                         int scanSession = (Byte.toUnsignedInt(packet[index + 1]) * 65536) + (Byte.toUnsignedInt(packet[index + 2]) * 256) + Byte.toUnsignedInt(packet[index + 3]);
                         text += "[Footer]" + ValueCodes.CR + ValueCodes.LF;
+                        metrics += "[Footer]" + ValueCodes.CR + ValueCodes.LF;
                         text += "Session Num: " + scanSession + ValueCodes.CR + ValueCodes.LF;
+                        metrics += "Session Num: " + scanSession + ValueCodes.CR + ValueCodes.LF;
                         date = Byte.toUnsignedInt(packet[index + 12]) << 16 | Byte.toUnsignedInt(packet[index + 13]) << 8 | Byte.toUnsignedInt(packet[index + 14]);
                         mm = date % 100;
                         hh = (date / 100) % 100;
@@ -594,17 +643,36 @@ public class Converters {
                         MM = date / 1000000;
                         ss = Byte.toUnsignedInt(packet[index + 15]);
                         text += "Time Stamp: " + MM + "/" + DD + "/" + YY + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                        metrics += "Time Stamp: " + MM + "/" + DD + "/" + YY + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
                         if (scanSession == sessionNumber)
                             sessionNumber++;
                         index += 8;
                         byteIndex += 8;
+                        break;
+                    default: // METRICS
+                        if (packet[index] == ValueCodes.TIMESTAMP_COMMAND) {
+                            int sysTime = Byte.toUnsignedInt(packet[index + 1]) << 16 | Byte.toUnsignedInt(packet[index + 2]) << 8 | Byte.toUnsignedInt(packet[index + 3]);
+                            date = Byte.toUnsignedInt(packet[index + 4]) << 16 | Byte.toUnsignedInt(packet[index + 5]) << 8 | Byte.toUnsignedInt(packet[index + 6]);
+                            mm = date % 100;
+                            hh = (date / 100) % 100;
+                            DD = (date / 10000) % 100;
+                            MM = date / 1000000;
+                            ss = Byte.toUnsignedInt(packet[index + 7]);
+                            metrics += "SysTime: " + sysTime + ", M: " + MM + ", D: " + DD + ", H: " + hh + ", m: " + mm + ", s: " + ss + ValueCodes.CR + ValueCodes.LF;
+                        } else if (packet[index] == ValueCodes.VOLTAGE_COMMAND) {
+                            int sysTime = Byte.toUnsignedInt(packet[index + 1]) << 16 | Byte.toUnsignedInt(packet[index + 2]) << 8 | Byte.toUnsignedInt(packet[index + 3]);
+                            int volt = Byte.toUnsignedInt(packet[index + 5]) << 8 | Byte.toUnsignedInt(packet[index + 6]);
+                            metrics += "SysTime: " + sysTime + ", Batt: " + Byte.toUnsignedInt(packet[index + 4]) + ", Volt: " + volt + ValueCodes.CR + ValueCodes.LF;
+                        } else if (packet[index] == ValueCodes.LOW_BATTERY_COMMAND) {
+                            metrics += "Low Battery Detected" + ValueCodes.CR + ValueCodes.LF;
+                        }
                         break;
                 }
                 index += 8;
                 byteIndex += 8;
             }
         }
-        return text;
+        return new String[] {text, metrics};
     }
 
     public static String getTagsData(ArrayList<TagDetail> tags) {
@@ -618,37 +686,78 @@ public class Converters {
     /**
      * Creates a file with the downloaded data.
      */
+//    public static boolean printDataFiles(File root, ArrayList<Data> dataList) {
+//        int i = 0;
+//        boolean outcome;
+//        FileOutputStream stream;
+//        File newFile;
+//        try {
+//            if (!root.exists()) {
+//                outcome = root.mkdirs();
+//                if (!outcome)
+//                    throw new Exception("Folder 'atstrack' can't be created on root: " + root.getPath());
+//                root.setReadable(true);
+//                root.setWritable(true);
+//            }
+//            while(i < dataList.size()) {
+//                String fileName = dataList.get(i).fileName;
+//                newFile = new File(root.getAbsolutePath(), fileName);
+//                int copy = 1; // see if there's a possible copy
+//                while (!(newFile.createNewFile())) {
+//                    newFile = new File(root.getAbsolutePath(), fileName.substring(0, fileName.length() - 4) + " (" + copy + ").txt");
+//                    copy++;
+//                }
+//                boolean result = newFile.setReadable(true);
+//                result = result & newFile.setWritable(true);
+//                if (result) {
+//                    stream = new FileOutputStream(newFile); // write in the file created
+//                    for (byte[] data : dataList.get(i).packets)
+//                        stream.write(data);
+//                    stream.flush(); // save the file
+//                    stream.close();
+//                    i++;
+//                }
+//            }
+//            return i == dataList.size();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
     public static boolean printDataFiles(File root, ArrayList<Data> dataList) {
-        int i = 0;
-        boolean outcome;
-        FileOutputStream stream;
-        File newFile;
+        if (dataList == null) return false;
+
         try {
-            if (!root.exists()) {
-                outcome = root.mkdirs();
-                if (!outcome)
+            if (!root.exists()) { // 1. Validar y crear directorio raíz
+                if (!root.mkdirs())
                     throw new Exception("Folder 'atstrack' can't be created on root: " + root.getPath());
                 root.setReadable(true);
                 root.setWritable(true);
             }
-            while(i < dataList.size()) {
-                String fileName = dataList.get(i).fileName;
-                newFile = new File(root.getAbsolutePath(), fileName);
-                int copy = 1; //see if there's a possible copy
-                while (!(newFile.createNewFile())) {
-                    newFile = new File(root.getAbsolutePath(), fileName.substring(0, fileName.length() - 4) + " (" + copy + ").txt");
+
+            for (Data dataObj : dataList) { // 2. Procesar cada elemento de la lista
+                File newFile = new File(root, dataObj.fileName);
+                int copy = 1;
+                String baseName = dataObj.fileName.substring(0, dataObj.fileName.length() - 4); // Extraer base sin el ".txt" de forma segura
+                while (newFile.exists() && copy < 100) { // Evitar bucle infinito limitando los intentos de copia (ej. max 100)
+                    newFile = new File(root, baseName + " (" + copy + ").txt");
                     copy++;
                 }
-                newFile.setReadable(true);
-                newFile.setWritable(true);
-                stream = new FileOutputStream(newFile); //write in the file created
-                for (byte[] data : dataList.get(i).packets)
-                    stream.write(data);
-                stream.flush(); //save the file
-                stream.close();
-                i++;
+
+                if (newFile.createNewFile()) { // 3. Crear y escribir en el archivo usando Try-With-Resources (Cierre automático)
+                    newFile.setReadable(true);
+                    newFile.setWritable(true);
+
+                    try (FileOutputStream stream = new FileOutputStream(newFile)) {
+                        for (byte[] packet : dataObj.packets)
+                            stream.write(packet);
+                        stream.flush();
+                    } // El stream se cierra automáticamente aquí, incluso si hay un error de escritura
+                } else {
+                    throw new Exception("The file can't be created: " + newFile.getName());
+                }
             }
-            return i == dataList.size();
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }

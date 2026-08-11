@@ -23,15 +23,16 @@ public class ValueCodes {
     public static final int REQUEST_CODE_OPEN_STORAGE = 2;
     public static final int RAW_FILE = 3;
     public static final int PROCESSED_FILE = 4;
-    public static final int BLUETOOTH_FILE = 5;
-    public static final int LOG_FILE = 6;
+    public static final int METRICS_FILE = 5;
+    public static final int BLUETOOTH_FILE = 6;
+    public static final int LOG_FILE = 7;
     public static final byte NONE = (byte) 0x00;
     public static final byte NULL = (byte) 0xFF;
 
     //Periods
     public static final int WAITING_PERIOD = 180;
     public static final int MESSAGE_PERIOD = 1000;
-    public static final int DOWNLOAD_PERIOD = 220; //280
+    public static final int DOWNLOAD_PERIOD = 260; //280
     public static final int SCAN_PERIOD = 2000;
     public static final int BRANDING_PERIOD = 2000;
     public static final int CONNECT_TIMEOUT = 3200;
@@ -148,6 +149,9 @@ public class ValueCodes {
     public static final byte AUDIO_BACKGROUND_COMMAND = (byte) 0x5B;
     public static final byte FATAL_SCAN_ERROR_COMMAND = (byte) 0x44;
     public static final byte LOW_POWER_COMMAND = (byte) 0x45;
+    public static final byte TIMESTAMP_COMMAND = (byte) 0x28;
+    public static final byte VOLTAGE_COMMAND = (byte) 0x29;
+    public static final byte LOW_BATTERY_COMMAND = (byte) 0x2D;
 
     public static final byte GPS_VALID = 3;
     public static final byte GPS_FAILED = 2;

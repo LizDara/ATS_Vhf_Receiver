@@ -48,9 +48,8 @@ public class ConvertingRawFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.btnCancelConversion.setOnClickListener(v -> {
-            if (getParentFragmentManager() != null) {
+            if (getParentFragmentManager() != null)
                 getParentFragmentManager().popBackStack();
-            }
         });
         convertRawData();
     }
@@ -75,13 +74,17 @@ public class ConvertingRawFragment extends Fragment {
                 ArrayList<byte[]> rawList = new ArrayList<>();
                 rawList.add(rawData);
 
-                String processData = Converters.getPackageProcessed(rawList, binding.pbConvertingRaw, (BaseActivity) fragmentContext, true);
-                byte[] data = Converters.convertToUTF8(processData);
+                String[] texts = Converters.getPackageProcessed(rawList, binding.pbConvertingRaw, (BaseActivity) fragmentContext, true);
+                byte[] processed = Converters.convertToUTF8(texts[0]);
+                byte[] metrics = Converters.convertToUTF8(texts[1]);
 
                 Data processedData = new Data(ValueCodes.PROCESSED_FILE);
-                processedData.packets.add(data);
+                processedData.packets.add(processed);
+                Data metricsData = new Data(ValueCodes.METRICS_FILE);
+                metricsData.packets.add(metrics);
                 ArrayList<Data> dataList = new ArrayList<>();
                 dataList.add(processedData);
+                dataList.add(metricsData);
 
                 File root = new File(uri.getPath().split(":")[0].replace("document", "storage"), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
                 String fileName = dataList.get(0).fileName;
@@ -112,7 +115,7 @@ public class ConvertingRawFragment extends Fragment {
 
     private void updateProgress(int value) {
         new Handler(Looper.getMainLooper()).post(() -> {
-            if (isAdded() && getView() != null && binding.pbConvertingRaw != null)
+            if (isAdded() && getView() != null)
                 binding.pbConvertingRaw.setProgress(value);
         });
     }

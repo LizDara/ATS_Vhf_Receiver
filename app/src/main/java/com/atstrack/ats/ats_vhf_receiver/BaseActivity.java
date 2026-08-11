@@ -39,9 +39,9 @@ public class BaseActivity extends AppCompatActivity {
     protected boolean showToolbar;
     protected String deviceCategory;
     protected String title;
+    protected boolean isScanning = false;
     protected final List<Dialog> dialogList = new ArrayList<>();
     protected final Handler messageHandler = new Handler();
-
     protected final Context mContext = this;
     protected byte parameter = ValueCodes.NONE;
     protected ReceiverCallback receiverCallback;
@@ -73,8 +73,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) // API 33+
+            registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), Context.RECEIVER_NOT_EXPORTED);
         else
             registerReceiver(gattUpdateReceiver.mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
         if(showToolbar && deviceCategory.equals(ValueCodes.VHF))
@@ -186,9 +186,13 @@ public class BaseActivity extends AppCompatActivity {
         AlertDialog dialog = Dialogs.createLowPowerDialog(mContext);
         dialogList.add(dialog);
         messageHandler.postDelayed(() -> {
-            Intent intent = new Intent(this, MenuActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            if (isScanning) {
+                Intent intent = new Intent(this, MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
+                dialog.dismiss();
+            }
         }, ValueCodes.BRANDING_PERIOD);
         dialog.show();
     }

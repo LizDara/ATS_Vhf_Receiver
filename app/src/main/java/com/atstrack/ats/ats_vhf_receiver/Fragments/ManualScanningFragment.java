@@ -262,12 +262,12 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
             case ValueCodes.SCAN_MANUAL_NON_CODED_COMMAND:
                 int signalStrength = Byte.toUnsignedInt(data[3]);
                 int period = (Byte.toUnsignedInt(data[4]) * 256) + Byte.toUnsignedInt(data[5]);
-                if (detectionType == ValueCodes.FIXED)
-                    logScanNonCodedFixed(data[0], period, signalStrength);
-                else if (detectionType == ValueCodes.VARIABLE) {
+//                if (detectionType == ValueCodes.FIXED)
+//                    logScanNonCodedFixed(data[0], period, signalStrength);
+//                else if (detectionType == ValueCodes.VARIABLE) {
                     if (period > 0)
                         scanNonCodedVariable(period, signalStrength);
-                }
+//                }
                 break;
         }
     }

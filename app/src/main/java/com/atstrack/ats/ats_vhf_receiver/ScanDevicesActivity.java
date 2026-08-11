@@ -410,8 +410,8 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
     }
 
     private void mRegisterReceiver() {
-        if (Build.VERSION.SDK_INT >= 33)
-            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), 2);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) // API 33+
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), Context.RECEIVER_NOT_EXPORTED);
         else
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
     }

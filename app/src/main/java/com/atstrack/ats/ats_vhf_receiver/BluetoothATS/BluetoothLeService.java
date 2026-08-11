@@ -3,6 +3,7 @@ package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothCodecStatus;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -10,6 +11,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.BluetoothStatusCodes;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -56,7 +58,7 @@ public class BluetoothLeService extends Service {
                 Log.d(TAG, "DEVICE DISCONNECTED, STATUS = " + status);
                 intentAction = ACTION_GATT_DISCONNECTED;
                 broadcastUpdate(intentAction);
-                if (status == 8) // TIMEOUT
+                if (status == 8) // CONNECTION TIMEOUT
                     close();
             }
         }

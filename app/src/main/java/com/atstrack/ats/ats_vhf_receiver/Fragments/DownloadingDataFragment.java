@@ -54,6 +54,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     private ArrayList<byte[]> pagePackets;
     private Data rawData;
     private Data processedData;
+    private Data metricsData;
     private Data logData;
     private ArrayList<Data> dataList;
     private final Runnable downloadRunnable = new Runnable() {
@@ -225,6 +226,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         pagePackets = new ArrayList<>();
         rawData = new Data(ValueCodes.RAW_FILE);
         processedData = new Data(ValueCodes.PROCESSED_FILE);
+        metricsData = new Data(ValueCodes.METRICS_FILE);
         logData = new Data(ValueCodes.LOG_FILE);
         dataList = new ArrayList<>();
     }
@@ -237,7 +239,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     private void setResponsePage(boolean isOk) {
         byte[] b = new byte[]{isOk ? (byte) 0x95 : (byte) 0x96};
         TransferBleData.writeResponse(b);
-        Log.i("DownloadFragment", "------------------------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
+        Log.i("DownloadFragment", "----------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
     }
 
     private void setVisibility(int view) {
@@ -365,18 +367,19 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         new Thread(() -> {
             if (!error) {
                 dataList.add(rawData);
-                String processData = Converters.getPackageProcessed(rawData.packets, binding.includeDownloadingProcess.tvProcessPercent, (BaseActivity) requireActivity(), false);
-                byte[] data = Converters.convertToUTF8(processData);
+                String[] texts = Converters.getPackageProcessed(rawData.packets, binding.includeDownloadingProcess.tvProcessPercent, (BaseActivity) requireActivity(), false);
+                byte[] processed = Converters.convertToUTF8(texts[0]);
+                byte[] metrics = Converters.convertToUTF8(texts[1]);
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (isAdded() && getView() != null) {
                         binding.includeDownloadingProcess.tvProcessPercent.setText(" - 100%");
-                        processedData.packets.add(data);
+                        processedData.packets.add(processed);
+                        metricsData.packets.add(metrics);
                         dataList.add(processedData);
+                        dataList.add(metricsData);
 
                         setVisibility(ValueCodes.THIRD_STEP);
-                        receiveHandler.postDelayed(() -> {
-                            saveFiles();
-                        }, ValueCodes.DOWNLOAD_PERIOD);
+                        receiveHandler.postDelayed(() -> saveFiles(), ValueCodes.DOWNLOAD_PERIOD);
                     }
                 });
             }

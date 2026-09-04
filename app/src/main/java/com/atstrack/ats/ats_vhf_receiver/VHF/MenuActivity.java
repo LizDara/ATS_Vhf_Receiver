@@ -122,12 +122,12 @@ public class MenuActivity extends BaseActivity {
     }
 
     private void setBattery(ReceiverInformation receiverInformation) {
-        ((ActivityVhfMenuBinding) binding).tvPercentBatteryMenu.setText(receiverInformation.getPercentBattery() + "%");
-        ((ActivityVhfMenuBinding) binding).imgBatteryMenu.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
+        ((ActivityVhfMenuBinding) binding).tvPercentBatteryMenu.setText(receiverInformation.getPercentBattery() == 0 ? "Low" : receiverInformation.getPercentBattery() + "%");
+        ((ActivityVhfMenuBinding) binding).imgBatteryMenu.setBackground(ContextCompat.getDrawable(this, receiverInformation.getPercentBattery() > 0 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
     }
 
     private void setSdCard(ReceiverInformation receiverInformation) {
-        ((ActivityVhfMenuBinding) binding).tvSdCardMenu.setText(receiverInformation.isSDCardInserted() ? "Inserted" : "None");
+        ((ActivityVhfMenuBinding) binding).tvSdCardMenu.setText(receiverInformation.isSDCardInserted() ? getString(R.string.lbl_vhf_home_sd_card_inserted) : getString(R.string.lbl_vhf_manual_option_none));
         ((ActivityVhfMenuBinding) binding).imgSdCardMenu.setBackground(ContextCompat.getDrawable(this, receiverInformation.isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
     }
 }

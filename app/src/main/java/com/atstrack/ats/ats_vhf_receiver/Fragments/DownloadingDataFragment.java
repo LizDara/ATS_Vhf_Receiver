@@ -39,11 +39,14 @@ import com.google.api.services.drive.DriveScopes;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DownloadingDataFragment extends Fragment implements ReceiverCallback {
     private FragmentDownloadingDataBinding binding = null;
     private File root;
     private ArrayList<byte[]> packets;
+    private Timer downloadTimeout;
     private Handler receiveHandler;
     private int finalPageNumber;
     private int pageNumber;
@@ -51,60 +54,13 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     private int packetNumber;
     private boolean error;
     private boolean downloading;
+    private boolean packetWaiting;
     private ArrayList<byte[]> pagePackets;
     private Data rawData;
     private Data processedData;
     private Data metricsData;
     private Data logData;
     private ArrayList<Data> dataList;
-    private final Runnable downloadRunnable = new Runnable() {
-        @Override
-        public void run() {
-            boolean isOk = false;
-            if (pagePackets.size() >= 9 && downloading) {
-                if (findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
-                    int number = Converters.findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
-                    if (number == pageNumber) {
-                        pageNumber++;
-                        for (byte[] pagePacket : pagePackets) {
-                            number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
-                            if (number == packetNumber)
-                                packetNumber++;
-                        }
-                        if (packetNumber == 10) {
-                            packetNumber = 1;
-                            for (byte[] pagePacket : pagePackets) {
-                                number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
-                                if (number < packetNumber) {
-                                    packets.set((number - 1) + ((pageNumber - 1) * 9), pagePacket);
-                                } else if (number == packetNumber) {
-                                    packets.add(pagePacket);
-                                    packetNumber++;
-                                }
-                            }
-                            int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
-                            binding.includeDownloadingProcess.tvDownloadPercent.setText(" - " + percent + "%");
-                            isOk = true;
-                            LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page " + pageNumber + " downloaded successfully." + ValueCodes.CR + ValueCodes.LF;
-                        } else {
-                            LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The 9 packages were not found." + ValueCodes.CR + ValueCodes.LF;
-                            pageNumber--;
-                        }
-                    } else {
-                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page number " + (number + 1) + " was received, expected number is " + (pageNumber + 1) + ValueCodes.CR + ValueCodes.LF;
-                    }
-                } else {
-                    LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The last package received is not 9" + ValueCodes.CR + ValueCodes.LF;
-                }
-            } else {
-                LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Only " + pagePackets.size() + " packages arrived, 9 were expected." + ValueCodes.CR + ValueCodes.LF;
-            }
-            packetNumber = 1;
-            pagePackets = new ArrayList<>();
-            if (downloading)
-                setResponsePage(isOk);
-        }
-    };
 
     @Nullable
     @Override
@@ -122,6 +78,12 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
             showAlertDialog("Download Timeout", "Do you want to save the downloaded bytes?", 3);
         });
         setVisibility(ValueCodes.DOWNLOADING);
+        TransferBleData.requestConnectionPriority();
+        try {
+            Thread.sleep(ValueCodes.WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         setNotification();
     }
 
@@ -222,6 +184,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         pageNumber = 0;
         packetNumber = 1; // 9 data packages of 230 bytes
         error = false;
+        packetWaiting = false;
         packets = new ArrayList<>();
         pagePackets = new ArrayList<>();
         rawData = new Data(ValueCodes.RAW_FILE);
@@ -286,7 +249,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     private void successfulResponse() {
         if (downloading) {
             setVisibility(ValueCodes.SECOND_STEP);
-            receiveHandler.postDelayed(() -> checkPackets(), ValueCodes.DOWNLOAD_PERIOD);
+            receiveHandler.postDelayed(() -> checkPages(), ValueCodes.DOWNLOAD_PERIOD);
         }
     }
 
@@ -330,6 +293,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         totalPackagesNumber = finalPageNumber * 9;
         downloading = finalPageNumber > 0;
         receiveHandler = new Handler(Looper.getMainLooper());
+        downloadTimeout = new Timer();
         if (downloading) {
             binding.includeDownloadingProcess.tvDownloadPercent.setVisibility(View.VISIBLE);
             binding.includeDownloadingProcess.tvProcessPercent.setVisibility(View.VISIBLE);
@@ -353,14 +317,79 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
 
     private void downloadRawData(byte[] packet) {
         if (downloading) {
-            if (pagePackets.isEmpty())
-                receiveHandler.postDelayed(downloadRunnable, ValueCodes.DOWNLOAD_PERIOD);
-            pagePackets.add(packet);
+            if (pagePackets.isEmpty()) {
+                packetWaiting = true;
+                downloadTimeout = new Timer();
+                downloadTimeout.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        checkPackets();
+                        downloadTimeout.cancel();
+                        downloadTimeout.purge();
+                        downloadTimeout = null;
+                    }
+                }, ValueCodes.DOWNLOAD_PERIOD);
+            }
+            if (packetWaiting) {
+                pagePackets.add(packet);
+                if (pagePackets.size() >= 9 && findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
+                    downloadTimeout.cancel();
+                    downloadTimeout.purge();
+                    downloadTimeout = null;
+                    checkPackets();
+                }
+            }
         }
     }
 
     private void checkPackets() {
-        receiveHandler.removeCallbacks(downloadRunnable);
+        boolean isOk = false;
+        packetWaiting = false;
+        if (pagePackets.size() >= 9 && downloading) {
+            if (findPacketNumber(new byte[] {pagePackets.get(pagePackets.size() - 1)[228], pagePackets.get(pagePackets.size() - 1)[229]}) == 9) {
+                int number = Converters.findPageNumber(new byte[]{pagePackets.get(pagePackets.size() - 1)[224], pagePackets.get(pagePackets.size() - 1)[225], pagePackets.get(pagePackets.size() - 1)[226], pagePackets.get(pagePackets.size() - 1)[227]});
+                if (number == pageNumber) {
+                    pageNumber++;
+                    for (byte[] pagePacket : pagePackets) {
+                        number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
+                        if (number == packetNumber)
+                            packetNumber++;
+                    }
+                    if (packetNumber == 10) {
+                        packetNumber = 1;
+                        for (byte[] pagePacket : pagePackets) {
+                            number = findPacketNumber(new byte[]{pagePacket[228], pagePacket[229]});
+                            if (number < packetNumber) {
+                                packets.set((number - 1) + ((pageNumber - 1) * 9), pagePacket);
+                            } else if (number == packetNumber) {
+                                packets.add(pagePacket);
+                                packetNumber++;
+                            }
+                        }
+                        int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
+                        binding.includeDownloadingProcess.tvDownloadPercent.setText(" - " + percent + "%");
+                        isOk = true;
+                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page " + pageNumber + " downloaded successfully." + ValueCodes.CR + ValueCodes.LF;
+                    } else {
+                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The 9 packages were not found." + ValueCodes.CR + ValueCodes.LF;
+                        pageNumber--;
+                    }
+                } else {
+                    LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page number " + (number + 1) + " was received, expected number is " + (pageNumber + 1) + ValueCodes.CR + ValueCodes.LF;
+                }
+            } else {
+                LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The last package received is not 9" + ValueCodes.CR + ValueCodes.LF;
+            }
+        } else {
+            LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Only " + pagePackets.size() + " packages arrived, 9 were expected." + ValueCodes.CR + ValueCodes.LF;
+        }
+        packetNumber = 1;
+        pagePackets = new ArrayList<>();
+        if (downloading)
+            setResponsePage(isOk);
+    }
+
+    private void checkPages() {
         binding.includeDownloadingProcess.tvProcessPercent.setText(" - 0%");
         fillRawData();
         binding.includeDownloadingProcess.tvProcessPercent.setText(" - 1%");

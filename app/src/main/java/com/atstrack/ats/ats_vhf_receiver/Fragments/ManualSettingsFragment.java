@@ -54,7 +54,7 @@ public class ManualSettingsFragment extends Fragment {
                 getParentFragmentManager().beginTransaction()
                         .setReorderingAllowed(true)
                         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                        .replace(R.id.fcv_activity_fragment, new ManualScanningFragment(baseFrequency, range, currentFrequency, binding.includeGpsOption.swGps.isChecked()))
+                        .replace(R.id.fcv_activity_fragment, new ManualScanningFragment(baseFrequency, range, currentFrequency))
                         .commit();
             }
         });

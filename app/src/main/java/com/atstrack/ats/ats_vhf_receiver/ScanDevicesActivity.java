@@ -56,6 +56,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
+                leServiceConnection.getBluetoothLeService().downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - onScanDevicesActivity: Broadcast Receiver (action): " + action + ValueCodes.CR + ValueCodes.LF;
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action) && mConnected) {
@@ -74,6 +75,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                         downloadScanStatus(packet);
                 }
             } catch (Exception e) {
+                leServiceConnection.getBluetoothLeService().downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - onScanDevicesActivity: Broadcast Receiver catch: " + e.getLocalizedMessage() + ValueCodes.CR + ValueCodes.LF;
                 if (!cancel && leServiceConnection.existConnection() && mConnected && deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
                     parameter = ValueCodes.NONE;
                     getDeviceStatus();
@@ -90,9 +92,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
         parameter = ValueCodes.NONE;
         TransferBleData.notificationLog(true);
         if (!cancel && mConnected) {
-            messageHandler.postDelayed(() -> {
-                TransferBleData.readBoardStatus();
-            }, ValueCodes.WAITING_PERIOD);
+            messageHandler.postDelayed(() -> TransferBleData.readBoardStatus(), ValueCodes.WAITING_PERIOD);
         }
     }
 
@@ -127,8 +127,6 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                 public void run() {
                     Log.i(TAG, "SCAN TIMEOUT " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
                     if (!cancel && mConnected && !deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
-                        connectionTimeout.cancel();
-                        connectionTimeout.purge();
                         if (deviceAdapter.deviceType.contains(ValueCodes.ACOUSTIC)) {
                             showAcousticReceiverMenu();
                         } else if (deviceAdapter.deviceType.contains(ValueCodes.BLUETOOTH_RECEIVER)) {
@@ -138,6 +136,8 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                         if (!readBoardStatus || !readScanStatus)
                             showDisconnectionAlertDialog(); //Connection timeout, make sure you write mac address correct and ble device is discoverable
                     }
+                    connectionTimeout.cancel();
+                    connectionTimeout.purge();
                 }
             }, ValueCodes.CONNECT_TIMEOUT);
         });
@@ -297,7 +297,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                     setVisibility(ValueCodes.NO_FOUNDED);
                 }
                 invalidateOptionsMenu();
-            }, ValueCodes.SCAN_PERIOD);
+            }, ValueCodes.BRANDING_PERIOD);
         }
     }
 
@@ -411,7 +411,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
 
     private void mRegisterReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) // API 33+
-            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), Context.RECEIVER_NOT_EXPORTED);
+            registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter(), Context.RECEIVER_EXPORTED);
         else
             registerReceiver(mGattUpdateReceiver, TransferBleData.makeGattUpdateIntentFilter());
     }

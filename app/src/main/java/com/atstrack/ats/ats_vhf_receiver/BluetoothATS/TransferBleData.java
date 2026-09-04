@@ -18,8 +18,8 @@ public class TransferBleData {
         return intentFilter;
     }
 
-    public static boolean readBoardStatus() {
-        return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
+    public static void readBoardStatus() {
+        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_BOARD_STATE, new byte[] { 0 });
     }
 
@@ -162,7 +162,7 @@ public class TransferBleData {
      */
     public static void readDiagnostic() {
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DIAG_INFO, new byte[]{ 0 });
+                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DIAGNOSTIC_INFO, new byte[]{ 0 });
     }
 
     public static void readDataInfo() {
@@ -186,8 +186,8 @@ public class TransferBleData {
                 AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, new byte[] { (byte) 0x97 });
     }
 
-    public static boolean writeResponse(byte[] data) {
-        return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
+    public static void writeResponse(byte[] data) {
+        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, data);
     }
 
@@ -207,7 +207,7 @@ public class TransferBleData {
         return LeServiceConnection.getInstance().getBluetoothLeService().requestMtu(mtu, isOta);
     }
 
-    public static boolean requestConnectionPriority() {
-        return LeServiceConnection.getInstance().getBluetoothLeService().requestConnectionPriority();
+    public static void requestConnectionPriority() {
+        LeServiceConnection.getInstance().getBluetoothLeService().requestConnectionPriority();
     }
 }

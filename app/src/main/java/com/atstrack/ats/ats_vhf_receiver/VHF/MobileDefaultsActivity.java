@@ -42,7 +42,7 @@ public class MobileDefaultsActivity extends BaseActivity {
         int info = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.isChecked() ? 1 : 0) << 7;
         info = info | ((((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.isChecked() ? 1 : 0) << 6);
         float scanRate = Float.parseFloat(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
-        int frequencyTableNumber = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString().equals("None")) ? 0 :
+        int frequencyTableNumber = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString().equals(getString(R.string.lbl_vhf_manual_option_none))) ? 0 :
                 Integer.parseInt(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString());
         byte[] b = new byte[] {(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
         boolean result = TransferBleData.writeDefaults(true, b);
@@ -126,7 +126,7 @@ public class MobileDefaultsActivity extends BaseActivity {
             if (!Converters.isDefaultEmpty(data)) {
                 mobileDefaults = new MobileDefaults(data);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.setText(
-                        (mobileDefaults.tableNumber == 0) ? "None" : String.valueOf(Byte.toUnsignedInt(data[1])));
+                        (mobileDefaults.tableNumber == 0) ? getString(R.string.lbl_vhf_manual_option_none) : String.valueOf(Byte.toUnsignedInt(data[1])));
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(mobileDefaults.scanRate));
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.setChecked(mobileDefaults.gpsOn);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.setChecked(mobileDefaults.autoRecordOn);

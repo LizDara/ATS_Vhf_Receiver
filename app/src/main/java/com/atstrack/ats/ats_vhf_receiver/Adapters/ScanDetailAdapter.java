@@ -42,6 +42,10 @@ public class ScanDetailAdapter extends RecyclerView.Adapter<ScanDetailAdapter.Sc
         details.add(position, detail);
     }
 
+    public void removeInPosition(int position) {
+        details.remove(position);
+    }
+
     public void removeAll() {
         details = new ArrayList<>();
     }

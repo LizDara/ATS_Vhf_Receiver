@@ -26,6 +26,8 @@ import android.view.WindowManager;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
+import com.atstrack.ats.ats_vhf_receiver.Models.Coordinates;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityMainBinding;
 

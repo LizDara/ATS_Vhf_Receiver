@@ -245,9 +245,10 @@
     <string name="lbl_vhf_defaults_stationary_tables_scan">Frequency Tables to Scan</string>
     <string name="lbl_vhf_defaults_stationary_scan_tables">Scan Tables</string>
     <string name="lbl_vhf_defaults_stationary_timeout">Timeout (Seconds)</string>
-    <string name="lbl_vhf_defaults_stationary_reference_rate">Reference Frequency Store Rate (Minutes)</string>
+    <string name="lbl_vhf_defaults_stationary_reference_rate_hours">Reference Frequency Store Rate (Hours)</string>
     <string name="lbl_vhf_defaults_stationary_no_reference">No Reference Frequency</string>
     <string name="lbl_vhf_defaults_store_rate_title">Store Rate</string>
+    <string name="lbl_vhf_defaults_stationary_reference_rate">Reference Store Rate</string>
     <string name="lbl_vhf_defaults_store_rate_select">Select Store Rate</string>
     <string name="lbl_vhf_defaults_store_rate_continuous">Continuous Store</string>
     <string name="lbl_vhf_defaults_store_rate_5m">5 minutes</string>
@@ -256,6 +257,7 @@
     <string name="lbl_vhf_defaults_store_rate_30m">30 minutes</string>
     <string name="lbl_vhf_defaults_store_rate_60m">60 minutes</string>
     <string name="lbl_vhf_defaults_store_rate_120m">120 minutes</string>
+    <string name="lbl_vhf_defaults_store_rate_240m">240 minutes</string>
     <string name="btn_vhf_defaults_go_mobile">Edit Mobile Defaults</string>
     <string name="btn_vhf_defaults_go_stationary">Edit Stationary Defaults</string>
 
@@ -856,7 +858,6 @@
     </string-array>
 
     <string-array name="array_vhf_stationary_reference_rate">
-        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>

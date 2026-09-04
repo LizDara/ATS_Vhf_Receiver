@@ -134,8 +134,10 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
 
     private void startGpsUpdates() {
         LocationRequest locationRequest = new LocationRequest.Builder(
-                Priority.PRIORITY_BALANCED_POWER_ACCURACY, 3000) // Intervalo de 3 segundos PRIORITY_BALANCED_POWER_ACCURACY
-                .setMinUpdateIntervalMillis(2000) // Mínimo cada 2 segundos
+                Priority.PRIORITY_HIGH_ACCURACY, 1000) // Intervalo de 3 segundos PRIORITY_BALANCED_POWER_ACCURACY
+                .setMinUpdateIntervalMillis(500) // Mínimo cada 2 segundos
+                .setMinUpdateDistanceMeters(0.0f)
+                .setMaxUpdateDelayMillis(0)
                 .build();
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());

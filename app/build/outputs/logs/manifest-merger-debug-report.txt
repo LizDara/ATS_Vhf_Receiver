@@ -33,8 +33,6 @@ MERGED from [androidx.core:core-ktx:1.13.0] C:\Users\crepo\.gradle\caches\transf
 MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\3a1b5e9dab358c49201b208de549184c\transformed\drawerlayout-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\19d023f3a60eea4cf5eb1c532bab591d\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.customview:customview:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\834f64c037d3eb1d80c9120d616e8ddf\transformed\customview-1.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.jakewharton:butterknife:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\06483b32e2ca239015b7bd2eee24e8a7\transformed\jetified-butterknife-10.2.3\AndroidManifest.xml:2:1-7:12
-MERGED from [com.jakewharton:butterknife-runtime:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\e17d8acda3e5e55cc4fb4d74c67004c8\transformed\jetified-butterknife-runtime-10.2.3\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\crepo\.gradle\caches\transforms-4\fcc72929abf7ab70d5bd488056277013\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\crepo\.gradle\caches\transforms-4\50cb2606853dba48988d7895609596c9\transformed\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.core:core:1.13.0] C:\Users\crepo\.gradle\caches\transforms-4\7355ed258ff004f1f7a52a25b39730a1\transformed\core-1.13.0\AndroidManifest.xml:17:1-30:12
@@ -520,10 +518,6 @@ MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\crepo\.gradle\caches\t
 MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\19d023f3a60eea4cf5eb1c532bab591d\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.customview:customview:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\834f64c037d3eb1d80c9120d616e8ddf\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.customview:customview:1.0.0] C:\Users\crepo\.gradle\caches\transforms-4\834f64c037d3eb1d80c9120d616e8ddf\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.jakewharton:butterknife:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\06483b32e2ca239015b7bd2eee24e8a7\transformed\jetified-butterknife-10.2.3\AndroidManifest.xml:5:5-44
-MERGED from [com.jakewharton:butterknife:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\06483b32e2ca239015b7bd2eee24e8a7\transformed\jetified-butterknife-10.2.3\AndroidManifest.xml:5:5-44
-MERGED from [com.jakewharton:butterknife-runtime:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\e17d8acda3e5e55cc4fb4d74c67004c8\transformed\jetified-butterknife-runtime-10.2.3\AndroidManifest.xml:5:5-44
-MERGED from [com.jakewharton:butterknife-runtime:10.2.3] C:\Users\crepo\.gradle\caches\transforms-4\e17d8acda3e5e55cc4fb4d74c67004c8\transformed\jetified-butterknife-runtime-10.2.3\AndroidManifest.xml:5:5-44
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\crepo\.gradle\caches\transforms-4\fcc72929abf7ab70d5bd488056277013\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\crepo\.gradle\caches\transforms-4\fcc72929abf7ab70d5bd488056277013\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\crepo\.gradle\caches\transforms-4\50cb2606853dba48988d7895609596c9\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41

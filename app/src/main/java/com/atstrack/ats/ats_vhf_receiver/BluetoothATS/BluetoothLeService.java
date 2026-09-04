@@ -3,7 +3,6 @@ package com.atstrack.ats.ats_vhf_receiver.BluetoothATS;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothCodecStatus;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -11,10 +10,11 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothStatusCodes;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import com.atstrack.ats.ats_vhf_receiver.Utils.AtsUuids;
@@ -53,7 +53,22 @@ public class BluetoothLeService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 broadcastUpdate(intentAction);
-                Log.d(TAG,"Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mBluetoothGatt != null) {
+                            try {
+                                boolean result = mBluetoothGatt.discoverServices();
+                                downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) + " - Attempting to start service discovery: " + result + ValueCodes.CR + ValueCodes.LF;
+                            } catch (Exception e) {
+                                downloadLogs += " - Error en discoverServices: " + e.getMessage() + ValueCodes.CR + ValueCodes.LF;
+                            }
+                        } else {
+                            downloadLogs += " - mBluetoothGatt es nulo en el Handler" + ValueCodes.CR + ValueCodes.LF;
+                        }
+                    }
+                }, ValueCodes.MESSAGE_PERIOD);
+//                Log.d(TAG,"Attempting to start service discovery: " + gatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, "DEVICE DISCONNECTED, STATUS = " + status);
                 intentAction = ACTION_GATT_DISCONNECTED;
@@ -77,18 +92,14 @@ public class BluetoothLeService extends Service {
             downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - onCharacteristicWrite: status = " + status + ", char = " + characteristic.getUuid().toString() + ValueCodes.CR + ValueCodes.LF;
             if (status != BluetoothGatt.GATT_SUCCESS)
                 return;
-            if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x00) {
+            if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x00)
                 broadcastUpdate(ACTION_GATT_CONNECTED); //OTA Begin written
-                Log.i(TAG, "OTA BEGIN 0x00");
-            } else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x03) {
+            else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x03)
                 broadcastUpdate(ACTION_GATT_CONNECTED); //OTA End written
-                Log.i(TAG, "OTA END 0x03");
-            } else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x04) {
+            else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_CONTROL) && characteristic.getValue().length == 1 && characteristic.getValue()[0] == 0x04)
                 broadcastUpdate(ACTION_GATT_CONNECTED); //OTA End written
-                Log.i(TAG, "OTA END 0x04");
-            } else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_DATA)) {
+            else if (characteristic.getUuid().equals(AtsUuids.UUID_CHARACTERISTIC_SILICON_LABS_OTA_DATA))
                 broadcastUpdate(ACTION_GATT_CONNECTED);
-            }
         }
 
         @Override
@@ -119,15 +130,18 @@ public class BluetoothLeService extends Service {
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
+        intent.setPackage(getPackageName());
+        downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - sendBroadcast: " + action + ValueCodes.CR + ValueCodes.LF;
         sendBroadcast(intent);
     }
 
     private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intent.setPackage(getPackageName());
         final byte[] data = characteristic.getValue();
-        if (data != null && data.length > 0) {
+        if (data != null && data.length > 0)
             intent.putExtra(EXTRA_DATA, data);
-        }
+        downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - sendBroadcast: " + (data == null ? "NULL" : " (" + data.length + ") " + Converters.getHexValue(data[0])) + ValueCodes.CR + ValueCodes.LF;
         sendBroadcast(intent);
     }
 
@@ -235,7 +249,6 @@ public class BluetoothLeService extends Service {
         if (mBluetoothGatt == null) {
             return;
         }
-        Log.i(TAG, "CLOSE BLUETOOTH GATT");
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }

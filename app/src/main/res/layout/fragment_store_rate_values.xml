@@ -30,8 +30,7 @@
             android:layout_height="wrap_content"
             android:padding="16sp"
             android:text="@string/lbl_vhf_defaults_store_rate_continuous"
-            android:textColor="@color/ebony_clay"
-            app:drawableEndCompat="@drawable/ic_check" />
+            android:textColor="@color/ebony_clay" />
 
         <View
             android:layout_width="match_parent"
@@ -121,6 +120,21 @@
             android:layout_height="wrap_content"
             android:padding="16sp"
             android:text="@string/lbl_vhf_defaults_store_rate_120m"
+            android:textColor="@color/ebony_clay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/light_gray"
+            tools:ignore="SmallSp" />
+
+        <TextView
+            android:id="@+id/tv_two_hundred_forty_minutes"
+            style="@style/body_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16sp"
+            android:text="@string/lbl_vhf_defaults_store_rate_240m"
             android:textColor="@color/ebony_clay" />
 
     </LinearLayout>

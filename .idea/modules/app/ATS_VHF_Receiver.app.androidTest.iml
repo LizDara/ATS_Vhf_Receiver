@@ -72,8 +72,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.android.gms:play-services-location:21.3.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.github.PhilJay:MPAndroidChart:v3.1.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.codesgood:justifiedtextview:2.0.1@aar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.jakewharton:butterknife:10.2.3@aar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.jakewharton:butterknife-runtime:10.2.3@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.annotation:annotation-jvm:1.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.1.21" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
@@ -120,7 +118,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.auto.value:auto-value-annotations:1.10.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client-apache-v2:1.44.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.api-client:google-api-client-android:2.6.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.jakewharton:butterknife-annotations:10.2.3" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="ATS_VHF_Receiver.app.main" />
 </module>

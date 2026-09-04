@@ -54,14 +54,14 @@ public class SelectValueFragment extends Fragment {
                 else if (type == ValueCodes.SCAN_RATE_STATIONARY_CODE) // Send the mobile scan rate value
                     value = Integer.parseInt(binding.spValue.getSelectedItem().toString());
                 else if (type == ValueCodes.TABLE_NUMBER_CODE) // Send the frequency table number
-                    value = (binding.spValue.getSelectedItem().toString().equals("None")) ? 0 :
+                    value = (binding.spValue.getSelectedItem().toString().equals(getString(R.string.lbl_vhf_manual_option_none))) ? 0 :
                             Integer.parseInt(binding.spValue.getSelectedItem().toString().replace("Table ", ""));
                 else if (type == ValueCodes.NUMBER_OF_ANTENNAS_CODE) // Send the number of antennas
                     value = binding.spValue.getSelectedItemPosition() + 1;
                 else if (type == ValueCodes.SCAN_TIMEOUT_SECONDS_CODE) // Send scan timeout value
                     value = Integer.parseInt(binding.spValue.getSelectedItem().toString());
                 else if (type == ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE)
-                    value = binding.spValue.getSelectedItemPosition();
+                    value = binding.spValue.getSelectedItemPosition() + 1;
                 if (getActivity() instanceof ValueDefaultsActivity)
                     ((ValueDefaultsActivity) getActivity()).value = value;
             }
@@ -105,7 +105,7 @@ public class SelectValueFragment extends Fragment {
             }
         }
         if (tables.isEmpty())
-            tables.add("None");
+            tables.add(getString(R.string.lbl_vhf_manual_option_none));
         ArrayAdapter<String> tablesAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, tables);
         tablesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spValue.setAdapter(tablesAdapter);
@@ -132,7 +132,7 @@ public class SelectValueFragment extends Fragment {
             scanRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.spValue.setAdapter(scanRateAdapter);
 
-            if (value <= 255)
+            if (value <= Byte.toUnsignedInt(ValueCodes.NULL))
                 binding.spValue.setSelection(value - 10);
             else
                 binding.spValue.setSelection(0);
@@ -155,7 +155,7 @@ public class SelectValueFragment extends Fragment {
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spValue.setAdapter(timeoutAdapter);
 
-        if (value <= 200)
+        if (value >= 4 && value <= 200)
             binding.spValue.setSelection(value - 4);
         else
             binding.spValue.setSelection(0);
@@ -166,8 +166,8 @@ public class SelectValueFragment extends Fragment {
         storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spValue.setAdapter(storeRateAdapter);
 
-        if (value <= 24)
-            binding.spValue.setSelection(value);
+        if (value > 0 && value <= 24)
+            binding.spValue.setSelection(value - 1);
         else
             binding.spValue.setSelection(0);
     }

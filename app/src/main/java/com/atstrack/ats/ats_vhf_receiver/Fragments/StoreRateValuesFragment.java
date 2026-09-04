@@ -71,6 +71,8 @@ public class StoreRateValuesFragment extends Fragment {
                 case 120:
                     binding.tvOneHundredTwentyMinutes.setCompoundDrawablesWithIntrinsicBounds(0, 0, i == 0 ? 0 : R.drawable.ic_check, 0);
                     break;
+                case 240:
+                    binding.tvTwoHundredFortyMinutes.setCompoundDrawablesWithIntrinsicBounds(0, 0, i == 0 ? 0 : R.drawable.ic_check, 0);
             }
             this.storeRate = storeRate;
         }

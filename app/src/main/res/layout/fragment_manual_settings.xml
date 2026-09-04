@@ -61,10 +61,6 @@
 
         </LinearLayout>
 
-        <include
-            android:id="@+id/include_gps_option"
-            layout="@layout/include_gps_option"/>
-
     </LinearLayout>
 
     <Space

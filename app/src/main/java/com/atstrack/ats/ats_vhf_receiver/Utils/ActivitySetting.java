@@ -24,14 +24,14 @@ public class ActivitySetting {
         ImageView sd_card_imageView = context.findViewById(R.id.img_sd_card);
         TextView sd_card_textView = context.findViewById(R.id.tv_sd_card);
         sd_card_imageView.setBackground(ContextCompat.getDrawable(context, ReceiverInformation.getReceiverInformation().isSDCardInserted() ? R.drawable.ic_sd_card : R.drawable.ic_no_sd_card));
-        sd_card_textView.setText(ReceiverInformation.getReceiverInformation().isSDCardInserted() ? "Inserted" : "None");
+        sd_card_textView.setText(ReceiverInformation.getReceiverInformation().isSDCardInserted() ? context.getString(R.string.lbl_vhf_home_sd_card_inserted) : context.getString(R.string.lbl_vhf_manual_option_none));
     }
 
     public static void setBatteryPercent(Activity context) {
         ImageView percent_battery_imageView = context.findViewById(R.id.img_battery);
         TextView percent_battery_textView = context.findViewById(R.id.tv_percent_battery);
-        percent_battery_imageView.setBackground(ContextCompat.getDrawable(context, ReceiverInformation.getReceiverInformation().getPercentBattery() > 20 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
-        percent_battery_textView.setText(ReceiverInformation.getReceiverInformation().getPercentBattery() + "%");
+        percent_battery_imageView.setBackground(ContextCompat.getDrawable(context, ReceiverInformation.getReceiverInformation().getPercentBattery() > 0 ? R.drawable.ic_full_battery : R.drawable.ic_low_battery));
+        percent_battery_textView.setText(ReceiverInformation.getReceiverInformation().getPercentBattery() == 0 ? "Low" : ReceiverInformation.getReceiverInformation().getPercentBattery() + "%");
     }
 
     public static void setToolbar(AppCompatActivity context, String title, String deviceCategory) {

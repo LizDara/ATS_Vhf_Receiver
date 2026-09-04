@@ -138,20 +138,20 @@ public class StationarySettingsFragment extends Fragment implements ReceiverCall
         binding.includeStationarySettings.layoutExternalReferenceDefault.setVisibility(View.GONE);
         binding.includeStationarySettings.layoutExternalReferenceScan.setVisibility(View.VISIBLE);
         String tables = "";
-        if (stationaryDefaults.firstTableNumber != 0 && stationaryDefaults.firstTableNumber != 255)
+        if (stationaryDefaults.firstTableNumber != 0 && stationaryDefaults.firstTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
             tables += stationaryDefaults.firstTableNumber;
-        if (stationaryDefaults.secondTableNumber != 0 && stationaryDefaults.secondTableNumber != 255)
+        if (stationaryDefaults.secondTableNumber != 0 && stationaryDefaults.secondTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
             tables += ", " + stationaryDefaults.secondTableNumber;
-        if (stationaryDefaults.thirdTableNumber != 0 && stationaryDefaults.thirdTableNumber != 255)
+        if (stationaryDefaults.thirdTableNumber != 0 && stationaryDefaults.thirdTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
             tables += ", " + stationaryDefaults.thirdTableNumber;
-        binding.includeStationarySettings.tvFrequencyTableNumberStationary.setText(tables.isEmpty() ? "None" : tables);
-        binding.includeStationarySettings.tvNumberOfAntennasStationary.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
+        binding.includeStationarySettings.tvFrequencyTableNumberStationary.setText(tables.isEmpty() ? getString(R.string.lbl_vhf_manual_option_none) : tables);
+        binding.includeStationarySettings.tvNumberOfAntennasStationary.setText((stationaryDefaults.antennaNumber == 0) ? getString(R.string.lbl_vhf_manual_option_none) : String.valueOf(stationaryDefaults.antennaNumber));
         binding.includeStationarySettings.tvStationaryExternalDataTransfer.setText(stationaryDefaults.dataTransferOn ? "On" : "Off");
         binding.includeStationarySettings.tvScanRateSecondsStationary.setText(String.valueOf(stationaryDefaults.scanRate));
         binding.includeStationarySettings.tvScanTimeoutSecondsStationary.setText(String.valueOf(stationaryDefaults.scanTimeout));
         binding.includeStationarySettings.tvStoreRateMinutesStationary.setText(stationaryDefaults.storeRate == 0 ? getString(R.string.lbl_vhf_defaults_store_rate_continuous) : String.valueOf(stationaryDefaults.storeRate));
-        binding.includeStationarySettings.tvFrequencyReferenceStationary.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : "No Reference Frequency");
-        binding.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");
+        binding.includeStationarySettings.tvFrequencyReferenceStationary.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : getString(R.string.lbl_vhf_defaults_stationary_no_reference));
+        binding.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : getString(R.string.lbl_vhf_defaults_stationary_no_reference));
         binding.includeStationarySettings.tvStationaryReferenceFrequency.setText(stationaryDefaults.referenceFrequencyOn ? "On" : "Off");
     }
 }

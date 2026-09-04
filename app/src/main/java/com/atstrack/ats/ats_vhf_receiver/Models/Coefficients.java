@@ -1,11 +1,13 @@
 package com.atstrack.ats.ats_vhf_receiver.Models;
 
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+
 public class Coefficients {
     public int position = -1;
-    public int frequency = 255;
-    public int coefficientA = 255;
-    public int coefficientB = 255;
-    public int constant = 255;
+    public int frequency = Byte.toUnsignedInt(ValueCodes.NULL);
+    public int coefficientA = Byte.toUnsignedInt(ValueCodes.NULL);
+    public int coefficientB = Byte.toUnsignedInt(ValueCodes.NULL);
+    public int constant = Byte.toUnsignedInt(ValueCodes.NULL);
     public boolean isCoefficientANegative = true;
     public boolean isCoefficientBNegative = true;
     public boolean isConstantNegative = true;

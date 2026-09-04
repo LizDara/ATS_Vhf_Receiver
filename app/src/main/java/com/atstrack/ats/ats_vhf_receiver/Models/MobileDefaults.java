@@ -1,9 +1,11 @@
 package com.atstrack.ats.ats_vhf_receiver.Models;
 
+import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+
 public class MobileDefaults {
     public byte[] originalBytes;
-    public int tableNumber = 255;
-    public double scanRate = 255;
+    public int tableNumber = Byte.toUnsignedInt(ValueCodes.NULL);
+    public double scanRate = Byte.toUnsignedInt(ValueCodes.NULL);
     public boolean gpsOn = true;
     public boolean autoRecordOn = true;
 

@@ -22,6 +22,8 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.DialogsFragment.AudioOptionsDialogFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Models.Coordinates;
+import com.atstrack.ats.ats_vhf_receiver.Models.ScanDetail;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
@@ -29,20 +31,16 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.EnterFrequencyActivity;
 import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentManualScanningBinding;
 
 public class ManualScanningFragment extends ScanBaseFragment implements ReceiverCallback {
-    private boolean gpsOn;
-    private boolean enableGpsScanning;
     private byte[] audioOption = {ValueCodes.AUDIO_ALL_COMMAND, 0, 0};
     private DialogFragment audioOptions;
     private ActivityResultLauncher<Intent> launcher;
     private byte[] scanStateScanning;
 
-    public ManualScanningFragment(int baseFrequency, int range, int currentFrequency, boolean gpsOn) {
+    public ManualScanningFragment(int baseFrequency, int range, int currentFrequency) {
         this.baseFrequency = baseFrequency;
         this.range = range;
         this.currentFrequency = currentFrequency;
-        this.gpsOn = gpsOn;
         isScanning = false;
-        enableGpsScanning = true;
         initializeLauncher();
     }
 
@@ -51,9 +49,7 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
         this.range = range;
         this.scanStateScanning = data;
         isScanning = true;
-        enableGpsScanning = true;
         initializeLauncher();
-
     }
 
     @Nullable
@@ -98,10 +94,6 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
             audioOptions.show(getParentFragmentManager(), AudioOptionsDialogFragment.TAG);
         });
         ((FragmentManualScanningBinding) binding).tvViewDetectionManual.setOnClickListener(v -> showDetectionAlertDialog());
-        ((FragmentManualScanningBinding) binding).swGpsScanning.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (enableGpsScanning)
-                setGps();
-        });
         if (isScanning) {
             initializeScanning();
             setNotificationLogScanning();
@@ -120,8 +112,7 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
     }
 
     private void initializeScanning() {
-        ((FragmentManualScanningBinding) binding).swGpsScanning.setChecked((Byte.toUnsignedInt(scanStateScanning[15]) >> 7 & 1) == 1);
-        setVisibility(((FragmentManualScanningBinding) binding).swGpsScanning.isChecked() ? ValueCodes.GPS_SEARCHING : ValueCodes.GPS_OFF);
+        setVisibility(ValueCodes.GPS_SEARCHING);
         scanState(scanStateScanning);
     }
 
@@ -132,7 +123,7 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
                         return;
                     if (ValueCodes.RESULT_OK == result.getResultCode()) {
                         currentFrequency = result.getData().getIntExtra(ValueCodes.VALUE, 0);
-                        setStartScan();
+                        changeFrequency();
                     }
                 });
     }
@@ -168,19 +159,21 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
     }
 
     private void setStartScan() {
-        byte[] b = Converters.setCalendar(10);
+        byte[] b = Converters.setCalendar(7);
         b[0] = ValueCodes.MANUAL_SCAN_COMMAND;
-        b[7] = (byte) ((currentFrequency - baseFrequency) / 256);
-        b[8] = (byte) ((currentFrequency - baseFrequency) % 256);
-        b[9] = (byte) (gpsOn ? 0x80 : 0x0);
         isScanning = TransferBleData.writeStartScan(ValueCodes.MANUAL_SCAN_COMMAND, b);
         if (isScanning) {
             ((FragmentManualScanningBinding) binding).tvFrequencyScanManual.setText(Converters.getFrequency(currentFrequency));
-            ((FragmentManualScanningBinding) binding).swGpsScanning.setChecked(gpsOn);
-            setVisibility(((FragmentManualScanningBinding) binding).swGpsScanning.isChecked() ? ValueCodes.GPS_SEARCHING : ValueCodes.GPS_OFF);
+            setVisibility(ValueCodes.GPS_SEARCHING);
             setVisibility(ValueCodes.SCANNING);
-            enableGpsScanning = true;
         }
+    }
+
+    private void changeFrequency() {
+        byte[] b = new byte[] {(byte) 0x5D, (byte) ((currentFrequency - baseFrequency) / 256), (byte) ((currentFrequency - baseFrequency) % 256)};
+        boolean result = TransferBleData.writeScanning(b);
+        if (result)
+            ((FragmentManualScanningBinding) binding).tvFrequencyScanManual.setText(Converters.getFrequency(currentFrequency));
     }
 
     private void setRecord() {
@@ -222,23 +215,12 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
             b = new byte[] {audioOption[0], audioOption[2]};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            String audioDescription = "All";
+            String audioDescription = getString(R.string.lbl_vhf_manual_option_all);
             if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
                 audioDescription = "Single (" + Byte.toUnsignedInt(audioOption[1]) + ")";
             else if (audioOption[0] == ValueCodes.AUDIO_BACKGROUND_COMMAND)
-                audioDescription = "None";
+                audioDescription = getString(R.string.lbl_vhf_manual_option_none);
             ((FragmentManualScanningBinding) binding).includeAudioOption.tvIdAudio.setText(audioDescription);
-        }
-    }
-
-    private void setGps() {
-        boolean result = TransferBleData.writeGps(((FragmentManualScanningBinding) binding).swGpsScanning.isChecked());
-        if (result) {
-            setVisibility(((FragmentManualScanningBinding) binding).swGpsScanning.isChecked() ? ValueCodes.GPS_SEARCHING : ValueCodes.GPS_OFF);
-        } else {
-            enableGpsScanning = false;
-            ((FragmentManualScanningBinding) binding).swGpsScanning.setChecked(!((FragmentManualScanningBinding) binding).swGpsScanning.isChecked());
-            enableGpsScanning = true;
         }
     }
 
@@ -260,21 +242,21 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
                 logScanCoded(data);
                 break;
             case ValueCodes.SCAN_MANUAL_NON_CODED_COMMAND:
-                int signalStrength = Byte.toUnsignedInt(data[3]);
-                int period = (Byte.toUnsignedInt(data[4]) * 256) + Byte.toUnsignedInt(data[5]);
-//                if (detectionType == ValueCodes.FIXED)
-//                    logScanNonCodedFixed(data[0], period, signalStrength);
-//                else if (detectionType == ValueCodes.VARIABLE) {
-                    if (period > 0)
-                        scanNonCodedVariable(period, signalStrength);
-//                }
+                int signalStrength = Byte.toUnsignedInt(data[5]);
+                int period = (Byte.toUnsignedInt(data[6]) * 256) + Byte.toUnsignedInt(data[7]);
+                if (period > 0)
+                    logScanNonCoded(period, signalStrength);
                 break;
         }
     }
 
     private void scanState(byte[] data) {
-        int frequency = baseFrequency + ((Byte.toUnsignedInt(data[10]) * 256) + Byte.toUnsignedInt(data[11]));
-        ((FragmentManualScanningBinding) binding).tvFrequencyScanManual.setText(Converters.getFrequency(frequency));
+        if (scanStateScanning == null && currentFrequency > baseFrequency) {
+            changeFrequency();
+        } else {
+            int frequency = baseFrequency + ((Byte.toUnsignedInt(data[10]) * 256) + Byte.toUnsignedInt(data[11]));
+            ((FragmentManualScanningBinding) binding).tvFrequencyScanManual.setText(Converters.getFrequency(frequency));
+        }
         detectionType = data[18];
         scanDetailAdapter = new ScanDetailAdapter(requireContext(), detectionType == ValueCodes.CODED);
         ((FragmentManualScanningBinding) binding).includeScanDetails.includeRecyclerView.rvItem.setAdapter(scanDetailAdapter);
@@ -298,22 +280,38 @@ public class ManualScanningFragment extends ScanBaseFragment implements Receiver
     }
 
     private void logScanCoded(byte[] data) {
-        int signalStrength = Byte.toUnsignedInt(data[3]);
-        int code = Byte.toUnsignedInt(data[4]);
-        int mortality = Byte.toUnsignedInt(data[5]);
+        int signalStrength = Byte.toUnsignedInt(data[5]);
+        int code = Byte.toUnsignedInt(data[6]);
+        int mortality = Byte.toUnsignedInt(data[7]);
         scanCoded(code, signalStrength, mortality);
     }
 
-    private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
-        int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
-        if (period > 0)
-            scanNonCodedFixed(period, signalStrength, type);
+    private void logScanNonCoded(int period, int signalStrength) {
+        int pulseRate = 60000 / period;
+        int position = getPositionNumber(period);
+        if (position == -1) {
+            scanDetailAdapter.addDetailInPosition(0, new ScanDetail(period, 1, pulseRate, signalStrength, -1));
+        } else {
+            int detection = scanDetailAdapter.getDetail(position).detection;
+            scanDetailAdapter.removeInPosition(position);
+            scanDetailAdapter.addDetailInPosition(0, new ScanDetail(period, detection + 1 > 1000 ? 1 : detection + 1, pulseRate, signalStrength, -1));
+        }
+        scanDetailAdapter.notifyDataSetChanged();
+    }
+
+    private int getPositionNumber(int number) {
+        for (int i = 0; i < scanDetailAdapter.getItemCount(); i++) {
+            int currentNumber = scanDetailAdapter.getDetail(i).period;
+            if (number == currentNumber)
+                return i;
+        }
+        return -1;
     }
 
     private void logGps(byte[] data) {
-        String[] coordinates = Converters.getGpsData(data);
-        ((FragmentManualScanningBinding) binding).includeCoordinates.tvLatitude.setText(coordinates[0]);
-        ((FragmentManualScanningBinding) binding).includeCoordinates.tvLongitude.setText(coordinates[1]);
+        Coordinates coordinates = Converters.getGpsData(data);
+        ((FragmentManualScanningBinding) binding).includeCoordinates.tvLatitude.setText(coordinates.latitude);
+        ((FragmentManualScanningBinding) binding).includeCoordinates.tvLongitude.setText(coordinates.longitude);
     }
 
     @Override

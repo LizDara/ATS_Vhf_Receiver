@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -32,7 +33,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
                     String numbers = "";
                     for (int number : value)
                         numbers += number + ", ";
-                    ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText(numbers.substring(0, numbers.length() - 2));
+                    ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText(numbers.isEmpty() ? getString(R.string.lbl_vhf_config_not_set) : numbers.substring(0, numbers.length() - 2));
                 } else {
                     int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                     switch (result.getResultCode()) {
@@ -46,7 +47,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
                             ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.setText(String.valueOf(value));
                             break;
                         case ValueCodes.STORE_RATE_CODE: // Get store rate
-                            ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.setText((value == 0) ? "Continuous Store" : String.valueOf(value));
+                            ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.setText((value == 0) ? getString(R.string.lbl_vhf_defaults_store_rate_continuous) : String.valueOf(value));
                             break;
                         case ValueCodes.REFERENCE_FREQUENCY_STORE_RATE_CODE: // Get reference store rate
                             ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText(String.valueOf(value));
@@ -69,20 +70,20 @@ public class StationaryDefaultsActivity extends BaseActivity {
         int firstTableNumber = (tables.length > 0) ? Integer.parseInt(tables[0]) : 0;
         int secondTableNumber = (tables.length > 1) ? Integer.parseInt(tables[1]) : 0;
         int thirdTableNumber = (tables.length > 2) ? Integer.parseInt(tables[2]) : 0;
-        int antennasNumber = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString().equals("None") ? 0 :
+        int antennasNumber = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString().equals(getString(R.string.lbl_vhf_manual_option_none)) ? 0 :
                 Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString());
         int scanRate = Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanRateSecondsStationary.getText().toString());
         int scanTimeout = Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanTimeoutSecondsStationary.getText().toString());
         int externalDataPush = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryExternalDataTransfer.isChecked() ? 1 : 0;
         int storeRate;
-        if ("Continuous Store".equals(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString()))
+        if (getString(R.string.lbl_vhf_defaults_store_rate_continuous).equals(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString()))
             storeRate = 0;
         else
             storeRate = Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString());
         int frequency = (((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.isChecked()) ?
                 (Converters.getFrequencyNumber(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.getText().toString()) - baseFrequency) : 0;
         int referenceFrequencyStoreRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.isChecked()
-                ? Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString()) : 255;
+                ? Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString()) : Byte.toUnsignedInt(ValueCodes.NULL);
         byte[] b = new byte[] {(byte) 0x4C, (byte) antennasNumber, (byte) externalDataPush, (byte) scanRate, (byte) scanTimeout,
                 (byte) storeRate, (byte) (frequency / 256), (byte) (frequency % 256), (byte) referenceFrequencyStoreRate,
                 (byte) firstTableNumber, (byte) secondTableNumber, (byte) thirdTableNumber};
@@ -134,9 +135,11 @@ public class StationaryDefaultsActivity extends BaseActivity {
         ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.setOnCheckedChangeListener((compoundButton, b) -> {
             if (b) {
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.layoutReferenceFrequencyStationary.setEnabled(true);
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.setText(stationaryDefaults.referenceFrequency != 0 && stationaryDefaults.referenceFrequency != 255 ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : getString(R.string.lbl_vhf_config_not_set));
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.setText(stationaryDefaults.referenceFrequency != ValueCodes.NONE && stationaryDefaults.referenceFrequency != Byte.toUnsignedInt(ValueCodes.NULL) ?
+                        Converters.getFrequency(stationaryDefaults.referenceFrequency) : getString(R.string.lbl_vhf_config_not_set));
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.layoutReferenceFrequencyStoreRateStationary.setEnabled(true);
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText(stationaryDefaults.referenceStoreRate == 255 ? getString(R.string.lbl_vhf_config_not_set) : String.valueOf(stationaryDefaults.referenceStoreRate));
+                String referenceStoreRate = stationaryDefaults.referenceStoreRate != Byte.toUnsignedInt(ValueCodes.NULL) ? String.valueOf(stationaryDefaults.referenceStoreRate) : getString(R.string.lbl_vhf_config_not_set);
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText(referenceStoreRate);
             } else {
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.layoutReferenceFrequencyStationary.setEnabled(false);
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.setText(R.string.lbl_vhf_defaults_stationary_no_reference);
@@ -146,7 +149,7 @@ public class StationaryDefaultsActivity extends BaseActivity {
         });
         ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.layoutReferenceFrequencyStationary.setOnClickListener(v -> {
             Intent intent = new Intent(this, EnterFrequencyActivity.class);
-            intent.putExtra(ValueCodes.TITLE, "Reference Frequency");
+            intent.putExtra(ValueCodes.TITLE, getString(R.string.lbl_vhf_stationary_reference_freq));
             intent.putExtra(ValueCodes.BASE_FREQUENCY, baseFrequency);
             intent.putExtra(ValueCodes.RANGE, range);
             launcher.launch(intent);
@@ -212,20 +215,20 @@ public class StationaryDefaultsActivity extends BaseActivity {
             if (!Converters.isDefaultEmpty(data)) {
                 stationaryDefaults = new StationaryDefaults(baseFrequency, data);
                 String tables = "";
-                if (stationaryDefaults.firstTableNumber != 0 && stationaryDefaults.firstTableNumber != 255)
+                if (stationaryDefaults.firstTableNumber != 0 && stationaryDefaults.firstTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
                     tables += stationaryDefaults.firstTableNumber;
-                if (stationaryDefaults.secondTableNumber != 0 && stationaryDefaults.secondTableNumber != 255)
+                if (stationaryDefaults.secondTableNumber != 0 && stationaryDefaults.secondTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
                     tables += ", " + stationaryDefaults.secondTableNumber;
-                if (stationaryDefaults.thirdTableNumber != 0 && stationaryDefaults.thirdTableNumber != 255)
+                if (stationaryDefaults.thirdTableNumber != 0 && stationaryDefaults.thirdTableNumber != Byte.toUnsignedInt(ValueCodes.NULL))
                     tables += ", " + stationaryDefaults.thirdTableNumber;
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText(tables.isEmpty() ? "None" : tables);
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.setText((stationaryDefaults.antennaNumber == 0) ? "None" : String.valueOf(stationaryDefaults.antennaNumber));
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText(tables.isEmpty() ? getString(R.string.lbl_vhf_manual_option_none) : tables);
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.setText((stationaryDefaults.antennaNumber == 0) ? getString(R.string.lbl_vhf_manual_option_none) : String.valueOf(stationaryDefaults.antennaNumber));
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryExternalDataTransfer.setChecked(stationaryDefaults.dataTransferOn);
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanRateSecondsStationary.setText(String.valueOf(stationaryDefaults.scanRate));
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanTimeoutSecondsStationary.setText(String.valueOf(stationaryDefaults.scanTimeout));
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.setText(stationaryDefaults.storeRate == 0 ? getString(R.string.lbl_vhf_defaults_store_rate_continuous) : String.valueOf(stationaryDefaults.storeRate));
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : "No Reference Frequency");
-                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : "No Reference Frequency");
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.setText((stationaryDefaults.referenceFrequencyOn) ? Converters.getFrequency(stationaryDefaults.referenceFrequency) : getString(R.string.lbl_vhf_defaults_stationary_no_reference));
+                ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.setText((stationaryDefaults.referenceFrequencyOn) ? String.valueOf(stationaryDefaults.referenceStoreRate) : getString(R.string.lbl_vhf_defaults_stationary_no_reference));
                 ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.setChecked(stationaryDefaults.referenceFrequencyOn);
             } else {
                 stationaryDefaults = new StationaryDefaults();
@@ -269,28 +272,31 @@ public class StationaryDefaultsActivity extends BaseActivity {
      */
     private boolean existChanges() {
         int firstTableNumber = 0, secondTableNumber = 0, thirdTableNumber = 0;
-        if (!((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.getText().toString().equals("Not Set")) {
+        if (!((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set))) {
             String[] tables = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.getText().toString().split(", ");
             firstTableNumber = (tables.length > 0) ? Integer.parseInt(tables[0]) : 0;
             secondTableNumber = (tables.length > 1) ? Integer.parseInt(tables[1]) : 0;
             thirdTableNumber = (tables.length > 2) ? Integer.parseInt(tables[2]) : 0;
         }
-        int antennaNumber = (((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString().equals("Not Set") ? 0 :
+        int antennaNumber = (((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)) ? ValueCodes.NONE :
                 Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvNumberOfAntennasStationary.getText().toString()));
-        int scanRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanRateSecondsStationary.getText().toString().equals("Not Set") ? 0 :
+        int scanRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanRateSecondsStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)) ? ValueCodes.NONE :
                 Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanRateSecondsStationary.getText().toString());
-        int timeout = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanTimeoutSecondsStationary.getText().toString().equals("Not Set") ? 0 :
+        int timeout = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanTimeoutSecondsStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)) ? ValueCodes.NONE :
                 Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvScanTimeoutSecondsStationary.getText().toString());
         int storeRate;
-        if ("Continuous Store".equals(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString()))
+        if (getString(R.string.lbl_vhf_defaults_store_rate_continuous).equals(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString()))
             storeRate = 0;
         else
-            storeRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString().equals("Not Set") ? 0 :
+            storeRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)) ? ValueCodes.NONE :
                     Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvStoreRateMinutesStationary.getText().toString());
-        int referenceFrequency = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.isChecked() && !((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.getText().toString().equals("Not Set") ?
-                Converters.getFrequencyNumber(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.getText().toString()) : 0;
-        int referenceFrequencyStoreRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.isChecked() && !((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString().equals("Not Set") ?
-                Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString()) : 255;
+        int referenceFrequency = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.swStationaryReferenceFrequency.isChecked() && !((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)) ?
+                Converters.getFrequencyNumber(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyReferenceStationary.getText().toString()) : ValueCodes.NONE;
+        int referenceFrequencyStoreRate = Byte.toUnsignedInt(ValueCodes.NULL);
+        if (!((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set))) {
+            referenceFrequencyStoreRate = ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString().equals(getString(R.string.lbl_vhf_defaults_store_rate_continuous)) ? ValueCodes.NONE :
+                    (((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString().equals(getString(R.string.lbl_vhf_defaults_stationary_no_reference)) ? ValueCodes.NONE : Integer.parseInt(((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvReferenceFrequencyStoreRateStationary.getText().toString()));
+        }
 
         return stationaryDefaults.firstTableNumber != firstTableNumber || stationaryDefaults.secondTableNumber != secondTableNumber
                 || stationaryDefaults.thirdTableNumber != thirdTableNumber || stationaryDefaults.antennaNumber != antennaNumber

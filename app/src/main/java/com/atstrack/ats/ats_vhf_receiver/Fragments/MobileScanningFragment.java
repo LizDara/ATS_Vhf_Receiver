@@ -21,6 +21,7 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.DialogsFragment.AudioOptionsDialogFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Models.Coordinates;
 import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
@@ -240,11 +241,11 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
             b = new byte[] {audioOption[0], audioOption[2]};
         boolean result = TransferBleData.writeScanning(b);
         if (result) {
-            String audioDescription = "All";
+            String audioDescription = getString(R.string.lbl_vhf_manual_option_all);
             if (audioOption[0] == ValueCodes.AUDIO_ONE_COMMAND)
                 audioDescription = "Single (" + Byte.toUnsignedInt(audioOption[1]) + ")";
             else if (audioOption[0] == ValueCodes.AUDIO_BACKGROUND_COMMAND)
-                audioDescription = "None";
+                audioDescription = getString(R.string.lbl_vhf_manual_option_none);
             ((FragmentMobileScanningBinding) binding).includeAudioOption.tvIdAudio.setText(audioDescription);
         }
     }
@@ -330,9 +331,9 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
     }
 
     private void logGps(byte[] data) {
-        String[] coordinates = Converters.getGpsData(data);
-        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLatitude.setText(coordinates[0]);
-        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLongitude.setText(coordinates[1]);
+        Coordinates coordinates = Converters.getGpsData(data);
+        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLatitude.setText(coordinates.latitude);
+        ((FragmentMobileScanningBinding) binding).includeCoordinates.tvLongitude.setText(coordinates.longitude);
     }
 
     @Override

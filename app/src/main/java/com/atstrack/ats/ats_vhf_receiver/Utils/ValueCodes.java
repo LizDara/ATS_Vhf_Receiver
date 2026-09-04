@@ -4,7 +4,7 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ATSar";
     public static final String VHF = "ATSvr";
-    public static final String BLUETOOTH_RECEIVER = "ATSbr"; // UART
+    public static final String BLUETOOTH_RECEIVER = "ATSbr"; //UART
     public static final String WILDLINK = "ATSwl";
     public static final String BEACON = "CTT"; // ATSbt
 
@@ -32,8 +32,7 @@ public class ValueCodes {
     //Periods
     public static final int WAITING_PERIOD = 180;
     public static final int MESSAGE_PERIOD = 1000;
-    public static final int DOWNLOAD_PERIOD = 260; //280
-    public static final int SCAN_PERIOD = 2000;
+    public static final int DOWNLOAD_PERIOD = 900; //280
     public static final int BRANDING_PERIOD = 2000;
     public static final int CONNECT_TIMEOUT = 3200;
 
@@ -152,6 +151,7 @@ public class ValueCodes {
     public static final byte TIMESTAMP_COMMAND = (byte) 0x28;
     public static final byte VOLTAGE_COMMAND = (byte) 0x29;
     public static final byte LOW_BATTERY_COMMAND = (byte) 0x2D;
+    public static final byte SERIAL_COMMAND = (byte) 0x2A;
 
     public static final byte GPS_VALID = 3;
     public static final byte GPS_FAILED = 2;

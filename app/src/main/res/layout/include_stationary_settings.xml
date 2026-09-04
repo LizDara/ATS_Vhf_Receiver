@@ -443,7 +443,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
-                android:text="@string/lbl_vhf_defaults_stationary_reference_rate"
+                android:text="@string/lbl_vhf_defaults_stationary_reference_rate_hours"
                 android:textColor="@color/limed_spruce" />
 
             <TextView

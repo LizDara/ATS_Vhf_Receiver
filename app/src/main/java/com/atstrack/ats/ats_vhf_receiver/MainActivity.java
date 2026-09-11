@@ -26,8 +26,6 @@ import android.view.WindowManager;
 import com.atstrack.ats.ats_vhf_receiver.Adapters.CategoryAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BeaconTag.BeaconTagDetectionActivity;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnAdapterClickListener;
-import com.atstrack.ats.ats_vhf_receiver.Models.Coordinates;
-import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityMainBinding;
 
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
     private CategoryAdapter categoryListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private String deniedPermissions = "";
-    private boolean isNightModeOn;
+//    private boolean isNightModeOn;
 
     ActivityResultLauncher<Intent> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -267,9 +265,14 @@ public class MainActivity extends AppCompatActivity implements OnAdapterClickLis
         builder.setMessage("To ensure complete functioning of this app please select it your phone's settings and set \"Allow\" for the following permissions:" + deniedPermissions);
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
             if (deniedPermissions.contains("Files")) {
-                Intent enableBtIntent = new Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                int REQUEST_STORAGE = 1;
-                startActivityForResult(enableBtIntent, REQUEST_STORAGE);
+//                Intent enableBtIntent = new Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+//                int REQUEST_STORAGE = 1;
+//                startActivityForResult(enableBtIntent, REQUEST_STORAGE);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    Intent enableBtIntent = new Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    int REQUEST_STORAGE = 1;
+                    startActivityForResult(enableBtIntent, REQUEST_STORAGE);
+                }
             }
             finish();
         });

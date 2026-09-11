@@ -4,6 +4,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.pow;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -65,10 +66,16 @@ public class Converters {
     }
 
     public static String getAsciiValue(int start, int end, byte[] data) {
-        String value = "";
+        StringBuilder value = new StringBuilder();
         for (int i = start; i < end; i++)
-            value += (char) data[i];
-        return value;
+            value.append((char) data[i]);
+        return value.toString();
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String getTimeString() {
+        Calendar cal = Calendar.getInstance();
+        return String.format("%02d:%02d:%02d.%03d", cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND));
     }
 
     public static String getFrequency(int frequency) {
@@ -303,8 +310,8 @@ public class Converters {
      * @return Returns the processed data.
      */
     public static synchronized String[] getPackageProcessed(ArrayList<byte[]> data, View process_percent, BaseActivity baseActivity, boolean isRawFile) {
-        String text = "";
-        String metrics = "";
+        StringBuilder text = new StringBuilder();
+        StringBuilder metrics = new StringBuilder();
         byte scanType = 0;
         int baseFrequency = 0;
         int frequency = 0;
@@ -332,29 +339,29 @@ public class Converters {
                         YY = Byte.toUnsignedInt(packet[index + 6]);
                         switch (format) {
                             case ValueCodes.STATIONARY_SCAN_COMMAND: {
-                                text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "[Header]" + ValueCodes.CR + ValueCodes.LF;
+                                text.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
+                                metrics.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
                                 if (packet[index + 24] == ValueCodes.SERIAL_COMMAND) {
                                     int serial = Byte.toUnsignedInt(packet[index + 28]) << 16 | Byte.toUnsignedInt(packet[index + 29]) << 8 | Byte.toUnsignedInt(packet[index + 30]);
-                                    text += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
+                                    text.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    metrics.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
                                 }
                                 baseFrequency = Byte.toUnsignedInt(packet[index + 20]) * 1000;
-                                text += "Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Scan Interval (seconds): " + Byte.toUnsignedInt(packet[index + 3]) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Scan Timeout (seconds): " + Byte.toUnsignedInt(packet[index + 4]) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Num of Antennas: " + (Byte.toUnsignedInt(packet[index + 1]) + 1) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Store Interval (minutes): " + (packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))) + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF);
+                                metrics.append("Scan Type: Stationary" + ValueCodes.CR + ValueCodes.LF);
+                                text.append("Scan Interval (seconds): ").append(Byte.toUnsignedInt(packet[index + 3])).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Scan Interval (seconds): ").append(Byte.toUnsignedInt(packet[index + 3])).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Scan Timeout (seconds): ").append(Byte.toUnsignedInt(packet[index + 4])).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Scan Timeout (seconds): ").append(Byte.toUnsignedInt(packet[index + 4])).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1]) + 1).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1]) + 1).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Store Interval (minutes): ").append(packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Store Interval (minutes): ").append(packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))).append(ValueCodes.CR).append(ValueCodes.LF);
                                 int referenceFrequency = (Byte.toUnsignedInt(packet[index + 9]) * 256) + Byte.toUnsignedInt(packet[index + 10]) + baseFrequency;
-                                text += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Reference Frequency: " + (referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)) + ValueCodes.CR + ValueCodes.LF;
-                                text += "Reference Frequency Store Interval (hours): " + (referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Reference Frequency Store Interval (hours): " + (referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))) + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Reference Frequency: ").append(referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Reference Frequency: ").append(referenceFrequency == baseFrequency ? "No" : Converters.getFrequency(referenceFrequency)).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Reference Frequency Store Interval (hours): ").append(referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Reference Frequency Store Interval (hours): ").append(referenceFrequency == baseFrequency ? "No" : String.valueOf(Byte.toUnsignedInt(packet[index + 11]))).append(ValueCodes.CR).append(ValueCodes.LF);
                                 detectionType = (byte) (packet[index + 2] & (byte) 0x0F);
                                 matches = Byte.toUnsignedInt(packet[index + 2]) / 16;
                                 String detection = "Coded";
@@ -367,27 +374,27 @@ public class Converters {
                                     details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
                                 } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
-                                text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Transmitter Detection Details: ").append(details).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Transmitter Detection Details: ").append(details).append(ValueCodes.CR).append(ValueCodes.LF);
                                 index += 16;
                                 byteIndex += 16;
                                 break;
                             }
                             case ValueCodes.MOBILE_SCAN_COMMAND: {
-                                text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "[Header]" + ValueCodes.CR + ValueCodes.LF;
+                                text.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
+                                metrics.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
                                 if (packet[index + 16] == ValueCodes.SERIAL_COMMAND) {
                                     int serial = Byte.toUnsignedInt(packet[index + 20]) << 16 | Byte.toUnsignedInt(packet[index + 21]) << 8 | Byte.toUnsignedInt(packet[index + 22]);
-                                    text += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
+                                    text.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    metrics.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
                                 }
                                 baseFrequency = Byte.toUnsignedInt(packet[index + 5]) * 1000;
-                                text += "Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF;
-                                text += "Scan Interval (seconds): " + (Byte.toUnsignedInt(packet[index + 3]) * 0.1) + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Scan Interval (seconds): " + (Byte.toUnsignedInt(packet[index + 3]) * 0.1) + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF);
+                                metrics.append("Scan Type: Mobile" + ValueCodes.CR + ValueCodes.LF);
+                                text.append("Scan Interval (seconds): ").append(Byte.toUnsignedInt(packet[index + 3]) * 0.1).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Scan Interval (seconds): ").append(Byte.toUnsignedInt(packet[index + 3]) * 0.1).append(ValueCodes.CR).append(ValueCodes.LF);
                                 detectionType = (byte) (packet[index + 4] & (byte) 0x0F);
                                 matches = Byte.toUnsignedInt(packet[index + 4]) / 16;
                                 String detection = "Coded";
@@ -400,13 +407,13 @@ public class Converters {
                                     details = matches + " matches required, " + Byte.toUnsignedInt(packet[index + 7]) + " to " + Byte.toUnsignedInt(packet[index + 10]) + " pulse rate range";
                                 } else if (detectionType == ValueCodes.VARIABLE_TEMPERATURE)
                                     detection = "Non Coded Variable Pulse Rate";
-                                text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                text += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Transmitter Detection Details: " + details + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Transmitter Detection Details: ").append(details).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Transmitter Detection Details: ").append(details).append(ValueCodes.CR).append(ValueCodes.LF);
                                 int gps = Byte.toUnsignedInt(packet[index + 2]) >> 7 & 1;
-                                text += "Gps: " + (gps == 1 ? "On" : "Off") + ValueCodes.CR + ValueCodes.LF;
-                                metrics += "Gps: " + (gps == 1 ? "On" : "Off") + ValueCodes.CR + ValueCodes.LF;
+                                text.append("Gps: ").append(gps == 1 ? "On" : "Off").append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Gps: ").append(gps == 1 ? "On" : "Off").append(ValueCodes.CR).append(ValueCodes.LF);
                                 index += 8;
                                 byteIndex += 8;
                                 break;
@@ -428,29 +435,29 @@ public class Converters {
                                 detectionType = packet[index + 8] == ValueCodes.SCAN_MANUAL_CODED_COMMAND ? ValueCodes.CODED : ValueCodes.NONE;
                                 String detection = detectionType == ValueCodes.CODED ? "Coded" : "Non Coded";
                                 if (scanType != ValueCodes.MANUAL_SCAN_COMMAND) {
-                                    text += "[Header]" + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "[Header]" + ValueCodes.CR + ValueCodes.LF;
-                                    text += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Serial: " + serial + ValueCodes.CR + ValueCodes.LF;
-                                    text += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF;
-                                    text += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Transmitter Detection Type: " + detection + ValueCodes.CR + ValueCodes.LF;
-                                    text += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
-                                    metrics += "Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF;
+                                    text.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
+                                    metrics.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
+                                    text.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    metrics.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    text.append("Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF);
+                                    metrics.append("Scan Type: Manual" + ValueCodes.CR + ValueCodes.LF);
+                                    text.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    metrics.append("Transmitter Detection Type: ").append(detection).append(ValueCodes.CR).append(ValueCodes.LF);
+                                    text.append("Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF);
+                                    metrics.append("Transmitter Detection Details: " + ValueCodes.CR + ValueCodes.LF);
                                 }
                                 break;
                             }
                         }
                         scanType = packet[index];
-                        text += "[Data]" + ValueCodes.CR + ValueCodes.LF;
-                        metrics += "[Data]" + ValueCodes.CR + ValueCodes.LF;
-                        text += (detectionType == ValueCodes.CODED ?
+                        text.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
+                        metrics.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
+                        text.append(detectionType == ValueCodes.CODED ?
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (detectionType == ValueCodes.CODED ?
+                                "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append(detectionType == ValueCodes.CODED ?
                                 "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum") + ValueCodes.CR + ValueCodes.LF;
+                                "Year, JulianDay, Hour, Min, Sec, Ant, Freq, SS, PeriodHi, PeriodLo, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_HEADER_COMMAND:
                         if (process_percent != null) {
@@ -502,14 +509,8 @@ public class Converters {
                             byteIndex += 16;
                         }
 
-                        text += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection + ", " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((currentDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(currentDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(currentDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(currentDateTime.get(Calendar.MINUTE)).append(", ").append(currentDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", ").append(numberDetection).append(", ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((currentDateTime.get(Calendar.MONTH) + 1)).append("/").append(currentDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(currentDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((currentDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(currentDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(currentDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(currentDateTime.get(Calendar.MINUTE)).append(", ").append(currentDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", ").append(numberDetection).append(", ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((currentDateTime.get(Calendar.MONTH) + 1)).append("/").append(currentDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(currentDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND:
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
@@ -517,14 +518,8 @@ public class Converters {
                         mort = (Byte.toUnsignedInt(packet[index + 6]) * 256) + Byte.toUnsignedInt(packet[index + 5]);
                         numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
-                        text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " +
-                                baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) +
-                                ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
-                                ", 0, 0, 0, " + ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " +
-                                baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) +
-                                ", " + Converters.getFrequency(frequency) + ", " + signalStrength + ", " + code + ", " + mort + ", " + numberDetection +
-                                ", 0, 0, 0, " + ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", ").append(numberDetection).append(", 0, 0, 0, ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", ").append(numberDetection).append(", 0, 0, 0, ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
                     case ValueCodes.SCAN_DATA_VARIABLE_NON_CODED_COMMAND:
@@ -552,14 +547,8 @@ public class Converters {
                             byteIndex += 16;
                         }
 
-                        text += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (currentDateTime.get(Calendar.YEAR) - 2000) + ", " + currentDateTime.get(Calendar.DAY_OF_YEAR) + ", " + currentDateTime.get(Calendar.HOUR_OF_DAY) + ", " + currentDateTime.get(Calendar.MINUTE) +
-                                ", " + currentDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((currentDateTime.get(Calendar.MONTH) + 1) + "/" + currentDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (currentDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((currentDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(currentDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(currentDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(currentDateTime.get(Calendar.MINUTE)).append(", ").append(currentDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", ").append(numberDetection).append(", ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((currentDateTime.get(Calendar.MONTH) + 1)).append("/").append(currentDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(currentDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((currentDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(currentDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(currentDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(currentDateTime.get(Calendar.MINUTE)).append(", ").append(currentDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", ").append(numberDetection).append(", ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((currentDateTime.get(Calendar.MONTH) + 1)).append("/").append(currentDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(currentDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
                         signalStrength = Byte.toUnsignedInt(packet[index + 4]);
@@ -567,14 +556,8 @@ public class Converters {
                         periodLo = 0;
                         numberDetection = (Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 7]);
 
-                        text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
-                                ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", 0, 0, 0, " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) + ", " + baseDateTime.get(Calendar.MINUTE) +
-                                ", " + baseDateTime.get(Calendar.SECOND) + ", " + (antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna) + ", " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", " + numberDetection + ", 0, 0, 0, " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", ").append(numberDetection).append(", 0, 0, 0, ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", ").append(antenna == 0 && scanType == ValueCodes.STATIONARY_SCAN_COMMAND ? "All" : antenna).append(", ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", ").append(numberDetection).append(", 0, 0, 0, ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_MANUAL_CODED_COMMAND:
                         date = Byte.toUnsignedInt(packet[index + 2]) << 16 | Byte.toUnsignedInt(packet[index + 3]) << 8 | Byte.toUnsignedInt(packet[index + 4]);
@@ -604,14 +587,8 @@ public class Converters {
                             byteIndex += 16;
                         }
 
-                        text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + code + ", " + mort + ", 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + code + ", " + mort + ", 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", 0, ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", 0, ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(code).append(", ").append(mort).append(", 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_MANUAL_NON_CODED_COMMAND:
                         date = Byte.toUnsignedInt(packet[index + 2]) << 16 | Byte.toUnsignedInt(packet[index + 3]) << 8 | Byte.toUnsignedInt(packet[index + 4]);
@@ -641,14 +618,8 @@ public class Converters {
                             byteIndex += 16;
                         }
 
-                        text += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += (baseDateTime.get(Calendar.YEAR) - 2000) + ", " + baseDateTime.get(Calendar.DAY_OF_YEAR) + ", " + baseDateTime.get(Calendar.HOUR_OF_DAY) +
-                                ", " + baseDateTime.get(Calendar.MINUTE) + ", " + baseDateTime.get(Calendar.SECOND) + ", 0, " + Converters.getFrequency(frequency) +
-                                ", " + signalStrength + ", " + periodHi + ", " + periodLo + ", 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", " +
-                                ((baseDateTime.get(Calendar.MONTH) + 1) + "/" + baseDateTime.get(Calendar.DAY_OF_MONTH) + "/" + (baseDateTime.get(Calendar.YEAR) - 2000)) + ", " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", 0, ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append((baseDateTime.get(Calendar.YEAR) - 2000)).append(", ").append(baseDateTime.get(Calendar.DAY_OF_YEAR)).append(", ").append(baseDateTime.get(Calendar.HOUR_OF_DAY)).append(", ").append(baseDateTime.get(Calendar.MINUTE)).append(", ").append(baseDateTime.get(Calendar.SECOND)).append(", 0, ").append(Converters.getFrequency(frequency)).append(", ").append(signalStrength).append(", ").append(periodHi).append(", ").append(periodLo).append(", 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", ").append((baseDateTime.get(Calendar.MONTH) + 1)).append("/").append(baseDateTime.get(Calendar.DAY_OF_MONTH)).append("/").append(baseDateTime.get(Calendar.YEAR) - 2000).append(", ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_GPS_COMMAND: // MANUAL SCAN, NO DATA ONLY GPS
                         byte[] gpsData = new byte[16];
@@ -664,23 +635,23 @@ public class Converters {
                         index += 8;
                         byteIndex += 8;
 
-                        text += YY + ", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", 0, " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
-                        metrics += YY + ", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, " + coordinates.latitude + ", " + coordinates.longitude + ", " + coordinates.timestamp + ", 0, " + sessionNumber + ValueCodes.CR + ValueCodes.LF;
+                        text.append(YY).append(", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", 0, ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append(YY).append(", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ").append(coordinates.latitude).append(", ").append(coordinates.longitude).append(", ").append(coordinates.timestamp).append(", 0, ").append(sessionNumber).append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_STOP_COMMAND:
                         int scanSession = (Byte.toUnsignedInt(packet[index + 1]) * 65536) + (Byte.toUnsignedInt(packet[index + 2]) * 256) + Byte.toUnsignedInt(packet[index + 3]);
-                        text += "[Footer]" + ValueCodes.CR + ValueCodes.LF;
-                        metrics += "[Footer]" + ValueCodes.CR + ValueCodes.LF;
-                        text += "Session Num: " + scanSession + ValueCodes.CR + ValueCodes.LF;
-                        metrics += "Session Num: " + scanSession + ValueCodes.CR + ValueCodes.LF;
+                        text.append("[Footer]" + ValueCodes.CR + ValueCodes.LF);
+                        metrics.append("[Footer]" + ValueCodes.CR + ValueCodes.LF);
+                        text.append("Session Num: ").append(scanSession).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append("Session Num: ").append(scanSession).append(ValueCodes.CR).append(ValueCodes.LF);
                         date = Byte.toUnsignedInt(packet[index + 12]) << 16 | Byte.toUnsignedInt(packet[index + 13]) << 8 | Byte.toUnsignedInt(packet[index + 14]);
                         mm = date % 100;
                         hh = (date / 100) % 100;
                         DD = (date / 10000) % 100;
                         MM = date / 1000000;
                         ss = Byte.toUnsignedInt(packet[index + 15]);
-                        text += "Time Stamp: " + MM + "/" + DD + "/" + YY + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
-                        metrics += "Time Stamp: " + MM + "/" + DD + "/" + YY + " " + hh + ":" + mm + ":" + ss + ValueCodes.CR + ValueCodes.LF;
+                        text.append("Time Stamp: ").append(MM).append("/").append(DD).append("/").append(YY).append(" ").append(hh).append(":").append(mm).append(":").append(ss).append(ValueCodes.CR).append(ValueCodes.LF);
+                        metrics.append("Time Stamp: ").append(MM).append("/").append(DD).append("/").append(YY).append(" ").append(hh).append(":").append(mm).append(":").append(ss).append(ValueCodes.CR).append(ValueCodes.LF);
                         if (scanSession == sessionNumber)
                             sessionNumber++;
                         index += 8;
@@ -695,14 +666,14 @@ public class Converters {
                             DD = (date / 10000) % 100;
                             MM = date / 1000000;
                             ss = Byte.toUnsignedInt(packet[index + 7]);
-                            metrics += "SysTime: " + sysTime + ", M: " + MM + ", D: " + DD + ", H: " + hh + ", m: " + mm + ", s: " + ss + ValueCodes.CR + ValueCodes.LF;
+                            metrics.append("SysTime: ").append(sysTime).append(", M: ").append(MM).append(", D: ").append(DD).append(", H: ").append(hh).append(", m: ").append(mm).append(", s: ").append(ss).append(ValueCodes.CR).append(ValueCodes.LF);
                         } else if (packet[index] == ValueCodes.VOLTAGE_COMMAND) {
                             int sysTime = Byte.toUnsignedInt(packet[index + 1]) << 16 | Byte.toUnsignedInt(packet[index + 2]) << 8 | Byte.toUnsignedInt(packet[index + 3]);
                             int extVolt = Byte.toUnsignedInt(packet[index + 4]) << 8 | Byte.toUnsignedInt(packet[index + 5]);
                             int intVolt = (Byte.toUnsignedInt(packet[index + 7]) * 10) + 6000;
-                            metrics += "SysTime: " + sysTime + ", Battery: " + Byte.toUnsignedInt(packet[index + 6]) + ", Internal Voltage: " + intVolt + ", External Voltage: " + extVolt + ValueCodes.CR + ValueCodes.LF;
+                            metrics.append("SysTime: ").append(sysTime).append(", Battery: ").append(Byte.toUnsignedInt(packet[index + 6])).append(", Internal Voltage: ").append(intVolt).append(", External Voltage: ").append(extVolt).append(ValueCodes.CR).append(ValueCodes.LF);
                         } else if (packet[index] == ValueCodes.LOW_BATTERY_COMMAND) {
-                            metrics += "Low Battery Detected" + ValueCodes.CR + ValueCodes.LF;
+                            metrics.append("Low Battery Detected" + ValueCodes.CR + ValueCodes.LF);
                         }
                         break;
                 }
@@ -710,44 +681,44 @@ public class Converters {
                 byteIndex += 8;
             }
         }
-        return new String[] {text, metrics};
+        return new String[] {text.toString(), metrics.toString()};
     }
 
     public static String getTagsData(ArrayList<TagDetail> tags) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        String text = "Tag Type, Tag ID, Date/Time, RSSI, Latitude, Longitude, Tag Version, Vcc (mv), Temp (C)" + ValueCodes.CR + ValueCodes.LF;
+        StringBuilder text = new StringBuilder("Tag Type, Tag ID, Date/Time, RSSI, Latitude, Longitude, Tag Version, Vcc (mv), Temp (C)" + ValueCodes.CR + ValueCodes.LF);
         for (TagDetail tag : tags)
-            text += "Bluetooth, " + tag.code + ", " + simpleDateFormat.format(new Date(tag.lastTimestamp)) + ", " + tag.rssi + ", " + tag.latitude + ", " + tag.longitude + ", 1.0, " + tag.voltage + ", " + tag.temperature + ValueCodes.CR + ValueCodes.LF;
-        return text;
+            text.append("Bluetooth, ").append(tag.code).append(", ").append(simpleDateFormat.format(new Date(tag.lastTimestamp))).append(", ").append(tag.rssi).append(", ").append(tag.latitude).append(", ").append(tag.longitude).append(", 1.0, ").append(tag.voltage).append(", ").append(tag.temperature).append(ValueCodes.CR).append(ValueCodes.LF);
+        return text.toString();
     }
 
     public static boolean printDataFiles(File root, ArrayList<Data> dataList) {
         if (dataList == null) return false;
 
         try {
-            if (!root.exists()) { // 1. Validar y crear directorio raíz
+            if (!root.exists()) {
                 if (!root.mkdirs())
                     throw new Exception("Folder 'atstrack' can't be created on root: " + root.getPath());
                 root.setReadable(true);
                 root.setWritable(true);
             }
 
-            for (Data dataObj : dataList) { // 2. Procesar cada elemento de la lista
+            for (Data dataObj : dataList) {
                 File newFile = new File(root, dataObj.fileName);
                 int copy = 1;
-                String baseName = dataObj.fileName.substring(0, dataObj.fileName.length() - 4); // Extraer base sin el ".txt" de forma segura
-                while (newFile.exists() && copy < 100) { // Evitar bucle infinito limitando los intentos de copia (ej. max 100)
+                String baseName = dataObj.fileName.substring(0, dataObj.fileName.length() - 4);
+                while (newFile.exists() && copy < 100) {
                     newFile = new File(root, baseName + " (" + copy + ").txt");
                     copy++;
                 }
-                if (newFile.createNewFile()) { // 3. Crear y escribir en el archivo usando Try-With-Resources (Cierre automático)
+                if (newFile.createNewFile()) {
                     newFile.setReadable(true);
                     newFile.setWritable(true);
                     try (FileOutputStream stream = new FileOutputStream(newFile)) {
                         for (byte[] packet : dataObj.packets)
                             stream.write(packet);
                         stream.flush();
-                    } // El stream se cierra automáticamente aquí, incluso si hay un error de escritura
+                    }
                 } else {
                     throw new Exception("The file can't be created: " + newFile.getName());
                 }

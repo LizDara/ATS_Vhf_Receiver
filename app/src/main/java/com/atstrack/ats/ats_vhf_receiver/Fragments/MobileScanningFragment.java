@@ -209,7 +209,7 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
         ((FragmentMobileScanningBinding) binding).tvTableIndexMobile.setText(String.valueOf(currentIndex));
         setVisibility(isHold ? ValueCodes.START_HOLD : ValueCodes.STOP_HOLD);
         setVisibility(isRecord ? ValueCodes.START_RECORD : ValueCodes.STOP_RECORD);
-        setVisibility(mobileDefaults.gpsOn ? ValueCodes.GPS_SEARCHING : ValueCodes.GPS_OFF);
+        setVisibility(mobileDefaults.gpsOn ? (scanState[14] == ValueCodes.GPS_OFF ? ValueCodes.GPS_SEARCHING : scanState[14]) : ValueCodes.GPS_OFF);
         scanState(scanState);
     }
 

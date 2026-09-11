@@ -369,19 +369,19 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
                         int percent = (int) (((float) pageNumber / (float) finalPageNumber) * 100);
                         binding.includeDownloadingProcess.tvDownloadPercent.setText(" - " + percent + "%");
                         isOk = true;
-                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page " + pageNumber + " downloaded successfully." + ValueCodes.CR + ValueCodes.LF;
+                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.append("Page ").append(pageNumber).append(" downloaded successfully.").append(ValueCodes.CR).append(ValueCodes.LF);
                     } else {
-                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The 9 packages were not found." + ValueCodes.CR + ValueCodes.LF;
+                        LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.append("The 9 packages were not found." + ValueCodes.CR + ValueCodes.LF);
                         pageNumber--;
                     }
                 } else {
-                    LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Page number " + (number + 1) + " was received, expected number is " + (pageNumber + 1) + ValueCodes.CR + ValueCodes.LF;
+                    LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.append("Page number ").append(number + 1).append(" was received, expected number is ").append(pageNumber + 1).append(ValueCodes.CR).append(ValueCodes.LF);
                 }
             } else {
-                LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "The last package received is not 9" + ValueCodes.CR + ValueCodes.LF;
+                LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.append("The last package received is not 9" + ValueCodes.CR + ValueCodes.LF);
             }
         } else {
-            LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs += "Only " + pagePackets.size() + " packages arrived, 9 were expected." + ValueCodes.CR + ValueCodes.LF;
+            LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.append("Only ").append(pagePackets.size()).append(" packages arrived, 9 were expected.").append(ValueCodes.CR).append(ValueCodes.LF);
         }
         packetNumber = 1;
         pagePackets = new ArrayList<>();
@@ -481,7 +481,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
                 break;
             case 3: // Cancel download. Save the download bytes
                 builder.setPositiveButton("OK", (dialog, which) -> {
-                    byte[] data = Converters.convertToUTF8(LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs);
+                    byte[] data = Converters.convertToUTF8(LeServiceConnection.getInstance().getBluetoothLeService().downloadLogs.toString());
                     logData.packets.add(data);
                     dataList.add(logData);
                     saveRawData();

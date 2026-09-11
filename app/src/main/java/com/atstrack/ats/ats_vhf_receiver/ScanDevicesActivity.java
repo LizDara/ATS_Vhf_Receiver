@@ -38,7 +38,6 @@ import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityScanDevicesBinding;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,13 +49,19 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
     private byte parameter = ValueCodes.NONE;
     private AlertDialog disconnectionDialog;
     private Handler messageHandler;
+    private byte gpsStatus = ValueCodes.GPS_OFF;
+    private boolean isFinishingActivity = false;
+    private final StringBuilder errorLog = new StringBuilder(); // Eliminar esta variable luego
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
                 final String action = intent.getAction();
-                leServiceConnection.getBluetoothLeService().downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - onScanDevicesActivity: Broadcast Receiver (action): " + action + ValueCodes.CR + ValueCodes.LF;
+                if (leServiceConnection != null && leServiceConnection.getBluetoothLeService() != null)
+                    leServiceConnection.getBluetoothLeService().downloadLogs.append(Converters.getTimeString()).append(" - onScanDevicesActivity: Broadcast Receiver (action): ").append(action).append(ValueCodes.CR).append(ValueCodes.LF);
+                else
+                    errorLog.append(Converters.getTimeString()).append(" - onScanDevicesActivity: Broadcast Receiver (action): ").append(action).append(". Bluetooth Low Energy Service is null.").append(ValueCodes.CR).append(ValueCodes.LF);
                 if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                     mConnected = true;
                 } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action) && mConnected) {
@@ -69,14 +74,18 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                 } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                     byte[] packet = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                     if (packet == null) return;
+                    Log.i(TAG, Converters.getHexValue(packet));
                     if (packet[0] == ValueCodes.BOARD_STATUS_COMMAND)
                         downloadBoardState(packet);
                     else if (packet[0] == ValueCodes.SCAN_STATE_COMMAND)
                         downloadScanStatus(packet);
+                    else if (packet[0] == ValueCodes.SCAN_GPS_STATE_COMMAND)
+                        downloadGpsStatus(packet);
                 }
             } catch (Exception e) {
-                leServiceConnection.getBluetoothLeService().downloadLogs += String.format("%02d", Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.MINUTE)) + ":" + String.format("%02d", Calendar.getInstance().get(Calendar.SECOND)) + "." + String.format("%03d", Calendar.getInstance().get(Calendar.MILLISECOND)) +  " - onScanDevicesActivity: Broadcast Receiver catch: " + e.getLocalizedMessage() + ValueCodes.CR + ValueCodes.LF;
+                errorLog.append(Converters.getTimeString()).append(" - onScanDevicesActivity: Broadcast Receiver Catch: ").append(e.getLocalizedMessage()).append(ValueCodes.CR).append(ValueCodes.LF);
                 if (!cancel && leServiceConnection.existConnection() && mConnected && deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
+                    leServiceConnection.getBluetoothLeService().downloadLogs.append(Converters.getTimeString()).append(" - onScanDevicesActivity: Broadcast Receiver Catch: ").append(e.getLocalizedMessage()).append(ValueCodes.CR).append(ValueCodes.LF);
                     parameter = ValueCodes.NONE;
                     getDeviceStatus();
                     Log.w(TAG, e.getLocalizedMessage());
@@ -125,7 +134,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
             connectionTimeout.schedule(new TimerTask() { //create timer for connection timeout
                 @Override
                 public void run() {
-                    Log.i(TAG, "SCAN TIMEOUT " + Calendar.getInstance().get(Calendar.MINUTE) + "." + Calendar.getInstance().get(Calendar.SECOND));
+                    Log.i(TAG, "SCAN TIMEOUT ");
                     if (!cancel && mConnected && !deviceAdapter.deviceType.contains(ValueCodes.VHF)) {
                         if (deviceAdapter.deviceType.contains(ValueCodes.ACOUSTIC)) {
                             showAcousticReceiverMenu();
@@ -186,6 +195,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
             disconnectionDialog.dismiss();
         if (messageHandler != null)
             messageHandler.removeCallbacksAndMessages(null);
+        Log.i(TAG, "ON DESTROY");
         super.onDestroy();
     }
 
@@ -313,7 +323,11 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                     disconnectionDialog = Dialogs.createDisconnectionDialog(context, getString(R.string.lbl_receiver_connection_failed), deviceAdapter.deviceType);
                     disconnectionDialog.show();
 
-                    byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
+                    byte[] data;
+                    if (leServiceConnection.getBluetoothLeService() != null)
+                        data = Converters.convertToUTF8(errorLog.length() > 0 ? errorLog.toString() + leServiceConnection.getBluetoothLeService().downloadLogs.toString() : "NO BROADCAST RECEIVER ERRORS" + ValueCodes.CR + ValueCodes.LF + leServiceConnection.getBluetoothLeService().downloadLogs.toString());
+                    else
+                        data = Converters.convertToUTF8(errorLog.toString() + "NO SERVICE LOG GENERATED.");
                     Data logData = new Data(ValueCodes.LOG_FILE);
                     logData.packets.add(data);
                     ArrayList<Data> dataList = new ArrayList<>();
@@ -363,17 +377,23 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
             readScanStatus = true;
             connectionTimeout.cancel();
             connectionTimeout.purge();
-            showVhfReceiverMenu(data);
+            new Handler().postDelayed(() -> showVhfReceiverMenu(data), 60);
         }
     }
 
+    private void downloadGpsStatus(byte[] data) {
+        gpsStatus = data[1];
+    }
+
     private void showVhfReceiverMenu(byte[] data) {
-        Log.i(TAG, Converters.getHexValue(data));
+        if (isFinishingActivity) return;
+        isFinishingActivity = true;
         Intent intent = new Intent(this, MenuActivity.class);
         switch (data[1]) {
             case ValueCodes.MOBILE_SCAN_COMMAND:
             case ValueCodes.MOBILE_HOLD_COMMAND:
             case ValueCodes.MOBILE_PAUSE_COMMAND:
+                data[14] = gpsStatus;
                 intent = new Intent(this, MobileScanActivity.class);
                 intent.putExtra(ValueCodes.IS_SCANNING, true);
                 intent.putExtra(ValueCodes.VALUE, data);
@@ -386,6 +406,7 @@ public class ScanDevicesActivity extends BluetoothScannerActivity {
                 startActivities(new Intent[]{new Intent(this, MenuActivity.class), new Intent(this, StartScanningActivity.class), intent});
                 break;
             case ValueCodes.MANUAL_SCAN_COMMAND:
+                data[14] = gpsStatus;
                 intent = new Intent(this, ManualScanActivity.class);
                 intent.putExtra(ValueCodes.IS_SCANNING, true);
                 intent.putExtra(ValueCodes.VALUE, data);

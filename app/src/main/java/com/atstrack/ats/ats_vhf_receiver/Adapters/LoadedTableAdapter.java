@@ -47,18 +47,17 @@ public class LoadedTableAdapter extends BaseAdapter {
         TextView tv_loaded_frequencies_subtitle = view.findViewById(R.id.tv_loaded_frequencies_subtitle);
         TextView tv_loaded_frequencies = view.findViewById(R.id.tv_loaded_frequencies);
 
+        StringBuilder frequencies = new StringBuilder();
         if (isRemoved) {
             tv_loaded_frequencies_subtitle.setText("Table " + loadedTables.get(position).tableNumber);
-            String frequencies = "";
             for (int frequency : loadedTables.get(position).frequenciesLoaded)
-                frequencies += frequency + "\n";
-            tv_loaded_frequencies.setText(frequencies);
+                frequencies.append(frequency).append("\n");
+            tv_loaded_frequencies.setText(frequencies.toString());
         } else {
             tv_loaded_frequencies_subtitle.setVisibility(View.GONE);
-            String frequencies = "";
             for (int frequency : loadedTables.get(position).frequenciesLoaded)
-                frequencies += frequency + "\n";
-            tv_loaded_frequencies.setText(frequencies);
+                frequencies.append(frequency).append("\n");
+            tv_loaded_frequencies.setText(frequencies.toString());
         }
 
         return view;

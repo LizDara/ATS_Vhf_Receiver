@@ -30,10 +30,10 @@ public class StationaryDefaultsActivity extends BaseActivity {
                     return;
                 if (ValueCodes.TABLES_NUMBER_CODE == result.getResultCode()) { // Gets the modified frequency table number
                     int[] value = result.getData().getIntArrayExtra(ValueCodes.VALUE);
-                    String numbers = "";
+                    StringBuilder numbers = new StringBuilder();
                     for (int number : value)
-                        numbers += number + ", ";
-                    ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText(numbers.isEmpty() ? getString(R.string.lbl_vhf_config_not_set) : numbers.substring(0, numbers.length() - 2));
+                        numbers.append(number).append(", ");
+                    ((ActivityVhfStationaryDefaultsBinding) binding).fragmentStationarySettings.includeStationarySettings.tvFrequencyTableNumberStationary.setText((numbers.length() == 0) ? getString(R.string.lbl_vhf_config_not_set) : numbers.substring(0, numbers.length() - 2));
                 } else {
                     int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
                     switch (result.getResultCode()) {

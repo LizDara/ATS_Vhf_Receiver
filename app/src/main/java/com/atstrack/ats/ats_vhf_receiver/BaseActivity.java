@@ -198,7 +198,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void createLog() {
-        byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs);
+        byte[] data = Converters.convertToUTF8(leServiceConnection.getBluetoothLeService().downloadLogs.toString());
         Data logData = new Data(ValueCodes.LOG_FILE);
         logData.packets.add(data);
         ArrayList<Data> dataList = new ArrayList<>();

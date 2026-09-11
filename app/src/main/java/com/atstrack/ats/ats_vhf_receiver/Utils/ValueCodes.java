@@ -4,7 +4,7 @@ public class ValueCodes {
     //Device Category
     public static final String ACOUSTIC = "ATSar";
     public static final String VHF = "ATSvr";
-    public static final String BLUETOOTH_RECEIVER = "ATSbr"; //UART
+    public static final String BLUETOOTH_RECEIVER = "ATSbr"; // UART
     public static final String WILDLINK = "ATSwl";
     public static final String BEACON = "CTT"; // ATSbt
 

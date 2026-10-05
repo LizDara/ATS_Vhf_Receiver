@@ -358,8 +358,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_rssi" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\rssi.svg" />
+                            <entry key="outputName" value="ic_stop_scan" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\stop_scan.svg" />
                           </map>
                         </option>
                       </PersistentState>

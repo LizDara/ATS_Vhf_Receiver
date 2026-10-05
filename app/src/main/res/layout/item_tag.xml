@@ -26,7 +26,7 @@
             app:drawableStartCompat="@drawable/ic_circle_light" />
 
         <TextView
-            android:id="@+id/tv_detections_tag"
+            android:id="@+id/tv_last_time_tag"
             style="@style/body_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,8 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8sp"
-            android:drawablePadding="6sp"
-            app:drawableStartCompat="@drawable/ic_rssi" />
+            android:drawablePadding="6sp" />
 
         <Space
             android:layout_width="0dp"

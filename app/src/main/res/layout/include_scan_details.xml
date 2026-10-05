@@ -64,4 +64,8 @@
         android:id="@+id/include_recycler_view"
         layout="@layout/include_recycler_view" />
 
+    <include
+        android:id="@+id/include_no_detections"
+        layout="@layout/include_no_detections" />
+
 </LinearLayout>

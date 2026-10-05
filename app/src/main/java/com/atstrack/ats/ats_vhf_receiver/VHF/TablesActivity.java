@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -83,39 +84,46 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
             pushingTimeout.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    dialog.dismiss();
-                    showAlertDialog(getString(R.string.err_vhf_tables_generic), getString(R.string.err_vhf_tables_push), false);
+                    runOnUiThread(() -> {
+                        dialog.dismiss();
+                        showAlertDialog(getString(R.string.err_vhf_tables_generic), getString(R.string.err_vhf_tables_push), false);
+                    });
                 }
             }, (long) ValueCodes.DOWNLOAD_PERIOD * 2 * tableAdapter.getItemCount());
 
-            int index = 0;
-            while (index < tableAdapter.getItemCount()) {
-                while (!setTable(tableAdapter.loadedTables.get(index))) {
+            new Thread(() -> {
+                int index = 0;
+                while (index < tableAdapter.getItemCount()) {
+                    while (!setTable(tableAdapter.loadedTables.get(index))) {
+                        try {
+                            Thread.sleep(ValueCodes.WAITING_PERIOD);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                     try {
-                        Thread.sleep(ValueCodes.WAITING_PERIOD);
+                        Thread.sleep(ValueCodes.DOWNLOAD_PERIOD);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+                    index++;
                 }
-                try {
-                    Thread.sleep(ValueCodes.DOWNLOAD_PERIOD);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                if (index == tableAdapter.getItemCount()) {
+                    pushingTimeout.cancel();
+                    pushingTimeout.purge();
+
+                    runOnUiThread(() -> {
+                        state_loading_textView.setText(R.string.lbl_vhf_tables_pushed);
+                        loading_progressBar.setVisibility(View.GONE);
+                        loaded_imageView.setVisibility(View.VISIBLE);
+                        messageHandler.postDelayed(() -> {
+                            TransferBleData.readTables();
+                            dialog.dismiss();
+                            setVisibility(ValueCodes.OVERVIEW);
+                        }, ValueCodes.MESSAGE_PERIOD);
+                    });
                 }
-                index++;
-            }
-            if (index == tableAdapter.getItemCount()) {
-                pushingTimeout.cancel();
-                pushingTimeout.purge();
-                state_loading_textView.setText(R.string.lbl_vhf_tables_pushed);
-                loading_progressBar.setVisibility(View.GONE);
-                loaded_imageView.setVisibility(View.VISIBLE);
-                messageHandler.postDelayed(() -> {
-                    TransferBleData.readTables();
-                    dialog.dismiss();
-                    setVisibility(ValueCodes.OVERVIEW);
-                }, ValueCodes.MESSAGE_PERIOD);
-            }
+            }).start();
         });
 
         tableAdapter = new TableAdapter(this, this);
@@ -192,6 +200,9 @@ public class TablesActivity extends BaseActivity implements OnAdapterClickListen
             ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setVisibility(View.VISIBLE);
             ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setText(R.string.btn_vhf_tables_load_file);
             ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvTitleTable.setText(R.string.title_vhf_tables_edit);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutOptionsLoaded.setVisibility(View.GONE);
+            ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.layoutRemovedFrequencies.setVisibility(View.GONE);
+            ((ActivityVhfTablesBinding) binding).includeToolbar.tvTitleToolbar.setText(R.string.title_vhf_tables_edit);
         } else if (view == ValueCodes.DOWNLOADED) {
             ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.tvTitleTable.setText(R.string.title_vhf_tables_summary);
             ((ActivityVhfTablesBinding) binding).fragmentFrequenciesOverview.btnFrequencies.setVisibility(View.GONE);

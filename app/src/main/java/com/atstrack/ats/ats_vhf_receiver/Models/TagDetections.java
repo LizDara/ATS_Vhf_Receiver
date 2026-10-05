@@ -16,6 +16,7 @@ public class TagDetections {
     private Runnable timerRunnable;
     public int timeSince = 0;
     public TextView time_since_textView;
+    public TextView last_time_textView;
     public OnTimeTickListener timeTickListener;
 
     public TagDetections(String code, int frequencyTone) {

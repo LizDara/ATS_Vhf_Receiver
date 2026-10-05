@@ -52,8 +52,8 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull TagViewHolder holder, int position) {
         Detection currentDetection = tags.get(position).getLastDetection();
-        holder.tv_tag.setText(tags.get(position).code);
-        holder.tv_detections_tag.setText("Detections: " + tags.get(position).detections.size());
+        holder.tv_tag.setText(tags.get(position).code + " (" + tags.get(position).detections.size() + ")");
+        holder.tv_last_time_tag.setText("Last: " + tags.get(position).timeSince + "s");
         holder.tv_rssi_tag.setText(currentDetection.rssi + " dBm");
         holder.tv_rssi.setText("RSSI (dBm): " + currentDetection.rssi);
         holder.tv_time_since.setText("Time Since (secs): " + tags.get(position).timeSince);
@@ -61,7 +61,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
         holder.tv_voltage.setText("Voltage (mV): " + currentDetection.voltage);
         holder.cb_isolate_audio.setChecked(audioIsolateTag.equals(tags.get(position).code));
         if (audioIsolateTag.equals(tags.get(position).code) || audioIsolateTag.isEmpty()) {
-            holder.tv_detections_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_audio_on, 0);
+            holder.tv_last_time_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_audio_on, 0);
             if (beepTag.equals(tags.get(position).code) && (audioIsolateTag.equals(tags.get(position).code) || audioIsolateTag.isEmpty())) {
                 holder.layout_beep.setBackgroundColor(ContextCompat.getColor(inflater.getContext(), R.color.keppel));
                 new Handler().postDelayed(() -> {
@@ -70,11 +70,12 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
                 }, ValueCodes.WAITING_PERIOD);
             }
         } else {
-            holder.tv_detections_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_audio_off, 0);
+            holder.tv_last_time_tag.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_audio_off, 0);
         }
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.setMargins(32, 16, 32, 16);
         holder.layout_tags.setLayoutParams(params);
+        tags.get(position).last_time_textView = holder.tv_last_time_tag;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
     public class TagViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         LinearLayout layout_tags;
         TextView tv_tag;
-        TextView tv_detections_tag;
+        TextView tv_last_time_tag;
         TextView tv_rssi_tag;
         LinearLayout layout_tag_footer;
         TextView tv_rssi;
@@ -102,7 +103,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
             super(itemView);
             layout_tags = itemView.findViewById(R.id.layout_tags);
             tv_tag = itemView.findViewById(R.id.tv_tag);
-            tv_detections_tag = itemView.findViewById(R.id.tv_detections_tag);
+            tv_last_time_tag = itemView.findViewById(R.id.tv_last_time_tag);
             tv_rssi_tag = itemView.findViewById(R.id.tv_rssi_tag);
             layout_tag_footer = itemView.findViewById(R.id.layout_tag_footer);
             tv_rssi = itemView.findViewById(R.id.tv_rssi);

@@ -1,21 +1,25 @@
 package com.atstrack.ats.ats_vhf_receiver.Fragments;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.atstrack.ats.ats_vhf_receiver.R;
@@ -27,10 +31,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class FileSourceFragment extends Fragment {
     private FragmentFileSourceBinding binding = null;
-    private File[] externalStorageVolumes;
+    private String sdCardId;
     private Uri uri;
     private File rawFile;
 
@@ -45,12 +50,18 @@ public class FileSourceFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.layoutSelectFile.setOnClickListener(v -> {
-            File sdCardFile = externalStorageVolumes[externalStorageVolumes.length - 1];
+            String folderId = sdCardId + ":";
+            Uri targetFolderUri = DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", folderId);
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            File root = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/atstrack");
-            intent.setDataAndType(Uri.parse(root.getAbsolutePath()), "*/*");
-            // CLAVE: En un fragmento se llama directo sin el prefijo 'getActivity().' para que la respuesta viaje de regreso a este mismo fragmento.
-            startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
+            intent.setDataAndType(targetFolderUri, "vnd.android.document/directory");
+            intent.setType("text/plain");
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, targetFolderUri);
+
+            try {
+                startActivityForResult(intent, ValueCodes.REQUEST_CODE_OPEN_STORAGE);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "No se pudo abrir la raíz de la tarjeta SD.", Toast.LENGTH_SHORT).show();
+            }
         });
         binding.imgDeleteFile.setOnClickListener(v -> setVisibility(ValueCodes.OVERVIEW));
         binding.btnConvertData.setOnClickListener(v -> {
@@ -64,7 +75,8 @@ public class FileSourceFragment extends Fragment {
                         .commit();
             }
         });
-        externalStorageVolumes = ContextCompat.getExternalFilesDirs(requireContext().getApplicationContext(), null);
+        sdCardId = getExternalSDCardId();
+        Log.i("FileSourceFragment", "SD Card ID: " + sdCardId);
         setVisibility(ValueCodes.OVERVIEW);
     }
 
@@ -101,13 +113,13 @@ public class FileSourceFragment extends Fragment {
         if (view == ValueCodes.OVERVIEW) {
             binding.btnConvertData.setAlpha((float) 0.6);
             binding.btnConvertData.setEnabled(false);
-            binding.imgSdCardRaw.setBackgroundResource(externalStorageVolumes.length > 1 ? R.drawable.ic_sd_card : R.drawable.ic_sd_card_alert);
-            binding.tvSdCardRaw.setText(externalStorageVolumes.length > 1 ? R.string.lbl_vhf_home_sd_card_inserted : R.string.lbl_vhf_raw_none_detected);
-            binding.tvMessageNoInserted.setVisibility(externalStorageVolumes.length > 1 ? View.GONE : View.VISIBLE);
+            binding.imgSdCardRaw.setBackgroundResource(sdCardId != null ? R.drawable.ic_sd_card : R.drawable.ic_sd_card_alert);
+            binding.tvSdCardRaw.setText(sdCardId != null ? R.string.lbl_vhf_home_sd_card_inserted : R.string.lbl_vhf_raw_none_detected);
+            binding.tvMessageNoInserted.setVisibility(sdCardId != null ? View.GONE : View.VISIBLE);
             binding.layoutSelectFile.setVisibility(View.VISIBLE);
             binding.layoutSelectedFile.setVisibility(View.GONE);
-            binding.layoutSelectFile.setAlpha(externalStorageVolumes.length > 1 ? 1 : (float) 0.6);
-            binding.layoutSelectFile.setEnabled(externalStorageVolumes.length > 1);
+            binding.layoutSelectFile.setAlpha(sdCardId != null ? 1 : (float) 0.6);
+            binding.layoutSelectFile.setEnabled(sdCardId != null);
         } else if (view == ValueCodes.FOUNDED) {
             binding.layoutSelectFile.setVisibility(View.GONE);
             binding.layoutSelectedFile.setVisibility(View.VISIBLE);
@@ -153,5 +165,21 @@ public class FileSourceFragment extends Fragment {
 
     private boolean isExternalStorageReadable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState());
+    }
+
+    private String getExternalSDCardId() {
+        StorageManager storageManager = (StorageManager) requireContext().getSystemService(Context.STORAGE_SERVICE);
+        if (storageManager != null) {
+            List<StorageVolume> storageVolumes = storageManager.getStorageVolumes();
+            for (StorageVolume volume : storageVolumes) {
+                if (volume.isRemovable() && !volume.isPrimary()) {
+                    String uuid = volume.getUuid();
+                    if (uuid != null) {
+                        return uuid;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

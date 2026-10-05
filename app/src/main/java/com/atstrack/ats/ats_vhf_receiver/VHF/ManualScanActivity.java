@@ -13,6 +13,7 @@ import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class ManualScanActivity extends ScanBaseActivity implements OnDialogCreatedListener {
 
@@ -28,22 +29,38 @@ public class ManualScanActivity extends ScanBaseActivity implements OnDialogCrea
                     .add(R.id.fcv_activity_fragment, isScanning ? new ManualScanningFragment(baseFrequency, range, data) : new ManualSettingsFragment(baseFrequency, range))
                     .commit();
         }
+
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setOnClickListener(v -> {
+            leServiceConnection.getBluetoothLeService().disconnect();
+        });
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setOnClickListener(v -> {
+            boolean result = TransferBleData.writeStopScan(scanType);
+            if (result) {
+                if (getSupportFragmentManager() != null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .setReorderingAllowed(true)
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                            .replace(R.id.fcv_activity_fragment, new ManualSettingsFragment(baseFrequency, range))
+                            .commit();
+                }
+            }
+        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (isScanning) {
-                boolean result = TransferBleData.writeStopScan(scanType);
-                if (result) {
-                    if (getSupportFragmentManager() != null) {
-                        getSupportFragmentManager().beginTransaction()
-                                .setReorderingAllowed(true)
-                                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                                .replace(R.id.fcv_activity_fragment, new ManualSettingsFragment(baseFrequency, range))
-                                .commit();
-                    }
-                }
+//                boolean result = TransferBleData.writeStopScan(scanType);
+//                if (result) {
+//                    if (getSupportFragmentManager() != null) {
+//                        getSupportFragmentManager().beginTransaction()
+//                                .setReorderingAllowed(true)
+//                                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+//                                .replace(R.id.fcv_activity_fragment, new ManualSettingsFragment(baseFrequency, range))
+//                                .commit();
+//                    }
+//                }
             } else {
                 finish();
             }

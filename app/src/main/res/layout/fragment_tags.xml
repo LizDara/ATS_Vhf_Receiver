@@ -55,14 +55,30 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_detected_tags"
-        style="@style/body_large"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16sp"
-        android:text="@string/lbl_bt_tag_detected_count"
-        android:textStyle="bold" />
+        android:orientation="horizontal">
+    
+        <TextView
+            android:id="@+id/tv_detected_tags"
+            style="@style/body_large"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/lbl_bt_tag_detected_count"
+            android:textStyle="bold" />
+        
+        <TextView
+            android:id="@+id/tv_remove_audio_isolation"
+            style="@style/button_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_bt_tag_remove_audio_isolation"
+            android:textColor="@color/ebony_clay" />
+
+    </LinearLayout>
 
     <include
         android:id="@+id/include_recycler_view"

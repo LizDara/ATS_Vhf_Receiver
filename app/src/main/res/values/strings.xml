@@ -124,6 +124,7 @@
     <string name="btn_vhf_manual_edit_frequency">Edit Frequency</string>
     <string name="btn_vhf_manual_record_data">Record Data</string>
     <string name="btn_vhf_manual_edit_audio_options"><u>Edit Audio Options</u></string>
+    <string name="lbl_vhf_manual_no_detections">No Detections Currently</string>
 
     <!-- SUB-SECTION: MOBILE SCAN -->
     <string name="title_vhf_mobile_settings">Mobile Scanning</string>
@@ -936,6 +937,7 @@
     <string name="lbl_bt_tag_location_enabled">Location Data (Enabled)</string>
     <string name="lbl_bt_tag_location_unknown">Location: Unknown</string>
     <string name="lbl_bt_tag_detected_count">Detected Tags:</string>
+    <string name="lbl_bt_tag_remove_audio_isolation"><u>Remove Audio Isolation</u></string>
     <string name="lbl_bt_tag_rssi">RSSI (dBm): </string>
     <string name="lbl_bt_tag_time_since">Time Since (secs): </string>
     <string name="lbl_bt_tag_temperature_c">Temperature (C): </string>

@@ -116,6 +116,7 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
             case ValueCodes.SCAN_FIX_CODED_COMMAND:
             case ValueCodes.SCAN_FIX_CONSOLIDATED_CODED_COMMAND:
                 logScanCoded(data);
+                ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
                 break;
             case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
             case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
@@ -126,8 +127,10 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
                 if (detectionType == ValueCodes.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
                 else if (detectionType == ValueCodes.VARIABLE) {
-                    if (period > 0)
+                    if (period > 0) {
                         scanNonCodedVariable(period, signalStrength);
+                        ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
+                    }
                 }
                 break;
         }
@@ -176,8 +179,10 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
 
     private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
         int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
-        if (period > 0)
+        if (period > 0) {
             scanNonCodedFixed(period, signalStrength, type);
+            ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -185,5 +190,6 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
         ((FragmentStationaryScanningBinding) binding).tvFrequencyStationary.setText("");
         ((FragmentStationaryScanningBinding) binding).tvIndexStationary.setText("");
         super.clear();
+        ((FragmentStationaryScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.VISIBLE);
     }
 }

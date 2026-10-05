@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/paragraph_small"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8sp"
+    android:gravity="center"
+    android:padding="16sp"
+    android:text="@string/lbl_vhf_manual_no_detections"
+    android:textColor="@color/limed_spruce" />

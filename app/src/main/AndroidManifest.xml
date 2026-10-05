@@ -62,10 +62,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".BluetoothReceiver.MenuActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".BluetoothReceiver.BluetoothTagDetectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

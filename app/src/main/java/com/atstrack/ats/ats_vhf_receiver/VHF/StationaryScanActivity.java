@@ -14,6 +14,7 @@ import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class StationaryScanActivity extends ScanBaseActivity implements OnDialogCreatedListener {
 
@@ -41,24 +42,42 @@ public class StationaryScanActivity extends ScanBaseActivity implements OnDialog
                         .commit();
             }
         }
+
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setOnClickListener(v -> {
+            leServiceConnection.getBluetoothLeService().disconnect();
+        });
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setOnClickListener(v -> {
+            boolean result = TransferBleData.writeStopScan(scanType);
+            if (result) {
+                Fragment fragment1 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
+                Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                if (fragment2 != null) transaction.remove(fragment2);
+                if (fragment1 != null)
+                    transaction.show(fragment1);
+                transaction.commit();
+            }
+        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) { //Go back to the previous activity
             if (isScanning) {
-                boolean result = TransferBleData.writeStopScan(scanType);
-                if (result) {
-                    Fragment fragment1 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
-                    Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
-                            .setReorderingAllowed(true)
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                    if (fragment2 != null) transaction.remove(fragment2);
-                    if (fragment1 != null)
-                        transaction.show(fragment1);
-                    transaction.commit();
-                }
+//                boolean result = TransferBleData.writeStopScan(scanType);
+//                if (result) {
+//                    Fragment fragment1 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
+//                    Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
+//                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
+//                            .setReorderingAllowed(true)
+//                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+//                    if (fragment2 != null) transaction.remove(fragment2);
+//                    if (fragment1 != null)
+//                        transaction.show(fragment1);
+//                    transaction.commit();
+//                }
             } else {
                 finish();
             }

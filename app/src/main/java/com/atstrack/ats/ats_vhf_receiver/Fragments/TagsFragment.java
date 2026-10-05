@@ -51,8 +51,10 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
             if (isAdded() && getView() != null) {
                 if (updateTimeSince) {
                     for (TagDetections tag : tagAdapter.tags) {
-                        if (tag.code.equals(tagCode) && tag.time_since_textView != null) {
-                            tag.time_since_textView.setText("Time Since (secs): " + currentTimeSince);
+                        if (tag.code.equals(tagCode)) {
+                            tag.last_time_textView.setText("Last: "+ (currentTimeSince < 60 ? currentTimeSince + "s" : (currentTimeSince / 60) + "m"));
+                            if (tag.time_since_textView != null)
+                                tag.time_since_textView.setText("Time Since (secs): " + currentTimeSince);
                             break;
                         }
                     }
@@ -94,6 +96,12 @@ public class TagsFragment extends Fragment implements ReceiverCallback, OnAdapte
             }
         };
         startGpsUpdates();
+        binding.tvRemoveAudioIsolation.setOnClickListener(v -> {
+            if (!tagAdapter.audioIsolateTag.isEmpty()) {
+                tagAdapter.audioIsolateTag = "";
+                tagAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override

@@ -36,6 +36,34 @@ public class ConfigurationActivity extends BaseActivity {
         ((ActivityVhfConfigurationBinding) binding).btnCloneFromOtherReceiver.setOnClickListener(v -> {
             Intent intent = new Intent(this, CloneActivity.class);
             startActivity(intent);
+/*            PackageManager pm = getPackageManager();
+
+            // Opción 1: Intent nativo para abrir el explorador de almacenamiento completo de Android
+            Intent intent = pm.getLaunchIntentForPackage("com.google.android.apps.docs.storage");
+
+            // Opción 2: Si el anterior no existe, intentar con "Files de Google" (común en Pixel, Motorola, Xiaomi, etc.)
+            if (intent == null) {
+                intent = pm.getLaunchIntentForPackage("com.google.android.apps.nbu.files");
+            }
+
+            // Opción 3: Forzar la apertura del proveedor de documentos del sistema (AOSP Files)
+            if (intent == null) {
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("content://com.android.externalstorage.documents/root/primary"));
+            }
+
+            // Configuramos banderas para que abra como una app externa e independiente
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    startActivity(intent);
+                } catch (Exception e) {
+                    // Fallback definitivo si todo lo anterior falla
+                    abrirAlternativaGenerica();
+                }
+            } else {
+                abrirAlternativaGenerica();
+            }*/
         });
     }
 

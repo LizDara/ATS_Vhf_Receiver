@@ -449,7 +449,7 @@ public class Converters {
                                 break;
                             }
                         }
-                        scanType = packet[index];
+                        scanType = format;
                         text.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
                         metrics.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
                         text.append(detectionType == ValueCodes.CODED ?
@@ -471,6 +471,7 @@ public class Converters {
                         }
                         frequency = baseFrequency + ((Byte.toUnsignedInt(packet[index + 1]) * 256) + Byte.toUnsignedInt(packet[index + 2]));
 //                        frequencyTableIndex = (((Byte.toUnsignedInt(packet[index + 1]) >> 6) & 1) * 256) + Byte.toUnsignedInt(packet[index + 3]);
+                        antenna = 0;
                         if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND) {
                             antenna = Byte.toUnsignedInt(packet[index + 1]) >> 7;
                             if (antenna == 0)
@@ -658,7 +659,7 @@ public class Converters {
                         byteIndex += 8;
                         break;
                     default: // METRICS
-                        if (packet[index] == ValueCodes.TIMESTAMP_COMMAND) {
+                        if (format == ValueCodes.TIMESTAMP_COMMAND) {
                             int sysTime = Byte.toUnsignedInt(packet[index + 1]) << 16 | Byte.toUnsignedInt(packet[index + 2]) << 8 | Byte.toUnsignedInt(packet[index + 3]);
                             date = Byte.toUnsignedInt(packet[index + 4]) << 16 | Byte.toUnsignedInt(packet[index + 5]) << 8 | Byte.toUnsignedInt(packet[index + 6]);
                             mm = date % 100;
@@ -667,12 +668,12 @@ public class Converters {
                             MM = date / 1000000;
                             ss = Byte.toUnsignedInt(packet[index + 7]);
                             metrics.append("SysTime: ").append(sysTime).append(", M: ").append(MM).append(", D: ").append(DD).append(", H: ").append(hh).append(", m: ").append(mm).append(", s: ").append(ss).append(ValueCodes.CR).append(ValueCodes.LF);
-                        } else if (packet[index] == ValueCodes.VOLTAGE_COMMAND) {
+                        } else if (format == ValueCodes.VOLTAGE_COMMAND) {
                             int sysTime = Byte.toUnsignedInt(packet[index + 1]) << 16 | Byte.toUnsignedInt(packet[index + 2]) << 8 | Byte.toUnsignedInt(packet[index + 3]);
                             int extVolt = Byte.toUnsignedInt(packet[index + 4]) << 8 | Byte.toUnsignedInt(packet[index + 5]);
                             int intVolt = (Byte.toUnsignedInt(packet[index + 7]) * 10) + 6000;
                             metrics.append("SysTime: ").append(sysTime).append(", Battery: ").append(Byte.toUnsignedInt(packet[index + 6])).append(", Internal Voltage: ").append(intVolt).append(", External Voltage: ").append(extVolt).append(ValueCodes.CR).append(ValueCodes.LF);
-                        } else if (packet[index] == ValueCodes.LOW_BATTERY_COMMAND) {
+                        } else if (format == ValueCodes.LOW_BATTERY_COMMAND) {
                             metrics.append("Low Battery Detected" + ValueCodes.CR + ValueCodes.LF);
                         }
                         break;

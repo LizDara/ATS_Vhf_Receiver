@@ -269,6 +269,7 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
                 break;
             case ValueCodes.SCAN_FIX_CODED_COMMAND:
                 logScanCoded(data);
+                ((FragmentMobileScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
                 break;
             case ValueCodes.SCAN_DATA_FIXED_NON_CODED_COMMAND:
             case ValueCodes.SCAN_FIXED_CONSOLIDATED_NON_CODED_COMMAND:
@@ -279,8 +280,10 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
                 if (detectionType == ValueCodes.FIXED)
                     logScanNonCodedFixed(data[0], period, signalStrength);
                 else if (detectionType == ValueCodes.VARIABLE) {
-                    if (period > 0)
+                    if (period > 0) {
                         scanNonCodedVariable(period, signalStrength);
+                        ((FragmentMobileScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
+                    }
                 }
                 break;
         }
@@ -326,8 +329,10 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
 
     private void logScanNonCodedFixed(byte format, int period, int signalStrength) {
         int type = Integer.parseInt(Converters.getHexValue(format).replace("E", ""));
-        if (period > 0)
+        if (period > 0) {
             scanNonCodedFixed(period, signalStrength, type);
+            ((FragmentMobileScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.GONE);
+        }
     }
 
     private void logGps(byte[] data) {
@@ -341,6 +346,7 @@ public class MobileScanningFragment extends ScanBaseFragment implements Receiver
         ((FragmentMobileScanningBinding) binding).tvTableIndexMobile.setText("");
         ((FragmentMobileScanningBinding) binding).tvFrequencyMobile.setText("");
         super.clear();
+        ((FragmentMobileScanningBinding) binding).includeScanDetails.includeNoDetections.getRoot().setVisibility(View.VISIBLE);
     }
 
     private void showAlertDialog(String message) {

@@ -1,11 +1,18 @@
 package com.atstrack.ats.ats_vhf_receiver.Fragments;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.DocumentsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +24,8 @@ import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentSuccessfulMessageBinding;
+
+import java.io.File;
 
 public class SuccessfulMessageFragment extends Fragment {
     private FragmentSuccessfulMessageBinding binding = null;
@@ -52,6 +61,28 @@ public class SuccessfulMessageFragment extends Fragment {
                     if (fragment1 != null)
                         transaction.show(fragment1);
                     transaction.commit();
+                }
+            } else if (parameter == ValueCodes.DOWNLOAD) {
+                String folderId = "primary:Download/atstrack";
+//                Uri treeUri = DocumentsContract.buildRootUri("com.android.externalstorage.documents", "primary");
+                Uri targetFolderUri = DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", folderId);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(targetFolderUri, "vnd.android.document/directory");
+                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, targetFolderUri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                try {
+                    startActivity(intent);
+                } catch (Exception e) {
+                    try {
+                        Intent intentFallback = new Intent(Intent.ACTION_VIEW);
+                        Uri downloadUri = DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Download");
+                        intentFallback.setDataAndType(downloadUri, "vnd.android.document/directory");
+                        intentFallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intentFallback);
+                    } catch (Exception ex) {
+                        Toast.makeText(requireContext(), "No se pudo acceder a la carpeta.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

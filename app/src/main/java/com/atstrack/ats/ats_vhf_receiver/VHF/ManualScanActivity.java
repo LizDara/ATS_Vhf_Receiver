@@ -6,14 +6,12 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ManualScanningFragment;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.ManualSettingsFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class ManualScanActivity extends ScanBaseActivity implements OnDialogCreatedListener {
 
@@ -29,22 +27,6 @@ public class ManualScanActivity extends ScanBaseActivity implements OnDialogCrea
                     .add(R.id.fcv_activity_fragment, isScanning ? new ManualScanningFragment(baseFrequency, range, data) : new ManualSettingsFragment(baseFrequency, range))
                     .commit();
         }
-
-        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setOnClickListener(v -> {
-            leServiceConnection.getBluetoothLeService().disconnect();
-        });
-        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setOnClickListener(v -> {
-            boolean result = TransferBleData.writeStopScan(scanType);
-            if (result) {
-                if (getSupportFragmentManager() != null) {
-                    getSupportFragmentManager().beginTransaction()
-                            .setReorderingAllowed(true)
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.fcv_activity_fragment, new ManualSettingsFragment(baseFrequency, range))
-                            .commit();
-                }
-            }
-        });
     }
 
     @Override

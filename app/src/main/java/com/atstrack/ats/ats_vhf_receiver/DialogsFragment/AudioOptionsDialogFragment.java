@@ -83,7 +83,7 @@ public class AudioOptionsDialogFragment extends DialogFragment {
             background.setTextColor(ContextCompat.getColor(view.getContext(), R.color.limed_spruce));
             enterDigit.setVisibility(View.VISIBLE);
             number.setText("");
-            audioOption = ValueCodes.AUDIO_ONE_COMMAND;
+            audioOption = ValueCodes.AUDIO_SINGLE_COMMAND;
         });
         all.setOnClickListener(v15 -> {
             single.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.button_tertiary));
@@ -127,7 +127,7 @@ public class AudioOptionsDialogFragment extends DialogFragment {
             }
         });
         saveChanges.setOnClickListener(view1 -> {
-            codeNumber = audioOption == ValueCodes.AUDIO_ONE_COMMAND ? (byte) Integer.parseInt(number.getText().toString()) : 0;
+            codeNumber = audioOption == ValueCodes.AUDIO_SINGLE_COMMAND ? (byte) Integer.parseInt(number.getText().toString()) : 0;
             Bundle bundle = new Bundle();
             bundle.putByteArray(ValueCodes.VALUE, new byte[] {audioOption, (byte) codeNumber, 0x0});
             getParentFragmentManager().setFragmentResult(ValueCodes.VALUE, bundle);

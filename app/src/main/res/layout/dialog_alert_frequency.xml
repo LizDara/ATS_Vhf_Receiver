@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16sp"
-    android:layout_marginEnd="16sp"
+    android:layout_marginHorizontal="16sp"
     android:background="@color/catskill_white"
     android:elevation="4sp"
     android:orientation="vertical">

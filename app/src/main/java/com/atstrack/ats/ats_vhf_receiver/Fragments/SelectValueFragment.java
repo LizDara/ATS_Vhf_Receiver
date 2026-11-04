@@ -162,7 +162,7 @@ public class SelectValueFragment extends Fragment {
     }
 
     private void setReferenceFrequencyStoreRate() {
-        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_reference_rate, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> storeRateAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.array_vhf_stationary_reference_store_rate, android.R.layout.simple_spinner_item);
         storeRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spValue.setAdapter(storeRateAdapter);
 

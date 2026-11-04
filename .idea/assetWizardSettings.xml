@@ -102,6 +102,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+                                                <entry key="imagePath" value="C:\Users\crepo\Downloads\bridge-app-icon.png" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -131,6 +132,14 @@
                                       </entry>
                                     </map>
                                   </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundColor" value="ffffff" />
+                                      <entry key="generateWebpIcons" value="false" />
+                                      <entry key="outputName" value="ic_launcher_ats" />
+                                    </map>
+                                  </option>
                                 </PersistentState>
                               </value>
                             </entry>
@@ -157,7 +166,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\maria\Downloads\VhfReceiverDesign\receiver.png" />
+                                                <entry key="imagePath" value="C:\Users\crepo\Downloads\bridge-app-icon.png" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -191,7 +200,8 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="backgroundColor" value="f0f4f8" />
-                                      <entry key="imageAsset" value="C:\Users\maria\Downloads\VhfReceiverDesign\receiver.png" />
+                                      <entry key="iconShape" value="NONE" />
+                                      <entry key="imageAsset" value="C:\Users\crepo\Downloads\bridge-app-icon.png" />
                                       <entry key="outputName" value="ic_receiver" />
                                     </map>
                                   </option>
@@ -319,11 +329,6 @@
                             </entry>
                           </map>
                         </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
-                          </map>
-                        </option>
                       </PersistentState>
                     </value>
                   </entry>
@@ -358,8 +363,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_stop_scan" />
-                            <entry key="sourceFile" value="D:\VhfReceiverDesign\stop_scan.svg" />
+                            <entry key="outputName" value="ic_gmt_warning" />
+                            <entry key="sourceFile" value="D:\VhfReceiverDesign\scan option\gmt_warning.svg" />
                           </map>
                         </option>
                       </PersistentState>

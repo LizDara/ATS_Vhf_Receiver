@@ -24,6 +24,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8sp"
+                android:text="@string/lbl_vhf_manual_gps"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/tv_gps_state"
+                style="@style/body_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
                 android:text="@string/lbl_vhf_manual_latitude"
                 android:textColor="@color/limed_spruce" />
 

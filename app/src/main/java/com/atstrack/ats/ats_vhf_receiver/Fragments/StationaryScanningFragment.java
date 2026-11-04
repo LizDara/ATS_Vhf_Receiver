@@ -10,9 +10,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.ScanDetailAdapter;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
@@ -48,6 +51,27 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.layoutHold.setVisibility(View.GONE);
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.layoutRecordData.setVisibility(View.GONE);
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.tvRefill1.setVisibility(View.VISIBLE);
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.tvRefill2.setVisibility(View.VISIBLE);
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.tvStopScan.setOnClickListener(v -> {
+            boolean result = TransferBleData.writeStopScan(scanType);
+            if (result) {
+                Fragment fragment1 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
+                Fragment fragment2 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                if (fragment2 != null) transaction.remove(fragment2);
+                if (fragment1 != null)
+                    transaction.show(fragment1);
+                transaction.commit();
+            }
+        });
+        ((FragmentStationaryScanningBinding) binding).includeScanOptions.tvExitReceiver.setOnClickListener(v -> {
+            LeServiceConnection.getInstance().getBluetoothLeService().disconnect();
+        });
         ((FragmentStationaryScanningBinding) binding).tvViewDetectionStationary.setOnClickListener(v -> showDetectionAlertDialog());
         if (isScanning) {
             setNotificationLogScanning();
@@ -94,10 +118,8 @@ public class StationaryScanningFragment extends ScanBaseFragment implements Rece
     }
 
     private void initializeScanning() {
-        currentFrequency = (Byte.toUnsignedInt(scanState[16]) * 256)
-                + Byte.toUnsignedInt(scanState[17]) + baseFrequency;
-        currentIndex = (Byte.toUnsignedInt(scanState[7]) * 256)
-                + Byte.toUnsignedInt(scanState[8]);
+        currentFrequency = (Byte.toUnsignedInt(scanState[16]) * 256) + Byte.toUnsignedInt(scanState[17]) + baseFrequency;
+        currentIndex = (Byte.toUnsignedInt(scanState[7]) * 256) + Byte.toUnsignedInt(scanState[8]);
         int currentAntenna = Byte.toUnsignedInt(scanState[9]);
         ((FragmentStationaryScanningBinding) binding).tvFrequencyStationary.setText(Converters.getFrequency(currentFrequency));
         ((FragmentStationaryScanningBinding) binding).tvIndexStationary.setText(String.valueOf(currentIndex));

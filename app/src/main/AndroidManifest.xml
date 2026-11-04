@@ -41,11 +41,11 @@
         android:allowBackup="true"
         android:exported="true"
         android:fullBackupContent="@xml/backup_descriptor"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_ats"
         android:label="@string/lbl_app_name"
         android:noHistory="true"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_ats_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity

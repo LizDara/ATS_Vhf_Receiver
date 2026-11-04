@@ -1,20 +1,17 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.MobileScanningFragment;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.MobileSettingsFragment;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
-import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
 public class MobileScanActivity extends ScanBaseActivity implements OnDialogCreatedListener {
 
@@ -42,24 +39,6 @@ public class MobileScanActivity extends ScanBaseActivity implements OnDialogCrea
                         .commit();
             }
         }
-
-        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setOnClickListener(v -> {
-            leServiceConnection.getBluetoothLeService().disconnect();
-        });
-        ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setOnClickListener(v -> {
-            boolean result = TransferBleData.writeStopScan(scanType);
-            if (result) {
-                Fragment fragment1 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.FIRST_STEP));
-                Fragment fragment2 = getSupportFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
-                        .setReorderingAllowed(true)
-                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                if (fragment2 != null) transaction.remove(fragment2);
-                if (fragment1 != null)
-                    transaction.show(fragment1);
-                transaction.commit();
-            }
-        });
     }
 
     @Override
@@ -80,6 +59,8 @@ public class MobileScanActivity extends ScanBaseActivity implements OnDialogCrea
 //                        transaction.commit();
 //                    }
                 } else {
+                    if (getSupportFragmentManager().getBackStackEntryCount() == 2)
+                        setTitle(getString(R.string.title_vhf_mobile_holding));
                     getSupportFragmentManager().popBackStack();
                 }
             } else {

@@ -3,13 +3,11 @@ package com.atstrack.ats.ats_vhf_receiver.VHF;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
-import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
@@ -47,26 +45,27 @@ public class ScanBaseActivity extends BaseActivity {
 
     public void setScanViews(boolean isScanning) {
         this.isScanning = isScanning;
-        int titleId = isScanning ? R.string.title_vhf_manual_scanning : R.string.title_vhf_manual_settings;
+        int titleId = isScanning ? R.string.lbl_vhf_start_scan_scanning : R.string.title_vhf_manual_settings;
         if (scanType == ValueCodes.MOBILE_SCAN_COMMAND)
-            titleId = isScanning ? R.string.title_vhf_mobile_scanning : R.string.title_vhf_mobile_settings;
+            titleId = isScanning ? R.string.lbl_vhf_start_scan_scanning : R.string.title_vhf_mobile_settings;
         else if (scanType == ValueCodes.STATIONARY_SCAN_COMMAND)
-            titleId = isScanning ? R.string.title_vhf_stationary_scanning : R.string.title_vhf_stationary_settings;
+            titleId = isScanning ? R.string.lbl_vhf_start_scan_scanning : R.string.title_vhf_stationary_settings;
         if (isScanning) {
             ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(titleId);
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-            ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setVisibility(View.VISIBLE);
-            ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setVisibility(View.VISIBLE);
             ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.setBackgroundResource(R.drawable.scanning_animation);
             animationDrawable = (AnimationDrawable) ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.getBackground();
             animationDrawable.start();
         } else {
             ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(titleId);
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-//            Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_back);
-            ((ActivityVhfFragmentBinding) binding).includeToolbar.ibLeaveReceiver.setVisibility(View.GONE);
-            ((ActivityVhfFragmentBinding) binding).includeToolbar.ibStopScan.setVisibility(View.GONE);
             ((ActivityVhfFragmentBinding) binding).includeToolbar.vState.setBackgroundColor(ContextCompat.getColor(this, R.color.mountain_meadow));
         }
+    }
+
+    public void setTitle(String title) {
+        ((ActivityVhfFragmentBinding) binding).includeToolbar.tvTitleToolbar.setText(title);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(title.equals(getString(R.string.title_vhf_mobile_edit_table)));
+
     }
 }

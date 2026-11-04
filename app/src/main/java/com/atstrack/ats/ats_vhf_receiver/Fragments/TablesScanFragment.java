@@ -15,6 +15,7 @@ import com.atstrack.ats.ats_vhf_receiver.Adapters.TableToScanAdapter;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
+import com.atstrack.ats.ats_vhf_receiver.VHF.ScanBaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.databinding.FragmentTablesScanBinding;
 
 import java.util.ArrayList;
@@ -51,6 +52,9 @@ public class TablesScanFragment extends Fragment {
         setTables();
         if (type == ValueCodes.STATIONARY_DEFAULTS_COMMAND)
             binding.btnMergeTables.setVisibility(View.GONE);
+        if (getActivity() instanceof ScanBaseActivity) {
+            ((ScanBaseActivity) getActivity()).setTitle(getString(R.string.title_vhf_mobile_edit_table));
+        }
     }
 
     @Override
@@ -67,7 +71,7 @@ public class TablesScanFragment extends Fragment {
             bundle.putBoolean(ValueCodes.VALUE, true);
             getParentFragmentManager().setFragmentResult(ValueCodes.TABLE, bundle);
             if (getParentFragmentManager() != null) {
-                Fragment fragment1 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.THIRD_STEP));
+                Fragment fragment1 = getParentFragmentManager().findFragmentByTag(String.valueOf(ValueCodes.SECOND_STEP));
                 getParentFragmentManager().beginTransaction()
                         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                         .remove(this)

@@ -197,9 +197,9 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cr
 	android:exported
 		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:42:9-32
 	android:roundIcon
-		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:48:9-54
+		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:48:9-58
 	android:icon
-		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:44:9-43
+		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:44:9-47
 	android:allowBackup
 		ADDED from D:\Proyectos\ATS_VHF_Receiver\app\src\main\AndroidManifest.xml:41:9-35
 	android:theme

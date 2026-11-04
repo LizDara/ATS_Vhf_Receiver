@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16sp"
+    android:background="@color/catskill_white"
+    android:elevation="4sp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"
+        android:src="@drawable/ic_gmt_warning"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        style="@style/body_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lbl_vhf_start_scan_time_zone"
+        android:textColor="@color/slate_700" />
+
+    <TextView
+        style="@style/body_small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24sp"
+        android:layout_marginVertical="16sp"
+        android:gravity="center"
+        android:text="@string/lbl_vhf_start_scan_time_zone_message"
+        android:textColor="@color/slate_700" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24sp"
+        android:layout_marginVertical="16sp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        
+        <TextView
+            android:id="@+id/tv_go_back"
+            style="@style/button_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32sp"
+            android:text="@string/btn_vhf_start_scan_go_back"
+            android:textColor="@color/limed_spruce" />
+
+        <Button
+            android:id="@+id/btn_continue"
+            style="@style/button_primary_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_vhf_detection_continue" />
+        
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:background="@color/light_gray"
+        tools:ignore="SmallSp" />
+
+    <CheckBox
+        android:id="@+id/cb_dont_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8sp"
+        android:text="@string/lbl_vhf_start_scan_dont_show_message"
+        android:textColor="@color/limed_spruce" />
+
+</LinearLayout>

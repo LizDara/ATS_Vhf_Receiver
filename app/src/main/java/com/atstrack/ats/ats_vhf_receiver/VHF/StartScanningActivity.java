@@ -1,5 +1,6 @@
 package com.atstrack.ats.ats_vhf_receiver.VHF;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -8,12 +9,13 @@ import androidx.fragment.app.Fragment;
 import com.atstrack.ats.ats_vhf_receiver.BaseActivity;
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
 import com.atstrack.ats.ats_vhf_receiver.Fragments.MenuScanFragment;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfFragmentBinding;
 
-public class StartScanningActivity extends BaseActivity {
+public class StartScanningActivity extends BaseActivity implements OnDialogCreatedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,5 +59,11 @@ public class StartScanningActivity extends BaseActivity {
                 ((ReceiverCallback) currentFragment).onGattDataAvailable(data);
             });
         }
+    }
+
+    @Override
+    public void onNewDialogAdded(AlertDialog dialog) {
+        dialogList.add(dialog);
+        dialog.setOnDismissListener(d -> dialogList.remove(dialog));
     }
 }

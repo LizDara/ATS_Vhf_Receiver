@@ -36,6 +36,7 @@ public class MatchesNumberFragment extends Fragment {
             TextView text = (TextView) v;
             setMatchesForValidPattern(Integer.parseInt(text.getText().toString()));
         };
+        binding.tvOne.setOnClickListener(listener);
         binding.tvTwo.setOnClickListener(listener);
         binding.tvThree.setOnClickListener(listener);
         binding.tvFour.setOnClickListener(listener);
@@ -55,6 +56,9 @@ public class MatchesNumberFragment extends Fragment {
     private void setMatchesForValidPattern(int matches) {
         for (int i = 0; i < 2; i ++) {
             switch (this.matches) {
+                case 1:
+                    binding.tvOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, i == 0 ? 0 : R.drawable.ic_check, 0);
+                    break;
                 case 2:
                     binding.tvTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, i == 0 ? 0 : R.drawable.ic_check, 0);
                     break;

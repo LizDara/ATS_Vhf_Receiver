@@ -143,7 +143,7 @@ public class UpdatingFirmwareFragment extends Fragment implements ReceiverCallba
 
     private void setOtaBegin() {
         updateProgress(40);
-        byte[] b = new byte[] {0x00};
+        byte[] b = new byte[] {ValueCodes.NONE};
         boolean result = TransferBleData.writeOTA(b);
         updateProgress(60);
         if (result)

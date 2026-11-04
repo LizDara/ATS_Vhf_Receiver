@@ -20,7 +20,7 @@ public class TransferBleData {
 
     public static void readBoardStatus() {
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_BOARD_STATE, new byte[] { 0 });
+                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_BOARD_STATE, new byte[] { ValueCodes.NONE });
     }
 
     /**
@@ -42,7 +42,7 @@ public class TransferBleData {
     public static void readTables() {
         UUID service = AtsUuids.UUID_SERVICE_STORED_DATA;
         UUID characteristic = AtsUuids.UUID_CHARACTERISTIC_FREQ_TABLE;
-        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(service, characteristic, new byte[] { 0 });
+        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(service, characteristic, new byte[] { ValueCodes.NONE });
     }
 
     public static boolean writeStartScan(byte type, byte[] data) {
@@ -77,25 +77,9 @@ public class TransferBleData {
     /**
      * Records the specific code information, the code received.
      */
-    public static boolean writeRecord(boolean start, boolean isManual) {
-        byte[] data = new byte[] {start ? (byte) 0x8C : (byte) 0x8E};
+    public static boolean writeRecord(boolean isManual, byte[] data) {
         UUID characteristic = isManual ? AtsUuids.UUID_CHARACTERISTIC_MANUAL : AtsUuids.UUID_CHARACTERISTIC_MOBILE;
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(AtsUuids.UUID_SERVICE_SCAN, characteristic, data);
-    }
-
-    public static boolean writeGps(boolean gpsOn) {
-        byte[] data = new byte[] {gpsOn ? (byte) 0x92 : (byte) 0x91};
-        return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_GPS, data);
-    }
-
-    /**
-     * Writes a value for add one to the current frequency.
-     */
-    public static boolean writeDecreaseIncrease(boolean isDecrease) {
-        byte[] data = new byte[] {isDecrease ? (byte) 0x5E : (byte) 0x5F};
-        return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_SCAN_TABLE, data);
     }
 
     public static boolean writeScanning(byte[] data) {
@@ -104,18 +88,9 @@ public class TransferBleData {
     }
 
     public static boolean setHold(boolean isHold) {
-        byte[] b = new byte[] {isHold ? (byte) 0x80 : (byte) 0x81};
+        byte[] b = new byte[] {isHold ? ValueCodes.MOBILE_PAUSE_COMMAND : ValueCodes.MOBILE_HOLD_COMMAND};
         return LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
                 AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_MOBILE, b);
-    }
-
-    /**
-     * Writes a value to go to the previous or next index.
-     */
-    public static void writeLeftRight(boolean isLeft) {
-        byte[] b = new byte[] {isLeft ? (byte) 0x57 : (byte) 0x58};
-        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_SCAN_TABLE, b);
     }
 
     /**
@@ -124,7 +99,7 @@ public class TransferBleData {
     public static void readDefaults(boolean isMobile) {
         UUID characteristic = isMobile ? AtsUuids.UUID_CHARACTERISTIC_MOBILE : AtsUuids.UUID_CHARACTERISTIC_STATIONARY;
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, characteristic, new byte[] { isMobile ? (byte) 0x6D : (byte) 0x6C });
+                AtsUuids.UUID_SERVICE_SCAN, characteristic, new byte[] { isMobile ? ValueCodes.MOBILE_DEFAULTS_COMMAND : ValueCodes.STATIONARY_DEFAULTS_COMMAND });
     }
 
     /**
@@ -154,7 +129,7 @@ public class TransferBleData {
      */
     public static void readDetectionFilter() {
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_TX_TYPE, new byte[] { 0x67 });
+                AtsUuids.UUID_SERVICE_SCAN, AtsUuids.UUID_CHARACTERISTIC_TX_TYPE, new byte[] { ValueCodes.DETECTION_FILTER_COMMAND });
     }
 
     /**
@@ -162,12 +137,12 @@ public class TransferBleData {
      */
     public static void readDiagnostic() {
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DIAGNOSTIC_INFO, new byte[]{ 0 });
+                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DIAGNOSTIC_INFO, new byte[]{ ValueCodes.NONE });
     }
 
     public static void readDataInfo() {
         LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DATA_INFO, new byte[] { 0 });
+                AtsUuids.UUID_SERVICE_DIAGNOSTIC, AtsUuids.UUID_CHARACTERISTIC_DATA_INFO, new byte[] { ValueCodes.NONE });
     }
 
     /**
@@ -176,14 +151,6 @@ public class TransferBleData {
     public static void downloadResponse(boolean enabled) {
         LeServiceConnection.getInstance().getBluetoothLeService().setCharacteristicNotification(
                 AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, enabled);
-    }
-
-    /**
-     * Requests a read for get BLE device data before download data.
-     */
-    public static void readPageNumber() {
-        LeServiceConnection.getInstance().getBluetoothLeService().writeCharacteristic(
-                AtsUuids.UUID_SERVICE_STORED_DATA, AtsUuids.UUID_CHARACTERISTIC_STUDY_DATA, new byte[] { (byte) 0x97 });
     }
 
     public static void writeResponse(byte[] data) {

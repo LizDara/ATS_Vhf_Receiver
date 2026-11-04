@@ -3,8 +3,11 @@ package com.atstrack.ats.ats_vhf_receiver.Utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,9 +17,11 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.atstrack.ats.ats_vhf_receiver.Adapters.LoadedTableAdapter;
+import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.LeServiceConnection;
 import com.atstrack.ats.ats_vhf_receiver.Models.DetectionFilter;
 import com.atstrack.ats.ats_vhf_receiver.Models.LoadedTable;
 import com.atstrack.ats.ats_vhf_receiver.R;
+import com.atstrack.ats.ats_vhf_receiver.VHF.MenuActivity;
 
 import java.util.List;
 
@@ -25,8 +30,10 @@ public class Dialogs {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_alert_disconnect, null);
         final AlertDialog dialog = new AlertDialog.Builder(context).create();
+        ImageButton ib_dismiss = view.findViewById(R.id.ib_dismiss);
         TextView disconnect_message = view.findViewById(R.id.tv_disconnect_message);
         ImageView img_receiver = view.findViewById(R.id.img_receiver);
+        ib_dismiss.setVisibility(View.GONE);
         if (deviceType.equals(ValueCodes.VHF))
             img_receiver.setImageResource(R.drawable.receiver);
         else
@@ -36,14 +43,25 @@ public class Dialogs {
         return dialog;
     }
 
-    public static AlertDialog createLowPowerDialog(Context context) {
+    public static AlertDialog createLowPowerDialog(Context context, boolean isScanning) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_alert_disconnect, null);
         final AlertDialog dialog = new AlertDialog.Builder(context).create();
+        ImageButton ib_dismiss = view.findViewById(R.id.ib_dismiss);
         TextView disconnect_message = view.findViewById(R.id.tv_disconnect_message);
         ImageView img_receiver = view.findViewById(R.id.img_receiver);
         LinearLayout layout_background_alert = view.findViewById(R.id.layout_background_alert);
         layout_background_alert.setBackground(ContextCompat.getDrawable(context, R.drawable.connected_light));
+        ib_dismiss.setOnClickListener(v -> {
+            if (isScanning) {
+                dialog.dismiss();
+                Intent intent = new Intent(context, MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+            } else {
+                dialog.dismiss();
+            }
+        });
         img_receiver.setImageResource(R.drawable.receiver);
         disconnect_message.setText(R.string.lbl_vhf_home_low_power);
         dialog.setView(view);
@@ -126,10 +144,10 @@ public class Dialogs {
         if (detectionFilter != null) {
             filter_type_textView.setText(Converters.getDetectionFilter(detectionFilter.detectionType));
             number_matches_textView.setText(String.valueOf(detectionFilter.matches));
-            pulse_rate_1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
-            period_1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
 
             if (detectionFilter.detectionType == ValueCodes.FIXED) {
+                pulse_rate_1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
+                period_1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance1));
                 pulse_rate_2_textView.setText(String.valueOf(detectionFilter.pulseRate2));
                 period_2_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRateTolerance2));
                 TextView calculation_description_textView = view.findViewById(R.id.tv_calculation_description);
@@ -146,11 +164,27 @@ public class Dialogs {
                 period_2_tolerance_textView.setVisibility(View.GONE);
                 pr_description_textView.setText(R.string.lbl_vhf_detection_max_pulse_rate_ppm);
                 pr_tolerance_description_textView.setText(R.string.lbl_vhf_detection_min_pulse_rate_ppm);
+                pulse_rate_1_textView.setText(String.valueOf(detectionFilter.pulseRate1));
+                period_1_tolerance_textView.setText(String.valueOf(detectionFilter.pulseRate2));
                 optional_data_calculation_textView.setText(detectionFilter.optionalData == ValueCodes.VARIABLE_TEMPERATURE ? "Yes" : "No");
             }
             ImageButton close = view.findViewById(R.id.ib_close);
             close.setOnClickListener(view1 -> dialog.dismiss());
         }
+        dialog.setView(view);
+        return dialog;
+    }
+
+    public static AlertDialog createTimeZoneWarningDialog(Activity context) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.dialog_alert_gmt_offset, null);
+        final AlertDialog dialog = new AlertDialog.Builder(context).create();
+        TextView tv_go_back = view.findViewById(R.id.tv_go_back);
+        CheckBox cb_dont_show = view.findViewById(R.id.cb_dont_show);
+        tv_go_back.setOnClickListener(v -> {
+            dialog.dismiss();
+            context.finish();
+        });
         dialog.setView(view);
         return dialog;
     }

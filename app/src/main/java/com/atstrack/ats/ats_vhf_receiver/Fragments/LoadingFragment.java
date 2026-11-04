@@ -76,12 +76,7 @@ public class LoadingFragment extends Fragment implements ReceiverCallback {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        setDeleteData();
-    }
-
-    private void setDeleteData() {
-        byte[] b = new byte[]{(byte) 0x93};
-        TransferBleData.writeResponse(b);
+        TransferBleData.writeResponse(new byte[]{ValueCodes.DELETE_DATA_COMMAND});
     }
 
     private boolean isTransmissionDone(byte[] packet) {

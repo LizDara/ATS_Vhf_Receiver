@@ -27,7 +27,7 @@ import com.atstrack.ats.ats_vhf_receiver.VHF.ScanBaseActivity;
 
 public class ScanBaseFragment extends Fragment {
     protected ViewBinding binding = null;
-    protected int scanType;
+    protected byte scanType;
     protected boolean isScanning;
     protected int baseFrequency;
     protected int range;
@@ -88,10 +88,10 @@ public class ScanBaseFragment extends Fragment {
         detectionFilter.detectionType = detectionType;
         detectionFilter.optionalData = detectionType != ValueCodes.FIXED ? detectionType : 0;
         detectionFilter.matches = Byte.toUnsignedInt(data[19]);
-        detectionFilter.pulseRate1 = Byte.toUnsignedInt(data[20]);
-        detectionFilter.pulseRateTolerance1 = Byte.toUnsignedInt(data[21]);
-        detectionFilter.pulseRate2 = Byte.toUnsignedInt(data[22]);
-        detectionFilter.pulseRateTolerance2 = Byte.toUnsignedInt(data[23]);
+        detectionFilter.pulseRate1 = Byte.toUnsignedInt(data[22]);
+        detectionFilter.pulseRateTolerance1 = Byte.toUnsignedInt(data[23]);
+        detectionFilter.pulseRate2 = Byte.toUnsignedInt(data[20]);
+        detectionFilter.pulseRateTolerance2 = Byte.toUnsignedInt(data[21]);
     }
 
     protected void scanCoded(int code, int signalStrength, int mortality) {

@@ -58,7 +58,7 @@ public class PulseRateValuesFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 int pulseRate = (binding.etPulseRate.getText().toString().isEmpty()) ? 0 : Integer.parseInt(binding.etPulseRate.getText().toString());
-                int tolerance = binding.spPulseRateTolerance.getSelectedItemPosition() + 4;
+                int tolerance = binding.spPulseRateTolerance.getSelectedItemPosition() + 1;
                 value = (pulseRate * 100) + tolerance;
                 if (getActivity() instanceof ValueDetectionFilterActivity)
                     ((ValueDetectionFilterActivity) getActivity()).value = value;
@@ -100,7 +100,7 @@ public class PulseRateValuesFragment extends Fragment {
 
     private void setPulseRate(int pr, int tolerance) {
         binding.etPulseRate.setText(String.valueOf(pr));
-        binding.spPulseRateTolerance.setSelection(tolerance - 4);
+        binding.spPulseRateTolerance.setSelection(tolerance - 1);
         value = (pr * 100) + tolerance;
         if (getActivity() instanceof ValueDetectionFilterActivity)
             ((ValueDetectionFilterActivity) getActivity()).value = value;

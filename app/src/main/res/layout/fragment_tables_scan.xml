@@ -28,6 +28,6 @@
         android:layout_marginBottom="24sp"
         android:alpha="0.6"
         android:enabled="false"
-        android:text="@string/title_vhf_mobile_merge_table" />
+        android:text="@string/title_vhf_mobile_edit_table" />
 
 </LinearLayout>

@@ -9,6 +9,14 @@
     android:orientation="vertical"
     android:padding="32sp">
 
+    <ImageButton
+        android:id="@+id/ib_dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:background="@drawable/ic_close"
+        tools:ignore="ContentDescription" />
+
     <LinearLayout
         android:id="@+id/layout_background_alert"
         android:layout_width="@dimen/connect_image"

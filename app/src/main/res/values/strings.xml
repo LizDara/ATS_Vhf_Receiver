@@ -1,5 +1,5 @@
 <resources>
-    <string name="lbl_app_name">ATS Universal</string>
+    <string name="lbl_app_name">ATS Bridge</string>
 
     <!-- ========================================== -->
     <!-- SPLASH SCREEN                              -->
@@ -95,17 +95,22 @@
     <string name="btn_vhf_start_scan_go_tables">Go to Frequency Tables</string>
     <string name="btn_vhf_start_scan_go_detection">Go to Detection Filter Settings</string>
     <string name="btn_vhf_start_scan_go_settings">Go to Receiver Settings</string>
+    <string name="btn_vhf_start_scan_default_settings"><u>Edit Default Settings</u></string>
+    <string name="lbl_vhf_start_scan_scanning">Scanning ...</string>
+    <string name="lbl_vhf_start_scan_time_zone">Note on Time Zone</string>
+    <string name="lbl_vhf_start_scan_time_zone_message">Please note all scans started on the bridge app use exclusively GMT-0. If you wish to set a different time zone you must do so by starting the scan directly in the receiver itself after entering the GMT offset in the clock configuration.</string>
+    <string name="btn_vhf_start_scan_go_back"><u>Go Back</u></string>
+    <string name="lbl_vhf_start_scan_dont_show_message">Don\'t show me this message again.</string>
 
     <!-- SUB-SECTION: MANUAL SCAN -->
     <string name="title_vhf_manual_settings">Manual Scanning</string>
-    <string name="title_vhf_manual_scanning">Manual Scanning ...</string>
     <string name="title_vhf_manual_change_frequency">Change Frequency</string>
     <string name="title_vhf_manual_select_audio">Select Codes for Audio</string>
     <string name="lbl_vhf_manual_current_frequency">Current Frequency</string>
     <string name="lbl_vhf_manual_starting_frequency">Starting Frequency</string>
-    <string name="lbl_vhf_manual_gps_data">GPS Data</string>
-    <string name="lbl_vhf_manual_enter_id_digit">Enter a two digit ID</string>
-    <string name="lbl_vhf_manual_saving_targets">Saving targets ...</string>
+    <string name="lbl_vhf_manual_enter_id_digit">Enter a two digit Code</string>
+    <string name="lbl_vhf_manual_saving_targets">Saving Targets</string>
+    <string name="lbl_vhf_manual_gps">GPS</string>
     <string name="lbl_vhf_manual_code">Code</string>
     <string name="lbl_vhf_manual_signal_strength">Signal Strength</string>
     <string name="lbl_vhf_manual_detections">Detections</string>
@@ -119,29 +124,28 @@
     <string name="lbl_vhf_manual_option_all">All</string>
     <string name="lbl_vhf_manual_option_none">None</string>
     <string name="lbl_vhf_manual_option_background">Background</string>
+    <string name="btn_vhf_manual_apply">Apply</string>
     <string name="btn_vhf_manual_set_frequency">Edit Starting Frequency</string>
     <string name="btn_vhf_manual_start_scan">Start Manual Scan</string>
-    <string name="btn_vhf_manual_edit_frequency">Edit Frequency</string>
-    <string name="btn_vhf_manual_record_data">Record Data</string>
+    <string name="btn_vhf_manual_edit_frequency">Edit\nFrequency</string>
+    <string name="btn_vhf_manual_record_data">Start Recording</string>
+    <string name="btn_vhf_manual_stop_scan">Stop Scan</string>
+    <string name="btn_vhf_manual_exit_receiver">Exit Receiver</string>
     <string name="btn_vhf_manual_edit_audio_options"><u>Edit Audio Options</u></string>
     <string name="lbl_vhf_manual_no_detections">No Detections Currently</string>
 
     <!-- SUB-SECTION: MOBILE SCAN -->
     <string name="title_vhf_mobile_settings">Mobile Scanning</string>
-    <string name="title_vhf_mobile_scanning">Mobile Scanning ...</string>
-    <string name="title_vhf_mobile_merge_table">Merge Table</string>
+    <string name="title_vhf_mobile_holding">Holding ...</string>
     <string name="lbl_vhf_mobile_scan_settings">Scan Settings</string>
     <string name="lbl_vhf_mobile_scan_time_seconds">Scan Time (Seconds)</string>
-    <string name="lbl_vhf_mobile_scan_rate">Scan Rate</string>
     <string name="lbl_vhf_mobile_number_antennas">Number of Antennas</string>
     <string name="lbl_vhf_mobile_auto_record">Auto Record</string>
     <string name="lbl_vhf_mobile_frequency">Frequency</string>
-    <string name="lbl_vhf_mobile_table_total">Table Total</string>
-    <string name="lbl_vhf_mobile_current_index">Current Index</string>
-    <string name="lbl_vhf_mobile_gps_searching">GPS: Searching</string>
-    <string name="lbl_vhf_mobile_gps_off">GPS: Off</string>
-    <string name="lbl_vhf_mobile_gps_valid">GPS: Valid</string>
-    <string name="lbl_vhf_mobile_gps_failed">GPS: Failed</string>
+    <string name="lbl_vhf_mobile_gps_searching">Searching</string>
+    <string name="lbl_vhf_mobile_gps_off">Off</string>
+    <string name="lbl_vhf_mobile_gps_valid">Valid</string>
+    <string name="lbl_vhf_mobile_gps_failed">Failed</string>
     <string name="lbl_vhf_mobile_non_coded_detection">Non Coded Detection Filter</string>
     <string name="lbl_vhf_mobile_filter_type">Filter Type</string>
     <string name="lbl_vhf_mobile_frequency_deleted">Frequency Deleted</string>
@@ -151,30 +155,26 @@
     <string name="lbl_vhf_mobile_receiver_repair">Please send receiver in for repairs.</string>
     <string name="btn_vhf_mobile_start_scan">Start Mobile Scan</string>
     <string name="btn_vhf_mobile_edit_table"><u>Edit Table</u></string>
-    <string name="btn_vhf_mobile_hold">Hold Frequency</string>
-    <string name="btn_vhf_mobile_release">Release Frequency</string>
+    <string name="btn_vhf_mobile_hold">Hold Scan</string>
+    <string name="btn_vhf_mobile_release">Release Scan</string>
     <string name="btn_vhf_mobile_stop_recording">Stop Recording</string>
     <string name="btn_vhf_mobile_view_detection_filter"><u>View Detection Filter Settings</u></string>
-    <string name="btn_vhf_mobile_edit_default_settings">Edit Default Settings</string>
-    <string name="btn_vhf_mobile_add_frequency_scan">Add a Frequency to Table</string>
-    <string name="btn_vhf_mobile_delete_frequency_scan">Delete Current Frequency From Table</string>
-    <string name="btn_vhf_mobile_merge_table_scan">Merge Table Into Table</string>
+    <string name="btn_vhf_mobile_add_frequency_scan">Add\nFrequency</string>
+    <string name="btn_vhf_mobile_merge_table">Merge\nTable</string>
+    <string name="btn_vhf_mobile_delete_frequency_scan">Delete\nFrequency</string>
+    <string name="btn_vhf_mobile_confirm_delete_frequency_scan">Confirm\nDelete</string>
     <string name="btn_vhf_mobile_dismiss">Dismiss</string>
 
     <!-- SUB-SECTION: EDIT TABLE SCAN -->
     <string name="title_vhf_mobile_edit_table">Merge Table</string>
     <string name="lbl_vhf_mobile_edit_table_select_merge">Select a table to merge into scan table</string>
-    <string name="lbl_vhf_mobile_edit_table_freq_deleted">Frequency Deleted</string>
-    <string name="lbl_vhf_mobile_edit_table_success_merge">Table Merged</string>
-    <string name="btn_vhf_mobile_edit_table_add_freq">Add a Frequency to Table</string>
-    <string name="btn_vhf_mobile_edit_table_delete_freq">Delete Current Frequency From Table</string>
-    <string name="btn_vhf_mobile_edit_table_merge_into">Merge Table Into Table</string>
 
     <!-- SUB-SECTION: STATIONARY SCAN -->
     <string name="title_vhf_stationary_settings">Stationary Scanning</string>
-    <string name="title_vhf_stationary_scanning">Stationary Scanning ...</string>
     <string name="lbl_vhf_stationary_store_rate">Store Rate (Minutes)</string>
     <string name="lbl_vhf_stationary_data_transfer">External Data Transfer</string>
+    <string name="lbl_vhf_stationary_on">On</string>
+    <string name="lbl_vhf_stationary_off">Off</string>
     <string name="lbl_vhf_stationary_scan_details">Scan Details</string>
     <string name="lbl_vhf_stationary_current_antenna">Antenna #</string>
     <string name="lbl_vhf_stationary_reference_freq">Reference Frequency</string>
@@ -230,7 +230,7 @@
     <string name="btn_vhf_tables_cancel_upload">Cancel Upload</string>
     <string name="btn_vhf_tables_delete_frequencies">Delete Frequencies</string>
     <string name="btn_vhf_tables_add_frequency">Add Frequency</string>
-    <string name="btn_vhf_tables_view_all">View All Tables</string>
+    <string name="btn_vhf_tables_view_all"><u>View All Tables</u></string>
     <string name="btn_vhf_tables_save_changes">Save Changes</string>
     <string name="btn_vhf_tables_save">Save</string>
     <string name="btn_vhf_tables_edit_defaults">Edit Default Settings</string>
@@ -241,11 +241,12 @@
     <string name="title_vhf_defaults_stationary">Stationary Default Settings</string>
     <string name="lbl_vhf_defaults_mobile_settings">Mobile Settings</string>
     <string name="lbl_vhf_defaults_mobile_scan_table">Scan Table</string>
+    <string name="lbl_vhf_defaults_mobile_gps_data">GPS Data</string>
     <string name="lbl_vhf_defaults_mobile_select_val">Select Value</string>
     <string name="lbl_vhf_defaults_stationary_settings">Stationary Settings</string>
     <string name="lbl_vhf_defaults_stationary_tables_scan">Frequency Tables to Scan</string>
     <string name="lbl_vhf_defaults_stationary_scan_tables">Scan Tables</string>
-    <string name="lbl_vhf_defaults_stationary_timeout">Timeout (Seconds)</string>
+    <string name="lbl_vhf_defaults_stationary_timeout">Wait Timeout (Seconds)</string>
     <string name="lbl_vhf_defaults_stationary_reference_rate_hours">Reference Frequency Store Rate (Hours)</string>
     <string name="lbl_vhf_defaults_stationary_no_reference">No Reference Frequency</string>
     <string name="lbl_vhf_defaults_store_rate_title">Store Rate</string>
@@ -282,16 +283,16 @@
     <string name="lbl_vhf_detection_target_rates_title">Pulse Rates</string>
     <string name="lbl_vhf_detection_target_pr1">Target Pulse Rate 1</string>
     <string name="lbl_vhf_detection_target_pr1_ppm">PR1 (ppm)</string>
-    <string name="lbl_vhf_detection_target_pr1_tolerance">PR1 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr1_tolerance">PR1 Tolerance (ppm)</string>
     <string name="lbl_vhf_detection_target_pr2">Target Pulse Rate 2</string>
     <string name="lbl_vhf_detection_target_pr2_ppm">PR2 (ppm)</string>
-    <string name="lbl_vhf_detection_target_pr2_tolerance">PR2 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr2_tolerance">PR2 Tolerance (ppm)</string>
     <string name="lbl_vhf_detection_target_pr3">Target Pulse Rate 3</string>
     <string name="lbl_vhf_detection_target_pr3_ppm">PR3 (ppm)</string>
-    <string name="lbl_vhf_detection_target_pr3_tolerance">PR3 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr3_tolerance">PR3 Tolerance (ppm)</string>
     <string name="lbl_vhf_detection_target_pr4">Target Pulse Rate 4</string>
     <string name="lbl_vhf_detection_target_pr4_ppm">PR4 (ppm)</string>
-    <string name="lbl_vhf_detection_target_pr4_tolerance">PR4 Tolerance (ms)</string>
+    <string name="lbl_vhf_detection_target_pr4_tolerance">PR4 Tolerance (ppm)</string>
     <string name="lbl_vhf_detection_type_coded">Coded</string>
     <string name="lbl_vhf_detection_type_non_coded_fixed">Non Coded (Fixed Pulse Rate)</string>
     <string name="lbl_vhf_detection_type_non_coded_variable">Non Coded (Variable Pulse Rate)</string>
@@ -858,7 +859,7 @@
         <item>200</item>
     </string-array>
 
-    <string-array name="array_vhf_stationary_reference_rate">
+    <string-array name="array_vhf_stationary_reference_store_rate">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -886,6 +887,9 @@
     </string-array>
 
     <string-array name="array_vhf_detection_pulse_tolerance">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
         <item>4</item>
         <item>5</item>
         <item>6</item>
@@ -893,16 +897,6 @@
         <item>8</item>
         <item>9</item>
         <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>17</item>
-        <item>18</item>
-        <item>19</item>
-        <item>20</item>
     </string-array>
 
     <!--ACOUSTIC RECEIVER-->

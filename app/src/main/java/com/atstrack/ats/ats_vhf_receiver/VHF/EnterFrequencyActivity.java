@@ -41,7 +41,7 @@ public class EnterFrequencyActivity extends BaseActivity {
         public void afterTextChanged(Editable editable) {
             if (((ActivityVhfEnterFrequencyBinding) binding).tvFrequency.getText().toString().length() == 6) {
                 int frequency = Integer.parseInt(((ActivityVhfEnterFrequencyBinding) binding).tvFrequency.getText().toString());
-                if (frequency > baseFrequency && frequency <= frequencyRange) {
+                if (frequency >= baseFrequency && frequency <= frequencyRange) {
                     ((ActivityVhfEnterFrequencyBinding) binding).btnSaveChanges.setEnabled(true);
                     ((ActivityVhfEnterFrequencyBinding) binding).btnSaveChanges.setAlpha(1);
                     ((ActivityVhfEnterFrequencyBinding) binding).vLineFrequency.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.ghost));

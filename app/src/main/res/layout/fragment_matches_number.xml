@@ -31,6 +31,21 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tv_one"
+                style="@style/body_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16sp"
+                android:text="1"
+                android:textColor="@color/ebony_clay"
+                tools:ignore="HardcodedText" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+            <TextView
                 android:id="@+id/tv_two"
                 style="@style/body_regular"
                 android:layout_width="match_parent"

@@ -6,13 +6,9 @@
     android:layout_marginVertical="8sp"
     android:orientation="vertical">
 
-    <TextView
-        style="@style/subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16sp"
-        android:text="@string/lbl_vhf_stationary_scan_details"
-        android:textColor="@color/ebony_clay" />
+    <include
+        android:id="@+id/include_scan_options"
+        layout="@layout/include_scan_options"/>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32sp"
-            android:text="@string/btn_vhf_tables_save_changes" />
+            android:text="@string/btn_vhf_manual_apply" />
 
     </LinearLayout>
 

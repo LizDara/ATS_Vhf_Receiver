@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16sp"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/layout_hold"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="12sp"
+        android:layout_weight="1"
+        android:background="@drawable/scan_option">
+
+        <ImageView
+            android:id="@+id/img_hold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:background="@drawable/ic_dot"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tv_hold"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawablePadding="8sp"
+            android:gravity="center"
+            android:paddingHorizontal="8sp"
+            android:paddingVertical="12sp"
+            android:text="@string/btn_vhf_mobile_hold"
+            android:textColor="@color/black"
+            app:drawableTopCompat="@drawable/ic_lock" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_record_data"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="12sp"
+        android:layout_weight="1"
+        android:background="@drawable/scan_option">
+
+        <ImageView
+            android:id="@+id/img_record_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:background="@drawable/ic_dot"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tv_record_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawablePadding="8sp"
+            android:gravity="center"
+            android:paddingHorizontal="8sp"
+            android:paddingVertical="12sp"
+            android:text="@string/btn_vhf_manual_record_data"
+            android:textColor="@color/black"
+            app:drawableTopCompat="@drawable/ic_record" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_stop_scan"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="12sp"
+        android:layout_weight="1"
+        android:background="@drawable/scan_option"
+        android:drawablePadding="8sp"
+        android:gravity="center"
+        android:paddingHorizontal="8sp"
+        android:paddingVertical="12sp"
+        android:text="@string/btn_vhf_manual_stop_scan"
+        android:textColor="@color/black"
+        app:drawableTopCompat="@drawable/ic_stop" />
+
+    <TextView
+        android:id="@+id/tv_exit_receiver"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/scan_option"
+        android:drawablePadding="8sp"
+        android:gravity="center"
+        android:paddingHorizontal="8sp"
+        android:paddingVertical="12sp"
+        android:text="@string/btn_vhf_manual_exit_receiver"
+        android:textColor="@color/black"
+        app:drawableTopCompat="@drawable/ic_exit" />
+
+    <TextView
+        android:id="@+id/tv_refill1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12sp"
+        android:layout_weight="1"
+        android:paddingHorizontal="8sp"
+        android:paddingVertical="12sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_refill2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12sp"
+        android:layout_weight="1"
+        android:paddingHorizontal="8sp"
+        android:paddingVertical="12sp"
+        android:visibility="gone" />
+
+</LinearLayout>

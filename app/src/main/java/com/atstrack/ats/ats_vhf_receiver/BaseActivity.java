@@ -183,17 +183,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void showLowPower() {
-        AlertDialog dialog = Dialogs.createLowPowerDialog(mContext);
+        AlertDialog dialog = Dialogs.createLowPowerDialog(mContext, isScanning);
         dialogList.add(dialog);
-        messageHandler.postDelayed(() -> {
-            if (isScanning) {
-                Intent intent = new Intent(this, MenuActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } else {
-                dialog.dismiss();
-            }
-        }, ValueCodes.BRANDING_PERIOD);
         dialog.show();
     }
 

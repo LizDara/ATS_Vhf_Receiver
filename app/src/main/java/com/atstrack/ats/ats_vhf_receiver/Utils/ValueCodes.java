@@ -122,6 +122,11 @@ public class ValueCodes {
     public static final byte BOARD_STATUS_COMMAND = (byte) 0x41;
     public static final byte COEFFICIENTS_COMMAND = (byte) 0x7D;
     public static final byte STORAGE_COMMAND = (byte) 0x52;
+    public static final byte DELETE_DATA_COMMAND = (byte) 0x93;
+    public static final byte PAGE_NUMBER_COMMAND = (byte) 0x97;
+    public static final byte START_DOWNLOAD_COMMAND = (byte) 0x94;
+    public static final byte PAGE_OK_COMMAND = (byte) 0x95;
+    public static final byte PAGE_BAD_COMMAND = (byte) 0x96;
     public static final byte STORAGE_RESPONSE_COMMAND = (byte) 0xDD;
     public static final byte STORAGE_ERROR_COMMAND = (byte) 0xAA;
     public static final byte DETECTION_FILTER_COMMAND = (byte) 0x67;
@@ -129,7 +134,6 @@ public class ValueCodes {
     public static final byte DIAGNOSTIC_COMMAND = (byte) 0x89;
     public static final byte MOBILE_DEFAULTS_COMMAND = (byte) 0x6D;
     public static final byte STATIONARY_DEFAULTS_COMMAND = (byte) 0x6C;
-
     public static final byte SCAN_HEADER_COMMAND = (byte) 0xF0;
     public static final byte SCAN_FIX_CODED_COMMAND = (byte) 0xF1;
     public static final byte SCAN_FIX_CONSOLIDATED_CODED_COMMAND = (byte) 0xF2;
@@ -143,7 +147,7 @@ public class ValueCodes {
     public static final byte SCAN_GPS_COMMAND = (byte) 0xA1;
     public static final byte SCAN_FREQUENCIES_NUMBER_COMMAND = (byte) 0x8A;
     public static final byte SCAN_STOP_COMMAND = (byte) 0x87;
-    public static final byte AUDIO_ONE_COMMAND = (byte) 0x59;
+    public static final byte AUDIO_SINGLE_COMMAND = (byte) 0x59;
     public static final byte AUDIO_ALL_COMMAND = (byte) 0x5A;
     public static final byte AUDIO_BACKGROUND_COMMAND = (byte) 0x5B;
     public static final byte FATAL_SCAN_ERROR_COMMAND = (byte) 0x44;
@@ -152,6 +156,15 @@ public class ValueCodes {
     public static final byte VOLTAGE_COMMAND = (byte) 0x29;
     public static final byte LOW_BATTERY_COMMAND = (byte) 0x2D;
     public static final byte SERIAL_COMMAND = (byte) 0x2A;
+    public static final byte RECORD_COMMAND = (byte) 0x8C;
+    public static final byte STOP_RECORD_COMMAND = (byte) 0x8E;
+    public static final byte FREQUENCY_UP_COMMAND = (byte) 0x5F;
+    public static final byte FREQUENCY_DOWN_COMMAND = (byte) 0x5E;
+    public static final byte INDEX_NEXT_COMMAND = (byte) 0x58;
+    public static final byte INDEX_PREVIOUS_COMMAND = (byte) 0x57;
+    public static final byte ADD_FREQUENCY_COMMAND = (byte) 0x5D;
+    public static final byte DELETE_FREQUENCY_COMMAND = (byte) 0x5C;
+    public static final byte INTERVAL_ENDS = (byte) 0x8D;
 
     public static final byte GPS_VALID = 3;
     public static final byte GPS_FAILED = 2;

@@ -68,12 +68,12 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
         binding.includeMobileSettings.layoutScanRateSecondsMobile.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ValueDefaultsActivity.class);
             intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
-            intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanRate * 10));
+            intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanTime * 10));
             launcher.launch(intent);
         });
-        binding.includeMobileSettings.includeGpsOption.swGps.setOnCheckedChangeListener((compoundButton, b) -> {
+        binding.includeMobileSettings.swGps.setOnCheckedChangeListener((compoundButton, b) -> {
             if (isReadyToTemporary) {
-                binding.includeMobileSettings.includeGpsOption.swGps.setEnabled(false);
+                binding.includeMobileSettings.swGps.setEnabled(false);
                 setTemporary(ValueCodes.GPS_CODE);
             }
         });
@@ -174,8 +174,8 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
             binding.btnStartMobile.setEnabled(true);
             binding.btnStartMobile.setAlpha((float) 1);
         }
-        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(mobileDefaults.scanRate));
-        binding.includeMobileSettings.includeGpsOption.swGps.setChecked(mobileDefaults.gpsOn);
+        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.format("%.1f", mobileDefaults.scanTime));
+        binding.includeMobileSettings.swGps.setChecked(mobileDefaults.gpsOn);
         binding.includeMobileSettings.swMobileAutoRecord.setChecked(mobileDefaults.autoRecordOn);
         isReadyToTemporary = true;
     }
@@ -190,7 +190,7 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
                         binding.includeMobileSettings.tvTableNumberMobile.setText(String.valueOf(value));
                         setTemporary(ValueCodes.TABLE_NUMBER_CODE);
                     } else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) { // Gets the modified scan rate
-                        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(value * 0.1));
+                        binding.includeMobileSettings.tvScanRateSecondsMobile.setText(String.format("%.1f", value / 10.0));
                         setTemporary(ValueCodes.SCAN_RATE_MOBILE_CODE);
                     }
                 });
@@ -199,19 +199,19 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
     private void setTemporary(int type) {
         int info = (mobileDefaults.gpsOn ? 1 : 0) << 7;
         info = info | ((mobileDefaults.autoRecordOn ? 1 : 0) << 6);
-        byte[] b = new byte[]{(byte) 0x6F, (byte) mobileDefaults.tableNumber, (byte) info, (byte) ((int) (mobileDefaults.scanRate * 10))};
+        byte[] b = new byte[]{(byte) 0x6F, (byte) mobileDefaults.tableNumber, (byte) info, (byte) ((int) (mobileDefaults.scanTime * 10))};
         switch (type) {
             case ValueCodes.TABLE_NUMBER_CODE:
                 b[1] = (byte) Integer.parseInt(binding.includeMobileSettings.tvTableNumberMobile.getText().toString());
                 mobileDefaults.tableNumber = Integer.parseInt(binding.includeMobileSettings.tvTableNumberMobile.getText().toString());
                 break;
             case ValueCodes.SCAN_RATE_MOBILE_CODE:
-                b[3] = (byte) (Float.parseFloat(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString()) * 10);
-                mobileDefaults.scanRate = Double.parseDouble(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
+                b[3] = (byte) (Double.parseDouble(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString()) * 10);
+                mobileDefaults.scanTime = Double.parseDouble(binding.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
                 break;
             case ValueCodes.GPS_CODE:
-                b[2] = binding.includeMobileSettings.includeGpsOption.swGps.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x80) : (byte) (Byte.toUnsignedInt(b[2]) & 0x7F);
-                mobileDefaults.gpsOn = binding.includeMobileSettings.includeGpsOption.swGps.isChecked();
+                b[2] = binding.includeMobileSettings.swGps.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x80) : (byte) (Byte.toUnsignedInt(b[2]) & 0x7F);
+                mobileDefaults.gpsOn = binding.includeMobileSettings.swGps.isChecked();
                 break;
             case ValueCodes.AUTO_RECORD_CODE:
                 b[2] = binding.includeMobileSettings.swMobileAutoRecord.isChecked() ? (byte) (Byte.toUnsignedInt(b[2]) | 0x40) : (byte) (Byte.toUnsignedInt(b[2]) & 0xBF);
@@ -223,7 +223,7 @@ public class MobileSettingsFragment extends Fragment implements ReceiverCallback
             mobileDefaults = new MobileDefaults(mobileDefaults.originalBytes);
             downloadMobileDefault();
         }
-        binding.includeMobileSettings.includeGpsOption.swGps.setEnabled(true);
+        binding.includeMobileSettings.swGps.setEnabled(true);
         binding.includeMobileSettings.swMobileAutoRecord.setEnabled(true);
     }
 }

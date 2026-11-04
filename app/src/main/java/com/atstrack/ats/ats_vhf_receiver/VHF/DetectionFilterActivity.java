@@ -38,7 +38,7 @@ public class DetectionFilterActivity extends BaseActivity {
                         ((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.setText(String.valueOf(value));
                         break;
                     case ValueCodes.DATA_CALCULATION_TYPE_CODE:
-                        if (value == 0)
+                        if (value == ValueCodes.NONE)
                             ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(R.string.lbl_vhf_manual_option_none);
                         else if (value == ValueCodes.VARIABLE_TEMPERATURE)
                             ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(R.string.lbl_vhf_detection_temperature);
@@ -189,7 +189,7 @@ public class DetectionFilterActivity extends BaseActivity {
                     ((ActivityVhfDetectionFilterBinding) binding).tvMatchesForValidPattern.setText(String.valueOf(detectionFilter.matches));
                     ((ActivityVhfDetectionFilterBinding) binding).tvMaxPulseRate.setText(String.valueOf(detectionFilter.maxPulseRate));
                     ((ActivityVhfDetectionFilterBinding) binding).tvMinPulseRate.setText(String.valueOf(detectionFilter.minPulseRate));
-                    ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(detectionFilter.optionalData == 6 ? R.string.lbl_vhf_detection_temperature : R.string.lbl_vhf_manual_option_none);
+                    ((ActivityVhfDetectionFilterBinding) binding).tvOptionalData.setText(detectionFilter.optionalData == ValueCodes.VARIABLE_TEMPERATURE ? R.string.lbl_vhf_detection_temperature : R.string.lbl_vhf_manual_option_none);
                     break;
             }
             ((ActivityVhfDetectionFilterBinding) binding).btnSaveChangesDetection.setEnabled(false);

@@ -179,7 +179,7 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        TransferBleData.readPageNumber();
+        TransferBleData.writeResponse(new byte[] {ValueCodes.PAGE_NUMBER_COMMAND});
 
         pageNumber = 0;
         packetNumber = 1; // 9 data packages of 230 bytes
@@ -195,13 +195,11 @@ public class DownloadingDataFragment extends Fragment implements ReceiverCallbac
     }
 
     private void setStartDownload() {
-        byte[] b = new byte[]{(byte) 0x94};
-        TransferBleData.writeResponse(b);
+        TransferBleData.writeResponse(new byte[]{ValueCodes.START_DOWNLOAD_COMMAND});
     }
 
     private void setResponsePage(boolean isOk) {
-        byte[] b = new byte[]{isOk ? (byte) 0x95 : (byte) 0x96};
-        TransferBleData.writeResponse(b);
+        TransferBleData.writeResponse(new byte[]{isOk ? ValueCodes.PAGE_OK_COMMAND : ValueCodes.PAGE_BAD_COMMAND});
         Log.i("DownloadFragment", "----------------------------------Is Ok: " + isOk + " Page number: " + (isOk ? (pageNumber - 1) : pageNumber));
     }
 

@@ -1,21 +1,28 @@
 package com.atstrack.ats.ats_vhf_receiver.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.atstrack.ats.ats_vhf_receiver.BluetoothATS.TransferBleData;
+import com.atstrack.ats.ats_vhf_receiver.Interfaces.OnDialogCreatedListener;
 import com.atstrack.ats.ats_vhf_receiver.Interfaces.ReceiverCallback;
+import com.atstrack.ats.ats_vhf_receiver.Models.MobileDefaults;
+import com.atstrack.ats.ats_vhf_receiver.Models.StationaryDefaults;
 import com.atstrack.ats.ats_vhf_receiver.R;
 import com.atstrack.ats.ats_vhf_receiver.Utils.Converters;
+import com.atstrack.ats.ats_vhf_receiver.Utils.Dialogs;
 import com.atstrack.ats.ats_vhf_receiver.Utils.ValueCodes;
 import com.atstrack.ats.ats_vhf_receiver.VHF.ManualScanActivity;
 import com.atstrack.ats.ats_vhf_receiver.VHF.MobileScanActivity;
@@ -27,6 +34,7 @@ public class MenuScanFragment extends Fragment implements ReceiverCallback {
     private boolean isDetectionFilterEmpty;
     private boolean areTablesEmpty;
     private boolean isDefaultEmpty;
+    private boolean isDefaultCorrect;
     private byte[] detectionData;
     private byte[] tablesData;
     private byte[] defaultData;
@@ -45,8 +53,18 @@ public class MenuScanFragment extends Fragment implements ReceiverCallback {
             if (isDetectionFilterEmpty) {
                 showWarningMessage(ValueCodes.DETECTION_FILTER_COMMAND, detectionData);
             } else {
-                Intent intent = new Intent(requireContext(), ManualScanActivity.class);
-                startActivity(intent);
+                AlertDialog dialog = Dialogs.createTimeZoneWarningDialog(requireActivity());
+                if (getActivity() instanceof OnDialogCreatedListener) {
+                    ((OnDialogCreatedListener) getActivity()).onNewDialogAdded(dialog);
+                }
+                dialog.show();
+
+                Button btn_continue = dialog.findViewById(R.id.btn_continue);
+                btn_continue.setOnClickListener(v1 -> {
+                    dialog.dismiss();
+                    Intent intent = new Intent(requireContext(), ManualScanActivity.class);
+                    startActivity(intent);
+                });
             }
         });
         binding.btnStartMobileScan.setOnClickListener(v -> TransferBleData.readDefaults(true));
@@ -124,32 +142,62 @@ public class MenuScanFragment extends Fragment implements ReceiverCallback {
     private void downloadMobileDefaults(byte[] data) {
         defaultData = data;
         isDefaultEmpty = Converters.isDefaultEmpty(data);
+        if (!isDefaultEmpty) {
+            MobileDefaults mobileDefaults = new MobileDefaults(data);
+            isDefaultCorrect = mobileDefaults.isDataCorrect();
+        }
         if (isDetectionFilterEmpty) {
             showWarningMessage(ValueCodes.DETECTION_FILTER_COMMAND, detectionData);
         } else if (areTablesEmpty) {
             showWarningMessage(ValueCodes.TABLES_COMMAND, tablesData);
-        } else if (isDefaultEmpty) {
+        } else if (isDefaultEmpty || !isDefaultCorrect) {
             showWarningMessage(ValueCodes.MOBILE_DEFAULTS_COMMAND, defaultData);
         } else {
-            Intent intent = new Intent(requireContext(), MobileScanActivity.class);
-            intent.putExtra(ValueCodes.VALUE, data);
-            startActivity(intent);
+            AlertDialog dialog = Dialogs.createTimeZoneWarningDialog(requireActivity());
+            if (getActivity() instanceof OnDialogCreatedListener) {
+                ((OnDialogCreatedListener) getActivity()).onNewDialogAdded(dialog);
+            }
+            dialog.show();
+
+            Button btn_continue = dialog.findViewById(R.id.btn_continue);
+            btn_continue.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                Intent intent = new Intent(requireContext(), MobileScanActivity.class);
+                intent.putExtra(ValueCodes.VALUE, data);
+                startActivity(intent);
+            });
         }
     }
 
     private void downloadStationaryDefaults(byte[] data) {
         defaultData = data;
         isDefaultEmpty = Converters.isDefaultEmpty(data);
+        if (!isDefaultEmpty) {
+            SharedPreferences sharedPreferences = requireContext().getSharedPreferences(ValueCodes.DEFAULT_SETTING, 0);
+            int baseFrequency = sharedPreferences.getInt(ValueCodes.BASE_FREQUENCY, 0) * 1000;
+            StationaryDefaults stationaryDefaults = new StationaryDefaults(baseFrequency, data);
+            isDefaultCorrect = stationaryDefaults.isDataCorrect();
+        }
         if (isDetectionFilterEmpty) {
             showWarningMessage(ValueCodes.DETECTION_FILTER_COMMAND, detectionData);
         } else if (areTablesEmpty) {
             showWarningMessage(ValueCodes.TABLES_COMMAND, tablesData);
-        } else if (isDefaultEmpty) {
+        } else if (isDefaultEmpty || !isDefaultCorrect) {
             showWarningMessage(ValueCodes.STATIONARY_DEFAULTS_COMMAND, defaultData);
         } else {
-            Intent intent = new Intent(requireContext(), StationaryScanActivity.class);
-            intent.putExtra(ValueCodes.VALUE, data);
-            startActivity(intent);
+            AlertDialog dialog = Dialogs.createTimeZoneWarningDialog(requireActivity());
+            if (getActivity() instanceof OnDialogCreatedListener) {
+                ((OnDialogCreatedListener) getActivity()).onNewDialogAdded(dialog);
+            }
+            dialog.show();
+
+            Button btn_continue = dialog.findViewById(R.id.btn_continue);
+            btn_continue.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                Intent intent = new Intent(requireContext(), StationaryScanActivity.class);
+                intent.putExtra(ValueCodes.VALUE, data);
+                startActivity(intent);
+            });
         }
     }
 

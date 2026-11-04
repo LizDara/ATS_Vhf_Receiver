@@ -20,16 +20,20 @@ import com.atstrack.ats.ats_vhf_receiver.databinding.ActivityVhfMobileDefaultsBi
 
 public class MobileDefaultsActivity extends BaseActivity {
     private MobileDefaults mobileDefaults;
+    private MobileDefaults currentMobileDefaults;
     private boolean firstTime = true;
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (ValueCodes.CANCELLED == result.getResultCode())
                     return;
                 int value = result.getData().getIntExtra(ValueCodes.VALUE, 0);
-                if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) // Get the modified frequency table number
-                    ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.setText(String.valueOf(value));
-                else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) // Get the modified scan rate
-                    ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(value * 0.1));
+                if (ValueCodes.TABLE_NUMBER_CODE == result.getResultCode()) { // Get the modified frequency table number
+                    currentMobileDefaults.tableNumber = value;
+                    ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.setText(String.valueOf(currentMobileDefaults.tableNumber));
+                } else if (ValueCodes.SCAN_RATE_MOBILE_CODE == result.getResultCode()) { // Get the modified scan rate
+                    currentMobileDefaults.scanTime = value * 0.1;
+                    ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(String.format("%.1f", currentMobileDefaults.scanTime));
+                }
                 boolean changed = existChanges();
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setEnabled(changed);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setAlpha(changed ? (float) 1 : (float) 0.6);
@@ -39,12 +43,9 @@ public class MobileDefaultsActivity extends BaseActivity {
      * Writes the modified aerial defaults data by the user.
      */
     private void setMobileDefaults() {
-        int info = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.isChecked() ? 1 : 0) << 7;
-        info = info | ((((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.isChecked() ? 1 : 0) << 6);
-        float scanRate = Float.parseFloat(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
-        int frequencyTableNumber = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString().equals(getString(R.string.lbl_vhf_manual_option_none))) ? 0 :
-                Integer.parseInt(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString());
-        byte[] b = new byte[] {(byte) 0x4D, (byte) frequencyTableNumber, (byte) info, (byte) (scanRate * 10), 0, 0, 0, 0};
+        int info = (currentMobileDefaults.gpsOn ? 1 : 0) << 7;
+        info = info | ((currentMobileDefaults.autoRecordOn ? 1 : 0) << 6);
+        byte[] b = new byte[] {(byte) 0x4D, (byte) currentMobileDefaults.tableNumber, (byte) info, (byte) (currentMobileDefaults.scanTime * 10), 0, 0, 0, 0};
         boolean result = TransferBleData.writeDefaults(true, b);
         if (result)
             finish();
@@ -67,11 +68,12 @@ public class MobileDefaultsActivity extends BaseActivity {
         ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.layoutScanRateSecondsMobile.setOnClickListener(v -> {
             Intent intent = new Intent(this, ValueDefaultsActivity.class);
             intent.putExtra(ValueCodes.TYPE, ValueCodes.SCAN_RATE_MOBILE_CODE);
-            intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanRate * 10));
+            intent.putExtra(ValueCodes.VALUE, (int)(mobileDefaults.scanTime * 10));
             launcher.launch(intent);
         });
-        ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.setOnCheckedChangeListener((compoundButton, b) -> {
+        ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swGps.setOnCheckedChangeListener((compoundButton, b) -> {
             if (!firstTime) {
+                currentMobileDefaults.gpsOn = b;
                 boolean changed = existChanges();
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setEnabled(changed);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setAlpha(changed ? (float) 1 : (float) 0.6);
@@ -79,15 +81,18 @@ public class MobileDefaultsActivity extends BaseActivity {
         });
         ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.setOnCheckedChangeListener((compoundButton, b) -> {
             if (!firstTime) {
+                currentMobileDefaults.autoRecordOn = b;
                 boolean changed = existChanges();
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setEnabled(changed);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setAlpha(changed ? (float) 1 : (float) 0.6);
             }
         });
         ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setOnClickListener(v -> {
-            if (!existNotSet()) {
-                if (existChanges())
-                    setMobileDefaults();
+            if (!currentMobileDefaults.existNotSet()) {
+                if (existChanges()) {
+                    if (currentMobileDefaults.isDataCorrect())
+                        setMobileDefaults();
+                }
             } else {
                 AlertDialog dialog = Dialogs.createAlertDialog(this, "Error", "Complete all fields.", false);
                 dialogList.add(dialog);
@@ -125,16 +130,18 @@ public class MobileDefaultsActivity extends BaseActivity {
         if (data[0] == ValueCodes.MOBILE_DEFAULTS_COMMAND) {
             if (!Converters.isDefaultEmpty(data)) {
                 mobileDefaults = new MobileDefaults(data);
+                currentMobileDefaults = new MobileDefaults(data);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.setText(
                         (mobileDefaults.tableNumber == 0) ? getString(R.string.lbl_vhf_manual_option_none) : String.valueOf(Byte.toUnsignedInt(data[1])));
-                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(String.valueOf(mobileDefaults.scanRate));
-                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.setChecked(mobileDefaults.gpsOn);
+                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(String.format("%.1f", mobileDefaults.scanTime));
+                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swGps.setChecked(mobileDefaults.gpsOn);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.setChecked(mobileDefaults.autoRecordOn);
             } else {
                 mobileDefaults = new MobileDefaults();
+                currentMobileDefaults = new MobileDefaults();
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.setText(R.string.lbl_vhf_config_not_set);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.setText(R.string.lbl_vhf_config_not_set);
-                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.setChecked(true);
+                ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swGps.setChecked(true);
                 ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.setChecked(true);
             }
             ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.btnStartMobile.setEnabled(false);
@@ -143,23 +150,12 @@ public class MobileDefaultsActivity extends BaseActivity {
         }
     }
 
-    private boolean existNotSet() {
-        if (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set)))
-            return true;
-        return ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.getText().toString().equals(getString(R.string.lbl_vhf_config_not_set));
-    }
-
     /**
      * Checks for changes to the default data.
      * @return Returns true, if there are changes.
      */
     private boolean existChanges() {
-        int tableNumber = (((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString().equals("Not Set")) ? 0 :
-                Integer.parseInt(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvTableNumberMobile.getText().toString());
-        double scanRate = ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.getText().toString().equals("Not Set") ? 0 :
-                Double.parseDouble(((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.tvScanRateSecondsMobile.getText().toString());
-
-        return mobileDefaults.tableNumber != tableNumber || mobileDefaults.gpsOn != ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.includeGpsOption.swGps.isChecked()
-                || mobileDefaults.autoRecordOn != ((ActivityVhfMobileDefaultsBinding) binding).fragmentMobileSettings.includeMobileSettings.swMobileAutoRecord.isChecked() || mobileDefaults.scanRate != scanRate;
+        return mobileDefaults.tableNumber != currentMobileDefaults.tableNumber || mobileDefaults.gpsOn != currentMobileDefaults.gpsOn
+                || mobileDefaults.autoRecordOn != currentMobileDefaults.autoRecordOn || mobileDefaults.scanTime != currentMobileDefaults.scanTime;
     }
 }

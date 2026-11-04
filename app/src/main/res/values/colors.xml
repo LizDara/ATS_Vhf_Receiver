@@ -25,6 +25,7 @@
     <color name="yellow_500">#EAB308</color>
     <color name="orange_500">#F97316</color>
     <color name="green_500">#22C55E</color>
+    <color name="red_50">#FEF2F2</color>
     <color name="boston_blue">#3994C1</color>
     <color name="transparent">#00000000</color>
 </resources>

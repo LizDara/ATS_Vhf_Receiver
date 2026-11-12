@@ -32,7 +32,7 @@ public class PulseRateValuesFragment extends Fragment {
         @Override
         public void afterTextChanged(Editable editable) {
             int pulseRate = (binding.etPulseRate.getText().toString().isEmpty()) ? 0 : Integer.parseInt(binding.etPulseRate.getText().toString());
-            int tolerance = binding.spPulseRateTolerance.getSelectedItemPosition() + 4;
+            int tolerance = binding.spPulseRateTolerance.getSelectedItemPosition() + 1;
             value = (pulseRate * 100) + tolerance;
             if (getActivity() instanceof ValueDetectionFilterActivity)
                 ((ValueDetectionFilterActivity) getActivity()).value = value;

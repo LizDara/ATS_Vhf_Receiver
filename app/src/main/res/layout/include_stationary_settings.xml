@@ -11,51 +11,6 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/layout_scan_timeout_seconds_stationary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="16sp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/body_small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:text="@string/lbl_vhf_defaults_stationary_timeout"
-                android:textColor="@color/limed_spruce" />
-
-            <TextView
-                android:id="@+id/tv_scan_timeout_seconds_stationary"
-                style="@style/body_regular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ebony_clay" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/img_timeout_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_next" />
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray" />
-
-    <LinearLayout
         android:id="@+id/layout_scan_rate_seconds_stationary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,6 +44,51 @@
 
         <ImageView
             android:id="@+id/img_scan_time_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_next" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_gray" />
+
+    <LinearLayout
+        android:id="@+id/layout_scan_timeout_seconds_stationary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16sp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/body_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:text="@string/lbl_vhf_defaults_stationary_timeout"
+                android:textColor="@color/limed_spruce" />
+
+            <TextView
+                android:id="@+id/tv_scan_timeout_seconds_stationary"
+                style="@style/body_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ebony_clay" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_timeout_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_next" />

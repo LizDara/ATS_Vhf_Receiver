@@ -311,7 +311,7 @@ public class Converters {
     public static synchronized String[] getPackageProcessed(ArrayList<byte[]> data, View process_percent, BaseActivity baseActivity, boolean isRawFile) {
         StringBuilder text = new StringBuilder();
         StringBuilder metrics = new StringBuilder();
-        byte scanType = 0;
+        byte scanType = ValueCodes.SCAN_STOP_COMMAND;
         byte detectionType = 0;
         int baseFrequency = 0;
         int frequency = 0;
@@ -354,8 +354,8 @@ public class Converters {
                                 metrics.append("Scan Interval (seconds): ").append(Byte.toUnsignedInt(packet[index + 3])).append(ValueCodes.CR).append(ValueCodes.LF);
                                 text.append("Scan Wait Timeout (seconds): ").append(Byte.toUnsignedInt(packet[index + 4])).append(ValueCodes.CR).append(ValueCodes.LF);
                                 metrics.append("Scan Wait Timeout (seconds): ").append(Byte.toUnsignedInt(packet[index + 4])).append(ValueCodes.CR).append(ValueCodes.LF);
-                                text.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1]) + 1).append(ValueCodes.CR).append(ValueCodes.LF);
-                                metrics.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1]) + 1).append(ValueCodes.CR).append(ValueCodes.LF);
+                                text.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1])).append(ValueCodes.CR).append(ValueCodes.LF);
+                                metrics.append("Num of Antennas: ").append(Byte.toUnsignedInt(packet[index + 1])).append(ValueCodes.CR).append(ValueCodes.LF);
                                 text.append("Store Interval (minutes): ").append(packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))).append(ValueCodes.CR).append(ValueCodes.LF);
                                 metrics.append("Store Interval (minutes): ").append(packet[index + 5] == ValueCodes.NONE ? "Continuous" : String.valueOf(Byte.toUnsignedInt(packet[index + 5]))).append(ValueCodes.CR).append(ValueCodes.LF);
                                 int referenceFrequency = (packet[index + 9] != ValueCodes.NULL || packet[index + 10] != ValueCodes.NULL) ? (Byte.toUnsignedInt(packet[index + 9]) * 256) + Byte.toUnsignedInt(packet[index + 10]) + baseFrequency : Byte.toUnsignedInt(ValueCodes.NULL);
@@ -442,7 +442,7 @@ public class Converters {
                                 detectionType = packet[index + 8] == ValueCodes.SCAN_MANUAL_CODED_COMMAND ? ValueCodes.CODED : ValueCodes.NONE;
                                 String detection = detectionType == ValueCodes.CODED ? "Coded" : "Non Coded";
                                 gmt = (Byte.toUnsignedInt(packet[index + 1]) >> 2) - 12;
-                                if (scanType != ValueCodes.MANUAL_SCAN_COMMAND) {
+                                if (scanType == ValueCodes.SCAN_STOP_COMMAND) {
                                     text.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
                                     metrics.append("[Header]" + ValueCodes.CR + ValueCodes.LF);
                                     text.append("Serial: ").append(serial).append(ValueCodes.CR).append(ValueCodes.LF);
@@ -459,15 +459,17 @@ public class Converters {
                                 break;
                             }
                         }
+                        if (scanType == ValueCodes.SCAN_STOP_COMMAND) {
+                            text.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
+                            metrics.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
+                            text.append(detectionType == ValueCodes.CODED ?
+                                    "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
+                                    "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PulseRate, PeriodLo, PulseRate, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
+                            metrics.append(detectionType == ValueCodes.CODED ?
+                                    "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
+                                    "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PulseRate, PeriodLo, PulseRate, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
+                        }
                         scanType = format;
-                        text.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
-                        metrics.append("[Data]" + ValueCodes.CR + ValueCodes.LF);
-                        text.append(detectionType == ValueCodes.CODED ?
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PulseRate, PeriodLo, PulseRate, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
-                        metrics.append(detectionType == ValueCodes.CODED ?
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, Code, Mort, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum" :
-                                "Year, JulianDay, Hour, Min, Sec, Ant, Index, Freq, SS, PeriodHi, PulseRate, PeriodLo, PulseRate, NumDet, Lat, Long, GpsTimestamp, Date, SessionNum").append(ValueCodes.CR).append(ValueCodes.LF);
                         break;
                     case ValueCodes.SCAN_HEADER_COMMAND:
                         if (process_percent != null) {
@@ -487,6 +489,8 @@ public class Converters {
                             antenna = Byte.toUnsignedInt(packet[index + 1]) >> 7;
                             if (antenna == 0)
                                 antenna = (Byte.toUnsignedInt(packet[index + 7]) >> 6) + 1;
+                            else
+                                antenna = 0;
                         }
                         date = Byte.toUnsignedInt(packet[index + 4]) << 16 | Byte.toUnsignedInt(packet[index + 5]) << 8 | Byte.toUnsignedInt(packet[index + 6]);
                         mm = date % 100;
@@ -668,6 +672,7 @@ public class Converters {
                         sessionNumber++;
                         index += 8;
                         byteIndex += 8;
+                        scanType = ValueCodes.SCAN_STOP_COMMAND;
                         break;
                     default: // METRICS
                         if (format == ValueCodes.TIMESTAMP_COMMAND) {
